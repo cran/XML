@@ -1,3 +1,18 @@
+Version 0.95-6
+ 
+  *  Documentation updates for synchronization with the code.
+
+Version 0.95-5
+
+  *  Trivial bug of including extra arguments in call to UseMethod for
+     dtdElementValidEntry that generated warnings.
+
+Version 0.95-4
+
+  *  Configuration now tries to find libxml 1, then libxml 2 unless explicitly
+     instructed to find libxml 2 via --with-libxml2. So the change is to pick
+     up libxml 2 if libxml 1 is not found rather than signal an error.
+
 Version 0.95-3
 
   *  Remove the need to define xmlParserError. Instead, set the value of the error

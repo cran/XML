@@ -12,7 +12,7 @@ node objects.
 
 }
 \usage{
-xmlOutputBuffer(dtd=NULL, nameSpace=NULL, buf=NULL,
+xmlOutputBuffer(dtd=NULL, nameSpace="", buf=NULL,
                  nsURI=NULL, header="<?xml version=\"1.0\"?>")
 
 xmlOutputDOM(tag="doc", attrs = NULL, dtd=NULL,

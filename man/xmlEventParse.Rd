@@ -15,7 +15,7 @@
  standard callback names.
 }
 \usage{
-xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks = FALSE, addContext=TRUE,
+xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext=TRUE,
                useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
                 state = NULL, replaceEntities = TRUE)
 }
@@ -163,7 +163,7 @@ to connect to remote servers.
   # Parse the text rather than a file or URL by reading the URL's contents
   # and making it a single string. Then call xmlEventParse
 xmlURL <- "http://www.omegahat.org/Scripts/Data/mtcars.xml"
-xmlText <- paste(scan.url(xmlURL, what="",sep="\n"),"\n",collapse="\n")
+xmlText <- paste(scan(xmlURL, what="",sep="\n"),"\n",collapse="\n")
 xmlEventParse(xmlText, asText=TRUE)
 }
 

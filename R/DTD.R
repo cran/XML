@@ -36,7 +36,7 @@ function(name, within, dtd, pos=NULL)
 dtdElementValidEntry <-
 function(element, name, pos=NULL)
 {
- UseMethod("dtdElementValidEntry", element, name, pos)
+ UseMethod("dtdElementValidEntry", element) # , name, pos)
 }
 
 dtdElementValidEntry.XMLElementDef <-

@@ -14,7 +14,7 @@ a name, a list of names, an element of enumerated set,
 a notation entity.
 }
 \usage{
-xmlAttributeType(def, defaultType=F)
+xmlAttributeType(def, defaultType=FALSE)
 }
 \arguments{
   \item{def}{the attribute definition object, usually retrieved from

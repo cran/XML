@@ -10,7 +10,7 @@
 }
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=FALSE,
+              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
                isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
@@ -70,7 +70,7 @@ return type.
   data source is a URL by using \code{\link{grep}}
   to look for http or ftp at the start of the string.
   The libxml parser handles the connection to servers,
-  not the R facilities (e.g. \code{\link{scan.url}}).
+  not the R facilities (e.g. \code{\link{scan}}).
  }
  \item{asTree}{this only applies when on passes a value for
    the  \code{handlers} argument and is used then to determine
