@@ -1,3 +1,14 @@
+
+Version 0.95-0
+
+  *  Event-driven parsing (SAX) can take a connection object or a function
+     that is called when the parser needs more input. See the documentation 
+     for xmlEventParse().
+
+  *  Classes and methods explicitly created during the installation.
+     This will cause problems with namespaces until the saving of the image
+     model works with namespaces.
+
 Version 0.94-1
 
   *   Minor change to configuration script to avoid -L-L in specification of

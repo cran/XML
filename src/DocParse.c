@@ -650,12 +650,8 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
   int n = 0, i;
 
       /* Count the number of attributes*/
-#ifdef LIBXML2
     atts = node->properties;
-    /*   atts = node->children; */
-#else
-    atts = node->properties;
-#endif
+
     while(atts) {
       n++;
       atts = atts->next;
@@ -668,12 +664,9 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
             and the elements of the name vector.
           */
 
-#ifdef LIBXML2
-    /*      atts = node->children; */
+
       atts = node->properties;
-#else
-      atts = node->properties;
-#endif
+
       for(i=0; i < n ; i++) {
 	/* Have to be careful that atts->val and atts->val->context are non-null. Something like
            <a href=""> kills it otherwise.

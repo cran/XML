@@ -20,12 +20,43 @@ xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks = FALSE, addContext=TRUE
                 state = NULL, replaceEntities = TRUE)
 }
 \arguments{
- \item{file}{ string identifying the file that is interpreted
-  using the internal expansion mechanism so it can contain \~
-and other environment variables.
-As with \code{\link{xmlTreeParse}}, if \code{useExpat}
-is false, this can be a URL (http or ftp) or a compressed file,
-as well as a regular local file.
+  \item{file}{the source of the XML content.
+    This can be a string givinging the name of a file or remote URL,
+    the XML itself, a connection object, or a function.
+    If this is a string, and \code{asText} is \code{TRUE},
+    the value is the XML content.
+    This allows one to read the content separately from parsing
+    without having to write it to a file.
+    If \code{asText} is \code{FALSE} and a string is passed
+    for \code{file}, this is taken as the name of a
+    file or remote URI. If one is using the libxml parser (i.e. not expat),
+    this can be a URI accessed via HTTP or FTP or a compressed local file.
+    If it is the name of a local file,
+    it can include \code{~}, environment variables, etc. which will be expanded by R.
+    (Note this is not the case in S-Plus, as far as I know.)
+
+    If a connection is given, the parser incrementally reads one line at
+    a time by calling the function \code{\link[base]{readLines}} with
+    the connection as the first argument (and \code{1} as the number of
+    lines to read).  The parser calls this function each time it needs
+    more input.
+
+    If invoking the \code{readLines} function to get each line is
+    excessively slow, one can provide a function as the value
+    of \code{fileName}. Again, when the XML parser needs more content
+    to process, it invokes this function to get a string.
+    This function is called with a single argument, the maximum size
+    of the string that can be returned.
+    The function is responsible for accessing the correct connection(s),
+    etc. which is typically done via lexical scoping/environments.
+    This mechanism allows the user to control how the XML content
+    is retrieved in very general ways. For example, one might
+    read from a set of files, starting one when the contents
+    of the previous file have been consumed. This allows for the
+    use of hybrid connection objects.
+
+    Support for connections and functions in this form is only
+    provided if one is using libxml2 and not libxml version 1.
 }
  \item{handlers}{ a closure object that contains  functions which will be invoked
 as the XML components in the document are encountered by the parser. 
@@ -144,6 +175,57 @@ zz <- xmlEventParse(f,
                                                      print(.state)
                                                      .state}), state = 0)
 print(zz)
+
+
+
+if(libxmlVersion()$major >= 2) {
+
+
+ startElement = function(x, ...) cat(x, "\n")
+
+
+ xmlEventParse(file(f), handlers = list(startElement = startElement))
+
+
+ xmlConnection = 
+  function(con) {
+
+   if(is.character(con))
+     con = file(con, "r")
+  
+   if(isOpen(con, "r"))
+     open(con, "r")
+
+   function(len) {
+
+     if(len < 0) {
+        close(con)
+        return(character(0))
+     }
+
+      x = character(0)
+      tmp = ""
+    while(length(tmp) > 0 && nchar(tmp) == 0) {
+      tmp = readLines(con, 1)
+      if(length(tmp) == 0)
+        break
+      if(nchar(tmp) == 0)
+        x = append(x, "\n")
+      else
+        x = tmp
+    }
+    if(length(tmp) == 0)
+      return(tmp)
+  
+    x = paste(x, collapse="")
+    print(x)
+    x
+  }
+ }
+
+ ff = xmlConnection(f)
+ xmlEventParse(ff, handlers = list(startElement = startElement))
+}
 }
 \keyword{file}
 \keyword{IO}

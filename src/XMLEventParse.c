@@ -38,14 +38,148 @@ void RS_XML(errorHandler)(void *ctx, const char *msg, ...);
 void RS_XML(fatalErrorHandler)(void *ctx, const char *msg, ...);
 
 
+#ifdef  NEED_CLOSE_CALLBACK
+/* Is this actually needed? We can ensure that all errors
+   are caught by R and so ensure that we close things.
+*/
+int
+RS_XML_closeConnectionInput(void *context)
+{
+   int status;
+   status = RS_XML_readConnectionInput(context, NULL, -1);
+
+   return(1);
+}
+#endif
+
+int
+RS_XML_readConnectionInput(void *context, char *buffer, int len)
+{
+  SEXP e, tmp, arg;
+  int n;
+  int errorOccurred;
+  char *str;
+  int left = len-1, count;
+
+#ifdef R_XML_DEBUG
+  char *orig = buffer;
+#endif
+
+  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) context;
+
+  if(isFunction(ctx->_private)) {
+     /* Invoke the user-provided function to get the 
+        next line. */
+    PROTECT(e = allocVector(LANGSXP, 2));
+    SETCAR(e, ctx->_private);
+    arg = NEW_INTEGER(1);
+    INTEGER_DATA(arg)[0] = len;
+    SETCAR(CDR(e), arg);
+  } else {
+       /* Call readLines on the connection to get the next line. */
+    PROTECT(e = allocVector(LANGSXP, buffer ? 3 : 2));
+    SETCAR(e, install(buffer ? "readLines" : "close"));
+    SETCAR(CDR(e), ctx->_private);
+    if(buffer) {
+      tmp = NEW_INTEGER(1);
+      INTEGER_DATA(tmp)[0] = 1;
+      SETCAR(CDR(CDR(e)), tmp);
+    }
+  }
+
+  n = count = 0;
+  while(n == 0 && left > 0) {
+   str = NULL;
+
+     /* Update the argument to the user-defined function to say how much is left. */
+   if(isFunction(ctx->_private))
+     INTEGER_DATA(arg)[0] = left;
+
+   tmp = R_tryEval(e, R_GlobalEnv, &errorOccurred);
+
+   if(errorOccurred || !IS_CHARACTER(tmp)) {
+     UNPROTECT(1);
+     if ((ctx->sax != NULL) && (ctx->sax->error != NULL))
+       ctx->sax->error(ctx->userData, "Failed to call read on XML connection");
+    /* throw an XML error. */
+     return;
+   }
+
+   if(GET_LENGTH(tmp)) {
+    str = CHAR_DEREF(STRING_ELT(tmp, 0));
+    n = strlen(str);
+    if(n == 0) {
+       buffer[0] = '\n';
+       buffer++;
+       count++;
+       left--;
+    } else {
+      if(n > left) {
+        PROBLEM "string read from XML connection too long for buffer: truncating %s to %d characters", str, left
+	WARN;
+      }
+      strncpy(buffer, str, left);
+      left -= n;
+
+      /* should add the \n that R took off via readLines. */
+      if(left > 0) {
+          buffer[n] = '\n';
+	  left--;
+      }
+      count += (n + 1);
+
+    }
+   } else {
+     /* Notice that we may have actually added something to the 
+        buffer, specifically a sequence of empty lines \n, 
+        and these will be discarded and not passed to the XML parser
+        but these are extraneous anyway.
+      */
+    n = count = 0;
+    break;
+   }
+  }
+
+#ifdef R_XML_DEBUG
+  fprintf(stderr, "size (n=%d, count=%d) %s '%s'\n", n, count, str, orig);fflush(stderr);
+#endif
+
+  UNPROTECT(1);
+
+  return(count);
+//  return(count == 0 ? -1 : count);
+}
+
+xmlParserCtxtPtr
+RS_XML_xmlCreateConnectionParserCtxt(USER_OBJECT_ con)
+{
+      xmlParserInputBufferPtr buf;
+      xmlParserCtxtPtr ctx = NULL;
+
+#ifdef LIBXML2
+      ctx = xmlNewParserCtxt();
+      ctx->_private = (USER_OBJECT_) con;
+      buf = (xmlParserInputBufferPtr) R_chk_calloc(1, sizeof(xmlParserInputBuffer));
+      buf->readcallback = RS_XML_readConnectionInput;
+      buf->context = (void*) ctx;
+      buf->buffer = xmlBufferCreate();
+      buf->raw = NULL; /* buf->buffer; */
+
+      ctx->input = xmlNewIOInputStream(ctx, buf, XML_CHAR_ENCODING_NONE);
+
+      inputPush(ctx, ctx->input);
+#endif
+      return(ctx);
+}
+
 void
-RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText)
+RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText)
 {
  extern int xmlDoValidityCheckingDefaultValue;
  int oldValiditySetting;
  xmlSAXHandlerPtr xmlParserHandler;
  
- xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) calloc(1, sizeof(xmlParserCtxtPtr));
+ xmlParserCtxtPtr ctx; /* = (xmlParserCtxtPtr) calloc(1, sizeof(xmlParserCtxtPtr)); XXX */
 
 #ifdef HAVE_VALIDITY
       oldValiditySetting = xmlDoValidityCheckingDefaultValue;
@@ -61,10 +195,20 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int
   RS_XML(initXMLParserHandler)(xmlParserHandler);
 
 
- if(asText)
-  ctx = xmlCreateDocParserCtxt((char *)fileName);
- else
-  ctx = xmlCreateFileParserCtxt(fileName);
+  switch(asText) {
+    case RS_XML_TEXT:
+      ctx = xmlCreateDocParserCtxt((char *)fileName);
+      break;
+
+    case RS_XML_FILENAME:
+      ctx = xmlCreateFileParserCtxt(fileName);
+      break;
+
+    case RS_XML_CONNECTION:
+      ctx = RS_XML_xmlCreateConnectionParserCtxt((USER_OBJECT_) fileName);
+/* Need to inputPush(ctx, xmlParserInputPtr) */
+      break;
+  }
 
 #ifdef HAVE_VALIDITY
     xmlDoValidityCheckingDefaultValue = oldValiditySetting ;

@@ -27,6 +27,25 @@ static void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
 
 extern void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText);
 
+typedef Rboolean Sboolean;
+
+Sboolean
+IsConnection(USER_OBJECT_ obj)
+{
+   int i;
+   USER_OBJECT_ k = GET_CLASS(obj);
+   if(GET_LENGTH(k) == 0)
+     return(FALSE);
+
+   for(i = 0; i < GET_LENGTH(k); i++) {
+      if(strcmp("connection", CHAR_DEREF(STRING_ELT(k, i))) == 0)
+	return(TRUE);
+   }
+
+   return(FALSE);
+}
+
+
 USER_OBJECT_ 
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
@@ -37,11 +56,15 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   FILE *file = NULL;
   int expat = 0;
 #endif
-  char *name;
-  int asTextBuffer;
+  char *name, *input;
+  RS_XML_ContentSourceType asTextBuffer;
   RS_XMLParserData *parserData;
+  USER_OBJECT_ ans;
 
-  asTextBuffer = LOGICAL_DATA(asText)[0];
+  if(IsConnection(fileName) || isFunction(fileName))
+     asTextBuffer = RS_XML_CONNECTION;
+  else 
+     asTextBuffer = LOGICAL_DATA(asText)[0] ? RS_XML_TEXT : RS_XML_FILENAME;
 
 #ifdef LIBEXPAT
    expat = LOGICAL_DATA(useExpat)[0];
@@ -59,7 +82,15 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
 
   } else
 #endif /* ifdef LIBEXPAT */
-  name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
+
+
+  if(asTextBuffer == RS_XML_CONNECTION) {
+    name = strdup("<connection>");
+    input = (char *)fileName;/*XXX*/
+  } else {
+    name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
+    input = name;
+  }
 
   parserData = RS_XML(createParserData)(handlers);
   parserData->fileName         = name; 
@@ -88,14 +119,18 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
       xmlSubstituteEntitiesDefault(1);   
 
 
-   RS_XML(libXMLEventParse)(name, parserData, asTextBuffer);
+  RS_XML(libXMLEventParse)(input, parserData, asTextBuffer);
 
-  free(parserData);
+
+  ans = parserData->stateObject ? parserData->stateObject : handlers;
+  free(parserData->fileName);
 
   if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
      R_ReleaseObject(parserData->stateObject);
 
-  return(parserData->stateObject ? parserData->stateObject : handlers);
+  free(parserData);
+
+  return(ans);
 }
 
 

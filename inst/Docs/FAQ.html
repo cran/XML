@@ -1,12 +1,42 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html> <head>
-<title></title>
+<html>
+<head>
+<title>FAQ for the XML package in R/S-Plus</title>
 </head>
 
 <body>
-<h1></h1>
+<h1>FAQ for the XML package in R/S-Plus</h1>
 
 <dl>
+
+  <dt>
+  <li> My XML document has attributes that have a namespace
+      prefix (e.g.
+<code>
+<b>&lt;node mine:foo="abc" /&gt;</b>
+</code>
+      )
+      When I parse this document into S, the namespace prefix
+      on the attribute is dropped. Why and how can I fix it?
+      
+  <dd>
+     The first thing to do is
+     use a value of <code>TRUE</code> for the <code>addAttributeNamespaces</code>
+     argument in the call to <code>xmlTreeParse</code>.
+     <br>
+     The next thing is to ensure that the namespace
+      (<code>mine</code>, in our example)
+     is defined in the document.
+      In other words, there must be be an
+       <code>xmlns:mine="<i>some url</i>"</code>
+      attribute in some node before or in the node
+      that is being processed.
+      If no definition for the namespace is in the document,
+      the libxml parser drops the prefix on the attribute.
+      <br>
+     The same applies to namespaces for node names, and not just
+      attributes.
+  
+  
   <dt>
   <li> <font class="question">I define a method in the closure, but it
       never gets called.</font>
@@ -32,7 +62,7 @@
   <dd> This is because the XML libraries work on unsigned characters
       for UniCode. The R and S facilities do not.
       I am not yet certain which direction to adapt things for this
-      package. The warnings are harmless.
+      package. The warnings are typically harmless.
 
   <dt>
   <li> <font class="question">When I compile the chapter for
@@ -53,47 +83,14 @@
 
 
 <dl>
-  <dt>
-  <li> <font class="question">I get errors when using parameter
-      entities in DTDs?</font>
-  <dd>
-This was true in version 1.7.3 and 1.8.2 of
-libxml. Thanks to Daneil Veillard for fixing
-      this quickly when I pointed it out.
 
-<p>
-
-      Parameters are allowed, but the libxml parsing library is fussy
-      about white-space, etc.
-      The following is is ok
-<pre>
-<!ELEMENT legend  (%PlotPrimitives;)* >
-</pre>
-      but 
-<pre>
-<!ELEMENT legend  (%PlotPrimitives; )* >
-</pre>
-      is not. The extra space preceeding the <code>)</code>
-causes an error in the parser something like
-<pre>
-1: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' '|' or ')' expected 
-2: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' expected 
-3: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementDecl: expected '>' at the end 
-4: XML Parsing Error: ../Histogram.dtd:80: Extra content at the end of the document 
-</pre>
-
-       This can be fixed by adding a call to SKIP_BLANKS at the end of
-      the loop <code>while(CUR!= ')' { ... } </code> in  the routine
-      <code>xmlParseElementChildrenContentDecl()</code> in parser.c
-      The problem lies in the transition between the different input
-      buffers introduced by the entity expansion.
 
   <dt>
   <li><font class="question">I can't seem to use conditional DTD
       segments via the IGNORE/INCLUDE mechanism.</font>
   <dd> Libxml doesn't support this. Perhaps we will add code for this.
 <p>
-Daneil Veillard might add this.      
+  Daneil Veillard might add this.      
 
 
   <dt>
@@ -113,12 +110,50 @@ Daneil Veillard might add this.
       trees.
        (They are functional languages and have no facilities for
       pointers or references as in C or Java.)
+
+
+
+  <dt>
+  <li> <font class="question">I get errors when using parameter
+      entities in DTDs?</font>
+  <dd>
+This was true in version 1.7.3 and 1.8.2 of
+libxml. Thanks to Daneil Veillard for fixing
+      this quickly when I pointed it out.
+
+<p>
+
+      Parameters are allowed, but the libxml parsing library is fussy
+      about white-space, etc.
+      The following is is ok
+<pre>
+&lt;!ELEMENT legend  (%PlotPrimitives;)* &gt;
+</pre>
+      but 
+<pre>
+&lt;!ELEMENT legend  (%PlotPrimitives; )* &gt;
+</pre>
+      is not. The extra space preceeding the <code>)</code>
+causes an error in the parser something like
+<pre>
+1: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' '|' or ')' expected 
+2: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' expected 
+3: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementDecl: expected '>' at the end 
+4: XML Parsing Error: ../Histogram.dtd:80: Extra content at the end of the document 
+</pre>
+
+       This can be fixed by adding a call to SKIP_BLANKS at the end of
+      the loop <code>while(CUR!= ')' { ... } </code> in  the routine
+      <code>xmlParseElementChildrenContentDecl()</code> in parser.c
+      The problem lies in the transition between the different input
+      buffers introduced by the entity expansion.      
       
 </dl>
 
 <hr>
-<address></address>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Tue Jan 18 08:22:27 EST 2000
+Last modified: Tue Aug 19 10:50:20 EDT 2003
 <!-- hhmts end -->
 </body> </html>
