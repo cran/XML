@@ -40,13 +40,13 @@ xmlName <-
 #
 #
 #
-function(node)
+function(node, full = FALSE)
 {
   UseMethod("xmlName", node)
 }
 
 xmlName.XMLComment <-
-function(node) {
+function(node, full = FALSE) {
  return("comment")
 }
 
@@ -54,9 +54,14 @@ xmlName.XMLNode <-
 #
 # Get the XML tag name of an XMLNode object
 #
-function(node)
+function(node, full = FALSE)
 {
-  node$name
+  if(full && !is.null(node$namespace)) {
+    tmp <- ifelse(is.character(node$namespace), node$namespace, node$namespace$id)
+    paste(tmp, node$name, sep=":")
+  }
+  else
+    node$name
 }
 
 xmlAttrs <-
@@ -177,14 +182,23 @@ function(x, ..., indent = "")
  } else 
    tmp <- ""
 
- cat(indent, paste("<",xmlName(x),ifelse(!is.null(xmlAttrs(x))," ",""),tmp,">\n", sep=""))
+ if(!is.null(x$namespaceDefinitions)) {
+   ns <- paste(sapply(x$namespaceDefinitions, function(x) paste("xmlns:", x$id, "=",  x$uri,sep="")), collapse=" ")
+ } else 
+   ns <- ""
+
+ 
+ cat(indent, paste("<",xmlName(x, TRUE),
+                     ifelse(tmp != ""," ",""), tmp,
+                     ifelse(ns != ""," ",""), ns,
+                   ">\n", sep=""))
    # Add one space to the indentation level for the children.
    # This will accumulate across successive levels of recursion.
   subIndent <- paste(indent, " ", sep="")
   for(i in xmlChildren(x)) {
      print(i, indent= subIndent)
   }
- cat(indent, paste("</",xmlName(x),">\n",sep=""))
+ cat(indent, paste("</",xmlName(x, TRUE),">\n",sep=""))
 }
 
 print.XMLEntityRef <-

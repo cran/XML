@@ -8,26 +8,29 @@ xmlTreeParse <-
 #       the XML text, and parse that.
 # See also xml
 #
-function(file="../XML/Docs/test.xml", ignoreBlanks = TRUE, handlers=NULL,
+function(file, ignoreBlanks = TRUE, handlers=NULL,
            replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-           isURL=FALSE, asTree = FALSE)
+           isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
 {
   if(missing(isURL)) {
-    isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
+    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file))
   }
 
     # check whether we are treating the file name as
     # a) the XML text itself, or b) as a URL.
     # Otherwise, check if the file exists and report an error.
- if(asText == FALSE & isURL == FALSE) {
+ if(isURL == FALSE) {
   if(file.exists(file) == FALSE)
+    if(!missing(asText) && asText == FALSE)
      stop(paste("File", file, "does not exist "))
+    else
+     asText <- TRUE
  }
 
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
-         as.logical(ignoreBlanks), as.logical(replaceEntities),
-          as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
-            as.logical(isURL))
+              as.logical(ignoreBlanks), as.logical(replaceEntities),
+              as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
+              as.logical(isURL), as.logical(addAttributeNamespaces))
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

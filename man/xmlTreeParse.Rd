@@ -11,7 +11,7 @@
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
               asText=FALSE, trim=TRUE, validate=FALSE, getDTD=FALSE,
-               isURL=FALSE, asTree = FALSE)
+               isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
                 isURL = FALSE, asTree = FALSE) 
@@ -76,7 +76,13 @@ return type.
    the  \code{handlers} argument and is used then to determine
    whether the DOM tree should be returned or the \code{handlers}
    object.
-  }
+ }
+ \item{addAttributeNamespaces}{a logical value indicating whether to
+   return the namespace in the names of the attributes within a node
+   or to omit them. If this is \code{TRUE}, an attribute such as
+   \code{xsi:type="xsd:string"}} is reported with the name
+     \code{xsi:type}.
+    If it is \code{FALSE}, the name of the attribute is \code{type}.}
 }
 \details{
  The \code{handlers} argument is used similarly

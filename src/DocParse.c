@@ -54,7 +54,8 @@ USER_OBJECT_
 RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions, 
                     USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities,
                      USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ validate,
-                      USER_OBJECT_ getDTD, USER_OBJECT_ isURL)
+                      USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
+                       USER_OBJECT_ addNamespaceAttributes)
 {
 #ifdef HAVE_VALIDITY
 extern int xmlDoValidityCheckingDefaultValue;
@@ -72,6 +73,8 @@ extern int xmlDoValidityCheckingDefaultValue;
   parserSettings.skipBlankLines = LOGICAL_DATA(skipBlankLines)[0];
   parserSettings.converters = converterFunctions;
   parserSettings.trim = LOGICAL_DATA(trim)[0];
+
+  parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaceAttributes)[0];
 
 
 #ifdef HAVE_VALIDITY
@@ -101,8 +104,8 @@ extern int xmlDoValidityCheckingDefaultValue;
   }
 
     /* If one wants entities expanded directly and to appear as text.  */
-  if(LOGICAL_DATA(replaceEntities)[0])
-    xmlSubstituteEntitiesDefault(1);   
+  if(LOGICAL_DATA(replaceEntities)[0]) 
+      xmlSubstituteEntitiesDefault(1);   
 
   if(asTextBuffer) {
    doc = xmlParseMemory(name, strlen(name));
@@ -236,6 +239,31 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
   return(rdoc);
 }
 
+USER_OBJECT_
+processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSettings)
+{
+  int n = 0;
+  xmlNs *ptr = ns;
+  USER_OBJECT_ ans, tmp, names;
+
+  while(ptr) {
+    ptr = ptr->next;
+    n++;
+  }
+  PROTECT(ans = NEW_LIST(n));
+  PROTECT(names = NEW_CHARACTER(n));
+
+  for(n = 0, ptr = ns; ptr ; n++, ptr = ptr->next) {
+    tmp = RS_XML(createNameSpaceIdentifier)(ptr,node);
+    (void) RS_XML(notifyNamespaceDefinition)(tmp, parserSettings);
+    SET_VECTOR_ELT(ans, n, tmp);
+    SET_STRING_ELT(names, n, COPY_TO_USER_STRING(ptr->prefix));
+  }
+
+  SET_NAMES(ans, names);
+  UNPROTECT(2);
+  return(ans);
+}
 
 /**
    Creates an R object representing the specified node, and its children
@@ -246,9 +274,10 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
 
    parentUserNode the previously created user-leve node for the parent of the
             target node. 
+
  */
 
-enum { NODE_NAME, NODE_ATTRIBUTES, NODE_CHILDREN, NODE_NAMESPACE, NUM_NODE_ELEMENTS};
+enum { NODE_NAME, NODE_ATTRIBUTES, NODE_CHILDREN, NODE_NAMESPACE, NODE_NAMESPACE_DEFS, NUM_NODE_ELEMENTS};
 
 USER_OBJECT_
 RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *parserSettings, USER_OBJECT_ parentUserNode)
@@ -286,16 +315,18 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
     n++;
 
 
-  if(node->nsDef)  {
-     nsDef = RS_XML(createNameSpaceIdentifier)(node->nsDef, node);
-    (void) RS_XML(notifyNamespaceDefinition)(nsDef, parserSettings);
-  }
-
      /* Create the default return value being a list of name, attributes, children 
         and possibly value. 
       */
  PROTECT(ans = NEW_LIST(n));
  PROTECT(ans_el_names = NEW_CHARACTER(n));
+
+   /* If there are namespace definitions within this node, */
+  if(node->nsDef)  {
+    nsDef = processNamespaceDefinitions(node->nsDef, node, parserSettings);
+    SET_VECTOR_ELT(ans, NODE_NAMESPACE_DEFS, nsDef);
+  }
+
 
   SET_VECTOR_ELT(ans, NODE_NAME, NEW_CHARACTER(1));
   if(node->name)
@@ -308,16 +339,21 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   else
     SET_VECTOR_ELT(ans, NODE_CHILDREN, NULL_USER_OBJECT); 
 
+
+
   SET_STRING_ELT(ans_el_names, NODE_NAME, COPY_TO_USER_STRING("name"));
   SET_STRING_ELT(ans_el_names, NODE_ATTRIBUTES,  COPY_TO_USER_STRING("attributes"));
   SET_STRING_ELT(ans_el_names, NODE_CHILDREN, COPY_TO_USER_STRING("children"));
   SET_STRING_ELT(ans_el_names, NODE_NAMESPACE, COPY_TO_USER_STRING("namespace"));
+  SET_STRING_ELT(ans_el_names, NODE_NAMESPACE_DEFS, COPY_TO_USER_STRING("namespaceDefinitions"));
 
   if(node->ns) {
-    if(!node->nsDef)
-       nsDef = RS_XML(createNameSpaceIdentifier)(node->ns, node);
+    PROTECT(nsDef = NEW_CHARACTER(1));
+    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(node->ns->prefix));
     SET_VECTOR_ELT(ans, NODE_NAMESPACE, nsDef);
+    UNPROTECT(1);
   }
+
 
 
   if(addValue) {
@@ -358,7 +394,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
         USER_OBJECT_ tmp;
 	 PROTECT(opArgs);
 	 SET_VECTOR_ELT(opArgs, 0, ans);
-	 tmp = RS_XML(invokeFunction)(fun, opArgs);
+	 tmp = RS_XML(invokeFunction)(fun, opArgs, NULL);
          ans = tmp;
    	 UNPROTECT(1);
       }
@@ -559,7 +595,7 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 #endif
     for(i = 0; i < n; i++) {
       tmp = RS_XML(createXMLNode)(c, 1, DOWN, parserSettings, ans);
-      if(tmp && GET_LENGTH(tmp)) {
+      if(tmp && tmp != NULL_USER_OBJECT) {
 	SET_VECTOR_ELT(ans, count, tmp); 
         if(c->name)
           SET_STRING_ELT(elNames, count++, COPY_TO_USER_STRING(c->name));
@@ -646,8 +682,15 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
          SET_STRING_ELT(ans, i, COPY_TO_USER_STRING((atts->val != (xmlNode*)NULL && atts->val->content != (xmlChar*)NULL )? atts->val->content : (xmlChar*)""));
 
 #endif
-         if(atts->name)
-           SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(atts->name));
+         if(atts->name) {
+           if(parserSettings->addAttributeNamespaces && atts->ns && atts->ns->prefix) {
+             char buf[400];
+             sprintf(buf, "%s:%s", atts->ns->prefix, atts->name);
+             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(buf));
+	   } else
+             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(atts->name));
+	 }
+
          atts = atts->next;
       }
 
@@ -670,7 +713,7 @@ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSetting
         USER_OBJECT_ tmp;
 	 PROTECT(opArgs);
 	 SET_VECTOR_ELT(opArgs, 0, arg);
-	 tmp = RS_XML(invokeFunction)(fun, opArgs);
+	 tmp = RS_XML(invokeFunction)(fun, opArgs, NULL);
          ans = tmp;
    	 UNPROTECT(1);
       }

@@ -12,7 +12,7 @@
 USER_OBJECT_ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses);
 
 USER_OBJECT_
-RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs)
+RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ data)
 {
   int i;
   long n;
@@ -20,11 +20,17 @@ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs)
   USER_OBJECT_ ans;
 
   n = GET_LENGTH(opArgs);
+  if(data)
+    n++;
   if(n  > 0) {
     PROTECT(c = call = allocList(n));
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < GET_LENGTH(opArgs); i++) {
       SETCAR(c, VECTOR_ELT(opArgs, i));
       c = CDR(c);
+    }
+    if(data) {
+       SETCAR(c, data);
+       SET_TAG(c, Rf_install(".state"));
     }
 
     call = LCONS(fun, call);
@@ -75,9 +81,8 @@ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klass
 
   PROTECT(args = NEW_LIST(1));
   SET_VECTOR_ELT(args, 0, top);
-  tmp =  RS_XML(invokeFunction)(func, args);
+  tmp =  RS_XML(invokeFunction)(func, args, NULL);
   UNPROTECT(1);
-
 
   return(tmp);
 }

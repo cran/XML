@@ -6,7 +6,7 @@ xmlEventParse <-
 # See also xmlParseTree()
 #
 function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
-          useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE) 
+          useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE, state = NULL) 
 {
   if(missing(isURL)) { 
         # check if this is a URL or regular file.
@@ -18,9 +18,12 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
      stop(paste("File", file, "does not exist "))
  }
 
- handlers <- .Call("RS_XML_Parse", as.character(file), handlers, 
+ state <- .Call("RS_XML_Parse", as.character(file), handlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
-                      as.logical(useExpat))
- return(invisible(handlers))
+                      as.logical(useExpat), state)
+ if(!is.null(state))
+   return(state)
+ else
+   return(invisible(handlers))
 }

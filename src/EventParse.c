@@ -13,6 +13,8 @@
 
 #include "RSCommon.h"
 
+static void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
+
 /*
   Read the specified file as an XML document and invoke functions/methods in
   the handlers closure object when each node in the tree is encountered by 
@@ -28,7 +30,7 @@ extern void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *par
 USER_OBJECT_ 
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
-                 USER_OBJECT_ trim, USER_OBJECT_ useExpat)
+                 USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -64,6 +66,9 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   parserData->addContextInfo   = LOGICAL_DATA(addContext)[0]; 
   parserData->trim             = LOGICAL_DATA(trim)[0]; 
   parserData->ignoreBlankLines = LOGICAL_DATA(ignoreBlanks)[0]; 
+  parserData->stateObject = (stateObject == NULL_USER_OBJECT ? NULL : stateObject);
+  if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
+    R_PreserveObject(parserData->stateObject);
 
 #ifdef LIBEXPAT
   if(expat) {
@@ -80,7 +85,10 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
 
   free(parserData);
 
-  return(handlers);
+  if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
+     R_ReleaseObject(parserData->stateObject);
+
+  return(parserData->stateObject ? parserData->stateObject : handlers);
 }
 
 
@@ -112,7 +120,7 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
    SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] : "")); 
   }
 
- RS_XML(callUserFunction)("entityDeclaration", (const char*)NULL, parserData, opArgs);
+  RS_XML(callUserFunction)("entityDeclaration", (const char*)NULL, parserData, opArgs);
 }
 
 
@@ -144,7 +152,8 @@ RS_XML(commentHandler)(void *userData, const XML_Char *data)
 
 
 USER_OBJECT_ 
-RS_XML(createAttributesList)(const char **atts) {
+RS_XML(createAttributesList)(const char **atts) 
+{
   int n=0, i;
   const char **ptr = atts;
   USER_OBJECT_ attr_names;
@@ -179,8 +188,9 @@ void RS_XML(endElement)(void *userData, const char *name)
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
      SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(name));
 
-   RS_XML(callUserFunction)("endElement", NULL, ((RS_XMLParserData*) userData), opArgs);
-   UNPROTECT(1);
+  RS_XML(callUserFunction)("endElement", NULL, ((RS_XMLParserData*) userData), opArgs);
+  UNPROTECT(1);
+
 }
 
 /**
@@ -199,8 +209,8 @@ RS_XML(processingInstructionHandler)(void *userData, const XML_Char *target, con
    SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(target));
  SET_VECTOR_ELT(opArgs, 1, NEW_CHARACTER(1));
    SET_STRING_ELT(VECTOR_ELT(opArgs, 1), 0, COPY_TO_USER_STRING(data));
-  RS_XML(callUserFunction)("processingInstruction", (const char *)NULL, (RS_XMLParserData*)userData, opArgs);
-  UNPROTECT(1);
+ RS_XML(callUserFunction)("processingInstruction", (const char *)NULL, (RS_XMLParserData*)userData, opArgs);
+ UNPROTECT(1);
 }
 
 void 
@@ -284,7 +294,7 @@ return(parser);
 USER_OBJECT_
 RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserData *parserData, USER_OBJECT_ opArgs) 
 {
-  USER_OBJECT_ fun = NULL;
+  USER_OBJECT_ fun = NULL, val;
   USER_OBJECT_ _userObject = parserData->methods;
 
   if(preferredName && parserData->callByTagName) {
@@ -299,6 +309,25 @@ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserDa
    return(NULL_USER_OBJECT);
   }
 
-  return(RS_XML(invokeFunction)(fun, opArgs));
+  val = RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject);
+  updateState(val, parserData);
+  return(val); 
 }
 
+void
+updateState(USER_OBJECT_ val, RS_XMLParserData *parserData)
+{
+    USER_OBJECT_ old;
+    if(!parserData->stateObject || parserData->stateObject == NULL_USER_OBJECT) {
+       return;
+    }
+
+#ifdef _R_
+    R_ReleaseObject(parserData->stateObject);
+    R_PreserveObject(val);
+#else
+    decr_ref_count(parserData->stateObject, TRUE, Local_data, S_evaluator);
+    incr_ref_count(val, TRUE, Local_data, S_evaluator);
+#endif
+    parserData->stateObject = val;
+}

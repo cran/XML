@@ -12,7 +12,7 @@
 int isBlank(const char *str);
 char *trim(char *str);
 
-USER_OBJECT_ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs);
+USER_OBJECT_ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ state);
 USER_OBJECT_ RS_XML(findFunction)(const char *opName, USER_OBJECT_ functions);
 
 void RS_XML(SetNames)(int n, const char *cnames[], USER_OBJECT_ ans);

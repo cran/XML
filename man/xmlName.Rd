@@ -9,10 +9,13 @@ in the \code{<name ...>} entry in an XML document.
 This function returns that name.
 }
 \usage{
-xmlName(node)
+xmlName(node, full = FALSE)
 }
 \arguments{
   \item{node}{The XMLNode object whose tag name is being requested.}
+  \item{full}{a logical value indicating whether to prepend the
+    namespace prefix, if there is one, or return just the
+    name of the XML element/node. \code{TRUE} means prepend the prefix.}
 }
 
 \value{

@@ -1,3 +1,32 @@
+Version 0.92-1
+  *   Display the namespace definitions when printing an XMLNode object.
+
+  *   New addAttributeNamespaces argument for xmlTreeParse() that controls whether
+      namespaces are included in attribute names.
+
+Version 0.92-0
+
+  *   XMLNode class now contains a field for namespace definitions
+      The `namespace' field is a character string identifying the prefix's 
+      namespace. The `namespaceDefinition' field contains the full definitions
+      of each of the namespaces defined within a node.
+     
+  *   Printing of XLM nodes displays the namespace.
+
+  *   xmlName() takes a `full' argument that controls whether the 
+      namespace prefix is prepended to the tag name.
+
+Version 0.91-0
+
+  *  Added a mechanism to the SAX parser to allow a state object
+     be passed between the callbacks and returned as the result of
+     the parsing. This avoids the need for closures. Also, works
+     with S4 classes and the genericSAXHandlers() methods by allowing
+     one to write methods for these generic callbacks that dispatch 
+     based on the type of the state object.
+
+  *  Fix to make work properly with S4 class system.
+
 Version 0.9-1
 
   *  Formatting of the help files to avoid long lines

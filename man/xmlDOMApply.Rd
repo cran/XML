@@ -2,9 +2,19 @@
 \alias{xmlDOMApply}
 \title{Apply function to nodes in an XML tree/DOM.}
 \description{
+
  This recursively applies the specified function to each node in an
-XML tree and then to each of the children nodes. The result is
-returned as a tree and additionally entire nodes can be dropped.
+ XML tree, creating a new tree,
+ parallel to the original input tree.
+ Each  element in the new tree is the resturn
+ value obtained from invoking the specified function
+ on the corresponding element
+ of the original tree.
+ The order in which the function is recursively applied
+ is "bottom-up". In other words, 
+ function is first applied to each of the children
+ nodes first and then to the  parent node
+ containing the newly computed results for the children.
 }
 \usage{
 xmlDOMApply(dom, func)

@@ -16,7 +16,8 @@
 }
 \usage{
 xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks, addContext=T,
-               useTagName=F, asText =F, trim=T, useExpat=F, isURL = F)
+               useTagName=F, asText =F, trim=T, useExpat=F, isURL = F,
+                state = NULL)
 }
 \arguments{
  \item{file}{ string identifying the file that is interpreted
@@ -73,10 +74,23 @@ If this is True, each callback function  should support
    indicates whether the \code{file}  argument refers to a URL
   (accessible via ftp or http) or a regular file on the system.
   If \code{asText} is TRUE, this should not be specified.
- }
+}
+\item{state}{an optional S object that is passed to the
+  callbacks and can be modified to communicate state between
+  the callbacks. If this is given, the callbacks should accept
+  an argument  named \code{.state} and it should return an object
+  that will be used as the updated value of this state object.
+  The new value can be any S object and will be passed to the next 
+  callback where again it will be updated by that functions return
+  value, and so on. 
+  If this not specified in the call to \code{xmlEventParse},
+  no \code{.state} argument is passed to the callbacks. This makes the
+  interface compatible with previous releases.
+  .}
 }
 \details{
- This is implemented via the Expat XML parser by
+ This is now implemented using the libxml parser.
+ Originally, this was implemented via the Expat XML parser by
  Jim Clark (\url{http://www.jclark.com}).
 }
 \value{
@@ -115,6 +129,15 @@ xmlURL <- "http://www.omegahat.org/Scripts/Data/mtcars.xml"
 xmlText <- paste(scan.url(xmlURL, what="",sep="\n"),"\n",collapse="\n")
 xmlEventParse(xmlText, asText=TRUE)
 }
+
+ # Using a state object to share mutable data across callbacks
+f <- system.file("exampleData", "gnumeric.xml", package = "XML")
+zz <- xmlEventParse(f,
+                    handlers = list(startElement=function(name, atts,.state) {
+                                                     state = .state + 1
+                                                     print(.state)
+                                                     .state}), state = 0)
+print(zz)
 }
 \keyword{file}
 \keyword{IO}
