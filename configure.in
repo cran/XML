@@ -24,6 +24,7 @@ AC_ARG_WITH(oldlibxml,[], USE_OLD_ROOT_CHILD_NAMES=1; FORCE_OLD=1;echo "Using ol
 AC_ARG_WITH(libxml2,[  --with-libxml2    indicate that the libxml version is 2.0 or higher],
                [ if test "${withval}" = yes; then
                     LIBXML2="-DLIBXML2=1";
+                    USE_XML2="yes" ;
                  fi])
 
   dnl compile for use with libxml. This is the default.
@@ -102,6 +103,15 @@ if test -n "${USE_LIBXML}" ; then
   dnl as an environment variable `XML_CONFIG'.
 
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
+
+   if test -n "${USE_XML2}" ; then
+     AC_PATH_PROGS(XML_CONFIG, xml2-config)      
+     if test -z "${XML_CONFIG}" ; then
+       echo "Cannot find xml2-config"
+       exit 1
+     fi
+   fi
+
    if test -z "${XML_CONFIG}" ; then
      AC_PATH_PROGS(XML_CONFIG, xml-config)
    fi
@@ -118,7 +128,8 @@ if test -n "${USE_LIBXML}" ; then
     dnl we use that.
     dnl Otherwise, we try to find the parser.h file.
 
-  if test -n "${LIBXML_INCDIR}" ; then
+  if test -n "${LIBXML_INCDIR}" && test -z "${XML_CONFIG}" ; then
+echo "Checking directory of LIBXML_INCDIR"
    if test -d $LIBXML_INCDIR ; then
 
         dnl Maybe also test for ${LIBXML_INCDIR}/parser.h 

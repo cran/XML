@@ -1,3 +1,10 @@
+Version 0.6-3
+
+  * Installation using --with-xml2 now attempts to link against libxml2.so
+    and the appropriate header files.
+
+  * Use libxml's xml-config or xml2-config scripts if these are available.
+
 Version 0.6
    
   * xmlDOMApply for recursively applying a function to each node in a tree.
