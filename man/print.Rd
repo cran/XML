@@ -20,14 +20,14 @@ Each typically outputs its contents in the way
 that they would appear in an XML document.
 }
 \usage{
-print.XMLAttributeDef(x)
-print.XMLElementContent(x)
-print.XMLElementDef(x)
-print.XMLEntity(x)
-print.XMLEntityRef(x, indent= "")
+print.XMLAttributeDef(x, ...)
+print.XMLElementContent(x, ...)
+print.XMLElementDef(x, ...)
+print.XMLEntity(x, ...)
+print.XMLEntityRef(x, ..., indent= "")
 print.XMLNode(x, ..., indent= "")
-print.XMLOrContent(x)
-print.XMLSequenceContent(x)
+print.XMLOrContent(x, ...)
+print.XMLSequenceContent(x, ...)
 }
 \arguments{
   \item{x}{the XML object to be displayed}

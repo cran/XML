@@ -181,26 +181,26 @@ function(x, ..., indent = "")
 }
 
 print.XMLEntityRef <-
-function(x, indent="")
+function(x, ..., indent="")
 {
  cat(indent, x$value)
 }
 
 
 print.XMLCDataNode <-
-function(node, indent="")
+function(x, ..., indent="")
 {
  cat(indent, "<![CDATA[\n")
    # Want new lines in value to be replaced by paste("\n", indent, sep="")
- cat(indent, node$value)
+ cat(indent, x$value)
  cat(indent, "]]>\n")
 }
 
 
 print.XMLProcessingInstruction <-
-function(node, indent="")
+function(x, ..., indent="")
 {
- cat(indent, paste("<?", node$name," ", node$value, ">\n", sep=""))
+ cat(indent, paste("<?", x$name," ", x$value, ">\n", sep=""))
 }
 
 

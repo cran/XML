@@ -28,12 +28,14 @@ This provides a convenient way to specify the default name space that appers in 
   This is currently a simplistic implementation since we will use the OOP-style classes
   from the Omegahat projects in the future.}
  \item{nsURI}{the URI or value for the name space which is used
-  when declaring the namespace.}
+  when declaring the namespace.
+  For \code{xmlOuputDOM}, this is a named character vector with each
+element giving the name space identifier and the
+  corresponding URI, e.g c(shelp="http://www.omegahat.org/XML/SHelp")
+}
  \item{header}{if non-NULL, this is immediately written to the output stream allowing
   one to control the initial section of the XML document.}
  \item{tag}{the name of the top-level node/element in the DOM being created.}
- \item{nsURI}{a named character vector with each element giving the name space identifier and the
-  corresponding URI, e.g c(shelp="http://www.omegahat.org/XML/SHelp")}
 }
 \details{
 

@@ -17,7 +17,7 @@
 
 
 print.XMLElementDef <-
-function(x)
+function(x, ...)
 {
  cat("<!ELEMENT", x$name," ")
  print(x$contents)
@@ -36,7 +36,7 @@ function(x)
 
 
 print.XMLElementContent <-
-function(x)
+function(x, ...)
 {
  if(names(x$type)[1] == "PCData") {
    cat(" ( #PCDATA ) ")
@@ -49,7 +49,7 @@ function(x)
 
 
 print.XMLOrContent <-
-function(x)
+function(x, ...)
 {
  n <- length(x$elements)
  cat("( ")
@@ -62,7 +62,7 @@ function(x)
 }
 
 print.XMLSequenceContent <-
-function(x)
+function(x, ...)
 {
  cat("( ")
  n <- length(x$elements)
@@ -76,7 +76,7 @@ function(x)
 
 
 print.XMLAttributeDef <-
-function(x)
+function(x, ...)
 {
  if(names(x$defaultType)[1] != "Implied")
    dflt <- paste("\"", x$defaultValue,"\"",collapse="",sep="")
@@ -114,7 +114,7 @@ function(def, defaultType = F)
 
 
 print.XMLEntity <-
-function(x)
+function(x, ...)
 {
  cat("<!ENTITY %", x$name,paste("\"", x$value,"\"",sep="",collapse=""), ">\n")
 }
