@@ -79,34 +79,43 @@ function(X, FUN, ...)
 
 
 xmlValue <- 
-function(x)
+function(x, ignoreComments = FALSE)
 {
  UseMethod("xmlValue")
 }
 
 xmlValue.XMLNode <- 
-function(x)
+function(x, ignoreComments = FALSE)
 {
  if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
-    return(xmlValue(x[[1]]))
+    return(xmlValue(x[[1]], ignoreComments))
 
  x$value
 }
 
 xmlValue.XMLTextNode <- 
-function(x)
+function(x, ignoreComments = FALSE)
 {
  x$value
 }
 
+xmlValue.XMLComment <- 
+function(x, ignoreComments = FALSE)
+{
+ if(ignoreComments)
+   return("")
+
+ x$value
+}
+
 xmlValue.XMLCDataNode <- 
-function(x)
+function(x, ignoreComments = FALSE)
 {
  x$value
 }
 
 xmlValue.XMLProcessingInstruction <- 
-function(x)
+function(x, ignoreComments = FALSE)
 {
  x$value
 }

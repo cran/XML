@@ -62,6 +62,7 @@ and
 }
 
 \examples{
-a <- xmlNode("arg", attrs = c(default="T"), xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
+a <- xmlNode("arg", attrs = c(default="T"),
+               xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
 }
 \keyword{file}

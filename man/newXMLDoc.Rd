@@ -22,8 +22,8 @@ newXMLNode(name, ..., attrs = NULL, namespace="", doc=NULL)
   \item{namespaces}{a named character vector
   with each element specifying a name space identifier and the
   corresponding URI for that namespace
-  that are to be declared and used in the XML document,
-   e.g c(shelp="http://www.omegahat.org/XML/SHelp")}
+  that are to be declared and used in the XML document, \\
+   e.g. \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
   \item{name}{the tag/element name for the XML node}
   \item{...}{the children of this node. These can be other nodes created
   earlier or R strings that are converted to text nodes and added as children

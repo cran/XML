@@ -4,6 +4,7 @@
 \alias{xmlValue.XMLNode}
 \alias{xmlValue.XMLProcessingInstruction}
 \alias{xmlValue.XMLTextNode}
+\alias{xmlValue.XMLComment}
 \title{Extract the contents of a leaf XML node}
 \description{
   Some types of XML nodes have no children nodes, but are leaf nodes and
@@ -13,11 +14,16 @@
   that contain a single text node.
 }
 \usage{
-xmlValue(x)
+xmlValue(x, ignoreComments = FALSE)
 }
 \arguments{
   \item{x}{the \code{XMLNode} object whose
     contents are to be  returned.}
+  \item{ignoreComments}{a logical value which, if \code{TRUE}
+    does not include the text in XML comment nodes.
+    If this is \code{FALSE}, the text in the comments is part
+    of the return value.
+  }
 }
 \value{
  The object stored in the 

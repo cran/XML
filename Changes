@@ -1,3 +1,12 @@
+Version 0.9-1
+
+  *  Formatting of the help files to avoid long lines
+     identified by Ott Toomet
+
+  *  Addition of `ignoreComments' argument for xmlValue()
+
+  *  Date in the DESCRIPTION file corrected (thanks to Doug Bates).
+
 Version 0.9-0
 
   *  Added addCData() and addPI() to the handlers of the different 

@@ -43,7 +43,8 @@ text node, comment, entity references and definitions, etc.
 }
 
 \examples{
- xmlEventParse(system.file("exampleData","mtcars.xml", package="XML"),  handlers=xmlEventHandler())
+ xmlEventParse(system.file("exampleData", "mtcars.xml", package="XML"),
+               handlers=xmlEventHandler())
 }
 \keyword{file}
 \keyword{IO}

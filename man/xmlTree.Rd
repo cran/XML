@@ -22,7 +22,8 @@ xmlTree(tag, attrs = NULL, dtd=NULL, namespaces=list())
     vector or list.}
   \item{dtd}{the name of the external DTD for this document. See \code{\link{newXMLDoc}}}
   \item{namespaces}{a named character vector with each element giving the name space identifier and the
-  corresponding URI, e.g c(shelp="http://www.omegahat.org/XML/SHelp")}
+    corresponding URI, \\
+    e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
 }
 \details{
  This creates a collection of functions that manipulate a shared

@@ -9,8 +9,12 @@
  to be (potentially malformed) HTML.
 }
 \usage{
-xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,asText=FALSE, trim=TRUE, validate=FALSE, getDTD=FALSE, isURL=FALSE, asTree = FALSE)
-htmlTreeParse(file = "../XML/Docs/test.xml", ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE, asText = FALSE, trim = TRUE, isURL = FALSE, asTree = FALSE) 
+xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
+              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=FALSE,
+               isURL=FALSE, asTree = FALSE)
+htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
+               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
+                isURL = FALSE, asTree = FALSE) 
 }
 
 \arguments{
@@ -192,10 +196,11 @@ and another for entities. See \code{\link{parseDTD}}.
  # See plotMathML() in examples/.
  fileName <- system.file("exampleData", "mathml.xml",package="XML")
 m <- xmlTreeParse(fileName, 
-                  handlers=list(startElement=function(node){
-                              cname <- paste(xmlName(node),"MathML",sep="",collapse="")
-                              class(node) <- c(cname, class(node)); 
-                              node
+                  handlers=list(
+                   startElement = function(node){
+                   cname <- paste(xmlName(node),"MathML", sep="",collapse="")
+                   class(node) <- c(cname, class(node)); 
+                   node
                 }))
 
 
@@ -249,7 +254,9 @@ m <- xmlTreeParse(fileName,
 
 
   # This should raise an error.
-  try(xmlTreeParse(system.file("exampleData", "TestInvalid.xml", package="XML"), validate=TRUE))
+  try(xmlTreeParse(
+            system.file("exampleData", "TestInvalid.xml", package="XML"),
+            validate=TRUE))
 
 \dontrun{
  # Parse an XML document directly from a URL.

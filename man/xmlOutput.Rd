@@ -12,8 +12,11 @@ node objects.
 
 }
 \usage{
-xmlOutputBuffer(dtd=NULL, nameSpace=NULL, buf=NULL, nsURI=NULL, header="<?xml version=\"1.0\"?>")
-xmlOutputDOM(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
+xmlOutputBuffer(dtd=NULL, nameSpace=NULL, buf=NULL,
+                 nsURI=NULL, header="<?xml version=\"1.0\"?>")
+
+xmlOutputDOM(tag="doc", attrs = NULL, dtd=NULL,
+                 nameSpace=NULL, nsURI=character(0))
 }
 
 \arguments{
@@ -34,7 +37,8 @@ This provides a convenient way to specify the default name space that appers in 
   when declaring the namespace.
   For \code{xmlOuputDOM}, this is a named character vector with each
 element giving the name space identifier and the
-  corresponding URI, e.g c(shelp="http://www.omegahat.org/XML/SHelp")
+ corresponding URI, \\
+ e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}
 }
  \item{header}{if non-NULL, this is immediately written to the output stream allowing
   one to control the initial section of the XML document.}

@@ -15,7 +15,8 @@
  standard callback names.
 }
 \usage{
-xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks, addContext=T, useTagName=F, asText =F, trim=T, useExpat=F, isURL = F)
+xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks, addContext=T,
+               useTagName=F, asText =F, trim=T, useExpat=F, isURL = F)
 }
 \arguments{
  \item{file}{ string identifying the file that is interpreted
@@ -46,10 +47,10 @@ If this is True, each callback function  should support
  \item{useTagName}{ logical value indicating whether 
  the callback mechanism should look  for a function
  matching the tag name in the startElement and
-endElement events, before calling the default handler
-functions. This allows the caller to handle different
-element types for a particular DTD with their own functions directly, rather
-than performing a second dispatch in \code{startElement()}.
+ endElement events, before calling the default handler
+ functions. This allows the caller to handle different
+ element types for a particular DTD with their own functions directly, rather
+ than performing a second dispatch in \code{startElement()}.
 }
   \item{asText}{logical value indicating that the first argument,
     `file', 
@@ -102,7 +103,9 @@ to connect to remote servers.
    # Print the name of each XML tag encountered at the beginning of each
    # tag.
    # Uses the libxml SAX parser.
- xmlEventParse(fileName, list(startElement=function(name, attrs){cat(name,"\n")}), useTagName=FALSE, addContext = FALSE)
+ xmlEventParse(fileName,
+                list(startElement=function(name, attrs){cat(name,"\n")}),
+                useTagName=FALSE, addContext = FALSE)
 
 
 \dontrun{

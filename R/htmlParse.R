@@ -8,7 +8,7 @@ htmlTreeParse <-
 #       the XML text, and parse that.
 # See also xml
 #
-function(file="../XML/Docs/test.xml", ignoreBlanks = TRUE, handlers=NULL,
+function(file, ignoreBlanks = TRUE, handlers=NULL,
            replaceEntities=FALSE, asText=FALSE, trim=TRUE, isURL=FALSE, asTree = FALSE)
 {
   if(missing(isURL)) {
