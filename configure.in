@@ -230,17 +230,17 @@ echo "${CPPFLAGS}"
 
   AC_CHECK_LIB(z, gzopen)
   if test -n "${LIBXML2}" ; then
-    AC_CHECK_LIB(xml2, xmlParseFile, LIBS="${LIBS} -lxml2"; USE_XMLLIB_NAME=xml2, NO_XML_LIB=1, "-L${LIBXML_LIBDIR-.}")
+    AC_CHECK_LIB(xml2, xmlParseFile, LIBS="${LIBS} -lxml2"; USE_XMLLIB_NAME=xml2, NO_XML_LIB=1, "${LIBXML_LIBDIR--L.}")
   else
      NO_XML_LIB=1
   fi
 
   if test -n "${NO_XML_LIB}" ; then
-    AC_CHECK_LIB(xml, xmlParseFile, LIBS="${LIBS} -lxml";USE_XMLLIB_NAME=xml, AC_MSG_ERROR("libxml not found"), "-L${LIBXML_LIBDIR-.}")
+    AC_CHECK_LIB(xml, xmlParseFile, LIBS="${LIBS} -lxml";USE_XMLLIB_NAME=xml, AC_MSG_ERROR("libxml not found"), "${LIBXML_LIBDIR--L.}")
   fi
 
   if test -n "${LIBXML_LIBDIR}" ; then
-     LIBS="-L${LIBXML_LIBDIR-.} ${LIBS}"
+     LIBS="${LIBXML_LIBDIR--L.} ${LIBS}"
      LD_PATH="${LIBXML_LIBDIR-.}"
   fi
 

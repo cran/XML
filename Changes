@@ -1,3 +1,8 @@
+Version 0.94-1
+
+  *   Minor change to configuration script to avoid -L-L in specification of
+      directory for XML library (libxml).
+
 Version 0.94-0
 
   *   Use registration of C routines
