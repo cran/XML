@@ -2,3 +2,69 @@ useDynLib(XML)
 exportPattern(".*")
 
 
+S3method(xmlChildren, XMLNode)
+
+S3method(xmlName, XMLComment)
+S3method(xmlName, XMLNode)
+
+S3method("[", XMLNode)
+S3method("[[", XMLNode)
+S3method("[[", XMLDocumentContent)
+
+S3method("[<-", XMLNode)
+S3method("[[<-", XMLNode)
+
+S3method(names, XMLNode)
+S3method(length, XMLNode)
+
+S3method(xmlAttrs, XMLNode)
+
+S3method(xmlSize, XMLDocument)
+S3method(xmlSize, default)
+S3method(xmlSize, XMLNode)
+
+S3method(print, XMLNode)
+S3method(print, XMLTextNode)
+S3method(print, XMLComment)
+S3method(print, XMLEntityRef)
+S3method(print, XMLCDataNode)
+S3method(print, XMLProcessingInstruction) 
+
+
+S3method(xmlRoot, XMLDocument)
+S3method(xmlRoot, XMLDocumentContent)
+
+S3method(xmlApply, XMLNode)
+S3method(xmlApply, XMLDocument)
+S3method(xmlApply, XMLDocumentContent)
+
+S3method(xmlSApply, XMLNode)
+S3method(xmlSApply, XMLDocument)
+S3method(xmlSApply, XMLDocumentContent)
+
+S3method(xmlValue, XMLNode)
+S3method(xmlValue, XMLTextNode)
+S3method(xmlValue, XMLComment)
+S3method(xmlValue, XMLCDataNode)
+S3method(xmlValue, XMLProcessingInstruction)
+
+
+S3method(xmlNamespace, XMLNode)
+
+S3method(append, XMLNode)
+S3method(saveXML, XMLInternalDocument)
+S3method(saveXML, XMLInternalDOM)
+S3method(saveXML, XMLOutputStream)
+S3method(saveXML, XMLNode)
+
+S3method(dtdElementValidEntry, XMLElementDef)
+S3method(dtdElementValidEntry, XMLOrContent)
+S3method(dtdElementValidEntry, XMLElementContent)
+S3method(dtdElementValidEntry, character)
+S3method(dtdElementValidEntry, XMLSequenceContent)
+
+
+
+
+
+

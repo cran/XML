@@ -31,6 +31,7 @@ text node, comment, entity references and definitions, etc.
   \item{comment}{}
   \item{externalEntity}{}
   \item{entityDeclaration}{}
+  \item{cdata}{}
   \item{dom}{}
 }
 \references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},

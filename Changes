@@ -1,3 +1,18 @@
+Version 0.97-3
+ 
+  * Added a method for xmlRoot for HTMLDocument
+
+  *  Changed the maintainer email address.
+
+Version 0.97-2
+
+  *  Added cdata to the collection of functions that are used in the handlers 
+     for xmlEventParse().  Omission identified by Jeff Gentry.
+
+Version 0.97-1
+
+  *  Put the correct S3method declarations in the NAMESPACE.
+
 Version 0.97-0
 
   *  Using a NAMESPACE for the package

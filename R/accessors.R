@@ -34,6 +34,13 @@ function(x, ...)
  a
 }
 
+
+xmlRoot.HTMLDocument <-
+function(x, ...)
+{
+   x$children[[1]]
+}
+
 xmlApply <-
 function(X, FUN, ...)
 {

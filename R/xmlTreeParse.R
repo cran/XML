@@ -33,6 +33,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
               as.logical(isURL), as.logical(addAttributeNamespaces))
 
+
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)
 

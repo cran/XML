@@ -3,6 +3,7 @@
 \alias{xmlRoot.XMLDocument}
 \alias{xmlRoot.XMLDocumentRoot}
 \alias{xmlRoot.XMLDocumentContent}
+\alias{xmlRoot.HTMLDocument}
 \title{Get the top-level XML node.}
 \description{
  These are a collection of methods for providing easy access to the
@@ -14,6 +15,7 @@ that is returned as part of the parsing.
 \usage{
 xmlRoot(x, ...)
 xmlRoot.XMLDocumentContent(x, ...)
+xmlRoot.HTMLDocument(x, ...)
 }
 \arguments{
   \item{x}{the object whose root/top-level XML node is to be returned.}

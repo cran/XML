@@ -27,6 +27,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
          as.logical(ignoreBlanks), as.logical(replaceEntities),
           as.logical(asText), as.logical(trim), as.logical(isURL))
 
+
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)
 

@@ -63,8 +63,8 @@ as the XML components in the document are encountered by the parser.
  The standard functions are 
 \code{startElement()}, \code{endElement()}
 \code{comment()}, \code{externalEntity()},
-\code{entityDeclaration()}, \code{processingInstruction},
-\code{text()}.
+\code{entityDeclaration()}, \code{processingInstruction()},
+\code{text()}, \code{cdata()}.
   }
  \item{ignoreBlanks}{ logical value indicating whether
 text elements made up entirely of white space should be included
