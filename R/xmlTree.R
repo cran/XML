@@ -3,7 +3,16 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
 {
  doc <- newXMLDoc(dtd, namespaces)
  currentNodes <- list(doc)
-
+ 
+ 
+ if(!is.null(dtd) && dtd != "") {
+   node = .Call("R_newXMLDtd", doc, dtd, "", "")
+   .Call("R_insertXMLNode", node, doc)
+   currentNodes[[2]] <- node
+ }
+ 
+ definedNamespaces = list()
+ 
  asXMLNode <- function(x) {
         if(is.character(x)) {
           v <- .Call("R_newXMLTextNode", x)
@@ -16,13 +25,28 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
 
         v 
  }
+
+ setNamespace <- function(node, namespace) {
+     if(is.null(namespace))
+       return(NULL)
+     
+     if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
+       ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace, PACKAGE="XML")
+       definedNamespaces[[namespace]] <<- ns
+     }
+     
+     .Call("R_xmlSetNs", node, definedNamespaces[[namespace]], PACKAGE = "XML")
+ }
+
  
  addTag <- function(name, ..., attrs=NULL, close=TRUE, namespace=NULL) {
 
    if(!is.null(attrs))
     storage.mode(attrs) <- "character"
 
-   node <- .Call("R_newXMLNode", name, attrs, namespace, doc)
+   node <- .Call("R_newXMLNode", name, attrs, namespace, doc, PACKAGE = "XML")
+
+   setNamespace(node, namespace)
 
    if(length(currentNodes) > 1)
      .Call("R_insertXMLNode", node, currentNodes[[1]])

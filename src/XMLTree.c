@@ -177,12 +177,53 @@ USER_OBJECT_
 R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces)
 {
   xmlDocPtr doc;
-
   doc = xmlNewDoc("1.0");
-
 
   return(R_createXMLDocRef(doc));
 }
+
+
+USER_OBJECT_
+R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID)
+{
+
+  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+  char *dtdName = CHAR_DEREF(STRING_ELT(sname, 0));
+  char *externalID = CHAR_DEREF(STRING_ELT(sexternalID, 0));
+  char *sysID = CHAR_DEREF(STRING_ELT(ssysID, 0));
+  xmlDtdPtr node;
+
+  node = xmlNewDtd(doc, externalID[0] ? externalID : NULL, sysID[0] ? sysID : NULL, dtdName);
+/*     xmlAddChild((xmlNodePtr) doc, (xmlNodePtr) DTD); */
+  return(R_createXMLNodeRef((xmlNodePtr) node));
+}
+
+
+USER_OBJECT_
+R_xmlSetNs(USER_OBJECT_ s_node, USER_OBJECT_ s_ns)
+{
+  xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+  xmlNsPtr ns = (xmlNsPtr) R_ExternalPtrAddr(s_ns);
+
+   xmlSetNs(node, ns);
+
+  return(s_ns);
+}
+
+
+USER_OBJECT_
+R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
+{
+  xmlNodePtr doc = (xmlNodePtr) R_ExternalPtrAddr(sdoc);
+  char *href = CHAR_DEREF(STRING_ELT(shref, 0));
+  char *prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
+  xmlNsPtr ns;
+
+  ns = xmlNewNs(doc, href, prefix);
+
+  return(R_createXMLNodeRef((xmlNodePtr) ns));
+}
+
 
 USER_OBJECT_
 R_createXMLDocRef(xmlDocPtr doc)
