@@ -5,6 +5,10 @@ function(tag=NULL, dtd=NULL, namespaces=list())
  currentNodes <- list(doc)
 
  addTag <- function(name, ..., attrs=NULL, close=T, namespace=NULL) {
+
+   if(!is.null(attrs))
+    storage.mode(attrs) <- "character"
+
    node <- .Call("R_newXMLNode", name, attrs, namespace, doc)
 
    if(length(currentNodes) > 1)

@@ -1,3 +1,8 @@
+Version 0.7-2
+
+  * Fix for printing XMLNode objects  to handle comments and elements 
+    with name "text". Identified by Andrew Schuh.
+
 Version 0.7-1
 
   * Minor fixes for passing R CMD check.

@@ -153,6 +153,18 @@ function(obj)
 }
 
 
+print.XMLComment <-
+function(x, ..., indent = "")
+{
+  cat(indent, "<!--", xmlValue(x), "-->","\n", sep="")
+}
+
+print.XMLTextNode <-
+function(x, ..., indent = "")
+{
+  cat(indent, xmlValue(x),"\n", sep="")
+}  
+
 print.XMLNode <-
 #
 # displays a node and attributes (and its children)
@@ -160,11 +172,6 @@ print.XMLNode <-
 # 
 function(x, ..., indent = "")
 {
- if(xmlName(x) == "text" || xmlName(x) == "comment") {
-   cat(indent, x$value,"\n", sep="")
-   return()
- }
-
  if(! is.null(xmlAttrs(x))) {
    tmp <- paste(names(xmlAttrs(x)),paste("\"", xmlAttrs(x),"\"", sep=""), sep="=", collapse=" ")
  } else 

@@ -6,6 +6,8 @@
 \alias{print.XMLEntity}
 \alias{print.XMLEntityRef}
 \alias{print.XMLNode}
+\alias{print.XMLTextNode}
+\alias{print.XMLComment}
 \alias{print.XMLOrContent}
 \alias{print.XMLSequenceContent}
 \alias{print.XMLProcessingInstruction}
