@@ -13,10 +13,13 @@ constructed in R and exported to another system
 such as XSLT (\url{http://www.omegahat.org/Sxslt})
 }
 \usage{
-xmlTree(tag, dtd=NULL, namespaces=list())
+xmlTree(tag, attrs = NULL, dtd=NULL, namespaces=list())
 }
 \arguments{
-  \item{tag}{the tagname of the top-level element. This is basically ignored!}
+  \item{tag}{the tagname of the top-level element. This is basically
+    ignored!}
+  \item{attrs}{attributes for the top-level node, in the form of a named
+    vector or list.}
   \item{dtd}{the name of the external DTD for this document. See \code{\link{newXMLDoc}}}
   \item{namespaces}{a named character vector with each element giving the name space identifier and the
   corresponding URI, e.g c(shelp="http://www.omegahat.org/XML/SHelp")}

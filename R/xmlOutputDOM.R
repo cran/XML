@@ -1,12 +1,12 @@
 xmlOutputDOM <-
-function(tag="doc", dtd=NULL, nameSpace=NULL, nsURI=character(0))
+function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 {
  buf <- NULL
  current <- NULL
 
  reset <-
  function() {
-  buf <<- xmlNode(tag)
+  buf <<- xmlNode(tag, attrs = attrs)
   if(length(nsURI) > 0) {
    names(nsURI) <- paste("xmlns", names(nsURI), sep=":")
    buf$attributes <<- nsURI

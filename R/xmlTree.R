@@ -1,5 +1,5 @@
 xmlTree <-
-function(tag=NULL, dtd=NULL, namespaces=list())
+function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
 {
  doc <- newXMLDoc(dtd, namespaces)
  currentNodes <- list(doc)

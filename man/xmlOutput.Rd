@@ -13,14 +13,17 @@ node objects.
 }
 \usage{
 xmlOutputBuffer(dtd=NULL, nameSpace=NULL, buf=NULL, nsURI=NULL, header="<?xml version=\"1.0\"?>")
-xmlOutputDOM(tag="doc", dtd=NULL, nameSpace=NULL, nsURI=character(0))
+xmlOutputDOM(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 }
 
 \arguments{
   \item{dtd}{a DTD object (see \code{\link{parseDTD}} and
  \code{\link{xmlTreeParse}}) which contains specifications about
  what elements are valid within other elements and what attributes
-are supported by different elements. This can be used to validate the document as it is being constructed incrementally.}
+ are supported by different elements. This can be used to validate the
+ document as it is being constructed incrementally.}
+  \item{attrs}{attributes for the top-level node, in the form of a named
+    vector or list.}
   \item{nameSpace}{the default namespace identifier to be used when
 an element is created without an explicit namespace.
 This provides a convenient way to specify the default name space that appers in tags throughout the resulting document.}

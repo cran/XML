@@ -17,7 +17,11 @@
 #include <gnome-xml/tree.h>
 #include <gnome-xml/entities.h>
 #else
+#if 0
+/* Problems with xmlValidCtxt in libxml2-2.4.[n] where n >= 21*/
 #include <libxml/valid.h>
+#endif
+
 #include <libxml/parser.h> 
 #include <libxml/parserInternals.h> 
 #include <libxml/tree.h>

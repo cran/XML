@@ -1,49 +1,48 @@
-WARNING: ignoring environment value of R_HOME
-[<-.XMLNode              Assign sub-nodes to an XML node
-append.xmlNode           Add children to an XML node
-asXMLNode                Converts non-XML node objects to XMLTextNode
-                         objects
-dtdElement               Gets the definition of an element or entity from
-                         a DTD.
-dtdElementValidEntry     Determines whether an XML element allows a
-                         particular type of sub-element.
-dtdIsAttribute           Query if a name is a valid attribute of a DTD
-                         element.
-dtdValidElement          Determines whether an XML tag is valid within
-                         another.
-length.XMLNode           Determine the number of children in an XMLNode
-                         object.
-libxmlVersion            Get the version of the libxml library.
-names.XMLNode            Get the names of an XML nodes children.
-newXMLDoc                Create internal XML node or document object
-parseDTD                 Read a Document Type Definition (DTD)
-print.XMLAttributeDef    Methods for displaying XML objects
-saveXML                  Output internal XML Tree
-supportsExpat            Determines which native XML parsers are being
-                         used.
-xmlApply                 Applies a function to each of the children of an
-                         XMLNode
-xmlAttributeType         The type of an XML attribute for element from
-                         the DTD
-xmlAttrs                 Get the list of attributes of an XML node.
-xmlChildren              Gets the sub-nodes within an XMLNode object.
-xmlContainsEntity        Checks if an entity is defined within a DTD.
-xmlDOMApply              Apply function to nodes in an XML tree/DOM.
-xmlElementsByTagName     Retrieve the children of an XML node with a
-                         specific tag name
-xmlEventHandler          Default handlers for the SAX-style event XML
-                         parser
-xmlEventParse            XML Event/Callback element-wise Parser
-xmlHandler               Example XML Event Parser Handler Functions
-xmlName                  Extraces the tag name of an XMLNode object.
-xmlNamespace             Retrieve the namespace value of an XML node.
-xmlNode                  Create an XML node
-xmlOutputBuffer          XML output streams
-xmlRoot                  Get the top-level XML node.
-xmlSize                  The number of sub-elements within an XML node.
-[.XMLNode                Convenience accessors for the children of
-                         XMLNode objects.
-xmlTree                  An internal, updatable DOM object for building
-                         XML trees
-xmlTreeParse             XML Parser
-xmlValue                 Extract the contents of a leaf XML node
+[<-.XMLNode             Assign sub-nodes to an XML node
+append.xmlNode          Add children to an XML node
+asXMLNode               Converts non-XML node objects to XMLTextNode
+                        objects
+dtdElement              Gets the definition of an element or entity
+                        from a DTD.
+dtdElementValidEntry    Determines whether an XML element allows a
+                        particular type of sub-element.
+dtdIsAttribute          Query if a name is a valid attribute of a DTD
+                        element.
+dtdValidElement         Determines whether an XML tag is valid within
+                        another.
+length.XMLNode          Determine the number of children in an XMLNode
+                        object.
+libxmlVersion           Get the version of the libxml library.
+names.XMLNode           Get the names of an XML nodes children.
+newXMLDoc               Create internal XML node or document object
+parseDTD                Read a Document Type Definition (DTD)
+print.XMLAttributeDef   Methods for displaying XML objects
+saveXML                 Output internal XML Tree
+supportsExpat           Determines which native XML parsers are being
+                        used.
+xmlApply                Applies a function to each of the children of
+                        an XMLNode
+xmlAttributeType        The type of an XML attribute for element from
+                        the DTD
+xmlAttrs                Get the list of attributes of an XML node. 
+xmlChildren             Gets the sub-nodes within an XMLNode object. 
+xmlContainsEntity       Checks if an entity is defined within a DTD.
+xmlDOMApply             Apply function to nodes in an XML tree/DOM.
+xmlElementsByTagName    Retrieve the children of an XML node with a
+                        specific tag name
+xmlEventHandler         Default handlers for the SAX-style event XML
+                        parser
+xmlEventParse           XML Event/Callback element-wise Parser
+xmlHandler              Example XML Event Parser Handler Functions
+xmlName                 Extraces the tag name of an XMLNode object.
+xmlNamespace            Retrieve the namespace value of an XML node.
+xmlNode                 Create an XML node
+xmlOutputBuffer         XML output streams
+xmlRoot                 Get the top-level XML node.
+xmlSize                 The number of sub-elements within an XML node.
+[.XMLNode               Convenience accessors for the children of
+                        XMLNode objects.
+xmlTree                 An internal, updatable DOM object for building
+                        XML trees
+xmlTreeParse            XML Parser
+xmlValue                Extract the contents of a leaf XML node

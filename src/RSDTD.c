@@ -288,6 +288,10 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
 }
 
 #ifdef LIBXML2
+/* libxml2 2.4.21 (and perhaps earlier) redefines this to have a return type of void,
+   rather than void*. Need to figure out if this makes any real difference to the interface
+   and also when to 
+*/
 void*
 RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name)
 {
