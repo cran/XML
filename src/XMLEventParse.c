@@ -186,13 +186,15 @@ RS_XML(fatalErrorHandler)(void *ctx, const char *msg, ...)
 
   PROBLEM "Fatal error in the XML event driven parser for %s.",
                     ((RS_XMLParserData*) ctx)->fileName
- ERROR;
+  ERROR;
 
 }
 
 void
 RS_XML(errorHandler)(void *ctx, const char *msg, ...)
 {
+/*XXX Need to be smarter here about the msg coming from libxml containing formatting instructions
+  e.g. %s and then picking up the ... */
   PROBLEM "Error in the XML event driven parser for %s: %s",
     ((RS_XMLParserData*) ctx)->fileName, msg
   ERROR;

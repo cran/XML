@@ -18,12 +18,12 @@ obj[[i]]
   The \code{XMLDocumentContent} is the container for the top-level node that also contains information
   such as the URI/filename and XML version. This accessor method is merely a convenience to get 
   access to children of the top-level node.}
+ \item{i}{index of the child of interest or the name of an XML element
+   of interest. In this latter case, only the first matching element is
+   returned, if any.}
   \item{\dots}{the identifiers for the children to be retrieved,
 given as integer indices, names, etc. in the usual format for the
 generic \code{link{[}} and \code{link{[[}} operators}
-}
-\details{
-
 }
 \value{
  A list or single element containing the

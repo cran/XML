@@ -87,3 +87,39 @@ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klass
   return(tmp);
 }
 
+
+#include <R_ext/Rdynload.h>
+
+/* Simple macro for expanding ENTRY(x, n) to {"<x>", (DL_FUNC) &<x>, <n>} */
+
+#define ENTRY(name, n)  { #name, (DL_FUNC) &name, n }
+
+static R_CallMethodDef callMethods[] = {
+	ENTRY(RS_XML_RecursiveApply, 3),
+	ENTRY(RS_XML_HtmlParseTree, 7),
+	ENTRY(RS_XML_getDTD, 4),
+	ENTRY(RS_XML_libxmlVersion, 0),
+	ENTRY(RS_XML_Parse, 10),
+	ENTRY(RS_XML_ParseTree, 10),
+	ENTRY(R_newXMLDtd, 4),
+	ENTRY(R_newXMLDoc, 2),
+	ENTRY(R_newXMLNode, 4),
+	ENTRY(R_newXMLTextNode, 1),
+	ENTRY(R_xmlNewComment, 1),
+	ENTRY(R_newXMLCDataNode, 2),
+	ENTRY(R_newXMLPINode, 3),
+	ENTRY(R_xmlNewNs, 3),
+	ENTRY(R_xmlSetNs, 2),
+	ENTRY(R_insertXMLNode, 2),
+	ENTRY(R_saveXMLDOM, 5),
+	{NULL, NULL, 0}
+};
+
+
+void
+R_init_XML(DllInfo *dll)
+{
+   R_useDynamicSymbols(dll, FALSE);
+   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+}
+

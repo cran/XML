@@ -272,7 +272,8 @@ R_createXMLNodeRef(xmlNodePtr node)
   the S value `NULL'.
  */
 USER_OBJECT_
-R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression, USER_OBJECT_ sindent)
+R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression, USER_OBJECT_ sindent,
+              USER_OBJECT_ prefix)
 {
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
     char *fileName = NULL;

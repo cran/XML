@@ -2,15 +2,25 @@
 \alias{saveXML}
 \alias{saveXML.XMLInternalDocument}
 \alias{saveXML.XMLInternalDOM}
+\alias{saveXML.XMLNode}
+\alias{saveXML.XMLOutputStream}
 \title{Output internal XML Tree}
 \description{
-Methods for writing the representation of an XML tree stored in 
-internal memory to a string or file.
+  Methods for writing the representation of an XML tree to a string or
+  file.
+  Originally this was intended to be used only for
+  DOMs (Document Object Models) stored in internal memory
+  created via \code{\link{xmlTree}}, but methods for
+  \code{XMLNode} and \code{XMLOutputStream} objects
+  allow it to be generic for different representations of the
+  XML tree.
 }
 \usage{
-saveXML(doc, file=NULL, compression=0, indent=T)
-saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=T)
-saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=T)
+saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+saveXML.XMLNode(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+saveXML.XMLOutputStream(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
 }
 \arguments{
   \item{doc}{the document object representing the XML document.}
@@ -22,6 +32,11 @@ saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=T)
     at the expense of computational time to do the compression and decompression.}
   \item{indent}{a logical value indicating whether to indent
     the nested nodes when serializing to the stream.}
+  \item{prefix}{a string that is written to the stream/connection before
+     the XML is output. If this is NULL, it is ignored. This allows us to
+     put the XML introduction/preamble at the beginning of the document
+     while allowing it to be omitted when we are outputting multiple
+     "documents" within a single stream.}
 }
 \details{
  One can create an internal XML tree (or DOM)
@@ -49,7 +64,18 @@ saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=T)
 }
 
 \examples{
+con <- xmlOutputDOM()
+con$addTag("author", "Duncan Temple Lang")
+con$addTag("address",  close=FALSE)
+con$addTag("office", "2C-259")
+con$addTag("street", "Mountain Avenue.")
+con$addTag("phone", close=FALSE)
+con$addTag("area", "908", attrs=c(state="NJ"))
+con$addTag("number", "582-3217")
+con$closeTag() # phone
+con$closeTag() # address
 
+saveXML(con$value(), file="con.xml")
 }
 \keyword{IO}
 \keyword{file}

@@ -1,3 +1,9 @@
+Version 0.94-0
+
+  *   Use registration of C routines
+
+  *   Added methods for saveXML for XMLNode and XMLOutputStream objects.
+
 Version 0.93-4
 
   *   replaceEntities argument for xmlEventParse.

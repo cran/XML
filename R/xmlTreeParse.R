@@ -27,6 +27,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      asText <- TRUE
  }
 
+
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),

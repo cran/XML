@@ -176,7 +176,7 @@ and another for entities. See \code{\link{parseDTD}}.
 
    # parse the document, discarding comments.
   
- xmlTreeParse(fileName, handlers=list("comment"=function(x, parent){NULL}))
+ xmlTreeParse(fileName, handlers=list("comment"=function(x,...){NULL}), asTree = TRUE)
 
    # print the entities
  invisible(xmlTreeParse(fileName,

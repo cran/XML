@@ -17,9 +17,9 @@ xmlRoot.XMLDocumentContent(x, ...)
 }
 \arguments{
   \item{x}{the object whose root/top-level XML node is to be returned.}
-  \item{skip}{a logical value that controls whether XMLComment objects that appear
-    before the real top-leve node of the document should be ignored
-   or not.}
+%  \item{skip}{a logical value that controls whether XMLComment objects that appear
+%    before the real top-leve node of the document should be ignored
+%%   or not.}
   \item{...}{arguments that are passed by the generic to the different specialized 
        methods of this generic.}
 }

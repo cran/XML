@@ -15,8 +15,8 @@
  standard callback names.
 }
 \usage{
-xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks, addContext=T,
-               useTagName=F, asText =F, trim=T, useExpat=F, isURL = F,
+xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks = FALSE, addContext=TRUE,
+               useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
                 state = NULL, replaceEntities = TRUE)
 }
 \arguments{
@@ -62,8 +62,7 @@ If this is True, each callback function  should support
  \item{trim}{
   whether to strip white space from the beginning and end of text strings.
 }
- \item{restartCounter}{
- }
+% \item{restartCounter}{}
  \item{useExpat}{
    a logical value indicating whether to use the expat SAX parser,
   or to default to the libxml.

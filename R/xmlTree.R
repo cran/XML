@@ -150,19 +150,38 @@ function(name, ..., attrs=NULL, namespace="", doc = NULL)
 
 
 saveXML <-
-function(doc, file=NULL, compression=0, indent=TRUE)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
 {
  UseMethod("saveXML")
 }
 
 saveXML.XMLInternalDocument <-
-function(doc, file=NULL, compression=0, indent=TRUE)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
 {
-  .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent))
+  .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent), as.character(prefix))
 }
 
 saveXML.XMLInternalDOM <-
-function(doc, file=NULL, compression=0, indent=TRUE)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
 {
   saveXML(doc$value(), file=file, compression=compression, indent=indent)
 }
+
+
+saveXML.XMLOutputStream =
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n')
+{
+  saveXML(doc$value(), file=file, compression=compression, indent=indent)
+}
+
+saveXML.XMLNode =
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n')
+{
+  sink(file)
+  if(!is.null(prefix))
+    cat(prefix)
+  on.exit(sink())
+  print(doc)
+}
+
+
