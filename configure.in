@@ -97,6 +97,10 @@ dnl    directory is usually libxml/
 
 if test -n "${USE_LIBXML}" ; then
 
+  dnl if the user has not specified anything about libxml,
+  dnl then lets look for xml-config. We let the user give this
+  dnl as an environment variable `XML_CONFIG'.
+
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
    if test -z "${XML_CONFIG}" ; then
      AC_PATH_PROGS(XML_CONFIG, xml-config)
@@ -447,7 +451,7 @@ echo ""
 echo "****************************************"
 
  dnl create the different targets
-AC_OUTPUT(cleanup src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE})
+AC_OUTPUT(src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE})
 chmod +x cleanup
 
  dnl 
