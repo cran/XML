@@ -30,7 +30,7 @@ pairs in the XML tag
 \code{\link{xmlName}}}
 
 \examples{
- fileName <- system.file("data", "mtcars.xml", pkg="XML") 
+ fileName <- system.file("exampleData", "mtcars.xml", package="XML") 
  doc <- xmlTreeParse(fileName)
 
  xmlAttrs(doc$doc$children[["dataset"]])
@@ -38,4 +38,4 @@ pairs in the XML tag
  xmlAttrs(doc$doc$children[["dataset"]][["variables"]])
 }
 \keyword{XML}
-\keyword{IO}
+\keyword{file}

@@ -53,7 +53,7 @@ on \code{xmlChildren(x)}.
 }
 
 \examples{
- doc <- xmlTreeParse(system.file("data", "mtcars.xml", pkg="XML"))
+ doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
  r <- xmlRoot(doc)
  xmlSApply(r[[2]], xmlName)
 
@@ -62,5 +62,5 @@ on \code{xmlChildren(x)}.
  xmlSApply(r[[2]], xmlSize)
 
 }
-\keyword{IO}
+\keyword{file}
 

@@ -1,7 +1,7 @@
 # Requires xmlOutputBuffer 
 
 prompt.xml <-
-function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Rhelp.dtd">\n\n<Rhelp>',footer="</Rhelp>")
+function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Shelp.dtd">\n\n<Rhelp>',footer="</Rhelp>")
 {
 
   local <- list(...)
@@ -43,7 +43,7 @@ function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Rhelp.dtd">\n
             if(!is.missing.arg(argls[[i]]))  {
                xml$addTag("defaultValue", deparse(argls[[i]]),sep="")
             }
-            xml$addEndTag("arg")
+            xml$closeTag("arg")
             if(i < n)
               xml$addTag("next")
         }

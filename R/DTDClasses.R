@@ -17,45 +17,44 @@
 
 
 print.XMLElementDef <-
-function(def)
+function(x)
 {
- cat("<!ELEMENT",def$name," ")
- print(def$contents)
+ cat("<!ELEMENT", x$name," ")
+ print(x$contents)
  cat(">\n")
- if(length(def$attributes)) {
+ if(length(x$attributes)) {
 
- cat("<!ATTLIST ",def$name,"\n")
-  for(i in def$attributes) {
+ cat("<!ATTLIST ", x$name,"\n")
+  for(i in x$attributes) {
     cat("\t")
     print(i)
     cat("\n")
   }
   cat(">\n")
  }
- 
 }
 
 
 print.XMLElementContent <-
-function(el)
+function(x)
 {
- if(names(el$type)[1] == "PCData") {
+ if(names(x$type)[1] == "PCData") {
    cat(" ( #PCDATA ) ")
    return()
  }
  cat("(")
- cat(el$elements)
- cat(")",switch(names(el$ocur)[1],Once="", "One or More"="+","Zero or One"="?","Mult"="*")) 
+ cat(x$elements)
+ cat(")",switch(names(x$ocur)[1],Once="", "One or More"="+","Zero or One"="?","Mult"="*")) 
 }
 
 
 print.XMLOrContent <-
-function(el)
+function(x)
 {
- n <- length(el$elements)
+ n <- length(x$elements)
  cat("( ")
  for(i in 1:n) {
-   print(el$elements[[i]])
+   print(x$elements[[i]])
    if(i < n)
     cat(" | ")
  }
@@ -63,12 +62,12 @@ function(el)
 }
 
 print.XMLSequenceContent <-
-function(el)
+function(x)
 {
  cat("( ")
- n <- length(el$elements)
+ n <- length(x$elements)
  for(i in 1:n) {
-    print(el$elements[[i]])
+    print(x$elements[[i]])
     if(i < n)
         cat(", ")
  }
@@ -77,14 +76,14 @@ function(el)
 
 
 print.XMLAttributeDef <-
-function(def)
+function(x)
 {
- if(names(def$defaultType)[1] != "Implied")
-   dflt <- paste("\"",def$defaultValue,"\"",collapse="",sep="")
+ if(names(x$defaultType)[1] != "Implied")
+   dflt <- paste("\"", x$defaultValue,"\"",collapse="",sep="")
  else
   dflt <- ""
 
- cat(def$name, xmlAttributeType(def), xmlAttributeType(def,T), dflt)
+ cat(x$name, xmlAttributeType(x), xmlAttributeType(x, T), dflt)
 }
 
 xmlAttributeType <-
@@ -115,9 +114,9 @@ function(def, defaultType = F)
 
 
 print.XMLEntity <-
-function(ent)
+function(x)
 {
- cat("<!ENTITY %", ent$name,paste("\"",ent$value,"\"",sep="",collapse=""), ">\n")
+ cat("<!ENTITY %", x$name,paste("\"", x$value,"\"",sep="",collapse=""), ">\n")
 }
 
 

@@ -31,8 +31,8 @@ xmlName(node)
 }
 
 \examples{
- fileName <- system.file("data", "test.xml", pkg="XML") 
+ fileName <- system.file("exampleData", "test.xml", package="XML") 
  doc <- xmlTreeParse(fileName)
- xmlName(doc$doc$children[[1]])
+ xmlName(xmlRoot(doc)[[1]])
 }
-\keyword{IO}
+\keyword{file}

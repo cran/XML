@@ -8,11 +8,7 @@
 #include <ctype.h>
 #include <stdlib.h> 
 
-#ifdef USE_R
 #include "RSCommon.h"
-#else
-#include "S.h"
-#endif
 #include "RS_XML.h"
 
 #ifdef LIBEXPAT

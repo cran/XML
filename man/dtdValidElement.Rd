@@ -44,7 +44,7 @@ within children of that tag.}
 }
 
 \examples{
- dtdFile <- system.file("data", "foo.dtd", pkg="XML")
+ dtdFile <- system.file("exampleData", "foo.dtd", package="XML")
  foo.dtd <- parseDTD(dtdFile)
 
   # The following are true.
@@ -54,4 +54,4 @@ within children of that tag.}
   # This is false.
  dtdValidElement("variable","dataset", dtd = foo.dtd)
 }
-\keyword{IO}
+\keyword{file}

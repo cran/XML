@@ -1,17 +1,23 @@
 \name{[.XMLNode}
 \alias{[.XMLNode}
 \alias{[[.XMLNode}
+\alias{[[.XMLDocumentContent}
 \title{Convenience accessors for the children of XMLNode objects.}
 \description{
  These provide a simplified syntax for extracting the children
 of an XML node.
 }
 \usage{
-[.XMLNode(obj, ...)
-[[.XMLNode(obj, ...)
+obj[[i]]
+"[.XMLNode"(obj, ...)
+"[[.XMLNode"(obj, ...)
+"[[.XMLDocumentContent"(obj, ...)
 }
 \arguments{
-  \item{obj}{the XML node whose children are to be accessed}
+  \item{obj}{the XML node or the top-level document content in which the children are to be accessed.
+  The \code{XMLDocumentContent} is the container for the top-level node that also contains information
+  such as the URI/filename and XML version. This accessor method is merely a convenience to get 
+  access to children of the top-level node.}
   \item{\dots}{the identifiers for the children to be retrieved,
 given as integer indices, names, etc. in the usual format for the
 generic \code{link{[}} and \code{link{[[}} operators}
@@ -38,5 +44,5 @@ and identified by \dots.
 
 }
 \keyword{XML}
-\keyword{IO}
+\keyword{file}
 

@@ -36,6 +36,8 @@ extern char *strdup(const char *);
 #define INPUT_CHUNK	250
 #define CUR (ctxt->token ? ctxt->token : (*ctxt->input->cur))
 
+#ifdef OLD_SKIP_BLANKS
+
 #define SKIP_BLANKS 							\
     do { 								\
 	while (IS_BLANK(CUR)) NEXT;					\
@@ -60,6 +62,13 @@ extern char *strdup(const char *);
     if (*ctxt->input->cur == '%') xmlParserHandlePEReference(ctxt);	\
     if (*ctxt->input->cur == '&') xmlParserHandleReference(ctxt);	\
 }}
+
+#else
+
+#define SKIP_BLANKS xmlSkipBlankChars(ctxt)
+#define NEXT xmlNextChar(ctxt)
+
+#endif
 
 
 /* end temporary. */
@@ -93,22 +102,23 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
  
 
  if(localAsText) {
-  ctxt = xmlCreateDocParserCtxt((xmlChar*) extId);
+     ctxt = xmlCreateDocParserCtxt((xmlChar*) extId);
  } else {
-   if(LOGICAL_DATA(isURL)[0] == 0) {
-      struct stat tmp_stat;
-      if(extId == NULL || stat(extId, &tmp_stat) < 0) {
-         PROBLEM "Can't find file %s", extId
-         ERROR;
-      }
-   }
+     if(LOGICAL_DATA(isURL)[0] == 0) {
+	 struct stat tmp_stat;
+	 if(extId == NULL || stat(extId, &tmp_stat) < 0) {
+             PROBLEM "Can't find file %s", extId
+	     ERROR;
+	 }
+     }
 
-   ctxt = xmlCreateFileParserCtxt(extId);  /* from parser.c xmlSAXParseFile */
+      ctxt = xmlCreateFileParserCtxt(extId);  /* from parser.c xmlSAXParseFile */
  }
-  if(ctxt == NULL) {
+
+ if(ctxt == NULL) {
     PROBLEM "error creating XML parser for `%s'", extId
     ERROR;
-  }
+ }
 
   ctxt->validate = 1;
 
@@ -117,7 +127,7 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
 
 
   if(localAsText) {
-    xmlCreateIntSubset(ctxt->myDoc, dtdName,NULL, NULL);
+    xmlCreateIntSubset(ctxt->myDoc, dtdName, NULL, NULL);
     while(ctxt->input->cur && ctxt->input->cur[0]) {
       SKIP_BLANKS;
       xmlParseMarkupDecl(ctxt);
@@ -125,7 +135,14 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
     dtd = ctxt->myDoc->intSubset;
   }  else {
      /* Read the file. */
+    /* Added for 2.2.12. May need to be conditional for 1.8.9 */
     ctxt->sax->internalSubset(ctxt->userData, dtdName, extId, extId);
+    /* Warnings will ensue about not being in internal subset if we don't go to level 2. */
+#ifdef USE_EXTERNAL_SUBSET
+    ctxt->inSubset = 2;
+    ctxt->sax->externalSubset(ctxt->userData, dtdName, extId, extId);
+    ctxt->inSubset = 0;
+#endif
     dtd = ctxt->myDoc->extSubset;
   }
 
@@ -251,6 +268,10 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
    scanData.counter = 0;
 
    xmlHashScan(table, RS_xmlElementTableConverter, &scanData);
+
+   dtdEls = SET_LENGTH(dtdEls, scanData.counter);
+   dtdNames = SET_LENGTH(dtdNames, scanData.counter);
+
  }
 #else
       for(i = 0; i < n; i++) {
@@ -310,6 +331,14 @@ RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
    scanData.counter = 0;
 
    xmlHashScan(table, RS_xmlEntityTableConverter, &scanData);
+     /* Reset the length to be the actual number rather than the
+        capacity of the table.
+        See ProcessElements also.
+      */
+
+   dtdEls = SET_LENGTH(dtdEls, scanData.counter);
+   dtdNames = SET_LENGTH(dtdNames, scanData.counter);
+
  }
 #else
       for(i = 0; i < n; i++) {

@@ -51,7 +51,7 @@ indexing this \code{elements} list.
 }
 
 \examples{
- dtdFile <- system.file("data","foo.dtd", pkg="XML")
+ dtdFile <- system.file("exampleData","foo.dtd", package="XML")
  foo.dtd <- parseDTD(dtdFile)
  
    # Get the definition of the `entry1' element
@@ -63,4 +63,4 @@ indexing this \code{elements} list.
   # Get the definition of the `img' entity
  dtdEntity("img", foo.dtd)
 }
-\keyword{IO}
+\keyword{file}

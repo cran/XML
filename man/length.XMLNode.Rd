@@ -26,10 +26,10 @@ It is provided as a convenient form of calling the
 }
 
 \examples{
-  doc <- xmlTreeParse(system.file("data", "mtcars.xml", pkg="XML"))
+  doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
   r <- xmlRoot(doc, skip=T)
   length(r)
     # get the last entry
   r[[length(r)]]
 }
-\keyword{IO}
+\keyword{file}

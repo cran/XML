@@ -9,6 +9,8 @@
 
 #include "Rinternals.h" /* Macros, etc. */
 
+USER_OBJECT_ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses);
+
 USER_OBJECT_
 RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs)
 {
@@ -40,21 +42,43 @@ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs)
 }
 
 USER_OBJECT_
-RS_XML(findFunction)(const char *opName, USER_OBJECT_ _userObject) 
-{ 
-  int i;
-  USER_OBJECT_ fun = NULL;
-
-     /* Get the names of the list. */
-  USER_OBJECT_ names = getAttrib(_userObject, R_NamesSymbol);
-     /* lookup function in the names of the list */
-  for (i = 0; i < GET_LENGTH(names); i++) {
-      if(!strcmp(opName, CHAR(STRING_ELT(names, i)))) {
-          fun = VECTOR_ELT(_userObject, i);
-          break;
-      }
-  }
-  return(fun);
+RS_XML(RecursiveApply)(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses)
+{
+  USER_OBJECT_ ans;
+  PROTECT(top = duplicate(top));
+  ans = R_InternalRecursiveApply(top, func, klasses);
+  UNPROTECT(1);
+  return(ans);
 }
 
+USER_OBJECT_
+R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses)
+{
+  int CHILD_NODE = 2, i;
+  USER_OBJECT_ kids;
+  int numChildren;
+  USER_OBJECT_ args, tmp;
+
+
+  if(GET_LENGTH(top) > CHILD_NODE) {
+    kids = VECTOR_ELT(top, CHILD_NODE);
+    numChildren = GET_LENGTH(kids);
+        /* Do the children first. */
+    PROTECT(args = NEW_LIST(1));
+    PROTECT(tmp = NEW_LIST(numChildren));  
+    for(i = 0; i < numChildren; i++) {
+      SET_VECTOR_ELT(tmp, i, R_InternalRecursiveApply(VECTOR_ELT(kids, i), func, klasses));
+    }
+    SET_VECTOR_ELT(top, CHILD_NODE, tmp);
+    UNPROTECT(2);
+  }
+
+  PROTECT(args = NEW_LIST(1));
+  SET_VECTOR_ELT(args, 0, top);
+  tmp =  RS_XML(invokeFunction)(func, args);
+  UNPROTECT(1);
+
+
+  return(tmp);
+}
 

@@ -7,6 +7,9 @@ function(x, ...)
 xmlRoot.XMLDocument <-
 function(x, ...)
 {
+#  x$children[[1]]
+# x$doc
+
   xmlRoot(x$doc, ...)
 }
 
@@ -14,6 +17,7 @@ xmlRoot.XMLDocumentContent <-
 function(x, skip=T)
 {
   a <- x$children[[1]]
+#  a <- x$children
   if(skip & inherits(a, "XMLComment")) {
      which <- sapply(x$children, function(x) !inherits(x, "XMLComment"))
      if(any(which)) {

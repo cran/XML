@@ -8,7 +8,23 @@ extern "C" {
 
   #if defined(_S_)
   /* || defined(_R_) */
+
+  #ifdef _SPLUS5_
+  #ifdef ARGS
+  #undef ARGS
+  #endif
+  #endif
+
+
   #include "S.h"
+
+  #ifdef _SPLUS5_
+
+  #include "S_tokens.h"
+  typedef boolean s_boolean;
+
+  #endif /* End of _SPLUS5_ */
+
 
   #endif
 

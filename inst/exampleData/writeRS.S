@@ -12,6 +12,7 @@ function(x, con, ...)
    return(writeXML.object(x, con, ...))
 
  name <- paste("writeXML", typeof(x), sep=".")
+
  if(exists(name, mode="function")) {
    f <- get(name)
    f(x, con, ...)
@@ -19,6 +20,8 @@ function(x, con, ...)
     lapply(x, function(i, con, ...) { con$addTag("integer", i); T} , con=con, ...)
  } else if(!is.na(match(mode(x), c("integer", "numeric", "character", "logical")))) {
     lapply(x, function(i, con, tag, ...) { con$addTag(tag, i); T} , con=con, tag=mode(x), ...)
+ } else if(typeof(x) == "NULL") {
+   con$addTag("null")
  } else
    stop(paste("No method for writeXML", typeof(x)))
 
@@ -130,7 +133,7 @@ function(x, con, ...)
  } else if(x[[1]] == "for") {
    writeXML.for(x, con, ...)
  } else if(isLogicalExpression(x)) {
-   writeXML.logical(x, con, ...)
+   writeXML.logicalExpr(x, con, ...)
  } else if(isComparator(x)) {
    writeXML.comparator(x, con, ...)
  } else if(x[[1]] == "while") {
@@ -147,9 +150,10 @@ function(x, con, ...)
    writeXML(x[[2]], con, ...)
    con$addEndTag("repeat")
  } else if(x[[1]] == "return") {
-   con$addTag("cond", close=F)
-     writeXML.for(x[[2]], con, ...)
-   con$addEndTag("cond")
+   con$addTag("return", close=F)
+    if(length(x) > 1)
+     writeXML(x[[2]], con, ...)
+   con$addEndTag("return")
  } else if(mode(x) == "call") {
    writeXML.call(x, con, ...)
  } 
@@ -241,13 +245,18 @@ function(x, con, ...)
      # Don't make this a x[2:length(x)]
      # or x[-1]. Infinite loop results.
    argNames <- names(x)
-   for(i in 2:length(x)) {
+
+ if(length(x) > 1) {
+   for(i in seq(2, length=length(x)-1)) {
     if(!is.null(argNames) && argNames[i] != "")
      con$addTag("namedArg", attrs=c(name=argNames[i]), close=F)
+
     writeXML(x[[i]], con, ...)
+
     if(!is.null(argNames) && argNames[i] != "")
      con$addEndTag("namedArg")
    }
+ }
   con$addEndTag("call")
 
  invisible(call)
@@ -261,7 +270,7 @@ function(x, ...)
 }
 
 
-writeXML.logical <-
+writeXML.logicalExpr <-
 function(x, con, ...)
 {
  logicalTags <- c("&" ="elementAnd", "&&"="logicalAnd", 
@@ -298,4 +307,41 @@ function(x, con, ...)
   writeXML(x[[3]], con, ...)
 
   con$addEndTag(tag) 
+}
+
+writeXML.builtin <-
+#
+# for primitives 
+#
+function(x, con, ...)
+{
+ con$addTag("builtin", attrs=c(name=getPrimitiveName(x)), close=F)
+}
+
+
+writeXML.special <-
+#
+# for primitives 
+#
+function(x, con, ...)
+{
+ con$addTag("special", attrs=c(name=getPrimitiveName(x)), close=F)
+}
+
+
+writeXML.environment <-
+#
+# for primitives 
+#
+function(x, con, ...)
+{
+ con$addTag("environment", attrs=c(name=getPrimitiveName(x)), close=F)
+}
+
+
+
+getPrimitiveName <-
+function(obj)
+{
+ .Call("RXML_getPrimitiveName", obj)
 }

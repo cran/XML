@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
-<!DOCTYPE literate SYSTEM "literate.dtd"
- [
+<!DOCTYPE literate SYSTEM "literate.dtd" [
    <!ENTITY % forS "INCLUDE"> 
    <!ENTITY % forR "IGNORE"> 
- ]
->
+]>
 
 <literate>
 <doc>

@@ -12,8 +12,9 @@ via the assignment operator, such as
 \code{x[["myTag"]] <- xmlNode("mySubTag")}.
 }
 \usage{
-[<-.XMLNode(x, i, value)
-[[<-.XMLNode(x, i, value)
+x[i] <- value
+"[<-.XMLNode"(x, i, value)
+"[[<-.XMLNode"(x, i, value)
 }
 \arguments{
   \item{x}{the \code{XMLNode} object to which the sub-node is to be assigned.}
@@ -44,4 +45,4 @@ nodes.
  top[[3]] <- xmlNode("tag",attrs=c(id="name"))
 }
 \keyword{XML}
-\keyword{IO}
+\keyword{file}

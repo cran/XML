@@ -34,7 +34,7 @@ entitiy or element definitions.
 }
 
 \examples{
- dtdFile <- system.file("data", "foo.dtd", pkg="XML")
+ dtdFile <- system.file("exampleData", "foo.dtd", package="XML")
  foo.dtd <- parseDTD(dtdFile)
  
   # Look for entities.
@@ -44,4 +44,4 @@ entitiy or element definitions.
   # Now look for an element
  xmlContainsElement("record", foo.dtd)
 }
-\keyword{IO}
+\keyword{file}

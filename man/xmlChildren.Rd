@@ -7,10 +7,10 @@
  XMLNode object.
 }
 \usage{
-xmlChildren(node)
+xmlChildren(x)
 }
 \arguments{
-  \item{node}{an object of class XMLNode.}
+  \item{x}{an object of class XMLNode.}
 }
 \value{
  A list whose elements are sub-nodes of the user-specified
@@ -26,8 +26,8 @@ XMLNode. These are also of class XMLNode.
 
 
 \examples{
-  fileName <- system.file("data", "mtcars.xml", pkg="XML")
+  fileName <- system.file("exampleData", "mtcars.xml", package="XML")
   doc <- xmlTreeParse(fileName)
   names(xmlChildren(doc$doc$children[["dataset"]]))
 }
-\keyword{IO}
+\keyword{file}

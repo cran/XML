@@ -193,7 +193,7 @@ struct _xmlHashTable {
 }; 
 #endif
 
-#if LIBXML2
+#if OWN_XML_HASH_SIZE
 int xmlHashSize(xmlHashTablePtr table)
 {
   /* For version 2.2.* */
@@ -204,3 +204,20 @@ int xmlHashSize(xmlHashTablePtr table)
 }
 #endif
 
+USER_OBJECT_
+RS_XML(findFunction)(const char *opName, USER_OBJECT_ _userObject)
+{
+  int i;
+  USER_OBJECT_ fun = NULL;
+ 
+     /* Get the names of the list. */
+  USER_OBJECT_ names = GET_NAMES(_userObject);
+     /* lookup function in the names of the list */
+  for (i = 0; i < GET_LENGTH(names); i++) {
+      if(!strcmp(opName, CHAR_DEREF(STRING_ELT(names, i)))) {
+          fun = VECTOR_ELT(_userObject, i);
+          break;
+      }
+  }
+  return(fun);
+}          

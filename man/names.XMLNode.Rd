@@ -39,10 +39,10 @@ of the fields, use \code{names(unclass(x))}.
 }
 
 \examples{
- doc <- xmlTreeParse(system.file("data", "mtcars.xml", pkg="XML"))
+ doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
  names(xmlRoot(doc))
 
  r <- xmlRoot(doc)
  r[names(r) == "variables"]
 }
-\keyword{IO}
+\keyword{file}

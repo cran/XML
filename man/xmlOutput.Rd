@@ -1,0 +1,99 @@
+\name{xmlOutputBuffer}
+\alias{xmlOutputBuffer}
+\alias{xmlOutputDOM}
+\title{XML output streams}
+\description{
+
+These two functions provide different ways to construct XML documents
+incrementally.  They provide a single, common interface for adding and
+closing tags, and inerting nodes.  The buffer version stores the XML
+representation as a string.  The DOM version builds the tree of XML
+node objects.
+
+}
+\usage{
+xmlOutputBuffer(dtd=NULL, nameSpace=NULL, buf=NULL, nsURI=NULL, header="<?xml version=\"1.0\"?>")
+xmlOutputDOM(dtd=NULL, nameSpace=NULL)
+}
+
+\arguments{
+  \item{dtd}{a DTD object (see \code{\link{parseDTD}} and
+ \code{\link{xmlTreeParse}}) which contains specifications about
+ what elements are valid within other elements and what attributes
+are supported by different elements. This can be used to validate the document as it is being constructed incrementally.}
+  \item{nameSpace}{the default namespace identifier to be used when
+an element is created without an explicit namespace.
+This provides a convenient way to specify the default name space that appers in tags throughout the resulting document.}
+ \item{buf}{a connection object or a string into which the XML content is written.
+  This is currently a simplistic implementation since we will use the OOP-style classes
+  from the Omegahat projects in the future.}
+ \item{nsURI}{the URI or value for the name space which is used
+  when declaring the namespace.}
+ \item{header}{if non-NULL, this is immediately written to the output stream allowing
+  one to control the initial section of the XML document.}
+}
+\details{
+
+  These functions create a closure instance which provides methods or
+functions that operate on shared data used to represent the contents
+of the XML document being created and the current state of that
+creation.
+
+}
+\value{
+ Both of these functions return  a list
+of functions which operate on the XML data in a shared environment.
+
+  \item{value}{get the contents of the XML document as they are currently 
+  defined.}
+  \item{addTag}{add a new element to the document, specifying its name and attributes.
+   This allows the tag to be left open so that new elements will be added as children
+   of it.}
+  \item{closeTag}{close the currently open tag, indicating that new elements will be added,
+  by default,  as siblings of this one.}
+  \item{reset}{discard the current contents of the document so that we can start over
+  and free the resources (memory) associated with this document.}
+
+The following are specific to \code{xmlOutputDOM}:
+  \item{addNode}{insert an complete \code{XMLNode} object
+      into the currently active (i.e. open)  node.}
+  \item{current}{obtain the path or collection of indices to 
+   to the currently active/open node from the root node.}
+}
+\references{\url{http://www.omegahat.org/RSXML},
+\url{http://www.w3.org/xml}}
+\author{Duncan Temple Lang}
+
+\seealso{
+\code{\link{xmlNode}},
+\code{\link{xmlTextNode}},
+\code{\link{append.xmlNode}}
+}
+
+\examples{
+ con <- xmlOutputDOM()
+con$addTag("author", "Duncan Temple Lang")
+con$addTag("address",  close=F)
+ con$addTag("office", "2C-259")
+ con$addTag("street", "Mountain Avenue.")
+ con$addTag("phone", close=F)
+   con$addTag("area", "908", attrs=c(state="NJ"))
+   con$addTag("number", "582-3217")
+ con$closeTag() # phone
+con$closeTag() # address
+
+con$addTag("section", close=F)
+ con$addNode(xmlTextNode("This is some text "))
+ con$addTag("a","and a link", attrs=c(href="http://www.omegahat.org"))
+ con$addNode(xmlTextNode("and some follow up text"))
+
+ con$addTag("subsection", close=F)
+   con$addNode(xmlTextNode("some addtional text "))
+   con$addTag("a", attrs=c(href="http://www.omegahat.org"), close=F)
+     con$addNode(xmlTextNode("the content of the link"))
+   con$closeTag() # a
+ con$closeTag() # "subsection"
+con$closeTag() # section
+}
+\keyword{file}
+\keyword{XML}

@@ -5,16 +5,9 @@ xmlEventParse <-
 #
 # See also xmlParseTree()
 #
-function(file, handlers=xmlHandler(), ignoreBlanks=F, addContext = T, useTagName = T,
-           asText = F, trim=T, restartCounter=-1, useExpat = F, isURL=F) 
+function(file, handlers=xmlEventHandler(), ignoreBlanks=F, addContext = T, useTagName = T,
+           asText = F, trim=T, useExpat = F, isURL=F) 
 {
-# restart(T)
-# restartCounter <- restartCounter + 1
-
-# if(restartCounter >= 0) {
-#   return(handlers)
-# }
-
   if(missing(isURL)) { 
         # check if this is a URL or regular file.
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))

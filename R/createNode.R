@@ -28,6 +28,14 @@ function(sys, value, namespace="")
  x
 }
 
+xmlCommentNode <-
+function(text)
+{
+  node <- xmlTextNode(text)
+  class(node) <- c("XMLCommentNode", class(node))
+ node
+}
+
 xmlCDataNode <-
 function(...)
 {

@@ -30,10 +30,10 @@ xmlURL <- "http://www.omegahat.org/Scripts/Data/mtcars.xml"
 xmlText <- paste(scan.url(xmlURL, what="", sep="\n"),"\n",collapse="\n")
 }
 
-xmlURL <- system.file("data", "mtcars.xml", pkg="XML")
+xmlURL <- system.file("exampleData", "mtcars.xml", package="XML")
 xmlText <- paste(scan(xmlURL, what="", sep="\n"), "\n", collapse="\n")
 xmlEventParse(xmlText, handlers = NULL, asText=T)
 xmlEventParse(xmlText, xmlHandler(), useTagName=T, asText=T)
 }
-\keyword{IO}
+\keyword{file}
 \keyword{XML}

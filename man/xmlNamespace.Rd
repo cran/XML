@@ -14,7 +14,10 @@ one can use the
  expression \code{xmlNamespace(xmlRoot(doc))}.
 }
 \usage{
-xmlNamespace()
+xmlNamespace(x)
+}
+\arguments{
+\item{x}{the object whose namespace is to be computed}
 }
 \value{
  For non-root nodes, this returns a string giving the identifier
@@ -38,11 +41,11 @@ namespace.}
 }
 
 \examples{
-  doc <- xmlTreeParse(system.file("data", "job.xml", pkg="XML"))
+  doc <- xmlTreeParse(system.file("exampleData", "job.xml", package="XML"))
   xmlNamespace(xmlRoot(doc))
   xmlNamespace(xmlRoot(doc)[[1]][[1]])
 
   node <- xmlNode("arg", xmlNode("name", "foo"), namespace="R")
   xmlNamespace(node)
 }
-\keyword{IO}
+\keyword{file}

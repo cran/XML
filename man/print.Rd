@@ -20,17 +20,19 @@ Each typically outputs its contents in the way
 that they would appear in an XML document.
 }
 \usage{
-print.XMLAttributeDef(def)
-print.XMLElementContent(def)
-print.XMLElementDef(def)
-print.XMLEntity(def)
-print.XMLEntityRef(def)
-print.XMLNode(def)
-print.XMLOrContent(def)
-print.XMLSequenceContent(def)
+print.XMLAttributeDef(x)
+print.XMLElementContent(x)
+print.XMLElementDef(x)
+print.XMLEntity(x)
+print.XMLEntityRef(x)
+print.XMLNode(x, ...)
+print.XMLOrContent(x)
+print.XMLSequenceContent(x)
 }
 \arguments{
-  \item{def}{the XML object to be displayed}
+  \item{x}{the XML object to be displayed}
+  \item{...}{additional arguments to for controlling the output from
+  print. Currently unused.}
 }
 \value{
  Currently, \code{NULL}.
@@ -46,5 +48,5 @@ print.XMLSequenceContent(def)
 
 }
 \keyword{XML}
-\keyword{IO}
+\keyword{file}
 

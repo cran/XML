@@ -40,7 +40,7 @@ fixed, etc.
 }
 
 \examples{
- dtdFile <- system.file("data", "foo.dtd", pkg="XML")
+ dtdFile <- system.file("exampleData", "foo.dtd", package="XML")
  foo.dtd <- parseDTD(dtdFile)
 
     # true
@@ -49,4 +49,4 @@ fixed, etc.
     # false
   dtdIsAttribute("date", "dataset", foo.dtd)
 }
-\keyword{IO}
+\keyword{file}

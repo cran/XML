@@ -9,13 +9,12 @@ it treats  the object as a string and creates
 an \code{XMLTextNode} object.
 }
 \usage{
-asXMLNode(x, namespace="")
+asXMLNode(x)
 }
 \arguments{
   \item{x}{the object to be converted to an \code{XMLNode} object.
    This is typically alread an object that inherits from \code{XMLNode}
    or a string.}
-  \item{namespace}{the XML namespace identifer for this node.}
 }
 \value{
 }
@@ -35,4 +34,4 @@ asXMLNode(x, namespace="")
    # unaltered.
  asXMLNode(xmlNode("p"))
 }
-\keyword{IO}
+\keyword{file}

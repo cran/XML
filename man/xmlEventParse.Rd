@@ -60,6 +60,8 @@ than performing a second dispatch in \code{startElement()}.
  \item{trim}{
   whether to strip white space from the beginning and end of text strings.
 }
+ \item{restartCounter}{
+ }
  \item{useExpat}{
    a logical value indicating whether to use the expat SAX parser,
   or to default to the libxml.
@@ -95,7 +97,7 @@ to connect to remote servers.
 \seealso{ \link{xmlTreeParse} }
 
 \examples{
- fileName <- system.file("data", "mtcars.xml", pkg="XML")
+ fileName <- system.file("exampleData", "mtcars.xml", package="XML")
 
    # Print the name of each XML tag encountered at the beginning of each
    # tag.
@@ -113,4 +115,3 @@ xmlEventParse(xmlText, asText=T)
 }
 \keyword{file}
 \keyword{XML}
-\keyword{DTD}

@@ -39,8 +39,8 @@ xmlRoot.XMLDocumentContent(x, skip = T)
 }
 
 \examples{
-  doc <- xmlTreeParse(system.file("data", "mtcars.xml", pkg="XML"))
+  doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
   xmlRoot(doc)
 }
-\keyword{IO}
+\keyword{file}
 

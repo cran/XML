@@ -18,7 +18,7 @@
 #include "RSDTD.h"
 
 int RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans);
-
+USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *parserSettings);
 
 /**
   Entry point for reading, parsing and converting an XML tree
@@ -87,8 +87,7 @@ extern int xmlDoValidityCheckingDefaultValue;
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
   }
 
-  /* If one wants entities expanded directly and to appear as text.
-  */
+    /* If one wants entities expanded directly and to appear as text.  */
   if(LOGICAL_DATA(replaceEntities)[0])
     xmlSubstituteEntitiesDefault(1);   
 
@@ -180,10 +179,14 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
      */
 {
   xmlNodePtr root;
-#ifndef USE_OLD_ROOT_CHILD_NAMES
-    root = doc->xmlRootNode;
-#else
+#ifdef USE_OLD_ROOT_CHILD_NAMES
     root = doc->root;
+#else
+    root = doc->xmlRootNode;
+
+#ifdef ROOT_HAS_DTD_NODE
+    root = root->next;
+#endif
 #endif
   SET_VECTOR_ELT(rdoc, CHILDREN_ELEMENT_NAME, RS_XML(createNodeChildren)(root,  SIDEWAYS, parserSettings)); 
 }
@@ -220,9 +223,15 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   int n = NUM_NODE_ELEMENTS;
   USER_OBJECT_ ans;
   USER_OBJECT_ ans_el_names;
+  USER_OBJECT_ nsDef = NULL_USER_OBJECT;
   int addValue;
 
   char *contentValue = node->content;
+
+#ifdef ROOT_HAS_DTD_NODE
+  if(node->type == XML_DTD_NODE)
+    return(NULL);
+#endif
 
   if(parserSettings->trim) {
     contentValue = trim(node->content);
@@ -243,6 +252,11 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   if(addValue)
     n++;
 
+
+  if(node->nsDef)  {
+     nsDef = RS_XML(createNameSpaceIdentifier)(node->nsDef, node);
+    (void) RS_XML(notifyNamespaceDefinition)(nsDef, parserSettings);
+  }
 
      /* Create the default return value being a list of name, attributes, children 
         and possibly value. 
@@ -267,7 +281,9 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   SET_STRING_ELT(ans_el_names, NODE_NAMESPACE, COPY_TO_USER_STRING("namespace"));
 
   if(node->ns) {
-    SET_VECTOR_ELT(ans, NODE_NAMESPACE, RS_XML(createNameSpaceIdentifier)(node->ns, node));
+    if(!node->nsDef)
+       nsDef = RS_XML(createNameSpaceIdentifier)(node->ns, node);
+    SET_VECTOR_ELT(ans, NODE_NAMESPACE, nsDef);
   }
 
 
@@ -291,8 +307,13 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
       */
 
   if(parserSettings != NULL) {
-    USER_OBJECT_  fun;
-      fun = RS_XML(findFunction)(node->name, parserSettings->converters);
+    USER_OBJECT_  fun = NULL;
+    const char *funName;
+       if(node->name) {
+          funName = node->name;
+          fun = RS_XML(findFunction)(funName, parserSettings->converters);
+       } 
+
       if(fun == NULL) {
 	/* Didn't find the tag-specific function in the handlers. 
            So see if there is one for this type node.
@@ -308,7 +329,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
          ans = tmp;
    	 UNPROTECT(1);
       }
-}
+  }
 
 
   UNPROTECT(1);
@@ -394,12 +415,19 @@ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node)
      SET_VECTOR_ELT(ans, NAMESPACE_TYPE_SLOT, NEW_LOGICAL(1));
      LOGICAL_DATA(VECTOR_ELT(ans, NAMESPACE_TYPE_SLOT))[0] = (space->type == XML_LOCAL_NAMESPACE);
 
-
      RS_XML(SetNames)(NAMESPACE_NUM_SLOTS, RS_XML(NameSpaceSlotNames), ans);
 
+   {
+    USER_OBJECT_ klass;
+    PROTECT(klass = NEW_CHARACTER(1));
+     SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING("XMLNameSpace"));
+     SET_CLASS(ans, klass);
+    UNPROTECT(1);
+   }
    UNPROTECT(1);
  } else {
    PROTECT(ans =  NEW_CHARACTER(1));
+   if(space->prefix)
       SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(space->prefix));
    UNPROTECT(1);
  }
@@ -409,7 +437,7 @@ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node)
 }
 
 /**
-  Attempt to ind a function in the handler methods corresponding to the
+  Attempt to find a function in the handler methods corresponding to the
   type of the node, not its specific tag name.
  */
 USER_OBJECT_
@@ -417,7 +445,7 @@ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ defaultNodeValu
                                      R_XMLSettings *parserSettings)
 {
   char *name;
-  USER_OBJECT_ fun;
+  USER_OBJECT_ fun = NULL;
   switch(node->type) {
     case XML_ENTITY_REF_NODE:
       name = "entity";
@@ -438,9 +466,10 @@ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ defaultNodeValu
       name = "cdata";
       break;
   default:
-    name = NULL;     
+      name = NULL;     
   }
 
+  if(name && name[0])
    fun = RS_XML(findFunction)(name, parserSettings->converters);   
  
  return(fun);
@@ -475,6 +504,7 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 #else
                               node->childs;
 #endif
+
   while(c) {
     c = c->next;
     n++;
@@ -496,7 +526,7 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 #endif
     for(i = 0; i < n; i++) {
       tmp = RS_XML(createXMLNode)(c, 1, DOWN, parserSettings, ans);
-      if(tmp) {
+      if(tmp && GET_LENGTH(tmp)) {
 	SET_VECTOR_ELT(ans, count, tmp); 
         if(c->name)
           SET_STRING_ELT(elNames, count++, COPY_TO_USER_STRING(c->name));
@@ -594,4 +624,23 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
     UNPROTECT(1);
    }
   return(ans);
+}
+
+USER_OBJECT_
+RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSettings)
+{
+ USER_OBJECT_ fun, ans = NULL_USER_OBJECT;
+
+     fun = RS_XML(findFunction)("namespace", parserSettings->converters);
+     if(fun != NULL) {
+        USER_OBJECT_ opArgs = NEW_LIST(1);
+        USER_OBJECT_ tmp;
+	 PROTECT(opArgs);
+	 SET_VECTOR_ELT(opArgs, 0, arg);
+	 tmp = RS_XML(invokeFunction)(fun, opArgs);
+         ans = tmp;
+   	 UNPROTECT(1);
+      }
+
+ return(ans);
 }

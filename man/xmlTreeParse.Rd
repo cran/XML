@@ -72,32 +72,51 @@ return type.
 }
 \details{
  The \code{handlers} argument is used similarly
-to those specifid in \link{xmlEventParse}.
+to those specified in \link{xmlEventParse}.
  When an XML tag (element) is processed,
   we look for a function in this collection 
   with the same name as the tag's name. 
   If this is not found, we look for one named
-  startElement. If this is not found, we use the default
+  \code{startElement}. If this is not found, we use the default
   built in converter.
-  The same works for comments, entity references, etc.
+  The same works for comments, entity references, cdata, processing instructions,
+  etc.
  The default entries should be named
 \code{comment}, \code{startElement},
 \code{externalEntity},
-\code{processingInstruction}
-\code{text}.
-They should take the XMLnode as their first argument.
+\code{processingInstruction},
+\code{text}, \code{cdata} and \code{namespace}.
+All but the last should take the XMLnode as their first argument.
 In the future, other information may be passed via \dots,
 for example, the depth in the tree, etc.
 Specifically, the second argument will be the parent node into which they
 are being added, but this is not currently implemented,
 so should have a default value (\code{NULL}).
 
+The \code{namespace} function is called with a single argument which
+is an object of class \code{XMLNameSpace}.  This contains
+\begin{description} 
+\item[id] the namespace identifier as used to
+qualify tag names; 
+\item[uri] the value of the namespace identifier,
+i.e. the URI
+ identifying the namespace.
+\item[local] a logical value indicating whether the definition
+is local to the document being parsed.
+\end{description}
+
+One should note that the \code{namespace} handler is called before the
+node in which the namespace definition occurs and its children are
+processed.  This is different than the other handlers which are called
+after the child nodes have been processed.
+
 Each of these functions can return arbitrary values that are then
 entered into the tree in place of the default node passed to the
 function as the first argument.  This allows the caller to generate
 the nodes of the resulting document tree exactly as they wish.  If the
-function returns \code{NULL}, in the future, we will drop this node
-from the tree.
+function returns \code{NULL}, the node is dropped from the resulting
+tree. This is a convenient way to discard nodes having processed their
+contents.
 
 }
 \value{
@@ -137,7 +156,7 @@ and another for entities. See \code{\link{parseDTD}}.
 \seealso{ \link{xmlEventParse} }
 
 \examples{
- fileName <- system.file("data", "test.xml", pkg="XML")
+ fileName <- system.file("exampleData", "test.xml", package="XML")
    # parse the document and return it in its standard format.
  xmlTreeParse(fileName)
 
@@ -145,17 +164,21 @@ and another for entities. See \code{\link{parseDTD}}.
   
  xmlTreeParse(fileName, handlers=list("comment"=function(x, parent){NULL}))
 
+   # print the entities
  invisible(xmlTreeParse(fileName,
             handlers=list(entity=function(x) {
-                                    cat("In entity",x$name, x$value,"\n")}
-                                  )
+                                    cat("In entity",x$name, x$value,"\n")
+                                    x}
+                                  ), asTree = T
                           )
-         )
+          )
 
  # Parse some XML text.
  # Read the text from the file
  xmlText <- paste(scan(fileName, what="",sep="\n"),"\n", collapse="\n")
+
  xmlTreeParse(xmlText, asText=T)
+
 
  # Read a MathML document and convert each node
  # so that the primary class is 
@@ -163,7 +186,7 @@ and another for entities. See \code{\link{parseDTD}}.
  # so that we can use method  dispatching when processing
  # it rather than conditional statements on the tag name.
  # See plotMathML() in examples/.
- fileName <- system.file("data", "mathml.xml",pkg="XML")
+ fileName <- system.file("exampleData", "mathml.xml",package="XML")
 m <- xmlTreeParse(fileName, 
                   handlers=list(startElement=function(node){
                               cname <- paste(xmlName(node),"MathML",sep="",collapse="")
@@ -197,7 +220,7 @@ m <- xmlTreeParse(fileName,
   # in the usual manner and the entire document and then executing
   # xmlSApply(xmlRoot(doc)[[1]], function(x) xmlValue(x[[1]]))
   # which is simpler but is more costly in terms of memory.
- fileName <- system.file("data", "mtcars.xml")
+ fileName <- system.file("exampleData", "mtcars.xml", package="XML")
  doc <- xmlTreeParse(fileName,  handlers = (function() { 
                                  vars <- character(0) ;
                                 list(variable=function(x, attrs) { 
@@ -218,7 +241,7 @@ m <- xmlTreeParse(fileName,
  doc <- xmlTreeParse(fileName, handlers = list(
                                   variable=function(x, attrs) {
                                              print(xmlValue(x[[1]])); T
-                                           }))
+                                           }), asTree=T)
 
 
 
@@ -231,4 +254,4 @@ m <- xmlTreeParse(fileName,
 
 \keyword{file}
 \keyword{XML}
-\keyword{DTD}
+

@@ -3,6 +3,7 @@
 \alias{xmlTextNode}
 \alias{xmlPINode}
 \alias{xmlCDataNode}
+\alias{xmlCommentNode}
 \title{Create an XML node}
 \description{
  These functions allow one to create XML nodes
@@ -16,6 +17,7 @@ xmlNode(name, ..., attrs=NULL, namespace="")
 xmlTextNode(value, namespace="")
 xmlPINode(sys, value, namespace="")
 xmlCDataNode(...)
+xmlCommentNode(text)
 }
 \arguments{
   \item{name}{The tag or element name of the XML node. This is what appears
@@ -61,4 +63,4 @@ and
 \examples{
 a <- xmlNode("arg", attrs = c(default="T"), xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
 }
-\keyword{IO}
+\keyword{file}

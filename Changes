@@ -1,3 +1,34 @@
+Version 0.6
+   
+  * xmlDOMApply for recursively applying a function to each node in a tree.
+
+Version 0.5-1
+
+  * simplification of xmlOutputBuffer so that it doesn't put
+    the namespace definition in each and every tag.
+
+  * configuration changes to support libxml2-2.3.6
+    (look for libxml2, check if xmlHashSize is available)
+
+  * now dropping nodes if the handler function returns NULL.
+    Updated documentation.
+
+  * spelling correction in the documentation
+
+Version 0.5
+ * xmlOutputBuffer now accepts a connection.   
+
+ * Fixes for using libxml2, specifically 2.2.12.
+   Also works for libxml2.2.8
+
+ * Enhanced configuration script to determine what features are available.
+   
+Version 0.4
+
+ * `namespace' handler in xmlTreeParse is called when a namespace
+   declaration is encountered. This is called before the child nodes
+   are processed.
+
  * More documentation, in Tour.
 
  * xmlValue, xmlApply, xmlSApply, xmlRoot, xmlNamespace, length, names

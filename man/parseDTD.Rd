@@ -75,18 +75,20 @@ objects.
  WritingXML.html in the distribution.}
 
 \examples{
- dtdFile <- system.file("data", "foo.dtd",pkg="XML")
+ dtdFile <- system.file("exampleData", "foo.dtd",package="XML")
  parseDTD(dtdFile)
 
-  # Read from text
+    # Read from text
+\dontrun{
  txt <- scan(dtdFile, what="", sep="\n")
  txt <- paste(txt, collapse="\n")
  d <- parseDTD(txt, asText=T)
+}
 
 \dontrun{
  url <- "http://www.omegahat.org/XML/DTDs/DatasetByRecord.dtd"
- d <- parseDTD(url, asText=T)  
+ d <- parseDTD(url, asText=F)  
 }
 }
-\keyword{IO}
+\keyword{file}
 \keyword{XML}

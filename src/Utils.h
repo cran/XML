@@ -6,11 +6,8 @@
 #define UTILS_H
 
 #include "RS_XML.h"
-#ifdef USE_R
 #include "RSCommon.h"
-#else
-#include "S.h"
-#endif
+
 
 int isBlank(const char *str);
 char *trim(char *str);

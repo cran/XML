@@ -1,66 +1,97 @@
-This package can be configured to use either or both of the libxml and
-expat libraries for parsing XML documents.  libxml is used for the
-tree-based (DOM) parsing and the event-driven (SAX) parsing.  Expat is
-used only for the event-driven parsing and is not necessary if
-one wishes to use libxml.
-
-Note that the descriptions here are for Unix systems. 
-
-One should use libxml, version 1.8.9. This is available from
-
-  ftp://ftp.gnome.org/pub/GNOME/stable/sources/libxml/
-
-and the home page for the library is 
-  http://xmlsoft.org/
-
-Many Linux installations provide a version of libxml (typically with
-the header files in /usr/include/gnome-xml or
-/usr/local/include/gnome-xml.) This is a slightly earlier version of
-libxml and we recommend using libxml-1.8.9. However, the configuration
-script will usually adapt the compilation to use these if a more
-recent library is not specified.
-
- If you have root privileges, you might consider installing
-libxml-1.8.9 and then proceed with the default installation.
-  R INSTALL --clean XML
-
-If there is no version of libxml installed on your system, or you want to use a 
-different version than is already installed, you have to tell the configure
-script where to find this library. You can do this by setting the environment
-variables 
-    LIBXML_INCDIR  and LIBXML_LIBDIR
-to point to the directories containing the header files and the shared
-library libxml.so, respectively.
-
-The following steps will usually give the desired results:
-Install the libxml in some directory, say /tmp/libxml-1.8.9
-
-   cd /tmp
-   tar zxvf libxml-1.8.9.tar.gz
-   cd libxml-1.8.9
-   ./configure
-   make
-
-Now, tell the configuration for the XML package where to find the
-libxml distribution. 
-
-  setenv LIBXML_INCDIR /tmp/libxml-1.8.9         #  LIBXML_INCDIR=/tmp/libxml-1.8.9; export LIBXML_INCDIR
-  setenv LIBXML_LIBDIR /tmp/libxml-1.8.9/.libs
-
-  R INSTALL --clean XML_0.3-1.tar.gz
-
-That should be sufficient.
+Installing this package can be a little trickier than others for
+several reasons.  The package uses libxml, the XML parser that is part
+of the Gnome system.  Many systems have a version of libxml installed,
+but in some cases, we do not want to use that. By-passing the system
+library, requires input from you, the user. Also, there are now two
+distribution series of libxml -- 1.8.* and 2.2.* that we support. 
+ The possiblity of picking up the system header (include) files and
+the wrong library, is complicated by the fact that these include files
+are found in different locations depending on whether we are using an
+installed on uninstalled version of libxml.  Oh, and yes, it can also
+be compiled to use expat, the XML parser by Jim Clark. These different
+possible combinations of these can make the installation and run-time
+behaviour tricky. It is further complicated by the fact the package
+works with both R and S-Plus 5 and S-Plus 6.  However, conceptually it
+is not difficult. It is only the different number of possible
+combinations.
 
 
+The package can be configured to use either or both of Daniel
+Veillard's libxml library
+(ftp://ftp.gnome.org/pub/GNOME/stable/sources/libxml/) and Jim Clark's
+expat (http://www.jclark.com/xml) library for parsing XML documents.
+libxml is used for the tree-based (DOM) parsing and the event-driven
+(SAX) parsing.  Expat is used only for the event-driven parsing and is
+not necessary if one wishes to use libxml. The support for expat is
+older and less well maintained.
+
+
+Note that the descriptions here are for Unix systems.  See
+WindowsInstall for some details for Windows.
+
+
+If you don't want to use the libxml2 series, then the default
+installation should work without any additional work from you.
+You can use the regular R installation command
+  R INSTALL -c -l <directory/to/install> XML
+or directly from the tar file
+  R INSTALL -c -l <directory/to/install> XML_0.6-1.tar.gz
+
+The -c and -l flags are explained in the R documentation (see ?INSTALL
+within R, the FAQ and the R-intro documents in the distribution.)
+
+
+
+Using a non-system version of libxml.
+========================
+
+If you want to use a version of libxml that is not installed in the
+regular location in your system, you will need to tell the configuration
+where to find the header files and the library. The simplest way to to 
+do this is to set the environment variables
+  LIBXML_INCDIR
+and 
+  LIBXML_LIBDIR
+before invoking the R INSTALL command.
+
+You should set these to the include/ and the .libs/ directory within
+the libxml distribution, respectively.  For example, whe I install
+using version libxml2-2.2.12 which I have in my ~/XML/ directory, I
+set these to
+
+  LIBXML_INCDIR  ~/XML/libxml2-2.2.12/include
+and
+  LIBXML_LIBDIR  ~/XML/libxml2-2.2.12/.libs
+
+Then, run 
+  R INSTALL -c -l <whereve> XML
+and it should tell you where it is finding the 
+
+
+
+Using libxml2
+=============
+If you want to use a
+
+First of a
+
+
+
+Other Sources of Information:
+=============================
 Far more information about the XML package and installing it and these
 other libraries is available from 
 
      http://www.omegahat.org/RSXML
 
 
+Feedback:
+=========
 We would appreciate hearing about any bugs, comments, suggestions, etc.
-and they can be submitted the Omegahat bug tracking system via the
+They can be submitted the Omegahat bug tracking system via the
 form at
   http://www.omegahat.org/bugs
 or by sending mail to 
    omega-bugs@www.omegahat.org
+Alternatively, send mail to the omegahat development list,
+  omega-devel@www.omegahat.org

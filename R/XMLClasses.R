@@ -89,6 +89,12 @@ function(obj, ...)
  NextMethod("[")
 }
 
+"[[.XMLDocumentContent" <-
+function(obj, ...) 
+{
+  obj$children[[...]]
+}
+
 "[[.XMLNode" <-
 #
 # Extract the  children (sub-nodes) within
@@ -152,7 +158,7 @@ print.XMLNode <-
 # displays a node and attributes (and its children)
 # in its XML format.
 # 
-function(x,...)
+function(x, ...)
 {
  if(xmlName(x) == "text" || xmlName(x) == "comment") {
    cat(x$value,"\n", sep="")
@@ -172,9 +178,9 @@ function(x,...)
 }
 
 print.XMLEntityRef <-
-function(node)
+function(x)
 {
- cat(node$value)
+ cat(x$value)
 }
 
 

@@ -40,5 +40,5 @@ append.xmlNode(to, ...)
    r[["references"]] <- append.xmlNode(r[["references"]],tmp)
 }
 }
+\keyword{file}
 \keyword{XML}
-\keyword{IO}
