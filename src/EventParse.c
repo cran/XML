@@ -30,7 +30,8 @@ extern void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *par
 USER_OBJECT_ 
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
-                 USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject)
+                 USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
+                  USER_OBJECT_ replaceEntities)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -81,6 +82,12 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
       }
   } else 
 #endif /* ifdef LIBEXPAT */
+
+    /* If one wants entities expanded directly and to appear as text.  */
+  if(LOGICAL_DATA(replaceEntities)[0]) 
+      xmlSubstituteEntitiesDefault(1);   
+
+
    RS_XML(libXMLEventParse)(name, parserData, asTextBuffer);
 
   free(parserData);

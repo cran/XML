@@ -3,12 +3,18 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
 {
  doc <- newXMLDoc(dtd, namespaces)
  currentNodes <- list(doc)
+
+
+ isXML2 <- libxmlVersion()$major != "1" 
  
  
  if(!is.null(dtd) && dtd != "") {
-   node = .Call("R_newXMLDtd", doc, dtd, "", "")
-   .Call("R_insertXMLNode", node, doc)
-   currentNodes[[2]] <- node
+   if(isXML2) {
+     node = .Call("R_newXMLDtd", doc, dtd, "", "")
+     .Call("R_insertXMLNode", node, doc)
+     currentNodes[[2]] <- node
+   } else
+     warning("DTDs not supported in R for libxml 1.*. Use libxml2 instead.")
  }
  
  definedNamespaces = list()
@@ -29,7 +35,7 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
  setNamespace <- function(node, namespace) {
      if(is.null(namespace))
        return(NULL)
-     
+
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
        ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace, PACKAGE="XML")
        definedNamespaces[[namespace]] <<- ns

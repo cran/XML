@@ -1,6 +1,7 @@
 \name{startElement.SAX}
 \alias{startElement.SAX}
 \alias{endElement.SAX}
+\alias{text.SAX}
 \alias{comment.SAX}
 \alias{processingInstruction.SAX}
 \alias{entityDeclaration.SAX}
@@ -22,8 +23,9 @@ startElement.SAX(name, atts, .state = NULL)
 endElement.SAX(name, .state = NULL)
 comment.SAX(content, .state = NULL)
 processingInstruction.SAX(target, content, .state = NULL)
+text.SAX(content, .state = NULL)
 entityDeclaration.SAX(name, base, sysId, publicId, notationName,  .state = NULL)
-.InitSAXMethods()
+.InitSAXMethods(where = "package:XML")
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -38,16 +40,18 @@ entityDeclaration.SAX(name, base, sysId, publicId, notationName,  .state = NULL)
   \item{notationName}{name of the notation specification}
   \item{.state}{the state object on which the user-defined methods
     should dispatch.}
+  \item{where}{the package in which the class and method definitions
+    should be defined. This is almost always unspecified.}
   
 }
 \value{
   Each method should return the (potentially modified)
   state value.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml}}
+\references{\url{http://www.w3.org/XML}, \url{http://www.xmlsoft.org}}
 \author{Duncan Temple Lang}
-\note{ This requires the Expat XML parser to be installed. }
-
+\note{ This no longer requires the Expat XML parser to be installed.
+Instead, we use libxml's SAX parser.}
 
 \seealso{
 \code{\link{xmlEventParse}}

@@ -1,3 +1,9 @@
+Version 0.93-4
+
+  *   replaceEntities argument for xmlEventParse.
+
+  *   S4 SAX methods assigned to the correct database.
+
 Version 0.93-3
  
   *   Correct support for DTDs and namespaces in the internal nodes

@@ -74,7 +74,7 @@ typedef struct {
 
 
 USER_OBJECT_ 
-RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, USER_OBJECT_ ignoreBlanks, USER_OBJECT_ useTagName, USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ state);
+RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, USER_OBJECT_ ignoreBlanks, USER_OBJECT_ useTagName, USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ state, USER_OBJECT_ replaceEntities);
 
 /* Allocate a data structure for use with the parser */
 RS_XMLParserData *createRSXMLParserData(USER_OBJECT_ handlers) ;

@@ -1,5 +1,7 @@
 [<-.XMLNode             Assign sub-nodes to an XML node
 startElement.SAX        Generic Methods for SAX callbacks
+SAXState-class          A virtual base class defining methods for SAX
+                        parsing
 append.xmlNode          Add children to an XML node
 asXMLNode               Converts non-XML node objects to XMLTextNode
                         objects

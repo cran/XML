@@ -17,7 +17,7 @@
 \usage{
 xmlEventParse(file, handlers=xmlHandler(), ignoreBlanks, addContext=T,
                useTagName=F, asText =F, trim=T, useExpat=F, isURL = F,
-                state = NULL)
+                state = NULL, replaceEntities = TRUE)
 }
 \arguments{
  \item{file}{ string identifying the file that is interpreted
@@ -87,6 +87,13 @@ If this is True, each callback function  should support
   no \code{.state} argument is passed to the callbacks. This makes the
   interface compatible with previous releases.
   .}
+  \item{replaceEntities}{
+   logical value indicating whether to substitute entity references
+    with their text directly. This should be left as False.
+    The text still appears as the value of the node, but there
+    is more information about its source, allowing the parse to be reversed
+    with full reference information.
+    }
 }
 \details{
  This is now implemented using the libxml parser.
