@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+<dl>
+  <dt>
+  <li> <font class="question">I define a method in the closure, but it
+      never gets called.</font>
+  <dd> The most likely cause is that you omitted to add it to the list
+      of functions returned by the closure. Another possibility is
+      that you have mis-spelled the name of the method. The matching
+      is case-sensitive and exact.
+      If the function corresponds to a particular XML element name,
+      check whether the value of the argument <code>useTagName</code> is T,
+      and also that there really is a  tag with this name in the
+      document.
+       Again, the case is important.
+
+  <dt>
+  <li><font class="question">When I compile the source code, I get
+      lots of warning messages such as 
+<pre>
+"RSDTD.c", line 110: warning: argument #2 is incompatible with prototype:
+        prototype: pointer to const uchar : "unknown", line 0
+        argument : pointer to const char   
+      </pre>
+      </font>
+  <dd> This is because the XML libraries work on unsigned characters
+      for UniCode. The R and S facilities do not.
+      I am not yet certain which direction to adapt things for this
+      package. The warnings are harmless.
+
+  <dt>
+  <li> <font class="question">When I compile the chapter for
+      Splus5/S4, I get warning messages about SET_CLASS being redefined.</font>
+  <dd> This is ok, in this situation. The warning is left there to
+      remind people that there are some games being played and that
+      if there are problems, to consider these warnings.
+       The SET_CLASS macro being redefined is a local version for S3/R
+      style classes. The one in the Splus5/S4 header files is for the
+      S4 style classes.
+
+  <dt>
+  <li> <font class="question">On which platfforms does it compile?</font>
+  <dd> I have used gcc on both Linux (RedHat 6.1) (egcs-2.91.66)
+       and Solaris (gcc-2.7.2.3), and the Sun compilers, cc 4.2 on
+       Solaris 2.6/SunOS 5.6 and cc 5.0 on Solaris 2.7/SunOS 5.7.
+</dl>
+
+
+<dl>
+  <dt>
+  <li> <font class="question">I get errors when using parameter
+      entities in DTDs?</font>
+  <dd>
+This was true in version 1.7.3 and 1.8.2 of
+libxml. Thanks to Daneil Veillard for fixing
+      this quickly when I pointed it out.
+
+<p>
+
+      Parameters are allowed, but the libxml parsing library is fussy
+      about white-space, etc.
+      The following is is ok
+<pre>
+<!ELEMENT legend  (%PlotPrimitives;)* >
+</pre>
+      but 
+<pre>
+<!ELEMENT legend  (%PlotPrimitives; )* >
+</pre>
+      is not. The extra space preceeding the <code>)</code>
+causes an error in the parser something like
+<pre>
+1: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' '|' or ')' expected 
+2: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementChildrenContentDecl : ',' expected 
+3: XML Parsing Error: ../Histogram.dtd:80: xmlParseElementDecl: expected '>' at the end 
+4: XML Parsing Error: ../Histogram.dtd:80: Extra content at the end of the document 
+</pre>
+
+       This can be fixed by adding a call to SKIP_BLANKS at the end of
+      the loop <code>while(CUR!= ')' { ... } </code> in  the routine
+      <code>xmlParseElementChildrenContentDecl()</code> in parser.c
+      The problem lies in the transition between the different input
+      buffers introduced by the entity expansion.
+
+  <dt>
+  <li><font class="question">I can't seem to use conditional DTD
+      segments via the IGNORE/INCLUDE mechanism.</font>
+  <dd> Libxml doesn't support this. Perhaps we will add code for this.
+<p>
+Daneil Veillard might add this.      
+
+
+  <dt>
+  <li> <font class="question">When I read a relatively simple tree in
+      Splus5 and print it to the terminal/console, I get an error
+      about nested expressions exceeding the limit of 256.
+      </font>
+  <dd> The simple fix is to set the value of the
+      <code>expressions</code>
+      option to a value larger than 256.
+<pre>
+ options(expressions=1000)
+</pre>
+      
+     The main cause of this is that 
+      S and R are programming languages not specialized for handling
+      trees.
+       (They are functional languages and have no facilities for
+      pointers or references as in C or Java.)
+      
+</dl>
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Tue Jan 18 08:22:27 EST 2000
+<!-- hhmts end -->
+</body> </html>

@@ -1,0 +1,18 @@
+libInstall: lib headersInstall
+	mv $(LIB) $(TOP)/inst/libs
+
+headersInstall: 
+	if test -n "${HEADERS}" ; then cp $(HEADERS) $(TOP)/inst/include ; fi
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(LOCAL_INCLUDES:%=-I%) -c $<
+
+%.o: %.cc
+	$(CXX) $(CXXFLAGS) $(LOCAL_INCLUDES:%=-I%) -c $<
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(LOCAL_INCLUDES:%=-I%) -c $<
+
+
+$(LIB): $(OBJ)
+	$(R_LINKER) $(SHLIB_LDFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LOCAL_LIBS)

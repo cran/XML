@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE foo [
+  <!ENTITY % bar "for R and S">
+  <!ENTITY % foo "for Omegahat">
+  <!ENTITY testEnt "test entity %bar;">
+  <!ENTITY % extEnt SYSTEM "http://www.omegahat.org">
+  <!ELEMENT x  (#PCDATA) >
+  <!ELEMENT y  (x)* >
+]>
+<!-- A comment -->
+<foo x="1">
+ <element attrib1="my value" />
+ %testEnt;
+ <?R sum(rnorm(100)) ?>
+ <a>
+  <b> 
+    %extEnt;
+  </b>
+ </a>
+</foo>

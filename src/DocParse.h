@@ -1,0 +1,45 @@
+/*
+ * See Copyright for the license status of this software.
+ */
+
+#ifndef XMLPARSE_H
+#define XMLPARSE_H
+
+#include <ctype.h>
+#include <stdlib.h> 
+
+#ifdef USE_R
+#include "Rdefines.h"
+#include "Rinternals.h"
+#else
+#include "S.h"
+#endif
+#include "RSCommon.h"
+
+#include "RS_XML.h"
+
+#include <libxml/parser.h>
+
+typedef struct {
+  int skipBlankLines;
+  int trim;
+  USER_OBJECT_ converters;
+} R_XMLSettings;
+
+
+enum {DOWN, SIDEWAYS};
+
+
+USER_OBJECT_ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions, USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities, USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_
+			       validate, USER_OBJECT_ getDTD, USER_OBJECT_ isURL);
+
+USER_OBJECT_ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *settings);
+USER_OBJECT_ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *settings, USER_OBJECT_ parentUserNode);
+USER_OBJECT_ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *settings);
+USER_OBJECT_ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parserSettings);
+
+USER_OBJECT_ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ methods, R_XMLSettings *parserSettings);
+
+
+USER_OBJECT_ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node);
+#endif

@@ -1,0 +1,12 @@
+supportsExpat <-
+function()
+{
+  @SUPPORTS_EXPAT@
+}
+
+supportsLibxml <-
+function()
+{
+  @SUPPORTS_LIBXML@
+}
+

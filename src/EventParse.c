@@ -1,0 +1,302 @@
+
+/*
+ File that provides the entry point for an event driven XML parser
+ that performs callbacks to the different user-level functions in
+ the closure passed to it.
+
+ * See Copyright for the license status of this software.
+
+ */
+
+#include "EventParse.h"
+#include "Utils.h" /* For the findFunction and invokeFunction. */
+
+#include "RSCommon.h"
+
+/*
+  Read the specified file as an XML document and invoke functions/methods in
+  the handlers closure object when each node in the tree is encountered by 
+  the parser. These events are startElement,endElement, character data, etc.
+  The remaining arguments control how the calls to the user level functions
+  are made. The first (addContext) indicates whether information about the position
+  in the tree (an integer index path)
+
+ */
+
+extern USER_OBJECT_ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText);
+
+USER_OBJECT_ 
+RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
+               USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
+                 USER_OBJECT_ trim, USER_OBJECT_ useExpat)
+{
+  FILE *file = NULL;
+  char *name;
+  int asTextBuffer;
+  RS_XMLParserData *parserData;
+  int expat = 0;
+
+  asTextBuffer = LOGICAL_DATA(asText)[0];
+
+#ifdef LIBEXPAT
+   expat = LOGICAL_DATA(useExpat)[0];
+  if(expat && asTextBuffer == 0) {
+#ifdef USE_R
+    name = R_ExpandFileName(CHAR(STRING(fileName)[0]));
+#else
+    name = CHARACTER_DATA(fileName)[0];
+#endif
+    file = fopen(name,"r");
+    if(file == NULL) {
+      PROBLEM "Can't find file %s", name
+      ERROR;
+    }
+
+  } else
+#endif /* ifdef LIBEXPAT */
+     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
+
+  parserData = RS_XML(createParserData)(handlers);
+  parserData->fileName         = name; 
+  parserData->callByTagName    = LOGICAL_DATA(useTagName)[0]; 
+  parserData->addContextInfo   = LOGICAL_DATA(addContext)[0]; 
+  parserData->trim             = LOGICAL_DATA(trim)[0]; 
+  parserData->ignoreBlankLines = LOGICAL_DATA(ignoreBlanks)[0]; 
+
+#ifdef LIBEXPAT
+  if(expat) {
+      if(asTextBuffer == 0) {
+     	RS_XML(parseWithParserData)(file, parserData);
+      } else {
+     	parserData->fileName = "<buffer>"; 
+     	RS_XML(parseBufferWithParserData)(name, parserData);
+     	free(name); /* match the strdup() above */
+      }
+  } else 
+#endif /* ifdef LIBEXPAT */
+    RS_XML(libXMLEventParse)(name, parserData, asTextBuffer);
+
+  free(parserData);
+
+  return(handlers);
+}
+
+
+
+/**
+Handler that receives declarations of unparsed entities. These are entity declarations that have a notation (NDATA) field: 
+
+                  <!ENTITY logo SYSTEM "images/logo.gif" NDATA gif>
+*/
+void 
+RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName, 
+                                 const XML_Char *base, const XML_Char *systemId, 
+                                   const XML_Char *publicId, const XML_Char *notationName)
+{
+ RS_XMLParserData *parserData = (RS_XMLParserData*)userData;
+ USER_OBJECT_ opArgs;
+ int i, num;
+  const XML_Char *xml_args[5];
+
+   num = sizeof(xml_args)/sizeof(xml_args[0]);
+
+   xml_args[0] = entityName; xml_args[1] = base;
+   xml_args[2] = systemId; xml_args[3] = publicId;
+   xml_args[4] = notationName;
+
+  opArgs = NEW_LIST(num);
+  for(i =0;i < num; i++) {
+   SET_VECTOR_ELT(opArgs, i,  NEW_CHARACTER(1));
+   SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] : "")); 
+  }
+
+ RS_XML(callUserFunction)("entityDeclaration", (const char*)NULL, parserData, opArgs);
+}
+
+
+void 
+RS_XML(startElement)(void *userData, const char *name, const char **atts)
+{
+  USER_OBJECT_ opArgs;
+
+  PROTECT(opArgs = NEW_LIST(2));
+  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+  SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(name)); 
+
+  /* Now convert the attributes list. */
+   SET_VECTOR_ELT(opArgs, 1, RS_XML(createAttributesList)(atts));
+   RS_XML(callUserFunction)("startElement", name, ((RS_XMLParserData*) userData), opArgs);
+   UNPROTECT(1);
+}
+
+void 
+RS_XML(commentHandler)(void *userData, const XML_Char *data)
+{
+  USER_OBJECT_ opArgs = NEW_LIST(2);
+  PROTECT(opArgs);
+  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+     SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(data));
+  RS_XML(callUserFunction)("comment", (const char *)NULL, ((RS_XMLParserData*)userData), opArgs);
+  UNPROTECT(1);
+}
+
+
+USER_OBJECT_ 
+RS_XML(createAttributesList)(const char **atts) {
+  int n=0, i;
+  const char **ptr = atts;
+  USER_OBJECT_ attr_names;
+  USER_OBJECT_ attr_values;
+  while(ptr && ptr[0]) {
+    n++;
+    ptr += 2;
+  }
+ 
+  if(n < 1)
+    return(NULL_USER_OBJECT);
+
+  PROTECT(attr_values = NEW_CHARACTER(n));
+  PROTECT(attr_names = NEW_CHARACTER(n));
+     ptr = atts;
+     for(i=0; i < n; i++, ptr+=2) {
+      SET_STRING_ELT(attr_values, i, COPY_TO_USER_STRING(ptr[1]));
+      SET_STRING_ELT(attr_names, i,  COPY_TO_USER_STRING(ptr[0]));
+     }
+    SET_NAMES(attr_values, attr_names);
+  UNPROTECT(2);
+
+  return(attr_values);
+}
+
+void RS_XML(endElement)(void *userData, const char *name)
+{
+ USER_OBJECT_ opArgs;
+ ((RS_XMLParserData*)userData)->depth++;
+
+  PROTECT(opArgs = NEW_LIST(1));
+  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+     SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(name));
+
+   RS_XML(callUserFunction)("endElement", NULL, ((RS_XMLParserData*) userData), opArgs);
+   UNPROTECT(1);
+}
+
+/**
+ Called for inline expressions of the form
+  <?target data-text>
+ such as 
+  <?R plot(1:10)>
+*/
+void 
+RS_XML(processingInstructionHandler)(void *userData, const XML_Char *target, const XML_Char *data) 
+{
+ USER_OBJECT_ opArgs;
+
+ PROTECT(opArgs = NEW_LIST(2));
+ SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+   SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(target));
+ SET_VECTOR_ELT(opArgs, 1, NEW_CHARACTER(1));
+   SET_STRING_ELT(VECTOR_ELT(opArgs, 1), 0, COPY_TO_USER_STRING(data));
+  RS_XML(callUserFunction)("processingInstruction", (const char *)NULL, (RS_XMLParserData*)userData, opArgs);
+  UNPROTECT(1);
+}
+
+void 
+RS_XML(endCdataSectionHandler)(void *userData) 
+{
+}
+
+void 
+RS_XML(startCdataSectionHandler)(void *userData) 
+{
+}
+
+
+void 
+RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
+{
+ char *tmpString, *tmp;
+ USER_OBJECT_ opArgs = NULL;
+ RS_XMLParserData *parserData = (RS_XMLParserData*)userData; 
+
+  if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && s[0] == '\n'))
+    return;
+
+           /* 1 more than length so we can put a \0 on the end. */
+    tmp = tmpString = (char*)calloc(len+1, sizeof(char));
+    strncpy(tmpString, s, len);
+ 
+    if(parserData->trim) {
+      tmpString = trim(tmpString);
+      len = strlen(tmpString);
+    }
+
+  if(len > 0 || parserData->ignoreBlankLines == 0 ) {
+    PROTECT(opArgs = NEW_LIST(1));
+     SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+     SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(tmpString));
+  }
+
+  free(tmp);
+
+    /* If we are ignoring blanks and the potentiall newly computed length is non-zero, then
+       call the user function.
+     */
+
+  if(opArgs != NULL) {
+     RS_XML(callUserFunction)("text", (const char *)NULL, ((RS_XMLParserData*) userData), opArgs);
+     UNPROTECT(1);
+  }
+}
+
+
+int
+RS_XML(notStandAloneHandler)(void *userData)
+{
+  /*  printf("In NotStandalone handler\n"); */
+ return(1);
+}
+
+
+/**
+  Create the parser data which contains the 
+  the collection of functions to call for each 
+  event type.
+
+  This allocates the parser memory using calloc.
+  The caller should arrange to free it.
+*/
+RS_XMLParserData *
+RS_XML(createParserData)(USER_OBJECT_ handlers) 
+{
+ RS_XMLParserData *parser = calloc(1, sizeof(RS_XMLParserData));
+
+ parser->methods = handlers;
+
+return(parser);
+}
+
+/**
+  Routine that locates and invokes the R function in the collection of handlers.
+*/
+USER_OBJECT_
+RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserData *parserData, USER_OBJECT_ opArgs) 
+{
+  USER_OBJECT_ fun = NULL;
+  USER_OBJECT_ _userObject = parserData->methods;
+
+  if(preferredName && parserData->callByTagName) {
+    fun = RS_XML(findFunction)(preferredName, _userObject);
+  }
+
+  if(fun == NULL) 
+    fun = RS_XML(findFunction)(opName, _userObject);
+
+  if(fun == NULL || isFunction(fun) == 0) {
+      /* FAILED */
+   return(NULL_USER_OBJECT);
+  }
+
+  return(RS_XML(invokeFunction)(fun, opArgs));
+}
+

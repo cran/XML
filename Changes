@@ -1,0 +1,23 @@
+
+ * Methods for print(), subsetting ([ and [[), accessing the fields
+   in an XMLNode object.
+
+ * New classes for the different node types (e.g. XMLTextNode)
+
+ * Event driven parsing available via libxml. Expat is not needed but
+   can be used.
+
+ * Document sources can be URLs (ftp and http) when using the libxml parser.
+
+ * Examples for processing MathML and SVG files. See examples/ directory.
+
+ * Examples for event driven parsing.
+
+
+
+ * Class of result from xmlTreeParse is XMLDocument.
+
+ * Comments, Entities, Text, etc. inherit from XMLNode
+   in addition to defining their own XML<type> class.
+
+ 
