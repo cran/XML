@@ -73,7 +73,7 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
       stop(paste("Namespace `",ns, "' is not defined\n",sep=""))
     m <- match(ns, openTags$nsprefix, NULL)
     if( any(!is.null(openTags[m,"nsURI"])) )
-      return
+      return(F)
     stop(paste("Namespace:",ns, "is not defined\n",sep=" "))
   }
 

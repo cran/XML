@@ -17,8 +17,14 @@
 
 #include "RSDTD.h"
 
+#include <stdarg.h>
+
 int RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans);
 USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *parserSettings);
+
+
+void RS_XML(ValidationWarning)(void *ctx, const char *msg, ...);
+void RS_XML(ValidationError)(void *ctx, const char *msg, ...);
 
 /**
   Entry point for reading, parsing and converting an XML tree
@@ -107,22 +113,30 @@ extern int xmlDoValidityCheckingDefaultValue;
    doc = xmlParseFile(name);
   }
 
-  if(doc == NULL) {
 #ifdef HAVE_VALIDITY
-    xmlDoValidityCheckingDefaultValue = previousValiditySetting;
+  xmlDoValidityCheckingDefaultValue = previousValiditySetting;
 #endif
+
+  if(doc == NULL) {
     PROBLEM "error in creating parser for %s", name
     ERROR;
+  }
+
+  if(LOGICAL_DATA(validate)[0]) {
+      xmlValidCtxt ctxt;
+      ctxt.error = RS_XML(ValidationError);
+      ctxt.warning = RS_XML(ValidationWarning);
+
+      if(!xmlValidateDocument(&ctxt, doc)) {
+	  PROBLEM "XML document is invalid"
+          ERROR;
+      }
   }
 
   PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));
 
   if(asTextBuffer && name)
     free(name);
-
-#ifdef HAVE_VALIDITY
-  xmlDoValidityCheckingDefaultValue = previousValiditySetting;
-#endif
 
 
   if(LOGICAL_DATA(getDTD)[0]) {
@@ -689,4 +703,51 @@ RS_XML(libxmlVersion)()
  ans = NEW_NUMERIC(1);
  NUMERIC_DATA(ans)[0] = val;
  return(ans);
+}
+
+
+
+static 
+void
+notifyError(const char *msg, va_list ap, Rboolean isError)
+{
+#if 0
+    if(isError) {
+	 PROBLEM "error in validating XML document"
+	 ERROR;
+    } else {
+	 PROBLEM "warning when validating XML document"
+	 ERROR;
+    }
+
+#else
+#define BUFSIZE 2048
+    char buf[BUFSIZE];
+
+    memset(buf, '\0', BUFSIZE);
+    vsnprintf(buf, BUFSIZE, msg, ap);
+
+    PROBLEM buf
+        WARN;
+
+#endif
+}
+
+
+
+void
+RS_XML(ValidationError)(void *ctx, const char *msg, ...)
+{
+  va_list(ap);
+  va_start(ap, msg);
+  notifyError(msg, ap, TRUE);
+}
+
+void
+RS_XML(ValidationWarning)(void *ctx, const char *msg, ...)
+{
+  va_list(ap);
+  va_start(ap, msg);
+  notifyError(msg, ap, FALSE);
+  va_end(ap);
 }

@@ -33,7 +33,7 @@ print.XMLSequenceContent(x, ...)
 }
 \arguments{
   \item{x}{the XML object to be displayed}
-  \item{...}{additional arguments to for controlling the output from
+  \item{...}{additional arguments for controlling the output from
   print. Currently unused.}
   \item{indent}{a prefix that is emitted before the node to indent it relative to its
    parent and child nodes. This is appended with a space at each succesive level of the tree.}
@@ -42,7 +42,7 @@ print.XMLSequenceContent(x, ...)
  Currently, \code{NULL}.
 }
 \references{\url{http://www.w3.org}, \url{http://www.omegahat.org/RSXML}}
-\author{Duncan Templle Lang}
+\author{Duncan Temple Lang}
 
 \seealso{
 \code{\link{xmlTreeParse}}

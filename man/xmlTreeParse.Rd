@@ -248,6 +248,8 @@ m <- xmlTreeParse(fileName,
                                            }), asTree=T)
 
 
+  # This should raise an error.
+  try(xmlTreeParse(system.file("exampleData", "TestInvalid.xml", package="XML"), validate=TRUE))
 
 \dontrun{
  # Parse an XML document directly from a URL.

@@ -134,6 +134,9 @@ extern "C" {
   #if defined(_R_)
   #define CHAR_DEREF(x)   CHAR((x))
 
+
+  #define IS_FUNCTION(x)   isFunction((x))
+
    /* SET_CLASS and SET_NAMES have been moved to Rdefines.h in the R distribution.*/
   #endif  /* of defined(_R_) */
 
