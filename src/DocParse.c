@@ -481,7 +481,8 @@ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node)
      SET_STRING_ELT(VECTOR_ELT(ans, NAMESPACE_PREFIX_SLOT), 0, COPY_TO_USER_STRING(space->prefix ? space->prefix : (xmlChar*)"")); 
 
      SET_VECTOR_ELT(ans, NAMESPACE_URI_SLOT, NEW_CHARACTER(1));
-     SET_STRING_ELT(VECTOR_ELT(ans, NAMESPACE_URI_SLOT), 0, COPY_TO_USER_STRING(space->href)); 
+     SET_STRING_ELT(VECTOR_ELT(ans, NAMESPACE_URI_SLOT), 0, space->href ? COPY_TO_USER_STRING(space->href) : NA_STRING); 
+
 
      SET_VECTOR_ELT(ans, NAMESPACE_TYPE_SLOT, NEW_LOGICAL(1));
      LOGICAL_DATA(VECTOR_ELT(ans, NAMESPACE_TYPE_SLOT))[0] = (space->type == XML_LOCAL_NAMESPACE);

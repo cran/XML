@@ -115,11 +115,15 @@ static R_CallMethodDef callMethods[] = {
 	{NULL, NULL, 0}
 };
 
+static R_CMethodDef cmethods[] = {
+    ENTRY(RSXML_setErrorHandlers, 0),
+    {NULL, NULL, 0}
+};
 
 void
 R_init_XML(DllInfo *dll)
 {
    R_useDynamicSymbols(dll, FALSE);
-   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+   R_registerRoutines(dll, cmethods, callMethods, NULL, NULL);
 }
 

@@ -37,11 +37,11 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
        return(NULL)
 
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
-       ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace, PACKAGE="XML")
+       ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace)
        definedNamespaces[[namespace]] <<- ns
      }
      
-     .Call("R_xmlSetNs", node, definedNamespaces[[namespace]], PACKAGE = "XML")
+     .Call("R_xmlSetNs", node, definedNamespaces[[namespace]])
  }
 
  
@@ -50,7 +50,7 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
    if(!is.null(attrs))
     storage.mode(attrs) <- "character"
 
-   node <- .Call("R_newXMLNode", name, attrs, namespace, doc, PACKAGE = "XML")
+   node <- .Call("R_newXMLNode", name, attrs, namespace, doc)
 
    setNamespace(node, namespace)
 

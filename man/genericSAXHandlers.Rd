@@ -56,7 +56,7 @@ genericSAXHandlers(include, exclude)
 
 \examples{
 \testonly{
-.InitSAXMethods()
+# .InitSAXMethods()
 names(genericSAXHandlers())
 names(genericSAXHandlers(inc=c("startElement", "endElement", "text")))
 names(genericSAXHandlers(ex=c("startElement", "endElement", "text")))

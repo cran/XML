@@ -1288,7 +1288,7 @@ if test "${with_libxml2+set}" = set; then
                     USE_XML2="yes" ;
                  fi
 else
-  USE_XML2="maybe"
+  USE_XML2="yes"
 fi;
 
 

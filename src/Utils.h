@@ -33,6 +33,8 @@ int xmlHashSize(xmlHashTablePtr table);
 #endif
 
 
+void RSXML_setErrorHandlers(void);
+
 
 USER_OBJECT_ RS_XML(RecursiveApply)(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses);
 USER_OBJECT_ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions, 

@@ -262,6 +262,7 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
  xmlElementPtr xmlEl;
  n = table->nb_elements;
 #endif
+
   if(n > 0) {
     USER_OBJECT_ dtdNames;
 
