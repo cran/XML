@@ -194,6 +194,7 @@ function(x, ..., indent="")
 }
 
 
+
 print.XMLCDataNode <-
 function(x, ..., indent="")
 {
@@ -207,7 +208,7 @@ function(x, ..., indent="")
 print.XMLProcessingInstruction <-
 function(x, ..., indent="")
 {
- cat(indent, paste("<?", x$name," ", x$value, ">\n", sep=""))
+ cat(indent, paste("<?", x$name," ", x$value, "?>\n", sep=""))
 }
 
 

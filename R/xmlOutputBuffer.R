@@ -222,6 +222,14 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
   }
 
 
+  addCData <- function(text) {
+    add("<![CDATA[", text, "]]>", sep="\n")
+  }
+
+  addPI <- function(name, text) {
+    add("<?", name, " ", text, "?>\n", sep="")
+  }  
+
   tagString <- function(tag, ..., attrs, close=FALSE) {
 
     tmp <- ""
@@ -240,6 +248,8 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
                tagString = tagString,
                add = add,
                addComment = addComment,
+               addPI = addPI,
+               addCData = addCData,
                getOpenTag=getOpenTag,
                addOpenTag=addOpenTag
               ) 

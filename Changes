@@ -1,3 +1,12 @@
+Version 0.9-0
+
+  *  Added addCData() and addPI() to the handlers of the different 
+     XMLOutputStream classes.
+     Code for XMLInternalDOM (i.e. xmlTree()) from Byron Ellis.
+
+  *  print() method for XMLProcessingInstruction node has the terminating `?'
+     as in <?pi-name text ?>.
+
 Version 0.8-2
 
   * Changes to support libxml2-2.4.21 (specifically the issues with

@@ -77,5 +77,12 @@ of the minor details.}
   tr$closeTag()
   tr$value()
   cat(saveXML(tr$value()))
+
+  tr <- xmlTree("CDataTest")
+  tr$addTag("top", close=FALSE)
+  tr$addCData("x <- list(1, a='&');\nx[[2]]")
+  tr$addPI("S", "plot(1:10)")
+  tr$closeTag()
+  cat(saveXML(tr$value()))
 }
 \keyword{IO}

@@ -69,6 +69,39 @@ R_newXMLTextNode(USER_OBJECT_ value)
 }
 
 USER_OBJECT_
+R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value)
+{
+  xmlDocPtr  doc = NULL;
+  xmlNodePtr node;
+  char *tmp;
+
+  if(GET_LENGTH(sdoc))
+    doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+
+  tmp = CHAR_DEREF(STRING_ELT(value,0));
+
+  node = xmlNewCDataBlock(doc, tmp, strlen(tmp));
+
+  return(R_createXMLNodeRef(node));
+}
+
+
+USER_OBJECT_
+R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
+{
+  xmlDocPtr  doc = NULL;
+  xmlNodePtr node;
+  int        n;
+
+  if(GET_LENGTH(sdoc))
+    doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+
+  node = xmlNewPI(CHAR_DEREF(STRING_ELT(name, 0)), CHAR_DEREF(STRING_ELT(content, 0)));
+  return(R_createXMLNodeRef(node));
+}
+
+
+USER_OBJECT_
 R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc)
 {
    xmlDocPtr doc = NULL;

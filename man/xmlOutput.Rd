@@ -102,6 +102,12 @@ con$addTag("section", close=FALSE)
    con$closeTag() # a
  con$closeTag() # "subsection"
 con$closeTag() # section
+
+
+ d <- xmlOutputDOM()
+ d$addPI("S", "plot(1:10)")
+ d$addCData('x <- list(1, a="&");\nx[[2]]')
+ print(d$value())
 }
 \keyword{file}
 \keyword{IO}

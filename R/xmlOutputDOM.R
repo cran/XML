@@ -73,6 +73,14 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
     addNode(xmlCommentNode(paste(as.character(), sep="")))
  }
 
+ addCData <- function(text) {
+    addNode(xmlCDataNode(text))
+ }
+
+ addPI <- function(name, text) {
+    addNode(xmlPINode(name, text))  
+ }   
+
  closeTag <-
  function(name="", namespace=NULL)  {
     # namespace is ignored since we already have the tag name!
@@ -86,6 +94,8 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
               addNode = addNode,
               add = function(...) {},
               addComment = addComment,
+              addPI = addPI,
+              addCData = addCData,             
               current = function(){current}
             ) 
   class(con) <- c("XMLOutputDOM", "XMLOutputStream")

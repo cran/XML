@@ -56,8 +56,25 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
   .Call("R_insertXMLNode", node, currentNodes[[1]])   
  }
 
+
+ addCData <- function(text) {
+   node <- .Call("R_newXMLCDataNode", doc, as.character(text))
+   if(length(currentNodes) > 1)
+     .Call("R_insertXMLNode", node, currentNodes[[1]])
+   node
+ }
+
+ addPI <- function(name, text) {
+   node <- .Call("R_newXMLPINode", doc, as.character(name), as.character(text))
+   if(length(currentNodes) > 1)
+     .Call("R_insertXMLNode", node, currentNodes[[1]])
+   node
+ }  
+
  v <- list(
          addTag = addTag,
+         addCData = addCData,
+         addPI = addPI,
          closeTag = closeTag,
          addComment = addComment,
          value = function() doc,
