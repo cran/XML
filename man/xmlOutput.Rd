@@ -36,9 +36,9 @@ This provides a convenient way to specify the default name space that appers in 
  \item{nsURI}{the URI or value for the name space which is used
   when declaring the namespace.
   For \code{xmlOuputDOM}, this is a named character vector with each
-element giving the name space identifier and the
- corresponding URI, \\
- e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}
+  element giving the name space identifier and the
+  corresponding URI, \\
+  e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}
 }
  \item{header}{if non-NULL, this is immediately written to the output stream allowing
   one to control the initial section of the XML document.}

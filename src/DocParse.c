@@ -257,7 +257,8 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
     tmp = RS_XML(createNameSpaceIdentifier)(ptr,node);
     (void) RS_XML(notifyNamespaceDefinition)(tmp, parserSettings);
     SET_VECTOR_ELT(ans, n, tmp);
-    SET_STRING_ELT(names, n, COPY_TO_USER_STRING(ptr->prefix));
+    if(ptr->prefix)
+       SET_STRING_ELT(names, n, COPY_TO_USER_STRING(ptr->prefix));
   }
 
   SET_NAMES(ans, names);
@@ -349,7 +350,8 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 
   if(node->ns) {
     PROTECT(nsDef = NEW_CHARACTER(1));
-    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(node->ns->prefix));
+    if(node->ns->prefix)
+       SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(node->ns->prefix));
     SET_VECTOR_ELT(ans, NODE_NAMESPACE, nsDef);
     UNPROTECT(1);
   }

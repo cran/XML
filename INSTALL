@@ -35,7 +35,7 @@ installation should work without any additional work from you.
 You can use the regular R installation command
   R INSTALL -c -l <directory/to/install> XML
 or directly from the tar file
-  R INSTALL -c -l <directory/to/install> XML_0.92-1.tar.gz
+  R INSTALL -c -l <directory/to/install> XML_0.92-2.tar.gz
 
 The -c and -l flags are explained in the R documentation (see ?INSTALL
 within R, the FAQ and the R-intro documents in the distribution.)

@@ -1,3 +1,9 @@
+Version 0.92-2
+
+  *   Fixed C bug caused by using namespace without a prefix,
+      e.g. xmlns="http:...." assumed prefix was present.
+      Thanks to David Meyer.
+  
 Version 0.92-1
   *   Display the namespace definitions when printing an XMLNode object.
 
