@@ -5,16 +5,16 @@ xmlEventParse <-
 #
 # See also xmlParseTree()
 #
-function(file, handlers=xmlEventHandler(), ignoreBlanks=F, addContext = T, useTagName = T,
-           asText = F, trim=T, useExpat = F, isURL=F) 
+function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
+          useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE) 
 {
   if(missing(isURL)) { 
         # check if this is a URL or regular file.
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
   }
 
- if(isURL == F & asText == F) {
-  if(file.exists(file) == F)
+ if(isURL == FALSE & asText == FALSE) {
+  if(file.exists(file) == FALSE)
      stop(paste("File", file, "does not exist "))
  }
 

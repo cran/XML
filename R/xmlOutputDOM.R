@@ -19,12 +19,12 @@ function(tag="doc", dtd=NULL, nameSpace=NULL, nsURI=character(0))
 
 
  addTag <- 
- function(tag, ..., attrs=NULL, close=T, namespace=NULL) {
+ function(tag, ..., attrs=NULL, close=TRUE, namespace=NULL) {
    if(missing(namespace))
      namespace <- nameSpace
 
    addNode(n <- xmlNode(tag, ..., attrs= attrs, namespace=namespace))
-   if(close == F) {
+   if(close == FALSE) {
      current <<- c(current, xmlSize(getCurrent()))
    }
 

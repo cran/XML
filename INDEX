@@ -1,3 +1,4 @@
+WARNING: ignoring environment value of R_HOME
 [<-.XMLNode              Assign sub-nodes to an XML node
 append.xmlNode           Add children to an XML node
 asXMLNode                Converts non-XML node objects to XMLTextNode

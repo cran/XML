@@ -1,5 +1,5 @@
 parseDTD <- 
-function(extId, asText=F, name="", isURL=F)
+function(extId, asText=FALSE, name="", isURL=FALSE)
 {
   extId <- as.character(extId)
   if(missing(isURL)) {

@@ -67,13 +67,13 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
 
 
   checkNamespace <- function(ns) {
-    return(T)
+    return(TRUE)
 
     if( (lastTag == 0) )
       stop(paste("Namespace `",ns, "' is not defined\n",sep=""))
     m <- match(ns, openTags$nsprefix, NULL)
     if( any(!is.null(openTags[m,"nsURI"])) )
-      return(F)
+      return(FALSE)
     stop(paste("Namespace:",ns, "is not defined\n",sep=" "))
   }
 
@@ -88,7 +88,7 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
    #
    # We also need to allow the user specify an empty namespace
    # so that tags 
-  addTag <- function(tag, ..., attrs=NULL, sep="\n", close=T,
+  addTag <- function(tag, ..., attrs=NULL, sep="\n", close=TRUE,
                        namespace=NULL, xmlns=NULL) {
 
     tmp <- ""
@@ -116,7 +116,7 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
          namespace <- nameSpace
 #         xmlns <- nsURI
        } else {
-         startingTag <- F   
+         startingTag <- FALSE
          namespace <- cur[["nsprefix"]]
        }
       }
@@ -222,7 +222,7 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
   }
 
 
-  tagString <- function(tag, ..., attrs, close=F) {
+  tagString <- function(tag, ..., attrs, close=FALSE) {
 
     tmp <- ""
 

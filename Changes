@@ -1,3 +1,10 @@
+Version 0.9-0
+
+  * xmlValue() extended to work recursively if a node has
+    only one child. 
+
+  * T and F replaced by TRUE and FALSE
+
 Version 0.7-4
 
   * Support for Windows

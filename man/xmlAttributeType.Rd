@@ -33,24 +33,7 @@ if this attribute is defined as being a value from an enumerated set.}
 }
 
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	     or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (def, defaultType = F) 
-{
-    if (defaultType == F & names(def$type)[1] == "Enumeration") {
-        return(paste("(", paste(def$defaultValue, collapse = " | "), 
-            ")", sep = " ", collapse = ""))
-    }
-    switch(ifelse(defaultType, names(def$defaultType)[1], names(def$type)[1]), 
-        Fixed = "#FIXED", CDATA = "CDATA", Implied = "#IMPLIED", 
-        Required = "#REQUIRED", Id = "#ID", IDRef = "#IDREF", 
-        IDRefs = "#IDREFS", Entity = "#ENTITY", Entities = "ENTITIES", 
-        NMToken = "#NMTOKEN", NMTokens = "#NMTOKENS", Enumeration = "", 
-        Notation = "", "<BROKEN>")
-  }
 }
 \keyword{file}
 

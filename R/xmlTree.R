@@ -17,7 +17,7 @@ function(tag=NULL, dtd=NULL, namespaces=list())
         v 
  }
  
- addTag <- function(name, ..., attrs=NULL, close=T, namespace=NULL) {
+ addTag <- function(name, ..., attrs=NULL, close=TRUE, namespace=NULL) {
 
    if(!is.null(attrs))
     storage.mode(attrs) <- "character"
@@ -103,19 +103,19 @@ function(name, ..., attrs=NULL, namespace="", doc = NULL)
 
 
 saveXML <-
-function(doc, file=NULL, compression=0, indent=T)
+function(doc, file=NULL, compression=0, indent=TRUE)
 {
  UseMethod("saveXML")
 }
 
 saveXML.XMLInternalDocument <-
-function(doc, file=NULL, compression=0, indent=T)
+function(doc, file=NULL, compression=0, indent=TRUE)
 {
   .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent))
 }
 
 saveXML.XMLInternalDOM <-
-function(doc, file=NULL, compression=0, indent=T)
+function(doc, file=NULL, compression=0, indent=TRUE)
 {
   saveXML(doc$value(), file=file, compression=compression, indent=indent)
 }

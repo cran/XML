@@ -83,14 +83,14 @@ function(x, ...)
  else
   dflt <- ""
 
- cat(x$name, xmlAttributeType(x), xmlAttributeType(x, T), dflt)
+ cat(x$name, xmlAttributeType(x), xmlAttributeType(x, TRUE), dflt)
 }
 
 xmlAttributeType <-
-function(def, defaultType = F)
+function(def, defaultType = FALSE)
 {
 
- if(defaultType == F & names(def$type)[1] == "Enumeration") {
+ if(defaultType == FALSE & names(def$type)[1] == "Enumeration") {
    return( paste("(",paste(def$defaultValue,collapse=" | "),")", sep=" ", collapse="") )
  }
 

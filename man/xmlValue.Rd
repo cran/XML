@@ -6,10 +6,11 @@
 \alias{xmlValue.XMLTextNode}
 \title{Extract the contents of a leaf XML node}
 \description{
- Some types of XML nodes have no children, but simply
-text. Examples are \code{XMLTextMode},
-\code{XMLProcessingInstruction}.
-This function provides access to their contents. 
+  Some types of XML nodes have no children nodes, but are leaf nodes and
+  simply contain text. Examples are \code{XMLTextMode}, \code{XMLProcessingInstruction}.
+  This function provides access to their raw contents.
+  This has been extended to operate recursivel on arbitrary XML nodes
+  that contain a single text node.
 }
 \usage{
 xmlValue(x)
@@ -35,6 +36,9 @@ xmlValue(x)
 }
 
 \examples{
-  
+ node <- xmlNode("foo", "Some text")
+ xmlValue(node)
+
+ xmlValue(xmlTextNode("some more raw text"))
 }
 \keyword{file}

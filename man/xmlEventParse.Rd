@@ -102,7 +102,7 @@ to connect to remote servers.
    # Print the name of each XML tag encountered at the beginning of each
    # tag.
    # Uses the libxml SAX parser.
- xmlEventParse(fileName, list(startElement=function(name, attrs){cat(name,"\n")}), useTagName=F, addContext = F)
+ xmlEventParse(fileName, list(startElement=function(name, attrs){cat(name,"\n")}), useTagName=FALSE, addContext = FALSE)
 
 
 \dontrun{
@@ -110,7 +110,7 @@ to connect to remote servers.
   # and making it a single string. Then call xmlEventParse
 xmlURL <- "http://www.omegahat.org/Scripts/Data/mtcars.xml"
 xmlText <- paste(scan.url(xmlURL, what="",sep="\n"),"\n",collapse="\n")
-xmlEventParse(xmlText, asText=T)
+xmlEventParse(xmlText, asText=TRUE)
 }
 }
 \keyword{file}

@@ -14,7 +14,7 @@ function(x, ...)
 }
 
 xmlRoot.XMLDocumentContent <-
-function(x, skip=T)
+function(x, skip=TRUE)
 {
   a <- x$children[[1]]
 #  a <- x$children
@@ -87,6 +87,9 @@ function(x)
 xmlValue.XMLNode <- 
 function(x)
 {
+ if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
+    return(xmlValue(x[[1]]))
+
  x$value
 }
 

@@ -24,7 +24,7 @@ xmlSApply(X, FUN, ...)
 xmlSApply.XMLNode(X, FUN, ...)
 xmlSApply.XMLDocument(X, FUN, ...)
 }
-%- maybe also `usage' for other objects documented here.
+
 \arguments{
   \item{X}{the \code{XMLNode} on whose children the regular
    \code{\link{apply}} or \code{\link{sapply}} is to be performed}

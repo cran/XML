@@ -3,7 +3,7 @@ function() {
   con <- xmlOutputDOM()
 
   startElement <- function(name, atts,...) {
-    con$addTag(name, attrs=atts, close=F)
+    con$addTag(name, attrs=atts, close=FALSE)
   }
   endElement <- function(name) {
     con$closeTag(name)

@@ -78,23 +78,23 @@ The following are specific to \code{xmlOutputDOM}:
 \examples{
  con <- xmlOutputDOM()
 con$addTag("author", "Duncan Temple Lang")
-con$addTag("address",  close=F)
+con$addTag("address",  close=FALSE)
  con$addTag("office", "2C-259")
  con$addTag("street", "Mountain Avenue.")
- con$addTag("phone", close=F)
+ con$addTag("phone", close=FALSE)
    con$addTag("area", "908", attrs=c(state="NJ"))
    con$addTag("number", "582-3217")
  con$closeTag() # phone
 con$closeTag() # address
 
-con$addTag("section", close=F)
+con$addTag("section", close=FALSE)
  con$addNode(xmlTextNode("This is some text "))
  con$addTag("a","and a link", attrs=c(href="http://www.omegahat.org"))
  con$addNode(xmlTextNode("and some follow up text"))
 
- con$addTag("subsection", close=F)
+ con$addTag("subsection", close=FALSE)
    con$addNode(xmlTextNode("some addtional text "))
-   con$addTag("a", attrs=c(href="http://www.omegahat.org"), close=F)
+   con$addTag("a", attrs=c(href="http://www.omegahat.org"), close=FALSE)
      con$addNode(xmlTextNode("the content of the link"))
    con$closeTag() # a
  con$closeTag() # "subsection"

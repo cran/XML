@@ -30,7 +30,7 @@ It is provided as a convenient form of calling the
 
 \examples{
   doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
-  r <- xmlRoot(doc, skip=T)
+  r <- xmlRoot(doc, skip=TRUE)
   length(r)
     # get the last entry
   r[[length(r)]]

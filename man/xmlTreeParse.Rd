@@ -9,8 +9,8 @@
  to be (potentially malformed) HTML.
 }
 \usage{
-xmlTreeParse(file, ignoreBlanks=T, handlers=NULL, replaceEntities=F,asText=F, trim=T, validate=F, getDTD=F, isURL=F, asTree = F)
-htmlTreeParse(file = "../XML/Docs/test.xml", ignoreBlanks = T, handlers = NULL, replaceEntities = F, asText = F, trim = T, isURL = F, asTree = F) 
+xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,asText=FALSE, trim=TRUE, validate=FALSE, getDTD=FALSE, isURL=FALSE, asTree = FALSE)
+htmlTreeParse(file = "../XML/Docs/test.xml", ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE, asText = FALSE, trim = TRUE, isURL = FALSE, asTree = FALSE) 
 }
 
 \arguments{
@@ -173,7 +173,7 @@ and another for entities. See \code{\link{parseDTD}}.
             handlers=list(entity=function(x) {
                                     cat("In entity",x$name, x$value,"\n")
                                     x}
-                                  ), asTree = T
+                                  ), asTree = TRUE
                           )
           )
 
@@ -181,7 +181,7 @@ and another for entities. See \code{\link{parseDTD}}.
  # Read the text from the file
  xmlText <- paste(readLines(fileName), "\n", collapse="")
 
- xmlTreeParse(xmlText, asText=T)
+ xmlTreeParse(xmlText, asText=TRUE)
 
 
  # Read a MathML document and convert each node
@@ -244,8 +244,8 @@ m <- xmlTreeParse(fileName,
   # with a special handler.
  doc <- xmlTreeParse(fileName, handlers = list(
                                   variable=function(x, attrs) {
-                                             print(xmlValue(x[[1]])); T
-                                           }), asTree=T)
+                                             print(xmlValue(x[[1]])); TRUE
+                                           }), asTree=TRUE)
 
 
   # This should raise an error.
@@ -254,7 +254,7 @@ m <- xmlTreeParse(fileName,
 \dontrun{
  # Parse an XML document directly from a URL.
  # Requires Internet access.
- xmlTreeParse("http://www.omegahat.org/Scripts/Data/mtcars.xml", asText=T)
+ xmlTreeParse("http://www.omegahat.org/Scripts/Data/mtcars.xml", asText=TRUE)
 }
 }
 

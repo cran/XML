@@ -32,8 +32,8 @@ xmlText <- paste(scan.url(xmlURL, what="", sep="\n"),"\n",collapse="\n")
 
 xmlURL <- system.file("exampleData", "mtcars.xml", package="XML")
 xmlText <- paste(readLines(xmlURL), "\n", collapse="")
-xmlEventParse(xmlText, handlers = NULL, asText=T)
-xmlEventParse(xmlText, xmlHandler(), useTagName=T, asText=T)
+xmlEventParse(xmlText, handlers = NULL, asText=TRUE)
+xmlEventParse(xmlText, xmlHandler(), useTagName=TRUE, asText=TRUE)
 }
 \keyword{file}
 \keyword{IO}

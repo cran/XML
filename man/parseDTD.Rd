@@ -5,7 +5,7 @@
  Represents the contents of a DTD as a user-level object containing the element and entity definitions.
 }
 \usage{
-parseDTD(extId, asText=F, name="", isURL=F)
+parseDTD(extId, asText=FALSE, name="", isURL=FALSE)
 }
 \arguments{
  \item{extId}{The name of the file containing the DTD to be processed.}
@@ -81,11 +81,11 @@ objects.
     # Read from text
  txt <- readLines(dtdFile)
  txt <- paste(txt, "\n", collapse="")
- d <- parseDTD(txt, asText=T)
+ d <- parseDTD(txt, asText=TRUE)
 
 \dontrun{
  url <- "http://www.omegahat.org/XML/DTDs/DatasetByRecord.dtd"
- d <- parseDTD(url, asText=F)  
+ d <- parseDTD(url, asText=FALSE)  
 }
 }
 \keyword{file}

@@ -50,10 +50,10 @@ function(element, name, pos=NULL)
 {
  for(i in element$elements) {
    if(dtdElementValidEntry(i, name, pos=pos))
-     return(T)
+     return(TRUE)
  }
 
- return(F)
+ return(FALSE)
 }
 
 dtdElementValidEntry.XMLElementContent <-
@@ -62,7 +62,7 @@ function(element, name, pos=NULL)
  # if there are no sub-element types, then can't be here.
  # Might check this is a PCDATA by looking at the type.
  if(is.null(element$elements)) {
-  return(F)
+  return(FALSE)
  }
 
  return( any(element$elements == name) )
@@ -82,16 +82,16 @@ function(element, name, pos=NULL)
    if(!is.null(tmp))
       return(dtdElementValidEntry(tmp))
    else
-     return(F)
+     return(FALSE)
  }
 
  for(i in element$elements) {
    if(dtdElementValidEntry(i, name)) {
-     return(T)
+     return(TRUE)
    }
  }
 
- return(F)
+ return(FALSE)
 }
 
 xmlContainsEntity <-

@@ -13,10 +13,15 @@ saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=T)
 saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=T)
 }
 \arguments{
-  \item{doc}{}
-  \item{file}{}
-  \item{compression}{ ~~Describe \code{compression} here~~ }
-  \item{indent}{ ~~Describe \code{indent} here~~ }
+  \item{doc}{the document object representing the XML document.}
+  \item{file}{the name of the file to which the contents of the XML
+    nodes will be serialized.}
+  \item{compression}{an integer value between 0 and 9 indicating the
+    level of compression to use when saving the file. Higher values
+    indicate increased compression and hence smaller files
+    at the expense of computational time to do the compression and decompression.}
+  \item{indent}{a logical value indicating whether to indent
+    the nested nodes when serializing to the stream.}
 }
 \details{
  One can create an internal XML tree (or DOM)
