@@ -33,7 +33,7 @@ or XMLDocument.}
 }
 
 \examples{
-  fileName <- system.file("data/mtcars.xml", pkg="XML") 
+  fileName <- system.file("data", "mtcars.xml", pkg="XML") 
   doc <- xmlTreeParse(fileName)
   xmlSize(doc)
   xmlSize(doc$doc$children[["dataset"]][["variables"]])

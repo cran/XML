@@ -1,69 +1,4 @@
-
-xmlWriteBuffer <-
-#
-# 
-#
-#
-# Want to check with the DTD whether a tag is legitimate
-#  attributes are valid, etc.
-#
-# Add an indentation level.
-#
-#  Need to escape characters via entities:
-#      <-   => %sgets;
-#      <    => %lt;
-#      >    => %gt;
-#   etc.
-#
-#
-function(dtd = NULL)
-{
-  paste0 <- function(...) paste(..., sep = "")
-  buf <- "<?xml version=\"1.0\"?>"
-
-  add <- function(..., sep="\n") {
-    buf <<- paste(buf, paste0(...), sep=sep) 
-  }
-
-  tagString <- function(tag, ..., attrs, close=F) {
-   tmp <- ""
-    if(!missing(attrs)) {
-     tmp <- paste(" ", paste(names(attrs), attrs,sep="=", collapse=" "),sep="")
-    }
-   return(paste0("<", tag,tmp, ">",...,"</",tag,">"))
-  }
-
-  addTag <- function(tag, ..., attrs=NULL, sep="\n", close=T) {
-    tmp <- ""
-    if(!missing(attrs)) {
-      tmp <- paste(" ", paste(names(attrs), attrs,sep="=", collapse=" "),sep="")
-    }
-
-    add(paste("<",tag, tmp, ">", sep=""))
-
-    if(length(list(...)) > 0) {
-      add(..., sep=sep)
-    }
-    if(close) {
-      add(paste("</",tag, ">", sep=""), sep="")
-    } 
-
-    NULL
-  }
-
-   addEndTag <- function(name) {
-     add("\n", "</",name,">", sep="")
-   }
-
-
-  list( value=function() {buf},
-        add = add,
-        addTag = addTag,
-        addEndTag = addEndTag,
-        tagString = tagString
-      )
-
-}
+# Requires xmlOutputBuffer 
 
 prompt.xml <-
 function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Rhelp.dtd">\n\n<Rhelp>',footer="</Rhelp>")
@@ -82,11 +17,11 @@ function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Rhelp.dtd">\n
   name <- as.character(name)
   fn <- get(name)
 
-  xml <- xmlWriteBuffer()
+  xml <- xmlOutputBuffer()
   if(!is.null(header))
      xml$add(header)
 
-  xml$addTag("name",name)   
+  xml$addTag("sname",name)   
   xml$addTag("alias",name)   
   xml$addTag("title"," ~~function to do ... ~~ ")   
 
@@ -100,7 +35,7 @@ function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Rhelp.dtd">\n
         if (n > 0) {
             arg.names <- names(argls)
         }
-        xml$addTag("name", name,sep="")
+        xml$addTag("sname", name,sep="")
       
         for (i in s) {
             xml$addTag("arg", xml$tagString("argName", arg.names[i]), close=F)

@@ -6,7 +6,7 @@
  structure representing the XML tree.
 }
 \usage{
-xmlTreeParse(file, ignoreBlanks=T, handlers=NULL, replaceEntities=F,asText=F, trim=T, validate=F, getDTD=F, isURL=F)
+xmlTreeParse(file, ignoreBlanks=T, handlers=NULL, replaceEntities=F,asText=F, trim=T, validate=F, getDTD=F, isURL=F, asTree = F)
 }
 
 \arguments{
@@ -23,7 +23,10 @@ in the resulting `tree'. }
  \item{handlers}{Optional collection of functions
   used to map the different XML nodes to R
   objects. This is a named list of functions,
-   and a closure can be used to provide local data.}
+   and a closure can be used to provide local data.
+  This provides a way of filtering the tree as it is being
+ created, adding or removing nodes, and generally processing
+  them as they are constructed in the C code.}
   \item{replaceEntities}{
    logical value indicating whether to substitute entity references
     with their text directly. This should be left as False.
@@ -61,6 +64,11 @@ return type.
   The libxml parser handles the connection to servers,
   not the R facilities (e.g. \code{\link{scan.url}}).
  }
+ \item{asTree}{this only applies when on passes a value for
+   the  \code{handlers} argument and is used then to determine
+   whether the DOM tree should be returned or the \code{handlers}
+   object.
+  }
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -129,7 +137,7 @@ and another for entities. See \code{\link{parseDTD}}.
 \seealso{ \link{xmlEventParse} }
 
 \examples{
- fileName <- system.file("data/test.xml", pkg="XML")
+ fileName <- system.file("data", "test.xml", pkg="XML")
    # parse the document and return it in its standard format.
  xmlTreeParse(fileName)
 
@@ -155,13 +163,64 @@ and another for entities. See \code{\link{parseDTD}}.
  # so that we can use method  dispatching when processing
  # it rather than conditional statements on the tag name.
  # See plotMathML() in examples/.
- fileName <- system.file("data/mathml.xml",pkg="XML")
+ fileName <- system.file("data", "mathml.xml",pkg="XML")
 m <- xmlTreeParse(fileName, 
                   handlers=list(startElement=function(node){
                               cname <- paste(xmlName(node),"MathML",sep="",collapse="")
                               class(node) <- c(cname, class(node)); 
                               node
                 }))
+
+
+
+  # In this example, we extract _just_ the names of the
+  # variables in the mtcars.xml file. 
+  # The names are the contents of the <variable>
+  # tags. We discard all other tags by returning NULL
+  # from the startElement handler.
+  #
+  # We cumulate the names of variables in a character
+  # vector named `vars'.
+  # We define this within a closure and define the 
+  # variable function within that closure so that it
+  # will be invoked when the parser encounters a <variable>
+  # tag.
+  # This is called with 2 arguments: the XMLNode object (containing
+  # its children) and the list of attributes.
+  # We get the variable name via call to xmlValue().
+
+  # Note that we define the closure function in the call and then 
+  # create an instance of it by calling it directly as
+  #   (function() {...})()
+
+  # Note that we can get the names by parsing
+  # in the usual manner and the entire document and then executing
+  # xmlSApply(xmlRoot(doc)[[1]], function(x) xmlValue(x[[1]]))
+  # which is simpler but is more costly in terms of memory.
+ fileName <- system.file("data", "mtcars.xml")
+ doc <- xmlTreeParse(fileName,  handlers = (function() { 
+                                 vars <- character(0) ;
+                                list(variable=function(x, attrs) { 
+                                                vars <<- c(vars, xmlValue(x[[1]])); 
+                                                NULL}, 
+                                     startElement=function(x,attr){
+                                                   NULL
+                                                  }, 
+                                     names = function() {
+                                                 vars
+                                             }
+                                    )
+                               })()
+                     )
+
+  # Here we just print the variable names to the console
+  # with a special handler.
+ doc <- xmlTreeParse(fileName, handlers = list(
+                                  variable=function(x, attrs) {
+                                             print(xmlValue(x[[1]])); T
+                                           }))
+
+
 
 \dontrun{
  # Parse an XML document directly from a URL.

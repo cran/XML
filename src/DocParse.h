@@ -8,17 +8,16 @@
 #include <ctype.h>
 #include <stdlib.h> 
 
-#ifdef USE_R
-#include "Rdefines.h"
-#include "Rinternals.h"
-#else
-#include "S.h"
-#endif
 #include "RSCommon.h"
 
 #include "RS_XML.h"
 
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
 #include <libxml/parser.h>
+#endif
+
 
 typedef struct {
   int skipBlankLines;

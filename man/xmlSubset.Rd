@@ -30,6 +30,8 @@ and identified by \dots.
 
 \seealso{
  \code{\link{xmlAttrs}}
+ \code{\link{[<-.XMLNode}}
+ \code{\link{[[<-.XMLNode}}
 }
 
 \examples{

@@ -116,20 +116,24 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 
   if(LOGICAL_DATA(getDTD)[0]) {
-    USER_OBJECT_ ans;
+    USER_OBJECT_ ans, klass, tmp;
     const char *names[] = {"doc", "dtd"};
       PROTECT(ans = NEW_LIST(2));
         SET_VECTOR_ELT(ans, 0, rdoc);
-        SET_VECTOR_ELT(ans, 1, RS_XML(ConstructDTDList)(doc, 1, NULL));
+        SET_VECTOR_ELT(ans, 1, tmp = RS_XML(ConstructDTDList)(doc, 1, NULL));
+
+        PROTECT(klass = NEW_CHARACTER(1));
+        SET_STRING_ELT( klass, 0, COPY_TO_USER_STRING("DTDList"));
+        SET_CLASS(tmp, klass);
 
         RS_XML(SetNames)(sizeof(names)/sizeof(names[0]), names, ans);
-      UNPROTECT(1); /* release the ans */
+
+      UNPROTECT(2); /* release the ans */
       rdoc = ans;
   }
 
 
      /* Set the class for the document. */
-
   className = NEW_CHARACTER(1);
   PROTECT(className);
     SET_STRING_ELT(className, 0, COPY_TO_USER_STRING("XMLDocument"));   
@@ -154,7 +158,7 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
                     R_XMLSettings *parserSettings)
 {
   USER_OBJECT_ rdoc;
-  USER_OBJECT_ rdoc_el_names;
+  USER_OBJECT_ rdoc_el_names, klass;
   int n = NUM_DOC_ELEMENTS;
 
   PROTECT(rdoc = NEW_LIST(n));
@@ -174,17 +178,24 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
        Note the SIDEWAYS argument to get the sibling nodes
        at the root, rather than just the first and its children.
      */
-  SET_VECTOR_ELT(rdoc, CHILDREN_ELEMENT_NAME, RS_XML(createNodeChildren)(doc->xmlRootNode,  SIDEWAYS, parserSettings)); 
-  /* Alternative (?)
-  RECURSIVE_DATA(rdoc)[CHILDREN_ELEMENT_NAME] = R_createXMLNode(doc->root,  1, SIDEWAYS, parserSettings,rdoc);
-  */
-
+{
+  xmlNodePtr root;
+#ifndef USE_OLD_ROOT_CHILD_NAMES
+    root = doc->xmlRootNode;
+#else
+    root = doc->root;
+#endif
+  SET_VECTOR_ELT(rdoc, CHILDREN_ELEMENT_NAME, RS_XML(createNodeChildren)(root,  SIDEWAYS, parserSettings)); 
+}
   SET_STRING_ELT(rdoc_el_names, CHILDREN_ELEMENT_NAME, COPY_TO_USER_STRING("children"));
 
   SET_NAMES(rdoc, rdoc_el_names);
 
-  UNPROTECT(1);
-  UNPROTECT(1);
+  PROTECT(klass = NEW_CHARACTER(1));
+  SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING("XMLDocumentContent"));
+  SET_CLASS(rdoc, klass);
+
+  UNPROTECT(3);
 
   return(rdoc);
 }
@@ -209,7 +220,6 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   int n = NUM_NODE_ELEMENTS;
   USER_OBJECT_ ans;
   USER_OBJECT_ ans_el_names;
-  char *className;
   int addValue;
 
   char *contentValue = node->content;
@@ -313,7 +323,6 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
  char *className = NULL;
  int numEls = 1;
  int appendDefault = 1;
- USER_OBJECT_ Class;
 
   switch(node->type) {
     case XML_ENTITY_REF_NODE:
@@ -327,6 +336,9 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
       break;
     case XML_TEXT_NODE:
       className = "XMLTextNode";
+      break;
+    case XML_CDATA_SECTION_NODE:
+      className = "XMLCDataNode";
       break;
 #ifdef LIBXML2
     case XML_ENTITY_DECL:
@@ -352,7 +364,6 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
       UNPROTECT(1);
       className = NULL;
   }
-
 
 
   return(node->type);
@@ -458,7 +469,12 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
   USER_OBJECT_ ans = NULL_USER_OBJECT;
   USER_OBJECT_ elNames = NULL;
   int unProtect = 0;
-  xmlNodePtr c = (direction == SIDEWAYS) ? node : node->xmlChildrenNode;
+  xmlNodePtr c = (direction == SIDEWAYS) ? node : 
+#ifndef USE_OLD_ROOT_CHILD_NAMES
+                              node->xmlChildrenNode;
+#else
+                              node->childs;
+#endif
   while(c) {
     c = c->next;
     n++;
@@ -472,7 +488,12 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
     PROTECT(ans = NEW_LIST(n));
     PROTECT(elNames = NEW_CHARACTER(n));
       unProtect = 2;
-    c = (direction == SIDEWAYS) ? node : node->xmlChildrenNode;
+    c = (direction == SIDEWAYS) ? node :
+#ifndef USE_OLD_ROOT_CHILD_NAMES
+                              node->xmlChildrenNode;
+#else
+                              node->childs;
+#endif
     for(i = 0; i < n; i++) {
       tmp = RS_XML(createXMLNode)(c, 1, DOWN, parserSettings, ans);
       if(tmp) {

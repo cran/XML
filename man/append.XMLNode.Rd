@@ -1,0 +1,44 @@
+\name{append.xmlNode}
+\alias{append.xmlNode}
+\alias{append.XMLNode}
+\title{Add children to an XML node}
+\description{
+ This appends one or more XML nodes as children of an existing node.
+}
+\usage{
+append.XMLNode(to, ...)
+append.xmlNode(to, ...)
+}
+\arguments{
+  \item{to}{the XML node to which the sub-nodes are to be added.}
+  \item{\dots}{the sub-nodes which are to be added to the \code{to} node.
+   If this is a \code{list} of \code{XMLNode} objects (e.g. create by a call to 
+   \code{\link{lapply}}), then that list is used.}
+}
+\value{
+ The original \code{to} node containing its new children nodes.
+}
+\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
+\url{http://www.omegahat.org}  }
+\author{ Duncan Temple Lang }
+
+
+\seealso{
+\code{\link{[<-.XMLNode}}
+\code{\link{[[<-.XMLNode}}
+\code{\link{[.XMLNode}}
+\code{\link{[[.XMLNode}}
+}
+
+\examples{
+\dontrun{
+   tmp <-  lapply(references, function(i) {
+                                  if(!inherits(i, "XMLNode"))
+                                    i <- xmlNode("reference", i)
+                                  i
+                              })
+   r[["references"]] <- append.xmlNode(r[["references"]],tmp)
+}
+}
+\keyword{XML}
+\keyword{IO}

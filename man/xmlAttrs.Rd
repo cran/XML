@@ -30,7 +30,7 @@ pairs in the XML tag
 \code{\link{xmlName}}}
 
 \examples{
- fileName <- system.file("data/mtcars.xml", pkg="XML") 
+ fileName <- system.file("data", "mtcars.xml", pkg="XML") 
  doc <- xmlTreeParse(fileName)
 
  xmlAttrs(doc$doc$children[["dataset"]])

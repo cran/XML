@@ -50,7 +50,7 @@ can appear in an \code{element} tag or not.
 }
 
 \examples{
- dtdFile <- system.file("data/foo.dtd",pkg="XML")
+ dtdFile <- system.file("data", "foo.dtd",pkg="XML")
  dtd <- parseDTD(dtdFile) 
  
   dtdElementValidEntry(dtdElement("variables",dtd), "variable")

@@ -44,12 +44,10 @@ to do this.
  a numeric vector of length 1.
 </doc>
 <![CDATA[
-
  getpid <- 
  function() {
    .Call("RS_getpid")
  }
-
 ]]>
 </function>
 

@@ -17,7 +17,11 @@
 #include <ctype.h>  /* For isspace() */
 
 #ifdef LIBXML
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
 #include <libxml/parser.h>
+#endif
 #endif
 
 #include "RSCommon.h" /* for SET_NAMES */
@@ -29,7 +33,7 @@
 
 int isBlank(const char *str)
 {
-  int blank; 
+  int blank=0; 
   const char *ptr = str;
   while(ptr && (blank = isspace(ptr[0]))) {
     ptr++;

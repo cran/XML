@@ -1,0 +1,6 @@
+<!-- See ../examples/Rhelp.dtd -->
+<!ENTITY % lt '<' >
+<!ENTITY % gt '>' >
+<!ENTITY % le '<='>
+<!ENTITY % ge '>='>
+

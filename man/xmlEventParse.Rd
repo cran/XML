@@ -95,7 +95,7 @@ to connect to remote servers.
 \seealso{ \link{xmlTreeParse} }
 
 \examples{
- fileName <- system.file("data/mtcars.xml", pkg="XML")
+ fileName <- system.file("data", "mtcars.xml", pkg="XML")
 
    # Print the name of each XML tag encountered at the beginning of each
    # tag.

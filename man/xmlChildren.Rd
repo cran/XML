@@ -26,7 +26,7 @@ XMLNode. These are also of class XMLNode.
 
 
 \examples{
-  fileName <- system.file("data/mtcars.xml", pkg="XML")
+  fileName <- system.file("data", "mtcars.xml", pkg="XML")
   doc <- xmlTreeParse(fileName)
   names(xmlChildren(doc$doc$children[["dataset"]]))
 }

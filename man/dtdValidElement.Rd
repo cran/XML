@@ -44,7 +44,7 @@ within children of that tag.}
 }
 
 \examples{
- dtdFile <- system.file("data/foo.dtd", pkg="XML")
+ dtdFile <- system.file("data", "foo.dtd", pkg="XML")
  foo.dtd <- parseDTD(dtdFile)
 
   # The following are true.

@@ -75,7 +75,7 @@ objects.
  WritingXML.html in the distribution.}
 
 \examples{
- dtdFile <- system.file("data/foo.dtd",pkg="XML")
+ dtdFile <- system.file("data", "foo.dtd",pkg="XML")
  parseDTD(dtdFile)
 
   # Read from text

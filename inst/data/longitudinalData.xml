@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!DOCTYPE dataframe SYSTEM "RS.dtd">
+
+<rs:dataframe xmlns:rs="http://www.omegahat.org/RSXML" numRecords="2">
+<rs:namedlist length="1">
+<name>X</name><element>
+<list>
+<longitudinal>
+<times><array><integer>1</integer><integer>6</integer></array></times>
+<cov><array><double>100.4</double><double>25.2</double></array></cov>
+</longitudinal>
+<longitudinal>
+<times><array><integer>1</integer><integer>6</integer></array></times>
+<cov><array><double>100.4</double><double>25.2</double></array></cov>
+</longitudinal>
+<object type="long">
+<slot name="times"><array><integer>1</integer><integer>6</integer></array></slot>
+<slot name="cov"><array><double>100.4</double><double>25.2</double></array></slot>
+</object>
+</list>
+</element>
+<name>Y</name>
+<element>
+<factor>
+<values><list>
+ <string>M</string>
+ <string>F</string></list>
+</values>
+</factor>
+</element>
+</rs:namedlist>
+</rs:dataframe>

@@ -25,7 +25,13 @@ extern char *strdup(const char *);
 /* For reading DTDs directly from text, not files. 
    Copied directly from parser.c in the libxml(-1.7.3) library.
 */
+
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parserInternals.h>
+#else
 #include <libxml/parserInternals.h>
+#endif
+
 
 #define INPUT_CHUNK	250
 #define CUR (ctxt->token ? ctxt->token : (*ctxt->input->cur))
@@ -149,7 +155,7 @@ const char *RS_XML(DtdTypeNames)[] = {"external", "internal"};
 USER_OBJECT_
 RS_XML(ConstructDTDList)(xmlDocPtr myDoc, int processInternals, xmlParserCtxtPtr ctxt)
 {
- USER_OBJECT_ ans;
+ USER_OBJECT_ ans, el, klass;
  int i;
  xmlDtdPtr sets[2];
   
@@ -163,7 +169,11 @@ RS_XML(ConstructDTDList)(xmlDocPtr myDoc, int processInternals, xmlParserCtxtPtr
   PROTECT(ans = NEW_LIST(num));
   for(i = 0; i < num; i++) {
     if(sets[i]) {
-      SET_VECTOR_ELT(ans, i, RS_XML(createDTDParts)(sets[i], ctxt));
+      SET_VECTOR_ELT(ans, i, el= RS_XML(createDTDParts)(sets[i], ctxt));
+      PROTECT(klass = NEW_CHARACTER(1));
+      SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING(i==0 ? "ExternalDTD" : "InternalDTD"));
+      SET_CLASS(el, klass);
+      UNPROTECT(1);
     }
   }
    RS_XML(SetNames)(num, RS_XML(DtdTypeNames), ans);
@@ -220,12 +230,12 @@ USER_OBJECT_
 RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
 {
  USER_OBJECT_ dtdEls = NULL_USER_OBJECT;
- xmlElementPtr xmlEl;
-
- int n, i;
+ int n;
 #ifdef LIBXML2
  n = xmlHashSize(table);
 #else
+ int i;
+ xmlElementPtr xmlEl;
  n = table->nb_elements;
 #endif
   if(n > 0) {
@@ -278,12 +288,12 @@ USER_OBJECT_
 RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
 {
  USER_OBJECT_ dtdEls = NULL_USER_OBJECT;
- xmlEntity *xmlEl;
-
- int n, i;
+ int n;
 #ifdef LIBXML2
  n = xmlHashSize(table);
 #else
+ xmlEntity *xmlEl;
+ int i;
  n = table->nb_entities;
 #endif
   if(n > 0) {

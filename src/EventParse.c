@@ -23,18 +23,20 @@
 
  */
 
-extern USER_OBJECT_ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText);
+extern void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText);
 
 USER_OBJECT_ 
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat)
 {
+#ifdef LIBEXPAT
   FILE *file = NULL;
+  int expat = 0;
+#endif
   char *name;
   int asTextBuffer;
   RS_XMLParserData *parserData;
-  int expat = 0;
 
   asTextBuffer = LOGICAL_DATA(asText)[0];
 
@@ -54,7 +56,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
 
   } else
 #endif /* ifdef LIBEXPAT */
-     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
+  name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
 
   parserData = RS_XML(createParserData)(handlers);
   parserData->fileName         = name; 
@@ -74,7 +76,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
       }
   } else 
 #endif /* ifdef LIBEXPAT */
-    RS_XML(libXMLEventParse)(name, parserData, asTextBuffer);
+   RS_XML(libXMLEventParse)(name, parserData, asTextBuffer);
 
   free(parserData);
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rm -f config.* src/RS_XML.h

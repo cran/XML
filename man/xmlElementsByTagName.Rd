@@ -36,8 +36,8 @@ tag name matches that specified by the user.
  xmlElementsByTagName(doc$children[[1]], "variable")
 }
 
- doc <- xmlTreeParse(system.file("data/mtcars.xml", pkg="XML"))
- xmlElementsByTagName(doc$children[[1]], "variable")
+ doc <- xmlTreeParse(system.file("data", "mtcars.xml", pkg="XML"))
+ xmlElementsByTagName(xmlRoot(doc)[[1]], "variable")
 }
 \keyword{XML}
 \keyword{I/O}

@@ -1,5 +1,6 @@
 \name{print.XMLAttributeDef}
 \alias{print.XMLAttributeDef}
+\alias{print.XMLCDataNode}
 \alias{print.XMLElementContent}
 \alias{print.XMLElementDef}
 \alias{print.XMLEntity}

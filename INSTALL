@@ -1,0 +1,66 @@
+This package can be configured to use either or both of the libxml and
+expat libraries for parsing XML documents.  libxml is used for the
+tree-based (DOM) parsing and the event-driven (SAX) parsing.  Expat is
+used only for the event-driven parsing and is not necessary if
+one wishes to use libxml.
+
+Note that the descriptions here are for Unix systems. 
+
+One should use libxml, version 1.8.9. This is available from
+
+  ftp://ftp.gnome.org/pub/GNOME/stable/sources/libxml/
+
+and the home page for the library is 
+  http://xmlsoft.org/
+
+Many Linux installations provide a version of libxml (typically with
+the header files in /usr/include/gnome-xml or
+/usr/local/include/gnome-xml.) This is a slightly earlier version of
+libxml and we recommend using libxml-1.8.9. However, the configuration
+script will usually adapt the compilation to use these if a more
+recent library is not specified.
+
+ If you have root privileges, you might consider installing
+libxml-1.8.9 and then proceed with the default installation.
+  R INSTALL --clean XML
+
+If there is no version of libxml installed on your system, or you want to use a 
+different version than is already installed, you have to tell the configure
+script where to find this library. You can do this by setting the environment
+variables 
+    LIBXML_INCDIR  and LIBXML_LIBDIR
+to point to the directories containing the header files and the shared
+library libxml.so, respectively.
+
+The following steps will usually give the desired results:
+Install the libxml in some directory, say /tmp/libxml-1.8.9
+
+   cd /tmp
+   tar zxvf libxml-1.8.9.tar.gz
+   cd libxml-1.8.9
+   ./configure
+   make
+
+Now, tell the configuration for the XML package where to find the
+libxml distribution. 
+
+  setenv LIBXML_INCDIR /tmp/libxml-1.8.9         #  LIBXML_INCDIR=/tmp/libxml-1.8.9; export LIBXML_INCDIR
+  setenv LIBXML_LIBDIR /tmp/libxml-1.8.9/.libs
+
+  R INSTALL --clean XML_0.3-1.tar.gz
+
+That should be sufficient.
+
+
+Far more information about the XML package and installing it and these
+other libraries is available from 
+
+     http://www.omegahat.org/RSXML
+
+
+We would appreciate hearing about any bugs, comments, suggestions, etc.
+and they can be submitted the Omegahat bug tracking system via the
+form at
+  http://www.omegahat.org/bugs
+or by sending mail to 
+   omega-bugs@www.omegahat.org

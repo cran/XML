@@ -26,7 +26,12 @@ int RS_XML(SetClassName)(const char *name, USER_OBJECT_ target);
 #endif
 
 #ifdef LIBXML2
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/hash.h>
+#else
 #include <libxml/hash.h>
+#endif
+
 int xmlHashSize(xmlHashTablePtr table);
 #endif
 

@@ -31,7 +31,7 @@ xmlName(node)
 }
 
 \examples{
- fileName <- system.file("data/test.xml", pkg="XML") 
+ fileName <- system.file("data", "test.xml", pkg="XML") 
  doc <- xmlTreeParse(fileName)
  xmlName(doc$doc$children[[1]])
 }

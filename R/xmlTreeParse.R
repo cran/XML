@@ -9,7 +9,7 @@ xmlTreeParse <-
 # See also xml
 #
 function(file="../XML/Docs/test.xml", ignoreBlanks = T, handlers=NULL,
-                       replaceEntities=F, asText=F, trim=T, validate=F, getDTD=T, isURL=F)
+           replaceEntities=F, asText=F, trim=T, validate=F, getDTD=T, isURL=F, asTree = F)
 {
   if(missing(isURL)) {
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
@@ -27,6 +27,9 @@ function(file="../XML/Docs/test.xml", ignoreBlanks = T, handlers=NULL,
          as.logical(ignoreBlanks), as.logical(replaceEntities),
           as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
             as.logical(isURL))
+
+ if(!missing(handlers) & !as.logical(asTree))
+   return(handlers)
 
  ans
 }

@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE RHelp SYSTEM "RSHelp.dtd">
+
+<RSHelp>
+<name></name>
+<aliases>
+<alias></alias>
+</aliases>
+<title></title>
+<description>
+
+</description>
+<usage>
+<name></name>
+<arg></arg>,
+<arg><defaultValue></defaultValue></arg>,
+</usage>
+
+<arguments>
+ <arg>
+  <name></name>
+   <description>
+   </description>
+ </arg>
+ <arg>
+  <name></name>
+   <description>
+   </description>
+ </arg>
+</arguments>
+<details>
+
+</details>
+
+<value>
+
+<valueElements>
+  <valueElement><id></id><description></description></valueElement>
+  <valueElement><id></id><description></description></valueElement>
+</valueElements>
+
+</value>
+
+<references>
+<reference>
+<url></url>
+</reference> 
+<reference>
+<url></url>
+</reference>
+</references>
+
+<author></author>
+
+<notes>
+<note>
+</note>
+</notes>
+
+<seealso>
+ <see><link></link></see> 
+</seealso>
+
+<examples>
+<example>
+<![CDATA[
+
+]]>
+</example>
+
+<example>
+<description>
+
+</description>
+<![CDATA[
+
+]]>
+</example>
+
+<example>
+<![CDATA[
+
+]]>
+</example>
+
+<example dontRun="T">
+<![CDATA[
+
+]]>
+</example>
+
+
+<example>
+<description>
+
+</description>
+<![CDATA[
+]]>
+</example>
+</examples>
+
+<keywords>
+<keyword></keyword>
+</keywords>
+<definition>
+<![CDATA[
+ name <-
+ fun() {
+
+ }
+]]>
+</definition>
+</RSHelp>

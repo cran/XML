@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<Rhelp>
+<!DOCTYPE RHelp SYSTEM "RSHelp.dtd">
+
+<RSHelp>
 <name>xmlTreeParse</name>
 <title>XML Parser</title>
 <description>
@@ -219,11 +221,59 @@ m <- xmlTreeParse(fileName,
 ]]>
 </example>
 
-<example run="T">
+<example dontRun="T">
 <![CDATA[
  # Parse an XML document directly from a URL.
  # Requires Internet access.
  xmlTreeParse("http://www.omegahat.org/Scripts/Data/mtcars.xml", asText=T)
+]]>
+</example>
+
+
+<example>
+<description>
+ In this example, we extract <u>just</u> the names of the
+ variables in the mtcars.xml file. 
+ The names are the contents of the &lt;variable&gt;
+ tags. We discard all other tags by returning NULL
+ from the startElement handler.
+<P/>
+ We cumulate the names of variables in a character
+ vector named `vars'.
+ We define this within a closure and define the 
+ variable function within that closure so that it
+ will be invoked when the parser encounters a &lt;variable&gt;
+ tag.
+ This is called with 2 arguments: the XMLNode object (containing
+ its children) and the list of attributes.
+ We get the variable name via call to xmlValue().
+<P/>
+ Note that we define the closure function in the call and then 
+ create an instance of it by calling it directly as
+  <code>(function() {...})()</code>
+<P/>
+ Note that we can get the names by parsing
+ in the usual manner and the entire document and then executing
+ <code>xmlSApply(xmlRoot(doc)[[1]], function(x) xmlValue(x[[1]]))</code>
+ which is simpler but is more costly in terms of memory.
+</description>
+<![CDATA[
+ fileName <- system.file("data/mtcars.xml")
+ doc <- xmlTreeParse(fileName,  handlers = (function() { 
+                                 vars <- character(0) ;
+                                list(variable=function(x, attrs) { 
+                                                vars <<- c(vars, xmlValue(x[[1]])); 
+                                                NULL}, 
+                                     startElement=function(x,attr){
+                                                   NULL
+                                                  }, 
+                                     names = function() {
+                                                 vars
+                                             }
+                                    )
+                               })()
+                     )
+
 ]]>
 </example>
 </examples>
@@ -233,4 +283,4 @@ m <- xmlTreeParse(fileName,
 <keyword>XML</keyword>
 <keyword>DTD</keyword>
 </keywords>
-</Rhelp>
+</RSHelp>

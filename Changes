@@ -1,3 +1,8 @@
+ * More documentation, in Tour.
+
+ * xmlValue, xmlApply, xmlSApply, xmlRoot, xmlNamespace, length, names
+
+ * Constructors for different types of nodes: XMLNode, XMLTextNode, XMLProcessingInstruction.
 
  * Methods for print(), subsetting ([ and [[), accessing the fields
    in an XMLNode object.

@@ -9,6 +9,8 @@
 
 AC_INIT(DESCRIPTION)
 
+
+AC_ARG_WITH(oldlibxml,[], USE_OLD_ROOT_CHILD_NAMES=1; FORCE_OLD=1;echo "Using old libxml names")
 AC_ARG_WITH(libxml2,[--with-libxml2    indicate that the libxml version is 2.0 or higher],
                [ if test "${withval}" = yes; then
                     LIBXML2="-DLIBXML2=1";
@@ -28,20 +30,51 @@ AC_ARG_WITH(libxml,
 AC_ARG_WITH(expat,
   [  --with-expat            use expat library],
   [ if test "${withval}" = no; then
-      USE_EXPAT=false;
+      USE_EXPAT= ;
     else
       USE_EXPAT=true;
     fi],
-  USE_EXPAT=false)
+  USE_EXPAT= )
 
-if ${USE_LIBXML}; then
-  if test -z ${LIBXML_INCDIR}; then
-    AC_CHECK_HEADER(gnome-xml/parser.h, LIBXML_INCDIR="gnome-xml/")
-  fi
-  if test -z ${LIBXML_INCDIR}; then
+
+AC_PROG_CC
+AC_PROG_CPP
+
+
+dnl In this section, we try to find the different
+dnl characteristics of the libxml library.
+
+dnl Whether it is 
+
+if test -n "${USE_LIBXML}" ; then
+
+    dnl If the user has specified LIBXML_INCDIR, then
+    dnl we use that. Otherwise, we try to find the parser.h file.
+    
+#  if test -z "${LIBXML_INCDIR}" ; then
+    TMP_CPPFLAGS=${CPPFLAGS}
+    for dir in ${LIBXML_INCDIR} /usr/include /usr/local/include ; do
+
+       CPPFLAGS="${TMP_CPPFLAGS} -I${dir}/gnome-xml"
+       AC_CHECK_HEADER(gnome-xml/parser.h, FROM_GNOME_XML_DIR=1)
+       if test -n "${FROM_GNOME_XML_DIR}" ; then
+         PKG_CPPFLAGS="${PKG_CPPFLAGS} -DFROM_GNOME_XML_DIR=1"
+         CPPFLAGS="${CPPFLAGS} -DFROM_GNOME_XML_DIR=1"
+         LIBXML_INCDIR="${dir}"
+echo "I got the gnome-xml parser in $dir"
+         break
+       fi
+    done
+   if test -z "${FROM_GNOME_XML_DIR}" ; then
+    CPPFLAGS=${TMP_CPPFLAGS}
+   fi
+#  fi    # end of -z LIBXML_INCDIR
+
+
+  if test -z "${LIBXML_INCDIR}"; then
     AC_CHECK_HEADER(libxml/parser.h, LIBXML_INCDIR="libxml/")
   fi
-  if test -z ${LIBXML_INCDIR} ; then
+  if test -z "${LIBXML_INCDIR}" ; then
    echo "Cannot find parser.h. Set the value of the environment variable"
    echo "    LIBXML_INCDIR"
    echo "to point to where it can be found."
@@ -49,6 +82,22 @@ if ${USE_LIBXML}; then
   else
    echo "Located parser file ${LIBXML_INCDIR}/parser.h"
   fi
+
+
+  if test -z "${LIBXML2}" ; then
+CPPFLAGS="${PKG_CPPFLAGS} -I${LIBXML_INCDIR}"
+echo "${CPPFLAGS}"
+  AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif],
+[ xmlAttr *attr;
+   attr->val = NULL;
+], [echo "Using libxml 1.8.*!"],[LIBXML2="-DLIBXML2=1"; echo "Using libxml2.*" ])
+  fi
+
 #  AC_EGREP_HEADER(xmlParseFile, ${LIBXML_INCDIR}parser.h,
 #	HAVE_LIBXML_HEADER=true,
 #	AC_MSG_ERROR("header files for libxml seem to be incorrect"))
@@ -58,15 +107,68 @@ if ${USE_LIBXML}; then
   AC_CHECK_LIB(xml, xmlParseFile,, AC_MSG_ERROR("libxml not found"), "-L${LIBXML_LIBDIR-.}")
 
   if test -n "${LIBXML_LIBDIR}" ; then
-     LIBS="${LIBS} -L${LIBXML_LIBDIR}"
-     LD_PATH="${LIBXML_LIBDIR}"
+     LIBS="${LIBS} -L${LIBXML_LIBDIR-.}"
+     LD_PATH="${LIBXML_LIBDIR-.}"
   fi
-  PKG_CPPFLAGS="${PKG_CPPFLAGS} -DLIBXML -I${LIBXML_INCDIR-.}"
+
+  PKG_CPPFLAGS="${PKG_CPPFLAGS} -DLIBXML"
+  if test -z "${FROM_GNOME_XML_DIR}" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -I${LIBXML_INCDIR-.}"
+  fi
+
+
+if test -z "${LIBXML2}" ; then
+ dnl Now we try to test whether we have a really old libxml
+ dnl which uses childs and root instead of xmlChildren and xmlRootNode
+
+ if test -z "${USE_OLD_ROOT_CHILD_NAMES}" ; then
+  CPPFLAGS=${PKG_CPPFLAGS}
+  AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif],
+[ xmlDocPtr node;
+   node->xmlRootNode = NULL;
+], [echo "New style libxml!"],[USE_OLD_ROOT_CHILD_NAMES=1; echo "Need to use old-style libxml names"])
+
+echo "Using old root child names? ${USE_OLD_ROOT_CHILD_NAMES-0}" 
+ fi  # USE_OLD_ROOT_CHILD_NAMES
+else
+ CPPFLAGS=${PKG_CPPFLAGS}
+AC_TRY_RUN([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif
+int 
+main(int argc, char *argv)
+{
+  xmlCheckVersion(20000);
+return(0);
+}
+],[ LIBXML2_OK=1],[LIBXML2_OK=0])
+
+ if test "${LIBXML2_OK}" = "0" ; then 
+    echo "You are trying to use a version 2.* edition of libxml"
+    echo "but an incompatible library. The header files and library seem to be"
+    echo "mismatched. If you have specified LIBXML_INCDIR, make certain to also"
+    echo "specify an appropriate LIBXML_LIBDIR if the libxml2 library is not in the default"
+    echo "directories."
+    exit 1
+ fi
 fi
 
-if ${USE_EXPAT}; then
+  if test -n "${USE_OLD_ROOT_CHILD_NAMES}" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DUSE_OLD_ROOT_CHILD_NAMES=1"
+  fi
+fi
+
+if test -n "${USE_EXPAT}" ; then
   AC_CHECK_HEADER(xmltok/xmlparse.h, XMLPARSE_INCDIR="xmltok/")
-  if test -z ${XMLPARSE_INCDIR}; then 
+  if test -z "${XMLPARSE_INCDIR}" ; then 
     AC_CHECK_HEADER(xmlparse/xmlparse.h, XMLPARSE_INCDIR="xmlparse/")
   fi
   AC_EGREP_HEADER(XML_Parse, ${XMLPARSE_INCDIR}xmlparse.h,
@@ -80,7 +182,7 @@ if ${USE_EXPAT}; then
 fi
 
 
-if  ${USE_EXPAT} ; then
+if test -n "${USE_EXPAT}" ; then
   SUPPORTS_EXPAT="TRUE"
 else
   SUPPORTS_EXPAT="FALSE"
@@ -88,7 +190,7 @@ fi
 
 echo "Expat: ${USE_EXPAT} ${SUPPORTS_EXPAT}"
 
-if ${USE_LIBXML} ; then
+if test -n "${USE_LIBXML}" ; then
   SUPPORTS_LIBXML="TRUE"
 else
   SUPPORTS_LIBXML="FALSE"
@@ -108,7 +210,7 @@ AC_SUBST(SUPPORTS_EXPAT)
 
 AC_SUBST(LD_PATH)
 
-AC_OUTPUT(src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh)
-
+AC_OUTPUT(cleanup src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh)
+chmod +x cleanup
 
 

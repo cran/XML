@@ -85,7 +85,6 @@ function(node)
 #
 function(obj, ...)
 {
- print("[.XMLNode")
  obj <- obj$children
  NextMethod("[")
 }
@@ -102,6 +101,17 @@ function(obj, ...)
  NextMethod("[[")
 }
 
+names.XMLNode <-
+function(x)
+{
+ names(xmlChildren(x))
+}
+
+length.XMLNode <-
+function(x)
+{
+  xmlSize(x)
+}
 
 xmlSize <-
 #
@@ -133,7 +143,7 @@ xmlSize.XMLNode <-
 #
 function(obj)
 {
- length(obj$children) 
+  length(obj$children) 
 }
 
 
@@ -145,14 +155,14 @@ print.XMLNode <-
 function(x,...)
 {
  if(xmlName(x) == "text" || xmlName(x) == "comment") {
-   cat(x$value,"\n")
+   cat(x$value,"\n", sep="")
    return()
  }
 
  if(! is.null(xmlAttrs(x))) {
    tmp <- paste(names(xmlAttrs(x)),paste("\"", xmlAttrs(x),"\"", sep=""), sep="=", collapse=" ")
  } else 
-    tmp <- ""
+   tmp <- ""
 
  cat(paste("<",xmlName(x),ifelse(!is.null(xmlAttrs(x))," ",""),tmp,">\n", sep=""))
   for(i in xmlChildren(x)) {
@@ -166,6 +176,16 @@ function(node)
 {
  cat(node$value)
 }
+
+
+print.XMLCDataNode <-
+function(node)
+{
+ cat("<![CDATA[\n")
+ cat(node$value)
+ cat("]]>\n")
+}
+
 
 print.XMLProcessingInstruction <-
 function(node)

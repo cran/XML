@@ -1,4 +1,7 @@
-
+<!ENTITY % lt '<' >
+<!ENTITY % gt '>' >
+<!ENTITY % le '<='>
+<!ENTITY % ge '>='>
 <!ENTITY % sgets "<-">
 
 <!ELEMENT name (#PCDATA)>

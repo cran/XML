@@ -1,6 +1,11 @@
 #include "EventParse.h"
 #include "DocParse.h"
+
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parserInternals.h>
+#else
 #include <libxml/parserInternals.h>
+#endif
 
 /*
   This is an event driven parsing implementation for R & S
@@ -33,7 +38,7 @@ void RS_XML(errorHandler)(void *ctx, const char *msg, ...);
 void RS_XML(fatalErrorHandler)(void *ctx, const char *msg, ...);
 
 
-USER_OBJECT_
+void
 RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText)
 {
  extern int xmlDoValidityCheckingDefaultValue;
