@@ -121,8 +121,8 @@ function(x, ...)
 
 
 xmlAttrs.XMLElementDef <-
-function(def)
+function(node)
 {
- def$attributes
+ node$attributes
 }
 

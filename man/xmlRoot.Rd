@@ -13,7 +13,7 @@ that is returned as part of the parsing.
 }
 \usage{
 xmlRoot(x, ...)
-xmlRoot.XMLDocumentContent(x, skip = T)
+xmlRoot.XMLDocumentContent(x, ...)
 }
 \arguments{
   \item{x}{the object whose root/top-level XML node is to be returned.}

@@ -14,10 +14,15 @@ function(x, ...)
 }
 
 xmlRoot.XMLDocumentContent <-
-function(x, skip=TRUE)
+function(x, ...)
 {
+  args <- list(...)
+  if("skip" %in% names(args))
+   skip <- args[["skip"]]
+  else
+   skip <- TRUE
+
   a <- x$children[[1]]
-#  a <- x$children
   if(skip & inherits(a, "XMLComment")) {
      which <- sapply(x$children, function(x) !inherits(x, "XMLComment"))
      if(any(which)) {
@@ -133,3 +138,18 @@ function(x)
 {
  x$namespace
 }
+
+
+xmlGetAttr <-
+function(node, name, default = NULL, converter = NULL)
+{
+  a <- xmlAttrs(node)
+  if(is.null(a) || is.na(match(name, names(a)))) 
+    return(default)
+
+  if(!is.null(converter))
+    converter(a[[name]])
+  else
+    a[[name]]
+}  
+

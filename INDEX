@@ -36,6 +36,7 @@ xmlElementsByTagName    Retrieve the children of an XML node with a
 xmlEventHandler         Default handlers for the SAX-style event XML
                         parser
 xmlEventParse           XML Event/Callback element-wise Parser
+xmlGetAttr              Get the value of an attribute in an XML node
 xmlHandler              Example XML Event Parser Handler Functions
 xmlName                 Extraces the tag name of an XMLNode object.
 xmlNamespace            Retrieve the namespace value of an XML node.

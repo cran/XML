@@ -134,9 +134,9 @@ function(obj)
 }
 
 xmlSize.XMLDocument <-
-function(doc)
+function(obj)
 {
- return(length(doc$doc$children))
+ return(length(obj$doc$children))
 }
 
 xmlSize.default <-

@@ -6,7 +6,7 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 
  reset <-
  function() {
-  buf <<- xmlNode(tag, attrs = attrs)
+  buf <<- xmlNode(tag, attrs = attrs, namespace = nameSpace)
   if(length(nsURI) > 0) {
    names(nsURI) <- paste("xmlns", names(nsURI), sep=":")
    buf$attributes <<- nsURI
@@ -89,6 +89,7 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 
  con <- list( value=function() {buf},
               addTag = addTag,
+              addEndTag = function(name){ closeTag(name)},
               closeTag = closeTag,
               reset = reset,
               addNode = addNode,
