@@ -1,3 +1,21 @@
+Version 0.95-3
+
+  *  Remove the need to define xmlParserError. Instead, set the value of the error
+     routine/function pointer to our error handler in the different default handlers
+     in libxml.  We now initialize these default objects when we load the library.  
+
+  *  When setting the environment variables LIBXML_INCDIR and LIBXML_LIBDIR, one
+     needs to specify the -I and -L prefixes for the compiler and linker respectively
+     in front of directory names.
+
+  *  Detect whether the routine for xmlHashScan (in libxml2) provides a return value
+     or not. This changed in version 2.4.21 of libxml2.
+
+Version 0.95-2
+
+  *  Configuration detects Darwin and handles multiplicity of xmlParserError 
+     symbol.
+
 Version 0.95-1
 
   *  Configuration now supports the specification of the xml-config script

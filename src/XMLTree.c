@@ -91,7 +91,6 @@ R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
 {
   xmlDocPtr  doc = NULL;
   xmlNodePtr node;
-  int        n;
 
   if(GET_LENGTH(sdoc))
     doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);

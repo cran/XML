@@ -7,6 +7,8 @@ function(libname, pkgname)
    .InitSAXMethods()
  }
 
+   # Set the error handlers to our local ones.
+ .C("RSXML_setErrorHandlers", PACAKAGE = "XML")
 }
 
 .onLoad =

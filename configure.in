@@ -13,6 +13,11 @@ dnl The different command line arguments for configure.
 dnl They can also be specified by setting environment variables.
 
 
+dnl
+dnl Establish the command line arguments accepted by this script.
+dnl
+dnl
+
  dnl whether to use Splus.
 AC_ARG_WITH(splus,[  --with-splus	Compile as an SPlus library (rather than R). Value can be the (fully qualified) name of the Splus script.], USE_SPLUS=1)
 
@@ -53,8 +58,14 @@ AC_ARG_WITH(expat,
   USE_EXPAT= )
 
 
+dnl
+dnl End of command line argument declarations.
+dnl Now compute the relevant settings.
+dnl
+
 
  dnl Get the C compiler, including any values set by the user
+ dnl We need this to perform compilation and link checks.
 AC_PROG_CC
 AC_PROG_CPP
 
@@ -74,34 +85,42 @@ if test -n "${USE_SPLUS}" ; then
  fi
 
    # Get the major version of the Splus being run.
+   dnl Shouldn't this be perl -epn
  SPLUS_VERSION=`echo 'cat(version$major,"\n",sep="")' | ${SPLUS} | perl -e 'while(<STDIN>){ $x = $_;} printf $x;'`
   
-
    # If this is version 3, we are in trouble.
  if test ${SPLUS_VERSION} -lt 5 ; then
     echo "This package does not work with SPlus 3, but only SPlus 5 and 6" 
     exit 1
  fi
-
 fi  # end of USE_SPLUS.
 
 dnl ======================================================
 
 
-
-
-dnl ======================================================
-
 dnl In this section, we try to find the different
 dnl characteristics of the libxml library.
 
 dnl We are looking to see if
-dnl a) it is version 1.8.* or version 2.2.*
+dnl a) it is version 1.8.* or version 2.*
 dnl b) whether it is installed with include files in <wherever>/gnome-xml
 dnl    or in a private, uninstalled form in which case the include
 dnl    directory is usually libxml/
 
 if test -n "${USE_LIBXML}" ; then
+
+   dnl If the user gave us xml*-config, then use that. 
+  if test -n "${XML_CONFIG}" && test -x "${XML_CONFIG}" ; then
+    USING_USER_XML_CONFIG="yes"
+
+    XML_VERSION="`${XML_CONFIG} --version | sed -e 's/\..*//g'`"
+    if test "${XML_VERSION}" = "2" ; then
+       USE_XML2="yes"
+       LIBXML2="-DLIBXML2=1";
+    fi
+    echo "Used defined xml-config: ${XML_CONFIG}, XML Version: ${XML_VERSION}, XML2: ${USE_XML2}"
+  fi
+
 
   LANGUAGE_DEFS="${LANGUAGE_DEFS} -DHAVE_VALIDITY=1"
 
@@ -111,8 +130,9 @@ if test -n "${USE_LIBXML}" ; then
 
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
 
-   if test -n "${USE_XML2}" ; then
+    dnl find xml*-config 
 
+  if test -n "${USE_XML2}" ; then
      if test -z "${XML_CONFIG}" ; then 
        AC_PATH_PROGS(XML_CONFIG, xml2-config)      
        if test -z "${XML_CONFIG}" ; then
@@ -122,15 +142,18 @@ if test -n "${USE_LIBXML}" ; then
      fi
    fi
 
-     if test -z "${XML_CONFIG}" ; then
+   if test -z "${XML_CONFIG}" ; then
        AC_PATH_PROGS(XML_CONFIG, xml-config)
-     fi
+   fi
 
-     if test -n "${XML_CONFIG}" ; then
-       LIBXML_INCDIR=`${XML_CONFIG} --cflags | sed -e 's/-I//g'`
+
+
+   if test -n "${XML_CONFIG}" ; then
+       LIBXML_INCDIR=`${XML_CONFIG} --cflags`
        LIBXML_LIBDIR=`${XML_CONFIG} --libs`   
-     fi
-   fi  dnl USE_XML2 
+       FOUND_LIBXML_INCLUDES="Ok"
+   fi
+  fi  dnl USE_XML2 
 
 
 
@@ -177,7 +200,7 @@ echo "Checking directory of LIBXML_INCDIR"
        CPPFLAGS="${TMP_CPPFLAGS} -I${dir}"
        AC_CHECK_HEADER(libxml/parser.h, FROM_LIBXML_DIR=1)
        if test -n "${FROM_LIBXML_DIR}" ; then
-         LIBXML_INCDIR="${dir}"
+         LIBXML_INCDIR="-I${dir}"
          CPPFLAGS="${TMP_CPPFLAGS} -I${dir} -I${dir}/libxml"
          PKG_CPPFLAGS="${TMP_CPPFLAGS} -I${dir} -I${dir}/libxml"
          echo "Found the libxml parser.h in $dir/libxml/"
@@ -190,7 +213,7 @@ echo "Checking directory of LIBXML_INCDIR"
        if test -n "${FROM_GNOME_XML_DIR}" ; then
          PKG_CPPFLAGS="${PKG_CPPFLAGS} -DFROM_GNOME_XML_DIR=1"
          CPPFLAGS="${CPPFLAGS} -DFROM_GNOME_XML_DIR=1"
-         LIBXML_INCDIR="${dir}"
+         LIBXML_INCDIR="-I${dir}"
          echo "Found the gnome-xml parser in $dir"
          break
        fi
@@ -218,8 +241,8 @@ echo "Checking directory of LIBXML_INCDIR"
 
 
   if test -z "${LIBXML2}" ; then
-CPPFLAGS="${PKG_CPPFLAGS} -I${LIBXML_INCDIR}"
-echo "${CPPFLAGS}"
+CPPFLAGS="${PKG_CPPFLAGS} ${LIBXML_INCDIR}"
+echo "Checking for 1.8: ${CPPFLAGS}"
   AC_TRY_COMPILE([
 #ifdef FROM_GNOME_XML_DIR
 #include <gnome-xml/parser.h>
@@ -254,7 +277,7 @@ echo "${CPPFLAGS}"
 
   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DLIBXML"
   if test -z "${FROM_GNOME_XML_DIR}" ; then
-   PKG_CPPFLAGS="${PKG_CPPFLAGS} -I${LIBXML_INCDIR-.}"
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} ${LIBXML_INCDIR--I.}"
   fi
 
 
@@ -428,10 +451,10 @@ fi
 
 if test -z "${USE_SPLUS}" ; then
 
-  LANGUAGE_DEFS="-DUSE_R=1 -D_R_=1"
-  PKG_SYS_FILE='system.file("scripts", name, pkg="RSPerl")'
+  LANGUAGE_DEFS="-DUSE_R=1 -D_R_=1 ${LANGUAGE_DEFS}"
+dnl   PKG_SYS_FILE='system.file("scripts", name, pkg="RSPerl")'
 
-else  # so compiling for R.
+else 
 
   dnl Test to see if the patch has been made to renamin the attribute()
   dnl routine in libxml
@@ -449,11 +472,11 @@ else  # so compiling for R.
 
  fi # ? SUPPORTS_LIBXML = "TRUE"
 
- LANGUAGE_DEFS="-D_S_=1 -DUSE_S=1 -D_S4_=1 -D_SPLUS${SPLUS_VERSION}_ -DNO_SPLUS_THREAD_DEF=1"
+ LANGUAGE_DEFS="-D_S_=1 -DUSE_S=1 -D_S4_=1 -D_SPLUS${SPLUS_VERSION}_ -DNO_SPLUS_THREAD_DEF=1 ${LANGUAGE_DEFS}"
  INSTALL_DIR=`pwd`
  PKG_SYS_FILE="paste(\"${INSTALL_DIR}/inst/scripts/\", name,sep=\"\")"
 
-fi
+fi   dnl end of if S-Plus.
 
 
 AC_TRY_LINK(
@@ -469,9 +492,70 @@ AC_TRY_LINK(
 , BLANKS_DEF="-DOLD_SKIP_BLANKS=1"
 )
 
+
+if test -n "LIBXML2" ; then
+
+TMP_CFLAGS="${CFLAGS}"
+CFLAGS="${CFLAGS} -pedantic-errors"
+echo "Checking for return type of xmlHashScan element routine."
+
+AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/SAX.h>
+#include <gnome-xml/hash.h>
+#else
+#include <libxml/SAX.h>
+#include <libxml/hash.h>
+#endif
+],
+[
+  void *(*foo)(void *, void *, xmlChar*);
+  xmlElementTablePtr table;
+  xmlHashScan(table, foo, NULL);
+], [echo "xmlHashScan wants a return value."],
+  [echo "No return value for xmlHashScan"; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DNO_XML_HASH_SCANNER_RETURN=1"]
+)
+
+CFLAGS="${TMP_CFLAGS}"
+
+fi
+
+
+
+
 AC_SUBST(DUMP_WITH_ENCODING)
 
 PKG_LIBS=${LIBS}
+
+
+dnl ----------------------------------------------------
+dnl Add -m to the linker flags (actually libraries)
+dnl to supress errors about multiple definitions of 
+dnl symbols.
+dnl
+dnl This is not needed anymore as we no longer define 
+dnl xmlParserError in our code and override the one
+dnl in libmxml. If we do find a situation (e.g. version
+dnl of libxml that doesn't allow us to play with routine
+dnl pointers to do this, we will need to define
+dnl  NEED_XML_PARSER_ERROR
+dnl
+dnl AC_CANONICAL_HOST
+dnl Doesn't work on my machine. Where do we find it - R?
+
+if test -n "${NEED_XML_PARSER_ERROR}" ; then
+ AC_PATH_PROG(UNAME, uname)
+ if test -n "${UNAME}" ; then
+   host_os=`${UNAME}`
+   if test "${host_os}" = "Darwin" ; then
+     PKG_LIBS="-m $PKG_LIBS"
+   fi
+ fi
+fi
+
+
+dnl  ---------------------------------------------------
+
 
 AC_SUBST(LIBXML2)
 
@@ -511,7 +595,8 @@ echo "****************************************"
 AC_OUTPUT(src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE})
 chmod +x cleanup
 
- dnl 
+
+ dnl Set things up for an S-Plus chapter.
 if test -n "${USE_SPLUS}" ; then
  mv GNUmakefile.Splus GNUmakefile
 

@@ -102,7 +102,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
      if ((ctx->sax != NULL) && (ctx->sax->error != NULL))
        ctx->sax->error(ctx->userData, "Failed to call read on XML connection");
     /* throw an XML error. */
-     return;
+     return(-1);
    }
 
    if(GET_LENGTH(tmp)) {
@@ -147,7 +147,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
   UNPROTECT(1);
 
   return(count);
-//  return(count == 0 ? -1 : count);
+/*  return(count == 0 ? -1 : count); */
 }
 
 xmlParserCtxtPtr
@@ -208,6 +208,8 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
       ctx = RS_XML_xmlCreateConnectionParserCtxt((USER_OBJECT_) fileName);
 /* Need to inputPush(ctx, xmlParserInputPtr) */
       break;
+    default:
+      ctx = NULL;
   }
 
 #ifdef HAVE_VALIDITY
@@ -293,7 +295,6 @@ RS_XML(endDocumentHandler)(void *ctx)
 void
 RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len)
 {
-  //  fprintf(stderr, "CDATA: %s %d\n", value, len); fflush(stderr);
  USER_OBJECT_ opArgs;
 
  PROTECT(opArgs = NEW_LIST(1));

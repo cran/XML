@@ -107,7 +107,12 @@ RS_XML(treeApply)(USER_OBJECT_ rtree, USER_OBJECT_ function, USER_OBJECT_ args)
 
 void localXmlParserPrintFileInfo(xmlParserInputPtr input, char *buf);
 
+
+#ifndef USE_LINKED_ERROR_HANDLER
+void S_xmlParserError(void *ctx, const char *msg, ...)
+#else
 void xmlParserError(void *ctx, const char *msg, ...)
+#endif
 { 
   xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
   char buf[3000], *tmp;
@@ -128,6 +133,29 @@ void xmlParserError(void *ctx, const char *msg, ...)
   PROBLEM "XML Parsing Error: %s", buf
   WARN;
 }
+
+#ifndef USE_LINKED_ERROR_HANDLER
+/*
+ Set the default error handlers in the libxml library
+ 
+*/
+void
+RSXML_setErrorHandlers()
+{
+   xmlDefaultSAXHandlerInit();
+   htmlDefaultSAXHandlerInit();
+#if 0
+   docbDefaultSAXHandlerInit();
+#endif
+
+   xmlDefaultSAXHandler.error = S_xmlParserError;
+   htmlDefaultSAXHandler.error = S_xmlParserError;
+#if 0
+   docbDefaultSAXHandler.error = S_xmlParserError;
+#endif
+}
+#endif
+
 
 /**
     Write the file name and the current line number into the specified 

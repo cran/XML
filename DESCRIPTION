@@ -1,6 +1,6 @@
 Package: XML
-Version: 0.95-1
-Date: 2003/09/30
+Version: 0.95-3
+Date: 2003/10/06
 Author:  Duncan Temple Lang (duncan@research.bell-labs.com)
 Title: Tools for parsing and generating XML within R and S-Plus.
 Depends: R (>= 1.2.0)

@@ -235,8 +235,15 @@ struct ElementTableScanner {
   int counter;
 };
 
+#ifndef NO_XML_HASH_SCANNER_RETURN
 void *RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name);
 void* RS_xmlEntityTableConverter(void *payload, void *data, xmlChar *name);
+#else
+void RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name);
+void RS_xmlEntityTableConverter(void *payload, void *data, xmlChar *name);
+#endif
+
+
 #endif
 
 /**
@@ -292,7 +299,11 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
    rather than void*. Need to figure out if this makes any real difference to the interface
    and also when to 
 */
+#ifndef NO_XML_HASH_SCANNER_RETURN
 void*
+#else
+void
+#endif
 RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name)
 {
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
@@ -301,7 +312,9 @@ RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name)
  SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(name));
 
  scanData->counter++;
+#ifndef NO_XML_HASH_SCANNER_RETURN
  return(payload);
+#endif
 }
 #endif
 
@@ -359,7 +372,12 @@ RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
 }
 
 #ifdef LIBXML2
+
+#ifndef NO_XML_HASH_SCANNER_RETURN
 void*
+#else
+void
+#endif
 RS_xmlEntityTableConverter(void *payload, void *data, xmlChar *name)
 {
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
@@ -368,7 +386,9 @@ RS_xmlEntityTableConverter(void *payload, void *data, xmlChar *name)
  SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(name));
 
  scanData->counter++;
+#ifndef NO_XML_HASH_SCANNER_RETURN
  return(payload);
+#endif
 }
 #endif /* End of LIBXML2 for definint RS_xmlEntityTableConverter */
 

@@ -13,6 +13,9 @@
 
 #include "RSCommon.h"
 
+extern void R_PreserveObject(SEXP);
+extern void R_ReleaseObject(SEXP);
+
 static void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
 
 /*
@@ -359,7 +362,6 @@ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserDa
 void
 updateState(USER_OBJECT_ val, RS_XMLParserData *parserData)
 {
-    USER_OBJECT_ old;
     if(!parserData->stateObject || parserData->stateObject == NULL_USER_OBJECT) {
        return;
     }
