@@ -22,6 +22,7 @@ print.XMLAttributeDef   Methods for displaying XML objects
 saveXML                 Output internal XML Tree
 supportsExpat           Determines which native XML parsers are being
                         used.
+toString.XMLNode        Creates string representation of XML node
 xmlApply                Applies a function to each of the children of
                         an XMLNode
 xmlAttributeType        The type of an XML attribute for element from

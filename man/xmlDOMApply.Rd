@@ -6,7 +6,7 @@
  This recursively applies the specified function to each node in an
  XML tree, creating a new tree,
  parallel to the original input tree.
- Each  element in the new tree is the resturn
+ Each  element in the new tree is the return
  value obtained from invoking the specified function
  on the corresponding element
  of the original tree.

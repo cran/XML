@@ -20,5 +20,6 @@ for f in src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh
       rm -f $f
  fi
 done
- 
+
+
 exit 0   

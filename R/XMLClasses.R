@@ -56,7 +56,7 @@ xmlName.XMLNode <-
 #
 function(node, full = FALSE)
 {
-  if(full && !is.null(node$namespace)) {
+  if(full && !is.null(node$namespace) && node$namespace != "") {
     tmp <- ifelse(is.character(node$namespace), node$namespace, node$namespace$id)
     paste(tmp, node$name, sep=":")
   }

@@ -1,3 +1,10 @@
+Version 0.93-0
+
+  *   Added toString.XMLNode
+
+  *   Fixed the printing of degenerate namespaces in an XML node,
+      i.e. the spurious `:'.
+
 Version 0.92-2
 
   *   Fixed C bug caused by using namespace without a prefix,
