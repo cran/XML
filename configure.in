@@ -30,7 +30,7 @@ AC_ARG_WITH(libxml2,[  --with-libxml2    indicate that the libxml version is 2.0
                [ if test "${withval}" = yes; then
                     LIBXML2="-DLIBXML2=1";
                     USE_XML2="yes" ;
-                 fi])
+                 fi], USE_XML2="maybe")
 
 
 AC_ARG_WITH(xml-config,[  --with-xml-config    the name of the xml-config program to use.],
@@ -118,7 +118,7 @@ if test -n "${USE_LIBXML}" ; then
        USE_XML2="yes"
        LIBXML2="-DLIBXML2=1";
     fi
-    echo "Used defined xml-config: ${XML_CONFIG}, XML Version: ${XML_VERSION}, XML2: ${USE_XML2}"
+    echo "User defined xml-config: ${XML_CONFIG}, XML Version: ${XML_VERSION}, XML2: ${USE_XML2}"
   fi
 
 
@@ -132,7 +132,8 @@ if test -n "${USE_LIBXML}" ; then
 
     dnl find xml*-config 
 
-  if test -n "${USE_XML2}" ; then
+   dnl If they ask explicitly for xml2, find it or fail otherwise.
+  if test  "${USE_XML2}" == "yes" ; then
      if test -z "${XML_CONFIG}" ; then 
        AC_PATH_PROGS(XML_CONFIG, xml2-config)      
        if test -z "${XML_CONFIG}" ; then
@@ -142,8 +143,25 @@ if test -n "${USE_LIBXML}" ; then
      fi
    fi
 
+   dnl Otherwise, if they implicitly ask for xml-config
+   dnl find that.
    if test -z "${XML_CONFIG}" ; then
        AC_PATH_PROGS(XML_CONFIG, xml-config)
+   fi
+
+   dnl and if they don't have libxml version 1, see if they
+   dnl have libxml2 
+
+  if test "${USE_XML2}" == "maybe" ; then
+     if test -z "${XML_CONFIG}" ; then 
+       AC_PATH_PROGS(XML_CONFIG, xml2-config)      
+       if test -z "${XML_CONFIG}" ; then
+         echo "Cannot find xml2-config"
+         exit 1
+       else
+         echo "Using libxml version 2."
+       fi
+     fi
    fi
 
 
