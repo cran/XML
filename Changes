@@ -1,3 +1,13 @@
+Version 0.7-0
+
+  * Generating XML trees using internal libxml structures: 
+     xmlTree(), newXMLDoc(), newXMLNode(), saveXML().
+
+  * Support parsing HTML (htmlTreeParse()) using DOM.
+     Suggestion from Luis Torgo.
+
+  * Additional updates for libxml2, relating to DTDs.
+
 Version 0.6-3
 
   * Installation using --with-xml2 now attempts to link against libxml2.so

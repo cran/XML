@@ -440,6 +440,13 @@ USER_OBJECT_
 RS_XML(createDTDElement)(xmlElementPtr el)
 {
  USER_OBJECT_ rel;
+ int type;
+
+#ifdef XML_ELEMENT_ETYPE
+ type = el->etype;
+#else
+ type = el->type;
+#endif
 
    PROTECT(rel =  NEW_LIST(DTD_ELEMENT_NUM_SLOTS));
 
@@ -448,7 +455,7 @@ RS_XML(createDTDElement)(xmlElementPtr el)
 
  SET_VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT, NEW_INTEGER(1));
  INTEGER_DATA(VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT))[0] = el->type;
- SET_ENUM_NAME(ElementTypeNames, el->type, VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT));
+ SET_ENUM_NAME(ElementTypeNames, type, VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT));
 
 
  if(el->content != NULL)
@@ -669,6 +676,13 @@ USER_OBJECT_
 RS_XML(createDTDAttribute)(xmlAttributePtr val, xmlElementPtr el)
 {
   USER_OBJECT_ ans;
+  int attrType;
+
+#ifdef XML_ATTRIBUTE_ATYPE
+  attrType = val->atype;
+#else
+  attrType = val->type;
+#endif
 
   PROTECT(ans = NEW_LIST(DTD_ATTRIBUTE_NUM_SLOTS));
 
@@ -677,7 +691,7 @@ RS_XML(createDTDAttribute)(xmlAttributePtr val, xmlElementPtr el)
 
  SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT, NEW_INTEGER(1));
  INTEGER_DATA(VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT))[0] =  val->type;
- SET_ENUM_NAME(AttributeTypeNames, val->type, VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT));
+ SET_ENUM_NAME(AttributeTypeNames, attrType, VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT));
 
  SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_SLOT, NEW_INTEGER(1));
  INTEGER_DATA(VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_SLOT))[0] =  val->def;

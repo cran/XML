@@ -24,8 +24,8 @@ print.XMLAttributeDef(x)
 print.XMLElementContent(x)
 print.XMLElementDef(x)
 print.XMLEntity(x)
-print.XMLEntityRef(x)
-print.XMLNode(x, ...)
+print.XMLEntityRef(x, indent= "")
+print.XMLNode(x, ..., indent= "")
 print.XMLOrContent(x)
 print.XMLSequenceContent(x)
 }
@@ -33,6 +33,8 @@ print.XMLSequenceContent(x)
   \item{x}{the XML object to be displayed}
   \item{...}{additional arguments to for controlling the output from
   print. Currently unused.}
+  \item{indent}{a prefix that is emitted before the node to indent it relative to its
+   parent and child nodes. This is appended with a space at each succesive level of the tree.}
 }
 \value{
  Currently, \code{NULL}.

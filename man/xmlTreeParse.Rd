@@ -1,12 +1,16 @@
 \name{xmlTreeParse}
 \alias{xmlTreeParse}
+\alias{htmlTreeParse}
 \title{XML Parser}
 \description{
- Parses an XML file or string, and generates an R 
- structure representing the XML tree.
+ Parses an XML or HTML file or string, and generates an R 
+ structure representing the XML/HTML tree.
+ Use \code{htmlTreeParse} when the content is known
+ to be (potentially malformed) HTML.
 }
 \usage{
 xmlTreeParse(file, ignoreBlanks=T, handlers=NULL, replaceEntities=F,asText=F, trim=T, validate=F, getDTD=F, isURL=F, asTree = F)
+htmlTreeParse(file = "../XML/Docs/test.xml", ignoreBlanks = T, handlers = NULL, replaceEntities = F, asText = F, trim = T, isURL = F, asTree = F) 
 }
 
 \arguments{
@@ -175,7 +179,7 @@ and another for entities. See \code{\link{parseDTD}}.
 
  # Parse some XML text.
  # Read the text from the file
- xmlText <- paste(scan(fileName, what="",sep="\n"),"\n", collapse="\n")
+ xmlText <- paste(readLines(fileName), "\n", collapse="")
 
  xmlTreeParse(xmlText, asText=T)
 

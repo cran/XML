@@ -1,15 +1,21 @@
 xmlOutputDOM <-
-function(dtd=NULL, nameSpace=NULL)
+function(tag="doc", dtd=NULL, nameSpace=NULL, nsURI=character(0))
 {
- buf <- xmlNode("doc")
- current <- integer(0)
+ buf <- NULL
+ current <- NULL
 
  reset <-
  function() {
-  buf <<- xmlNode("doc")
+  buf <<- xmlNode(tag)
+  if(length(nsURI) > 0) {
+   names(nsURI) <- paste("xmlns", names(nsURI), sep=":")
+   buf$attributes <<- nsURI
+  }
   current <<- integer(0)
-  NULL
+  invisible(buf)
  }
+
+ reset()
 
 
  addTag <- 
@@ -63,8 +69,13 @@ function(dtd=NULL, nameSpace=NULL)
   invisible(node)
  }
 
+ addComment <- function(...) {
+    addNode(xmlCommentNode(paste(as.character(), sep="")))
+ }
+
  closeTag <-
- function(name="")  {
+ function(name="", namespace=NULL)  {
+    # namespace is ignored since we already have the tag name!
    current <<- current[-length(current)]
  }
 
@@ -73,6 +84,8 @@ function(dtd=NULL, nameSpace=NULL)
               closeTag = closeTag,
               reset = reset,
               addNode = addNode,
+              add = function(...) {},
+              addComment = addComment,
               current = function(){current}
             ) 
   class(con) <- c("XMLOutputDOM", "XMLOutputStream")

@@ -79,11 +79,9 @@ objects.
  parseDTD(dtdFile)
 
     # Read from text
-\dontrun{
- txt <- scan(dtdFile, what="", sep="\n")
- txt <- paste(txt, collapse="\n")
+ txt <- readLines(dtdFile)
+ txt <- paste(txt, "\n", collapse="")
  d <- parseDTD(txt, asText=T)
-}
 
 \dontrun{
  url <- "http://www.omegahat.org/XML/DTDs/DatasetByRecord.dtd"

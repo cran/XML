@@ -27,7 +27,7 @@ xmlSApply.XMLDocument(X, FUN, ...)
 %- maybe also `usage' for other objects documented here.
 \arguments{
   \item{X}{the \code{XMLNode} on whose children the regular
-   \code{\link{apply} or \code{\link{sapply}} is to be performed}
+   \code{\link{apply}} or \code{\link{sapply}} is to be performed}
   \item{FUN}{the function to apply to each child node. This is passed
    directly to the relevant \code{\link{apply}} function.}
   \item{\dots}{additional arguments to be given to each invocation of
@@ -47,7 +47,7 @@ on \code{xmlChildren(x)}.
 \seealso{
 \code{\link{xmlChildren}}
 \code{\link{xmlRoot}}
-\code{\link{[.XMLNode}}
+\code{\link{[.XMLNode}}}
 \code{\link{sapply}}
 \code{\link{lapply}}
 }

@@ -139,9 +139,14 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
 
 
     if( !is.null(namespace) && !is.null(xmlns) ) {
-      attrs[[paste("xmlns", namespace, sep=":")]] <- xmlns
+      if(!is.null(names(xmlns))) {
+         tmpp <- xmlns
+         names(tmpp) <- paste("xmlns", names(tmpp), sep=":")
+         attrs <- c(attrs, tmpp)
+      } else
+        attrs[[paste("xmlns", namespace, sep=":")]] <- xmlns
     }
-    
+
      # if the namespace is non-trivial (null or ""), then concatenate with the
      # tag name. Also handle the case that this is the starting tag
      # and so no namespaces are defined at this point.
@@ -205,6 +210,10 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
      lastTag <<- 0
   }
 
+  addComment <- function(..., sep="\n") {
+    add("<!--", ..., "-->", sep=sep)
+  }
+
   add <- function(..., sep="\n") {
    if(is.character(buf))
      buf <<- paste(buf, paste0(..., collapse=sep), sep=sep) 
@@ -230,6 +239,7 @@ function(dtd = NULL, nameSpace=NULL, buf=NULL, nsURI=NULL,
                reset = reset,
                tagString = tagString,
                add = add,
+               addComment = addComment,
                getOpenTag=getOpenTag,
                addOpenTag=addOpenTag
               ) 

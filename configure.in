@@ -346,6 +346,38 @@ if test "${USE_LIBXML}" ; then
 fi
 
 
+AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlDocDumpFormatMemoryEnc, PKG_CPPFLAGS="${PKG_CPPFLAGS} -DDUMP_WITH_ENCODING=1")
+
+if test -z "${FROM_GNOME_XML_DIR}" ; then
+  AC_CHECK_HEADER(libxml/xmlversion.h, PKG_CPPFLAGS="${PKG_CPPFLAGS} -DUSE_XML_VERSION_H=1")
+fi
+
+AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/tree.h>
+#else
+#include <libxml/tree.h>
+#endif],
+[
+ xmlElementPtr el;
+ int x;
+  x = el->etype;
+], PKG_CPPFLAGS="${PKG_CPPFLAGS} -DXML_ELEMENT_ETYPE=1"
+)
+
+AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/tree.h>
+#else
+#include <libxml/tree.h>
+#endif],
+[
+ xmlAttributePtr el;
+ int x;
+  x = el->atype;
+], PKG_CPPFLAGS="${PKG_CPPFLAGS} -DXML_ATTRIBUTE_ATYPE=1"
+)
+
 
 
 if test -n "${USE_EXPAT}" ; then
@@ -423,7 +455,7 @@ AC_TRY_LINK(
 , BLANKS_DEF="-DOLD_SKIP_BLANKS=1"
 )
 
-
+AC_SUBST(DUMP_WITH_ENCODING)
 
 PKG_LIBS=${LIBS}
 

@@ -94,7 +94,7 @@ extern int xmlDoValidityCheckingDefaultValue;
   if(asTextBuffer) {
    doc = xmlParseMemory(name, strlen(name));
    if(doc != NULL) {
-      doc->name = "<buffer>";
+      doc->name = xmlStrdup("<buffer>");
    }
   } else {
    doc = xmlParseFile(name);
@@ -131,6 +131,7 @@ extern int xmlDoValidityCheckingDefaultValue;
       rdoc = ans;
   }
 
+  xmlFreeDoc(doc);
 
      /* Set the class for the document. */
   className = NEW_CHARACTER(1);
@@ -138,6 +139,7 @@ extern int xmlDoValidityCheckingDefaultValue;
     SET_STRING_ELT(className, 0, COPY_TO_USER_STRING("XMLDocument"));   
     SET_CLASS(rdoc, className);
   UNPROTECT(1);
+
 
  UNPROTECT(1); 
  return(rdoc);
@@ -159,6 +161,7 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
   USER_OBJECT_ rdoc;
   USER_OBJECT_ rdoc_el_names, klass;
   int n = NUM_DOC_ELEMENTS;
+  const char *version = "";
 
   PROTECT(rdoc = NEW_LIST(n));
   PROTECT(rdoc_el_names = NEW_CHARACTER(n));
@@ -170,7 +173,11 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
 
     /* Insert the XML version information */
   SET_VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME, NEW_CHARACTER(1));
-    SET_STRING_ELT(VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME), 0, COPY_TO_USER_STRING(doc->version));
+    if(doc->version)
+	version = doc->version;
+
+    SET_STRING_ELT(VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME), 0, 
+                                     COPY_TO_USER_STRING(version));
     SET_STRING_ELT(rdoc_el_names, VERSION_ELEMENT_NAME, COPY_TO_USER_STRING("version"));
 
     /* Compute the nodes for this tree, recursively. 
@@ -642,5 +649,32 @@ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSetting
    	 UNPROTECT(1);
       }
 
+ return(ans);
+}
+
+#ifdef USE_XML_VERSION_H
+#ifndef LIBXML_TEST_VERSION
+#include <libxml/xmlversion.h>
+#endif
+#endif
+
+USER_OBJECT_
+RS_XML(libxmlVersion)()
+{
+ USER_OBJECT_ ans;
+ unsigned int val;
+
+#ifdef LIBXML_VERSION_NUMBER
+ val = LIBXML_VERSION_NUMBER;
+#else 
+#ifdef LIBXML_VERSION
+ val = LIBXML_VERSION;
+#else
+ val = 0;
+#endif
+#endif
+
+ ans = NEW_NUMERIC(1);
+ NUMERIC_DATA(ans)[0] = val;
  return(ans);
 }

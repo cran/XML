@@ -33,7 +33,8 @@ xmlCommentNode(text)
   \item{namespace}{The XML namespace identifier for this node.}
   \item{sys}{the name of the system for which the processing instruction
     is targeted. This is the value that appears in the
-     \code{<?sys value?>}
+     \code{<?sys value?>}}
+  \item{text}{character string giving the contents of the comment.}
 }
 \value{
  An object of class \code{XMLNode}.

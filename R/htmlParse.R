@@ -1,0 +1,34 @@
+htmlTreeParse <- 
+#
+# HTML parser that reads the entire `document' tree into memory
+# and then converts it to an R/S object. 
+# Uses the libxml from Daniel Veillard at W3.org. 
+#
+# asText  treat the value of file as XML text, not the name of a file containing
+#       the XML text, and parse that.
+# See also xml
+#
+function(file="../XML/Docs/test.xml", ignoreBlanks = T, handlers=NULL,
+           replaceEntities=F, asText=F, trim=T, isURL=F, asTree = F)
+{
+  if(missing(isURL)) {
+    isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
+  }
+
+    # check whether we are treating the file name as
+    # a) the XML text itself, or b) as a URL.
+    # Otherwise, check if the file exists and report an error.
+ if(asText == F & isURL == F) {
+  if(file.exists(file) == F)
+     stop(paste("File", file, "does not exist "))
+ }
+
+ ans <- .Call("RS_XML_HtmlParseTree", as.character(file), handlers, 
+         as.logical(ignoreBlanks), as.logical(replaceEntities),
+          as.logical(asText), as.logical(trim), as.logical(isURL))
+
+ if(!missing(handlers) & !as.logical(asTree))
+   return(handlers)
+
+ ans
+}

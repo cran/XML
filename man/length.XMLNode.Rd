@@ -11,6 +11,9 @@ It is provided as a convenient form of calling the
 \usage{
  length.XMLNode(x)
 }
+\arguments{
+\item{x}{the \code{XMLNode} object whose length is to be queried.}
+}
 \value{
  An integer giving the number of sub-nodes
  of this node.

@@ -73,7 +73,7 @@ extern "C" {
 
   #define SETCAR(x,v)  (CAR(x) = v)
   #else
-  typedef Rboolean boolean;
+  #include "R_ext/Boolean.h"
   #endif
 
 
