@@ -1,0 +1,10 @@
+# List the directories containing the libxml include files and the iconv.h header file.
+
+XML_INC_DIR=c:/cygwin/usr/local/Gtk/libxml2-2.4.13/include c:/cygwin/usr/local/Gtk/include
+
+# Give the directory in which the the libxml2 .lib file is located.
+XML_LIB_DIR=c:/cygwin/usr/local/Gtk/libxml2-2.4.13/lib
+
+#
+PKG_CPPFLAGS=  -fnative-struct -g -Wall ${XML_INC_DIR:%=-I%} -D_R_=1 -DUSE_R=1 -DUSE_XML_VERSION_H=1 -DLIBXML -DUSE_EXTERNAL_SUBSET=1 -DROOT_HAS_DTD_NODE=1 -DUMP_WITH_ENCODING=1 -DXML_ELEMENT_ETYPE=1  -DXML_ATTRIBUTE_ATYPE=1 -DLIBXML2=1
+PKG_LIBS= -L${XML_LIB_DIR} -lxml2 

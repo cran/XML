@@ -98,6 +98,8 @@ dnl    directory is usually libxml/
 
 if test -n "${USE_LIBXML}" ; then
 
+  LANGUAGE_DEFS="${LANGUAGE_DEFS} -DHAVE_VALIDITY=1"
+
   dnl if the user has not specified anything about libxml,
   dnl then lets look for xml-config. We let the user give this
   dnl as an environment variable `XML_CONFIG'.

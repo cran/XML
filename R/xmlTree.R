@@ -4,6 +4,19 @@ function(tag=NULL, dtd=NULL, namespaces=list())
  doc <- newXMLDoc(dtd, namespaces)
  currentNodes <- list(doc)
 
+ asXMLNode <- function(x) {
+        if(is.character(x)) {
+          v <- .Call("R_newXMLTextNode", x)
+        } else if(is.list(x)) {
+          v <- lapply(x, asXMLNode)
+        }  else {
+          # Problem!
+          browser()
+        }
+
+        v 
+ }
+ 
  addTag <- function(name, ..., attrs=NULL, close=T, namespace=NULL) {
 
    if(!is.null(attrs))
@@ -21,8 +34,8 @@ function(tag=NULL, dtd=NULL, namespaces=list())
    kids <- list(...)
    if(length(kids)) {
     for(i in kids) {
-      if(is.character(i)) {
-        i <- .Call("R_newXMLTextNode", i)
+      if(!inherits(i, "XMLNode")) {
+        i <- asXMLNode(i)
       }
       .Call("R_insertXMLNode", i, node)
     }

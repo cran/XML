@@ -50,7 +50,9 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                      USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ validate,
                       USER_OBJECT_ getDTD, USER_OBJECT_ isURL)
 {
+#ifdef HAVE_VALIDITY
 extern int xmlDoValidityCheckingDefaultValue;
+#endif
 
   char *name;
   xmlDocPtr doc;
@@ -66,10 +68,13 @@ extern int xmlDoValidityCheckingDefaultValue;
   parserSettings.trim = LOGICAL_DATA(trim)[0];
 
 
+#ifdef HAVE_VALIDITY
   previousValiditySetting = xmlDoValidityCheckingDefaultValue;
 
    /* Control whether we are validating or not. */
   xmlDoValidityCheckingDefaultValue = LOGICAL_DATA(validate)[0];
+#endif
+
 
   if(asTextBuffer == 0) {
     struct stat tmp_stat;  
@@ -79,7 +84,9 @@ extern int xmlDoValidityCheckingDefaultValue;
    name = CHARACTER_DATA(fileName)[0];
 #endif
     if(!isURLDoc && (name == NULL || stat(name, &tmp_stat) < 0)) {
+#ifdef HAVE_VALIDITY
       xmlDoValidityCheckingDefaultValue = previousValiditySetting;
+#endif
       PROBLEM "Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0))
       ERROR;
     }
@@ -101,7 +108,9 @@ extern int xmlDoValidityCheckingDefaultValue;
   }
 
   if(doc == NULL) {
+#ifdef HAVE_VALIDITY
     xmlDoValidityCheckingDefaultValue = previousValiditySetting;
+#endif
     PROBLEM "error in creating parser for %s", name
     ERROR;
   }
@@ -111,7 +120,9 @@ extern int xmlDoValidityCheckingDefaultValue;
   if(asTextBuffer && name)
     free(name);
 
+#ifdef HAVE_VALIDITY
   xmlDoValidityCheckingDefaultValue = previousValiditySetting;
+#endif
 
 
   if(LOGICAL_DATA(getDTD)[0]) {

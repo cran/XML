@@ -42,10 +42,15 @@ void
 RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText)
 {
  extern int xmlDoValidityCheckingDefaultValue;
+ int oldValiditySetting;
  xmlSAXHandlerPtr xmlParserHandler;
+ 
  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) calloc(1, sizeof(xmlParserCtxtPtr));
 
+#ifdef HAVE_VALIDITY
+      oldValiditySetting = xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
+#endif
 
   xmlParserHandler = (xmlSAXHandlerPtr) Calloc(1,xmlSAXHandler);
   /* Make certain this is initialized so that we don't have any references
@@ -60,6 +65,10 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int
   ctx = xmlCreateDocParserCtxt((char *)fileName);
  else
   ctx = xmlCreateFileParserCtxt(fileName);
+
+#ifdef HAVE_VALIDITY
+    xmlDoValidityCheckingDefaultValue = oldValiditySetting ;
+#endif
 
   if(ctx == NULL) {
     PROBLEM "Can't parse %s", fileName

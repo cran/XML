@@ -924,6 +924,8 @@ fi  # end of USE_SPLUS.
 
 if test -n "${USE_LIBXML}" ; then
 
+  LANGUAGE_DEFS="${LANGUAGE_DEFS} -DHAVE_VALIDITY=1"
+
       
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
 
@@ -933,7 +935,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:937: checking for $ac_word" >&5
+echo "configure:939: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_XML_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -980,7 +982,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:984: checking for $ac_word" >&5
+echo "configure:986: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_XML_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1058,17 +1060,17 @@ echo "Checking directory of LIBXML_INCDIR"
        CPPFLAGS="${TMP_CPPFLAGS} -I${dir}"
        ac_safe=`echo "libxml/parser.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for libxml/parser.h""... $ac_c" 1>&6
-echo "configure:1062: checking for libxml/parser.h" >&5
+echo "configure:1064: checking for libxml/parser.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1067 "configure"
+#line 1069 "configure"
 #include "confdefs.h"
 #include <libxml/parser.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1072: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1074: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1101,17 +1103,17 @@ fi
 
        ac_safe=`echo "gnome-xml/parser.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for gnome-xml/parser.h""... $ac_c" 1>&6
-echo "configure:1105: checking for gnome-xml/parser.h" >&5
+echo "configure:1107: checking for gnome-xml/parser.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1110 "configure"
+#line 1112 "configure"
 #include "confdefs.h"
 #include <gnome-xml/parser.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1115: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1117: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1151,17 +1153,17 @@ fi
   if test -z "${LIBXML_INCDIR}"; then
     ac_safe=`echo "libxml/parser.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for libxml/parser.h""... $ac_c" 1>&6
-echo "configure:1155: checking for libxml/parser.h" >&5
+echo "configure:1157: checking for libxml/parser.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1160 "configure"
+#line 1162 "configure"
 #include "confdefs.h"
 #include <libxml/parser.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1165: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1167: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1198,7 +1200,7 @@ fi
 CPPFLAGS="${PKG_CPPFLAGS} -I${LIBXML_INCDIR}"
 echo "${CPPFLAGS}"
   cat > conftest.$ac_ext <<EOF
-#line 1202 "configure"
+#line 1204 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1212,7 +1214,7 @@ int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1216: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1218: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   echo "Using libxml 1.8.*!"
 else
@@ -1230,7 +1232,7 @@ rm -f conftest*
 
 
   echo $ac_n "checking for gzopen in -lz""... $ac_c" 1>&6
-echo "configure:1234: checking for gzopen in -lz" >&5
+echo "configure:1236: checking for gzopen in -lz" >&5
 ac_lib_var=`echo z'_'gzopen | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1238,7 +1240,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lz  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1242 "configure"
+#line 1244 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1249,7 +1251,7 @@ int main() {
 gzopen()
 ; return 0; }
 EOF
-if { (eval echo configure:1253: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1255: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1278,7 +1280,7 @@ fi
 
   if test -n "${LIBXML2}" ; then
     echo $ac_n "checking for xmlParseFile in -lxml2""... $ac_c" 1>&6
-echo "configure:1282: checking for xmlParseFile in -lxml2" >&5
+echo "configure:1284: checking for xmlParseFile in -lxml2" >&5
 ac_lib_var=`echo xml2'_'xmlParseFile | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1286,7 +1288,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxml2 "-L${LIBXML_LIBDIR-.}" $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1290 "configure"
+#line 1292 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1297,7 +1299,7 @@ int main() {
 xmlParseFile()
 ; return 0; }
 EOF
-if { (eval echo configure:1301: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1303: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1324,7 +1326,7 @@ fi
 
   if test -n "${NO_XML_LIB}" ; then
     echo $ac_n "checking for xmlParseFile in -lxml""... $ac_c" 1>&6
-echo "configure:1328: checking for xmlParseFile in -lxml" >&5
+echo "configure:1330: checking for xmlParseFile in -lxml" >&5
 ac_lib_var=`echo xml'_'xmlParseFile | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1332,7 +1334,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxml "-L${LIBXML_LIBDIR-.}" $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1336 "configure"
+#line 1338 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1343,7 +1345,7 @@ int main() {
 xmlParseFile()
 ; return 0; }
 EOF
-if { (eval echo configure:1347: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1349: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1382,7 +1384,7 @@ if test -z "${LIBXML2}" ; then
    if test -z "${USE_OLD_ROOT_CHILD_NAMES}" ; then
        CPPFLAGS=${PKG_CPPFLAGS}
        cat > conftest.$ac_ext <<EOF
-#line 1386 "configure"
+#line 1388 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1396,7 +1398,7 @@ int main() {
        
 ; return 0; }
 EOF
-if { (eval echo configure:1400: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1402: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   echo "New style libxml!"
 else
@@ -1419,7 +1421,7 @@ else   # -z "${LIBXML2}"
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 1423 "configure"
+#line 1425 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1435,7 +1437,7 @@ main(int argc, char *argv)
 }
     
 EOF
-if { (eval echo configure:1439: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:1441: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
    LIBXML2_OK=1
 else
@@ -1466,7 +1468,7 @@ fi
 
 if test "${USE_XMLLIB_NAME}" = "xml2" ; then
   echo $ac_n "checking for xmlHashSize in -lxml2""... $ac_c" 1>&6
-echo "configure:1470: checking for xmlHashSize in -lxml2" >&5
+echo "configure:1472: checking for xmlHashSize in -lxml2" >&5
 ac_lib_var=`echo xml2'_'xmlHashSize | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1474,7 +1476,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxml2  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1478 "configure"
+#line 1480 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1485,7 +1487,7 @@ int main() {
 xmlHashSize()
 ; return 0; }
 EOF
-if { (eval echo configure:1489: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1491: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1513,7 +1515,7 @@ if test "${USE_LIBXML}" ; then
   echo "Checking DTD parsing (presence of externalSubset)..."
 
   cat > conftest.$ac_ext <<EOF
-#line 1517 "configure"
+#line 1519 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1529,7 +1531,7 @@ int main() {
   
 ; return 0; }
 EOF
-if { (eval echo configure:1533: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1535: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   USE_EXT_SUBSET=1
 else
@@ -1545,7 +1547,7 @@ rm -f conftest*
 
 
   cat > conftest.$ac_ext <<EOF
-#line 1549 "configure"
+#line 1551 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1562,7 +1564,7 @@ int main() {
   
 ; return 0; }
 EOF
-if { (eval echo configure:1566: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1568: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ROOT_HAS_DTD_NODE=1
 else
@@ -1578,7 +1580,7 @@ rm -f conftest*
  fi
 
   echo $ac_n "checking for xmlHashSize in -l${USE_XMLLIB_NAME}""... $ac_c" 1>&6
-echo "configure:1582: checking for xmlHashSize in -l${USE_XMLLIB_NAME}" >&5
+echo "configure:1584: checking for xmlHashSize in -l${USE_XMLLIB_NAME}" >&5
 ac_lib_var=`echo ${USE_XMLLIB_NAME}'_'xmlHashSize | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1586,7 +1588,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-l${USE_XMLLIB_NAME}  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1590 "configure"
+#line 1592 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1597,7 +1599,7 @@ int main() {
 xmlHashSize()
 ; return 0; }
 EOF
-if { (eval echo configure:1601: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1603: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1623,7 +1625,7 @@ fi
 
 
 echo $ac_n "checking for xmlDocDumpFormatMemoryEnc in -l${USE_XMLLIB_NAME}""... $ac_c" 1>&6
-echo "configure:1627: checking for xmlDocDumpFormatMemoryEnc in -l${USE_XMLLIB_NAME}" >&5
+echo "configure:1629: checking for xmlDocDumpFormatMemoryEnc in -l${USE_XMLLIB_NAME}" >&5
 ac_lib_var=`echo ${USE_XMLLIB_NAME}'_'xmlDocDumpFormatMemoryEnc | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1631,7 +1633,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-l${USE_XMLLIB_NAME}  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1635 "configure"
+#line 1637 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1642,7 +1644,7 @@ int main() {
 xmlDocDumpFormatMemoryEnc()
 ; return 0; }
 EOF
-if { (eval echo configure:1646: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1648: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1666,17 +1668,17 @@ fi
 if test -z "${FROM_GNOME_XML_DIR}" ; then
   ac_safe=`echo "libxml/xmlversion.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for libxml/xmlversion.h""... $ac_c" 1>&6
-echo "configure:1670: checking for libxml/xmlversion.h" >&5
+echo "configure:1672: checking for libxml/xmlversion.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1675 "configure"
+#line 1677 "configure"
 #include "confdefs.h"
 #include <libxml/xmlversion.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1680: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1682: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1700,7 +1702,7 @@ fi
 fi
 
 cat > conftest.$ac_ext <<EOF
-#line 1704 "configure"
+#line 1706 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1716,7 +1718,7 @@ int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1720: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1722: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DXML_ELEMENT_ETYPE=1"
 
@@ -1727,7 +1729,7 @@ fi
 rm -f conftest*
 
 cat > conftest.$ac_ext <<EOF
-#line 1731 "configure"
+#line 1733 "configure"
 #include "confdefs.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -1743,7 +1745,7 @@ int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1747: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1749: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DXML_ATTRIBUTE_ATYPE=1"
 
@@ -1758,17 +1760,17 @@ rm -f conftest*
 if test -n "${USE_EXPAT}" ; then
   ac_safe=`echo "xmltok/xmlparse.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for xmltok/xmlparse.h""... $ac_c" 1>&6
-echo "configure:1762: checking for xmltok/xmlparse.h" >&5
+echo "configure:1764: checking for xmltok/xmlparse.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1767 "configure"
+#line 1769 "configure"
 #include "confdefs.h"
 #include <xmltok/xmlparse.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1772: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1774: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1792,17 +1794,17 @@ fi
   if test -z "${XMLPARSE_INCDIR}" ; then 
     ac_safe=`echo "xmlparse/xmlparse.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for xmlparse/xmlparse.h""... $ac_c" 1>&6
-echo "configure:1796: checking for xmlparse/xmlparse.h" >&5
+echo "configure:1798: checking for xmlparse/xmlparse.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1801 "configure"
+#line 1803 "configure"
 #include "confdefs.h"
 #include <xmlparse/xmlparse.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1806: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1808: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1825,7 +1827,7 @@ fi
 
   fi
   cat > conftest.$ac_ext <<EOF
-#line 1829 "configure"
+#line 1831 "configure"
 #include "confdefs.h"
 #include <${XMLPARSE_INCDIR}xmlparse.h>
 EOF
@@ -1840,7 +1842,7 @@ fi
 rm -f conftest*
 	
   echo $ac_n "checking for XmlInitEncoding in -lxmltok""... $ac_c" 1>&6
-echo "configure:1844: checking for XmlInitEncoding in -lxmltok" >&5
+echo "configure:1846: checking for XmlInitEncoding in -lxmltok" >&5
 ac_lib_var=`echo xmltok'_'XmlInitEncoding | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1848,7 +1850,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxmltok  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1852 "configure"
+#line 1854 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1859,7 +1861,7 @@ int main() {
 XmlInitEncoding()
 ; return 0; }
 EOF
-if { (eval echo configure:1863: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1865: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1888,7 +1890,7 @@ else
 fi
 
   echo $ac_n "checking for XML_Parse in -lxmlparse""... $ac_c" 1>&6
-echo "configure:1892: checking for XML_Parse in -lxmlparse" >&5
+echo "configure:1894: checking for XML_Parse in -lxmlparse" >&5
 ac_lib_var=`echo xmlparse'_'XML_Parse | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1896,7 +1898,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxmlparse -lxmltok $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1900 "configure"
+#line 1902 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1907,7 +1909,7 @@ int main() {
 XML_Parse()
 ; return 0; }
 EOF
-if { (eval echo configure:1911: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1913: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1967,7 +1969,7 @@ else  # so compiling for R.
  if test ${SUPPORTS_LIBXML}="TRUE" ; then
 
    echo $ac_n "checking for attribute in -lxml""... $ac_c" 1>&6
-echo "configure:1971: checking for attribute in -lxml" >&5
+echo "configure:1973: checking for attribute in -lxml" >&5
 ac_lib_var=`echo xml'_'attribute | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1975,7 +1977,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lxml  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1979 "configure"
+#line 1981 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1986,7 +1988,7 @@ int main() {
 attribute()
 ; return 0; }
 EOF
-if { (eval echo configure:1990: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1992: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2024,7 +2026,7 @@ fi
 
 
 cat > conftest.$ac_ext <<EOF
-#line 2028 "configure"
+#line 2030 "configure"
 #include "confdefs.h"
 
 #include "parser.h"
@@ -2037,7 +2039,7 @@ int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:2041: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2043: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   echo "No need for old SKIP_BLANKS definition"
 

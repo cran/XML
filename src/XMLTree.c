@@ -112,6 +112,20 @@ USER_OBJECT_
 R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
 {
     xmlNodePtr n, p;
+
+    if(IS_LIST(node))  {
+      int i;
+      for(i = 0; i < GET_LENGTH(node); i++)
+         R_insertXMLNode(VECTOR_ELT(node, i), parent);
+
+      return(NULL_USER_OBJECT);
+    }
+
+    if(TYPEOF(node) != EXTPTRSXP || TYPEOF(parent) != EXTPTRSXP) {
+       PROBLEM "R_insertXMLNode expects InternalXMLNode objects"
+       ERROR;
+    }
+
     p = (xmlNodePtr) R_ExternalPtrAddr(parent);
     n = (xmlNodePtr) R_ExternalPtrAddr(node);
 
