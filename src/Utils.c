@@ -51,20 +51,27 @@ trim(char *str)
 {
   char *tmp;
 
+    /* If a degenerate string, just return. */
   if(str == (char*)NULL || str[0] == '\0')
     return(str);
 
+   /* Jumpt to the end */
   tmp = str + strlen(str) - 1;
-   while(tmp >= str && isspace(*tmp)) {
+  while(tmp >= str && isspace(*tmp)) {
+      tmp[0] = '\0';
       tmp--;
-    }
+  }
   if(tmp == str) {
+#if 0
    if(strlen(tmp) > 1)
     tmp[0] = '\0';
+#endif
    return(str);
-  } else
+  }
+#if 0
+ else
     tmp[1] = '\0';
-
+#endif
 
 
   tmp = str;

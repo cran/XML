@@ -1,3 +1,7 @@
+Version 0.93-2
+
+  *   Bug in trimming white space discovered by Ott Toomet.
+
 Version 0.93-1
 
   *   Documentation updates. Included xmlGetAttr.Rd.
