@@ -27,6 +27,11 @@ AC_ARG_WITH(libxml2,[  --with-libxml2    indicate that the libxml version is 2.0
                     USE_XML2="yes" ;
                  fi])
 
+
+AC_ARG_WITH(xml-config,[  --with-xml-config    the name of the xml-config program to use.],
+               [ XML_CONFIG=${withval}])
+
+
   dnl compile for use with libxml. This is the default.
 AC_ARG_WITH(libxml, [  --with-libxml           use the libxml library (default)],
   [ if test "${withval}" = no; then
@@ -107,22 +112,25 @@ if test -n "${USE_LIBXML}" ; then
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
 
    if test -n "${USE_XML2}" ; then
-     AC_PATH_PROGS(XML_CONFIG, xml2-config)      
-     if test -z "${XML_CONFIG}" ; then
-       echo "Cannot find xml2-config"
-       exit 1
+
+     if test -z "${XML_CONFIG}" ; then 
+       AC_PATH_PROGS(XML_CONFIG, xml2-config)      
+       if test -z "${XML_CONFIG}" ; then
+         echo "Cannot find xml2-config"
+         exit 1
+       fi
      fi
    fi
 
-   if test -z "${XML_CONFIG}" ; then
-     AC_PATH_PROGS(XML_CONFIG, xml-config)
-   fi
+     if test -z "${XML_CONFIG}" ; then
+       AC_PATH_PROGS(XML_CONFIG, xml-config)
+     fi
 
-   if test -n "${XML_CONFIG}" ; then
-     LIBXML_INCDIR=`${XML_CONFIG} --cflags | sed -e 's/-I//g'`
-     LIBXML_LIBDIR=`${XML_CONFIG} --libs`   
-   fi
- fi
+     if test -n "${XML_CONFIG}" ; then
+       LIBXML_INCDIR=`${XML_CONFIG} --cflags | sed -e 's/-I//g'`
+       LIBXML_LIBDIR=`${XML_CONFIG} --libs`   
+     fi
+   fi  dnl USE_XML2 
 
 
 

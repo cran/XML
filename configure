@@ -842,6 +842,7 @@ Optional Packages:
   --with-splus	Compile as an SPlus library (rather than R). Value can be the (fully qualified) name of the Splus script.
 
   --with-libxml2    indicate that the libxml version is 2.0 or higher
+  --with-xml-config    the name of the xml-config program to use.
   --with-libxml           use the libxml library (default)
   --with-expat            use expat library (off by default)
 
@@ -1286,6 +1287,15 @@ if test "${with_libxml2+set}" = set; then
                     USE_XML2="yes" ;
                  fi
 fi;
+
+
+
+# Check whether --with-xml-config or --without-xml-config was given.
+if test "${with_xml_config+set}" = set; then
+  withval="$with_xml_config"
+   XML_CONFIG=${withval}
+fi;
+
 
 
 # Check whether --with-libxml or --without-libxml was given.
@@ -2459,7 +2469,9 @@ if test -n "${USE_LIBXML}" ; then
  if test -z "${LIBXML_INCDIR}" && test -z "${LIBXML_LIBDIR}" ; then
 
    if test -n "${USE_XML2}" ; then
-     for ac_prog in xml2-config
+
+     if test -z "${XML_CONFIG}" ; then
+       for ac_prog in xml2-config
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2503,14 +2515,15 @@ fi
   test -n "$XML_CONFIG" && break
 done
 
-     if test -z "${XML_CONFIG}" ; then
-       echo "Cannot find xml2-config"
-       exit 1
+       if test -z "${XML_CONFIG}" ; then
+         echo "Cannot find xml2-config"
+         exit 1
+       fi
      fi
    fi
 
-   if test -z "${XML_CONFIG}" ; then
-     for ac_prog in xml-config
+     if test -z "${XML_CONFIG}" ; then
+       for ac_prog in xml-config
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2554,14 +2567,13 @@ fi
   test -n "$XML_CONFIG" && break
 done
 
-   fi
+     fi
 
-   if test -n "${XML_CONFIG}" ; then
-     LIBXML_INCDIR=`${XML_CONFIG} --cflags | sed -e 's/-I//g'`
-     LIBXML_LIBDIR=`${XML_CONFIG} --libs`
+     if test -n "${XML_CONFIG}" ; then
+       LIBXML_INCDIR=`${XML_CONFIG} --cflags | sed -e 's/-I//g'`
+       LIBXML_LIBDIR=`${XML_CONFIG} --libs`
+     fi
    fi
- fi
-
 
 
 

@@ -1,3 +1,11 @@
+Version 0.95-1
+
+  *  Configuration now supports the specification of the xml-config script
+     to use via the environment variable XML_CONFIG or the --with-xml-config
+     as in --with-xml-config=xml2-config
+
+  *  Recognize file:/// prefix as URL and not switch to treating file name as
+     XML text.
 
 Version 0.95-0
 

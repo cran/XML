@@ -13,7 +13,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
            isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
 {
   if(missing(isURL)) {
-    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file))
+    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
   }
 
     # check whether we are treating the file name as

@@ -24,7 +24,7 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
   } else {
    if(missing(isURL)) { 
         # check if this is a URL or regular file.
-     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
+     isURL <- length(grep("http://",file)) | length(grep("ftp://",file)) | length(grep("file://",file))
    }
 
    if(isURL == FALSE & asText == FALSE) {
