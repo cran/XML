@@ -6,7 +6,7 @@
 
 These two functions provide different ways to construct XML documents
 incrementally.  They provide a single, common interface for adding and
-closing tags, and inerting nodes.  The buffer version stores the XML
+closing tags, and inserting nodes.  The buffer version stores the XML
 representation as a string.  The DOM version builds the tree of XML
 node objects.
 
@@ -101,4 +101,4 @@ con$addTag("section", close=F)
 con$closeTag() # section
 }
 \keyword{file}
-\keyword{XML}
+\keyword{IO}

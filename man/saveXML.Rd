@@ -46,6 +46,6 @@ saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=T)
 \examples{
 
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}
 

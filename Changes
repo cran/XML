@@ -1,3 +1,13 @@
+Version 0.7-3
+
+  * Documents without <DOCTYPE ..> are handled correctly.
+
+  * Configuration tweak to set LD_LIBRARY_PATH to handle the case
+    that the user specifies LIBXML_LIBDIR and it is needed to run the 
+    version test.
+
+  * Keyword XML changed to IO.
+
 Version 0.7-2
 
   * Fix for printing XMLNode objects  to handle comments and elements 

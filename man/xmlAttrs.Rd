@@ -37,5 +37,5 @@ pairs in the XML tag
 
  xmlAttrs(doc$doc$children[["dataset"]][["variables"]])
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}

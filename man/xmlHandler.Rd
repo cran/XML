@@ -36,4 +36,4 @@ xmlEventParse(xmlText, handlers = NULL, asText=T)
 xmlEventParse(xmlText, xmlHandler(), useTagName=T, asText=T)
 }
 \keyword{file}
-\keyword{XML}
+\keyword{IO}

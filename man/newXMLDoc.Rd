@@ -65,4 +65,4 @@ document.}
 \examples{
 
 }
-\keyword{XML}
+\keyword{IO}

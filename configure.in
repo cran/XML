@@ -268,6 +268,10 @@ if test -z "${LIBXML2}" ; then
    fi  # USE_OLD_ROOT_CHILD_NAMES
 else   # -z "${LIBXML2}"
    CPPFLAGS=${PKG_CPPFLAGS}
+   if test -d "${LIBXML_LIBDIR}" ; then
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBXML_LIBDIR}
+    export LD_LIBRARY_PATH
+   fi
    AC_TRY_RUN([
 #ifdef FROM_GNOME_XML_DIR
 #include <gnome-xml/parser.h>

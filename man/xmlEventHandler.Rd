@@ -46,4 +46,4 @@ text node, comment, entity references and definitions, etc.
  xmlEventParse(system.file("exampleData","mtcars.xml", package="XML"),  handlers=xmlEventHandler())
 }
 \keyword{file}
-\keyword{XML}
+\keyword{IO}

@@ -44,5 +44,5 @@ nodes.
  top[["second"]] <- xmlCDataNode("x <- 1:10")
  top[[3]] <- xmlNode("tag",attrs=c(id="name"))
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}

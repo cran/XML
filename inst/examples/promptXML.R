@@ -17,7 +17,7 @@ function(object, file = NULL, ..., header='<!DOCTYPE Rhelp system "Shelp.dtd">\n
   name <- as.character(name)
   fn <- get(name)
 
-  xml <- xmlOutputBuffer()
+  xml <- xmlOutputBuffer(nameSpace = "shelp")
   if(!is.null(header))
      xml$add(header)
 

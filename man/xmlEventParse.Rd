@@ -114,4 +114,4 @@ xmlEventParse(xmlText, asText=T)
 }
 }
 \keyword{file}
-\keyword{XML}
+\keyword{IO}

@@ -43,6 +43,6 @@ and identified by \dots.
 \examples{
 
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}
 

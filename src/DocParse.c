@@ -192,7 +192,8 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
     root = doc->xmlRootNode;
 
 #ifdef ROOT_HAS_DTD_NODE
-    root = root->next;
+    if(root->next && root->children == NULL)
+       root = root->next;
 #endif
 #endif
   SET_VECTOR_ELT(rdoc, CHILDREN_ELEMENT_NAME, RS_XML(createNodeChildren)(root,  SIDEWAYS, parserSettings)); 

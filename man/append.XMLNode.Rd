@@ -41,4 +41,4 @@ append.xmlNode(to, ...)
 }
 }
 \keyword{file}
-\keyword{XML}
+\keyword{IO}

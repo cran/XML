@@ -39,5 +39,5 @@ tag name matches that specified by the user.
  doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
  xmlElementsByTagName(xmlRoot(doc)[[1]], "variable")
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}

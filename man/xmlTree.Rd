@@ -75,5 +75,4 @@ of the minor details.}
   tr$value()
   cat(saveXML(tr$value()))
 }
-\keyword{XML}
 \keyword{IO}

@@ -51,6 +51,6 @@ print.XMLSequenceContent(x, ...)
 \examples{
 
 }
-\keyword{XML}
+\keyword{IO}
 \keyword{file}
 
