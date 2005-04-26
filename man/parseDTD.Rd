@@ -66,7 +66,7 @@ objects.
 }
 }
 \references{ \url{http://www.w3.org} }
-\author{Duncan Temple Lang, duncan@research.bell-labs.com}
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 \note{Needs libxml (currently version 1.8.7) from \url{}}
 
 \section{WARNING}{Errors in the DTD are stored as warnings for programmatic access.} 

@@ -1,3 +1,7 @@
+Version 0.97-4
+
+  *  Quote URI values in namespace definitions in print.XMLNode.
+
 Version 0.97-3
  
   * Added a method for xmlRoot for HTMLDocument
@@ -8,6 +12,8 @@ Version 0.97-2
 
   *  Added cdata to the collection of functions that are used in the handlers 
      for xmlEventParse().  Omission identified by Jeff Gentry.
+
+  *  Fixed the maintainer email address to duncan@wald.ucdavis.edu
 
 Version 0.97-1
 

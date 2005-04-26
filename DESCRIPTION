@@ -1,7 +1,7 @@
 Package: XML
-Version: 0.97-3
-Date: 2005/04/07
-Author:  Duncan Temple Lang (duncan@research.bell-labs.com)
+Version: 0.97-4
+Date: 2005/04/26
+Author:  Duncan Temple Lang (duncan@wald.ucdavis.edu)
 Title: Tools for parsing and generating XML within R and S-Plus.
 Depends: R (>= 1.2.0)
 Description: Parsing facilities for arbitrary XML files, DTDs and HTML, offering both
@@ -9,6 +9,6 @@ Description: Parsing facilities for arbitrary XML files, DTDs and HTML, offering
 Note: This is released by the Omegahat Project for Statistical
      Computing. Bug reports should be submitted via
       http://www.omegahat.org/bugs
-Maintainer: Duncan Temple Lang <duncan@research.bell-labs.com>
+Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
 URL:  http://www.omegahat.org/RSXML
 License: BSD. 

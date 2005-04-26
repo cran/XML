@@ -183,7 +183,11 @@ function(x, ..., indent = "")
    tmp <- ""
 
  if(!is.null(x$namespaceDefinitions)) {
-   ns <- paste(sapply(x$namespaceDefinitions, function(x) paste("xmlns:", x$id, "=",  x$uri,sep="")), collapse=" ")
+   ns <- paste(sapply(x$namespaceDefinitions, 
+                       function(x) {
+                            paste("xmlns", ifelse(nchar(x$id) > 0, ":", ""), x$id, "=", "\"", x$uri, "\"", sep="")
+                       }), collapse=" ")
+
  } else 
    ns <- ""
 

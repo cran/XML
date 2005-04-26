@@ -106,5 +106,10 @@ RS_XML(externalEntityHandler)(XML_Parser parser, const XML_Char *context,
  return(1); /* ok to go on */
 }
 
-
+#else
+/* Something to avoid an empty file.*/
+void 
+XML_Expat_unused_dummy(void)
+{
+}
 #endif /* only if LIBEXPAT is defined */
