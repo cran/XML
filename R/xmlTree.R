@@ -115,6 +115,59 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
  return(v)
 }
 
+
+xmlRoot.XMLInternalDocument = 
+function(x, ...)
+{
+  .Call("R_xmlRootNode", x)
+}
+
+setOldClass("XMLNode")
+setOldClass("XMLInternalNode")
+setAs("XMLInternalNode", "XMLNode",
+        function(from) {
+           .Call("R_createXMLNode", from, NULL)
+        })
+
+
+xmlName.XMLInternalNode =
+function(node, full = FALSE)
+{
+  .Call("RS_XML_xmlNodeName", node)
+}
+
+xmlNamespace.XMLInternalNode =
+function(x)
+{
+  .Call("RS_XML_xmlNodeNamespace", x)
+}
+
+xmlAttrs.XMLInternalNode = 
+function(node, addNamespace = TRUE)
+{
+  .Call("RS_XML_xmlNodeAttributes",  node, as.logical(addNamespace))
+}
+
+xmlChildren.XMLInternalNode =
+function(x)
+{
+ .Call("RS_XML_xmlNodeChildrenReferences", x)
+}
+
+
+xmlParent =
+function(x)
+ UseMethod("xmlParent")
+
+xmlParent.XMLInternalNode =
+function(x)
+{
+  .Call("RS_XML_xmlNodeParent", x)
+}
+
+
+
+
 newXMLDoc <-
 #
 # Creates internal C-level libxml object for representing
@@ -150,36 +203,55 @@ function(name, ..., attrs=NULL, namespace="", doc = NULL)
 
 
 saveXML <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 {
  UseMethod("saveXML")
 }
 
 saveXML.XMLInternalDocument <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 {
+  if(is(doctype, "Doctype")) {
+       # Check that the value in the DOCTYPE for the top-level name is the same as that of the
+       # root element
+       
+     topname = xmlName(xmlRoot(doc))
+
+     if(doctype@name == "")
+        doctype@name = topname
+     else if(topname == doctype@name)
+       stop("The top-level node and the name for the DOCTYPE must agree", doctype@name, " ", topname)
+
+     prefix = c(doctype@name, doctype@public, doctype@system)
+  }
+
   .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent), as.character(prefix))
 }
 
 saveXML.XMLInternalDOM <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 {
-  saveXML(doc$value(), file=file, compression=compression, indent=indent)
+  NextMethod("saveXML", object = doc$value())
 }
 
 
 saveXML.XMLOutputStream =
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n')
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 {
-  saveXML(doc$value(), file=file, compression=compression, indent=indent)
+  NextMethod("saveXML", object = doc$value())
 }
 
 saveXML.XMLNode =
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n')
+#
+# Need to handle a DTD here as the prefix argument..
+#
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 {
   sink(file)
   if(!is.null(prefix))
-    cat(prefix)
+    cat(as.character(prefix))
+  if(!is.null(doctype))
+    cat(as.character(doctype), '\n')
   on.exit(sink())
   print(doc)
 }

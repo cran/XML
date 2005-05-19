@@ -1,6 +1,7 @@
 \name{xmlNamespace}
 \alias{xmlNamespace}
 \alias{xmlNamespace.XMLNode}
+\alias{xmlNamespace.XMLInternalNode}
 \title{Retrieve the namespace value of an XML node.}
 \description{
 Each XML node has a namespace identifier which is a string indicating

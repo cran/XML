@@ -10,9 +10,10 @@ individual elements of these two lists, using the name
  The DTD is provided to determine where to look for the
  entry.
 } 
-\usage{ dtdElement(name,dtd),
-        dtdEntity(name,dtd),
- }
+\usage{
+dtdElement(name,dtd)
+dtdEntity(name,dtd)
+}
 \arguments{
   \item{name}{The name of the element being retrieved/acessed.}
   \item{dtd}{The DTD from which the element is to be retrieved.}

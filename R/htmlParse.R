@@ -9,7 +9,8 @@ htmlTreeParse <-
 # See also xml
 #
 function(file, ignoreBlanks = TRUE, handlers=NULL,
-           replaceEntities=FALSE, asText=FALSE, trim=TRUE, isURL=FALSE, asTree = FALSE)
+           replaceEntities=FALSE, asText=FALSE, trim=TRUE, 
+            isURL=FALSE, asTree = FALSE, useInternalNodes = FALSE)
 {
   if(missing(isURL)) {
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
@@ -23,10 +24,16 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      stop(paste("File", file, "does not exist "))
  }
 
- ans <- .Call("RS_XML_HtmlParseTree", as.character(file), handlers, 
-         as.logical(ignoreBlanks), as.logical(replaceEntities),
-          as.logical(asText), as.logical(trim), as.logical(isURL))
+# ans <- .Call("RS_XML_HtmlParseTree", as.character(file), handlers, 
+#         as.logical(ignoreBlanks), as.logical(replaceEntities),
+#          as.logical(asText), as.logical(trim), as.logical(isURL))
 
+ ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
+         as.logical(ignoreBlanks), as.logical(replaceEntities),
+          as.logical(asText), as.logical(trim), 
+           FALSE, FALSE, 
+           as.logical(isURL), FALSE, 
+           as.logical(useInternalNodes), TRUE)
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

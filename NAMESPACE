@@ -1,11 +1,14 @@
-useDynLib(XML)
+# Avoided if we are using Windows so that we can specify the directory to find the libxml DLL.
+# useDynLib(XML)
 exportPattern(".*")
 
 
 S3method(xmlChildren, XMLNode)
+S3method(xmlChildren, XMLInternalNode)
 
 S3method(xmlName, XMLComment)
 S3method(xmlName, XMLNode)
+S3method(xmlName, XMLInternalNode)
 
 S3method("[", XMLNode)
 S3method("[[", XMLNode)
@@ -32,6 +35,7 @@ S3method(print, XMLProcessingInstruction)
 
 
 S3method(xmlRoot, XMLDocument)
+S3method(xmlRoot, XMLInternalDocument)
 S3method(xmlRoot, XMLDocumentContent)
 
 S3method(xmlApply, XMLNode)

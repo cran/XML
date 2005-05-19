@@ -11,10 +11,12 @@
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
               asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-               isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
+               isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+               useInternalNodes = FALSE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
-                isURL = FALSE, asTree = FALSE) 
+               isURL = FALSE, asTree = FALSE, 
+               useInternalNodes = FALSE) 
 }
 
 \arguments{
@@ -80,9 +82,19 @@ return type.
  \item{addAttributeNamespaces}{a logical value indicating whether to
    return the namespace in the names of the attributes within a node
    or to omit them. If this is \code{TRUE}, an attribute such as
-   \code{xsi:type="xsd:string"}} is reported with the name
+   \code{xsi:type="xsd:string"} is reported with the name
      \code{xsi:type}.
     If it is \code{FALSE}, the name of the attribute is \code{type}.}
+ \item{useInternalNodes}{a logical value indicating whether 
+  to call the converter functions with objects of class
+   \code{XMLInternalNode} rather than \code{XMLNode}.
+   This should make things faster as we do not convert  the 
+  contents of the internal nodes to R explicit objects.
+  Also, it allows one to access the parent and ancestor nodes.
+  However, since the objects refer to volatile C-level objects,
+  one cannot store these nodes for use in further computations within R.
+  They \dQuote{disappear} after the processing the XML document is completed.
+  }
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -269,6 +281,42 @@ m <- xmlTreeParse(fileName,
  # Requires Internet access.
  xmlTreeParse("http://www.omegahat.org/Scripts/Data/mtcars.xml", asText=TRUE)
 }
+
+  counter = function() {
+              counts = integer(0)
+              list(startElement = function(node) {
+                                     name = xmlName(node)
+                                     if(name \%in\% names(counts))
+                                          counts[name] <<- counts[name] + 1
+                                     else
+                                          counts[name] <<- 1
+                                  },
+                    counts = function() counts)
+            }
+
+   h = counter()
+   xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"),  handlers = h, useInternalNodes = TRUE)
+   h$counts()
+
+
+
+
+ getLinks = function() { 
+       links = character() 
+       list(a = function(node, ...) { 
+                   links <<- c(links, xmlGetAttr(node, "href"))
+                   node 
+                }, 
+            links = function()links)
+     }
+
+ h1 = getLinks()
+ htmlTreeParse(system.file("examples", "index.html", package = "XML"), handlers = h1)
+ h1$links()
+
+ h2 = getLinks()
+ htmlTreeParse(system.file("examples", "index.html", package = "XML"), handlers = h2, useInternalNodes = TRUE)
+ all(h1$links() == h2$links())
 }
 
 \keyword{file}

@@ -2,6 +2,7 @@
 \alias{xmlName}
 \alias{xmlName.XMLComment}
 \alias{xmlName.XMLNode}
+\alias{xmlName.XMLInternalNode}
 \title{ Extraces the tag name of an XMLNode object.}
 \description{
   Each XMLNode object has a tag name introduced

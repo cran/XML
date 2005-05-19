@@ -12,14 +12,30 @@ function(libname, pkgname)
 }
 
 .onLoad =
-function(...)
+function(libname, pkgname)
 {
+  # Added by Uwe Ligges.
+ if(.Platform$OS.type == "windows"){
+     temp <- Sys.getenv("PATH")
+     Sys.putenv("PATH" = paste(normalizePath(file.path(libname, pkgname, "libs")), 
+                               file.path(Sys.getenv("R_HOME"), "modules", fsep="\\"), temp, sep=";"))
+     on.exit(Sys.putenv(temp))
+ }     
+ library.dynam("XML", pkgname, libname)
+
+
  if(exists("setMethod")) {
 #   .InitSAXMethods()
  }
    # Set the error handlers to our local ones.
  .C("RSXML_setErrorHandlers")
 }
+
+.onUnload <- function (libpath)
+{
+   library.dynam.unload("XML", libpath)
+}
+
 
 #
 #  Copyright (c) 1998, 1999 The Omega Project for Statistical Computing.

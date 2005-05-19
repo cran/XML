@@ -16,11 +16,11 @@
   XML tree.
 }
 \usage{
-saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
-saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
-saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
-saveXML.XMLNode(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
-saveXML.XMLOutputStream(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n')
+saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+saveXML.XMLNode(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+saveXML.XMLOutputStream(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
 }
 \arguments{
   \item{doc}{the document object representing the XML document.}
@@ -37,6 +37,8 @@ saveXML.XMLOutputStream(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?
      put the XML introduction/preamble at the beginning of the document
      while allowing it to be omitted when we are outputting multiple
      "documents" within a single stream.}
+  \item{doctype}{an object identifying the elements for the DOCTYPE in the output.
+    This can be a string or an object of class \code{Doctype}.}
 }
 \details{
  One can create an internal XML tree (or DOM)
@@ -75,7 +77,7 @@ con$addTag("number", "582-3217")
 con$closeTag() # phone
 con$closeTag() # address
 
-saveXML(con$value(), file="con.xml")
+saveXML(con$value(), file="out.xml")
 }
 \keyword{IO}
 \keyword{file}

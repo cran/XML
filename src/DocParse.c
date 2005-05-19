@@ -26,6 +26,10 @@ USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *p
 void RS_XML(ValidationWarning)(void *ctx, const char *msg, ...);
 void RS_XML(ValidationError)(void *ctx, const char *msg, ...);
 
+
+static USER_OBJECT_ convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings);
+static void NodeTraverse(xmlNodePtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *parserSettings);
+
 /**
   Entry point for reading, parsing and converting an XML tree
   to an R object.
@@ -55,7 +59,9 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                     USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities,
                      USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ validate,
                       USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
-                       USER_OBJECT_ addNamespaceAttributes)
+                       USER_OBJECT_ addNamespaceAttributes,
+                        USER_OBJECT_ internalNodeReferences, 
+                        USER_OBJECT_ s_useHTML)
 {
 #ifdef HAVE_VALIDITY
 extern int xmlDoValidityCheckingDefaultValue;
@@ -67,14 +73,19 @@ extern int xmlDoValidityCheckingDefaultValue;
   USER_OBJECT_ className;
   R_XMLSettings parserSettings;
   int previousValiditySetting;
+
   int asTextBuffer = LOGICAL_DATA(asText)[0];
   int isURLDoc = LOGICAL_DATA(isURL)[0];
+  int useHTML = LOGICAL_DATA(s_useHTML)[0];
 
   parserSettings.skipBlankLines = LOGICAL_DATA(skipBlankLines)[0];
   parserSettings.converters = converterFunctions;
   parserSettings.trim = LOGICAL_DATA(trim)[0];
 
+  parserSettings.internalNodeReferences = LOGICAL_DATA(internalNodeReferences)[0];
+
   parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaceAttributes)[0];
+
 
 
 #ifdef HAVE_VALIDITY
@@ -108,12 +119,12 @@ extern int xmlDoValidityCheckingDefaultValue;
       xmlSubstituteEntitiesDefault(1);   
 
   if(asTextBuffer) {
-   doc = xmlParseMemory(name, strlen(name));
+   doc = useHTML ? htmlParseDoc(name, NULL) : xmlParseMemory(name, strlen(name));
    if(doc != NULL) {
       doc->name = xmlStrdup("<buffer>");
    }
   } else {
-   doc = xmlParseFile(name);
+   doc = useHTML ? htmlParseFile(name, NULL) : xmlParseFile(name);
   }
 
 #ifdef HAVE_VALIDITY
@@ -125,7 +136,7 @@ extern int xmlDoValidityCheckingDefaultValue;
     ERROR;
   }
 
-  if(LOGICAL_DATA(validate)[0]) {
+  if(!useHTML && LOGICAL_DATA(validate)[0]) {
       xmlValidCtxt ctxt;
       ctxt.error = RS_XML(ValidationError);
       ctxt.warning = RS_XML(ValidationWarning);
@@ -136,13 +147,29 @@ extern int xmlDoValidityCheckingDefaultValue;
       }
   }
 
-  PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));
+  if(parserSettings.internalNodeReferences) {
+      /* Use a different approach - pass internal nodes to the converter functions*/
+      xmlNodePtr root;
+#ifdef USE_OLD_ROOT_CHILD_NAMES
+      root = doc->root;
+#else
+      root = doc->xmlRootNode;
+#ifdef ROOT_HAS_DTD_NODE
+    if(root->next && root->children == NULL)
+       root = root->next;
+#endif
+#endif   
+      NodeTraverse(root, converterFunctions, &parserSettings);
+      PROTECT(rdoc = NULL_USER_OBJECT);
+  } else {
+      PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));
+  }
 
   if(asTextBuffer && name)
     free(name);
 
 
-  if(LOGICAL_DATA(getDTD)[0]) {
+  if(!useHTML && !parserSettings.internalNodeReferences && LOGICAL_DATA(getDTD)[0]) {
     USER_OBJECT_ ans, klass, tmp;
     const char *names[] = {"doc", "dtd"};
       PROTECT(ans = NEW_LIST(2));
@@ -161,19 +188,48 @@ extern int xmlDoValidityCheckingDefaultValue;
 
   xmlFreeDoc(doc);
 
+  if(!parserSettings.internalNodeReferences) {
      /* Set the class for the document. */
-  className = NEW_CHARACTER(1);
-  PROTECT(className);
-    SET_STRING_ELT(className, 0, COPY_TO_USER_STRING("XMLDocument"));   
-    SET_CLASS(rdoc, className);
-  UNPROTECT(1);
+    className = NEW_CHARACTER(1);
+    PROTECT(className);
+      SET_STRING_ELT(className, 0, COPY_TO_USER_STRING(useHTML ? "HTMLDocument" : "XMLDocument"));   
+      SET_CLASS(rdoc, className);
+    UNPROTECT(1);
+  }
 
 
  UNPROTECT(1); 
  return(rdoc);
 }
 
-enum { FILE_ELEMENT_NAME, VERSION_ELEMENT_NAME, CHILDREN_ELEMENT_NAME, NUM_DOC_ELEMENTS,};
+enum { FILE_ELEMENT_NAME, VERSION_ELEMENT_NAME, CHILDREN_ELEMENT_NAME, NUM_DOC_ELEMENTS};
+
+
+
+void
+NodeTraverse(xmlNodePtr root, USER_OBJECT_ converterFunctions, R_XMLSettings *parserSettings)
+{
+  xmlNodePtr c, tmp;
+    c = root;
+
+    while(c) {
+	USER_OBJECT_ ref;
+#ifndef USE_OLD_ROOT_CHILD_NAMES
+         tmp = c->xmlChildrenNode;
+#else
+               c->childs;
+#endif
+        if(tmp)
+	    NodeTraverse(tmp, converterFunctions, parserSettings);
+	PROTECT(ref = R_createXMLNodeRef(c));
+	convertNode(ref, c, parserSettings);
+	UNPROTECT(1);
+	c = c->next;
+    }
+}
+
+
+
 
 
 /**
@@ -201,12 +257,12 @@ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunct
 
     /* Insert the XML version information */
   SET_VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME, NEW_CHARACTER(1));
-    if(doc->version)
+  if(doc->version)
 	version = doc->version;
 
-    SET_STRING_ELT(VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME), 0, 
+  SET_STRING_ELT(VECTOR_ELT(rdoc, VERSION_ELEMENT_NAME), 0, 
                                      COPY_TO_USER_STRING(version));
-    SET_STRING_ELT(rdoc_el_names, VERSION_ELEMENT_NAME, COPY_TO_USER_STRING("version"));
+  SET_STRING_ELT(rdoc_el_names, VERSION_ELEMENT_NAME, COPY_TO_USER_STRING("version"));
 
     /* Compute the nodes for this tree, recursively. 
        Note the SIDEWAYS argument to get the sibling nodes
@@ -318,6 +374,8 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 
      /* Create the default return value being a list of name, attributes, children 
         and possibly value. 
+
+
       */
  PROTECT(ans = NEW_LIST(n));
  PROTECT(ans_el_names = NEW_CHARACTER(n));
@@ -376,6 +434,17 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
      /* 
           Now invoke any user-level converters. 
       */
+  ans = convertNode(ans, node, parserSettings);
+
+  UNPROTECT(1);
+  UNPROTECT(1);
+  return(ans);
+}
+
+static USER_OBJECT_
+convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings)
+{
+    USER_OBJECT_ val = ans; /* R_NilValue; */
 
   if(parserSettings != NULL) {
     USER_OBJECT_  fun = NULL;
@@ -393,19 +462,13 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
       }
       if(fun != NULL) {
         USER_OBJECT_ opArgs = NEW_LIST(1);
-        USER_OBJECT_ tmp;
 	 PROTECT(opArgs);
 	 SET_VECTOR_ELT(opArgs, 0, ans);
-	 tmp = RS_XML(invokeFunction)(fun, opArgs, NULL);
-         ans = tmp;
+	 val = RS_XML(invokeFunction)(fun, opArgs, NULL);
    	 UNPROTECT(1);
       }
   }
-
-
-  UNPROTECT(1);
-  UNPROTECT(1);
-  return(ans);
+  return(val);
 }
 
 
@@ -570,13 +633,16 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
   USER_OBJECT_ ans = NULL_USER_OBJECT;
   USER_OBJECT_ elNames = NULL;
   int unProtect = 0;
-  xmlNodePtr c = (direction == SIDEWAYS) ? node : 
+  xmlNodePtr base, c = (direction == SIDEWAYS) ? node : 
 #ifndef USE_OLD_ROOT_CHILD_NAMES
                               node->xmlChildrenNode;
 #else
                               node->childs;
 #endif
 
+  base = c;
+
+      /* Count the number of elements being converted. */
   while(c) {
     c = c->next;
     n++;
@@ -585,28 +651,25 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
   if(n > 0) {
     USER_OBJECT_ tmp;
     USER_OBJECT_ tmpNames;
-
     int count = 0;
+
+
+    c = base;
+
     PROTECT(ans = NEW_LIST(n));
     PROTECT(elNames = NEW_CHARACTER(n));
-      unProtect = 2;
-    c = (direction == SIDEWAYS) ? node :
-#ifndef USE_OLD_ROOT_CHILD_NAMES
-                              node->xmlChildrenNode;
-#else
-                              node->childs;
-#endif
-    for(i = 0; i < n; i++) {
-      tmp = RS_XML(createXMLNode)(c, 1, DOWN, parserSettings, ans);
-      if(tmp && tmp != NULL_USER_OBJECT) {
-	SET_VECTOR_ELT(ans, count, tmp); 
-        if(c->name)
-          SET_STRING_ELT(elNames, count++, COPY_TO_USER_STRING(c->name));
-      }
-      c = c->next;
+    unProtect = 2;
+
+    for(i = 0; i < n; i++, c = c->next) {
+	tmp = RS_XML(createXMLNode)(c, 1, DOWN, parserSettings, ans);
+	if(tmp && tmp != NULL_USER_OBJECT) {
+	    SET_VECTOR_ELT(ans, count, tmp); 
+	    if(c->name)
+		SET_STRING_ELT(elNames, count++, COPY_TO_USER_STRING(c->name));
+	}
     }
 
-    if(count < n) {
+     if(count < n) {
       /* Reset the length! */
 #ifdef USE_S
 #else
@@ -622,10 +685,12 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
       PROTECT(ans);
       unProtect = 1;
 #endif
-    } else {
-      SET_NAMES(ans, elNames);
-    }
-    UNPROTECT(unProtect);
+     } else {
+         SET_NAMES(ans, elNames);
+     }
+
+    if(unProtect > 0)  
+       UNPROTECT(unProtect);
   }
 
   return(ans);
@@ -790,3 +855,91 @@ RS_XML(ValidationWarning)(void *ctx, const char *msg, ...)
   notifyError(msg, ap, FALSE);
   va_end(ap);
 }
+
+
+USER_OBJECT_
+R_createXMLNode(USER_OBJECT_ snode, USER_OBJECT_ handlers)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    R_XMLSettings parserSettings;
+
+    parserSettings.converters = handlers;
+
+    return(RS_XML(createNodeChildren)(node, SIDEWAYS, &parserSettings));
+}
+
+
+USER_OBJECT_
+RS_XML_xmlNodeName(USER_OBJECT_ snode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    USER_OBJECT_ ans;
+
+    PROTECT(ans = NEW_CHARACTER(1));
+    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(node->name));
+    UNPROTECT(1);    
+    return(ans);
+}
+
+
+USER_OBJECT_
+RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    USER_OBJECT_ ans;
+    xmlNs *ns;
+
+    ns = node->ns;
+    if(!ns)
+	return(NEW_CHARACTER(0));
+
+    PROTECT(ans = NEW_CHARACTER(2));
+    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(ns->prefix));
+    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(ns->href));
+    UNPROTECT(1);    
+    return(ans);
+}
+
+USER_OBJECT_
+RS_XML_xmlNodeAttributes(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    R_XMLSettings parserSettings;
+    parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaces)[0];
+
+    return(RS_XML(AttributeList)(node, &parserSettings));
+}
+
+USER_OBJECT_
+RS_XML_xmlNodeParent(USER_OBJECT_ snode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    return(R_createXMLNodeRef(node->parent));
+}
+
+
+
+USER_OBJECT_
+RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    USER_OBJECT_ ans;
+    int count = 0, i;
+    xmlNodePtr ptr =  node->children;
+
+    while(ptr) {
+	count++;
+	ptr = ptr->next;
+    }
+
+    ptr = node->children;
+
+    PROTECT(ans = NEW_LIST(count));
+    for(i = 0; i < count ; i++, ptr = ptr->next) {
+	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr));
+    }
+    UNPROTECT(1);
+   
+    return(ans);
+}
+

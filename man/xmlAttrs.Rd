@@ -2,6 +2,7 @@
 \alias{xmlAttrs}
 \alias{xmlAttrs.XMLElementDef}
 \alias{xmlAttrs.XMLNode}
+\alias{xmlAttrs.XMLInternalNode}
 \title{ Get the list of attributes of an XML node. }
 \description{
  This returns a named character vector giving the 

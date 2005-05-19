@@ -10,7 +10,8 @@ xmlTreeParse <-
 #
 function(file, ignoreBlanks = TRUE, handlers=NULL,
            replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-           isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE)
+           isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+           useInternalNodes = FALSE)
 {
   if(missing(isURL)) {
     isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
@@ -31,7 +32,8 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
-              as.logical(isURL), as.logical(addAttributeNamespaces))
+              as.logical(isURL), as.logical(addAttributeNamespaces),
+              as.logical(useInternalNodes), FALSE)
 
 
  if(!missing(handlers) & !as.logical(asTree))

@@ -206,7 +206,7 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
 
     case RS_XML_CONNECTION:
       ctx = RS_XML_xmlCreateConnectionParserCtxt((USER_OBJECT_) fileName);
-/* Need to inputPush(ctx, xmlParserInputPtr) */
+
       break;
     default:
       ctx = NULL;

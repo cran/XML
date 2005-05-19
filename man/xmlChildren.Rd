@@ -1,6 +1,7 @@
 \name{xmlChildren}
 \alias{xmlChildren}
 \alias{xmlChildren.XMLNode}
+\alias{xmlChildren.XMLInternalNode}
 \title{ Gets the sub-nodes within an XMLNode object. }
 \description{
  This returns a list of XMLNode objects within an

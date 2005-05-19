@@ -24,14 +24,13 @@ typedef struct {
   int trim;
   USER_OBJECT_ converters;
   int addAttributeNamespaces;
+  int internalNodeReferences;
 } R_XMLSettings;
 
 
 enum {DOWN, SIDEWAYS};
 
 
-USER_OBJECT_ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions, USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities, USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_
-			       validate, USER_OBJECT_ getDTD, USER_OBJECT_ isURL, USER_OBJECT_ addAttributeNamespaces);
 
 USER_OBJECT_ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *settings);
 USER_OBJECT_ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *settings, USER_OBJECT_ parentUserNode);

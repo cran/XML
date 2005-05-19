@@ -1,3 +1,27 @@
+Version 0.97-6
+
+  * useInternalNodes added to xmlTreeParse() and htmlTreeParse(). 
+    This allows one to avoid the overhead of converting the contents of nodes to 
+    R objects for each handler function call.  Also, can access parents, siblings,
+    etc. from within a handler function.
+
+  * Included parameterizations for Windows from Uwe Ligges to aid automate-building
+    and finding the libxml DLL at run time.
+
+Version 0.97-5
+
+  * Methods for accessing component of XMLInternalDocument and XMLInternalNode objects,
+    e.g. xmlName, xmlNamespace, xmlAttrs, xmlChildren
+
+  * saveXML.XMLInternalDOM now supports specification of a Doctype (see Doctype).
+ 
+  * saveXML uses NextMethod and arguments are transferred.   Identified by Vincent Carey.
+
+  * Suppress warnings from R CMD check.
+
+  * Change of the output file in saveXML() example to avoid  conflict with Microsoft
+    Windows use of name con.xml.
+
 Version 0.97-4
 
   *  Quote URI values in namespace definitions in print.XMLNode.

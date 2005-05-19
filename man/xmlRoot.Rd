@@ -1,6 +1,7 @@
 \name{xmlRoot}
 \alias{xmlRoot}
 \alias{xmlRoot.XMLDocument}
+\alias{xmlRoot.XMLInternalDocument}
 \alias{xmlRoot.XMLDocumentRoot}
 \alias{xmlRoot.XMLDocumentContent}
 \alias{xmlRoot.HTMLDocument}
@@ -15,6 +16,7 @@ that is returned as part of the parsing.
 \usage{
 xmlRoot(x, ...)
 xmlRoot.XMLDocumentContent(x, ...)
+xmlRoot.XMLInternalDocument(x, ...)
 xmlRoot.HTMLDocument(x, ...)
 }
 \arguments{

@@ -35,9 +35,7 @@
 #endif
 
 
-
-USER_OBJECT_ R_createXMLNodeRef(xmlNodePtr node);
-USER_OBJECT_ R_createXMLDocRef(xmlDocPtr doc);
+#include "Utils.h"  /* R_createXMLNodeRef() */
 
 
 #ifdef USE_OLD_ROOT_CHILD_NAMES
@@ -167,6 +165,15 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
 }
 
 
+USER_OBJECT_
+R_xmlRootNode(USER_OBJECT_ sdoc)
+{
+  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+  
+  return(R_createXMLNodeRef(doc->children));  
+}
+
+
 /**
  Create an S object representing a newly created internal 
  XML document object.
@@ -254,6 +261,9 @@ R_createXMLNodeRef(xmlNodePtr node)
 }
 
 
+#define ValOrNULL(x)  x && x[0] ? x : NULL
+
+
 /**
  Write the XML tree/DOM to a file or into a buffer (depending on the value
  of sfileName)
@@ -277,10 +287,26 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
     char *fileName = NULL;
     USER_OBJECT_ ans = NULL_USER_OBJECT;
+    xmlDtdPtr dtd = NULL;
 
     int oldIndent = xmlIndentTreeOutput;
 
     xmlIndentTreeOutput = LOGICAL_DATA(sindent)[0];
+
+    if(GET_LENGTH(prefix) == 3) {
+	fprintf(stderr, "setting DTD\n");fflush(stderr);
+	dtd = xmlNewDtd(doc, ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 0))), 
+                             ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 1))), 
+     	                     ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 2))));
+	dtd->parent = doc;
+	dtd->doc = doc;
+
+	dtd->prev = doc->children->prev;
+	dtd->next = doc->children;
+	doc->children->prev = (xmlNodePtr) dtd;
+
+	doc->children = (xmlNodePtr) dtd;
+    }
 
     /* Figure out what the name of the file is, or if it is NULL. */
     if(GET_LENGTH(sfileName))
@@ -309,6 +335,15 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 #else
 	xmlDocDumpMemory(doc, &mem, &size); 
 #endif
+
+	if(dtd) {
+	    xmlNodePtr tmp;
+	    doc->extSubset  = NULL;
+            tmp = doc->children->next;
+	    tmp->prev = NULL;
+            doc->children = tmp;
+	    xmlFreeDtd(dtd);
+	}
 
         SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(mem)); 
         xmlFree(mem);
