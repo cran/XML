@@ -1,5 +1,6 @@
 \name{asXMLNode}
 \alias{asXMLNode}
+\alias{coerce,XMLInternalNode,XMLNode-method}
 \title{Converts non-XML node objects to XMLTextNode objects}
 \description{
  This function is used to convert S objects that
@@ -7,6 +8,11 @@ are not already \code{XMLNode} objects
 into objects of that class. Specifically,
 it treats  the object as a string and creates
 an \code{XMLTextNode} object.
+
+ Also, there is a method for converting an XMLInternalNode
+ - the C-level libxml representation of a node - to 
+ an explicit R-only object which contains the R values
+ of the data in the internal node.
 }
 \usage{
 asXMLNode(x)

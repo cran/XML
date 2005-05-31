@@ -1,0 +1,31 @@
+\name{XMLNode-class}
+\docType{class}
+\alias{XMLNode-class}
+\alias{XMLInternalNode-class}
+
+\title{Classes to describe an XML node object.}
+\description{These classes are intended to 
+represent an XML node, either directly in S or a reference to an internal
+ libxml node.  Such nodes respond to queries about 
+ their name, attributes, namespaces and children.  
+ These are old-style, S3 classes at present.
+}
+\section{Slots}{
+  \describe{
+  }
+}
+\section{Methods}{
+No methods defined with class "XMLNode" in the signature.
+}
+
+\references{\url{http://www.w3.org/XML}, \url{http://www.xmlsoft.org}}
+\author{Duncan Temple Lang}
+
+\seealso{
+ \code{\link{xmlTreeParse}}
+ \code{\link{xmlTree}}
+}
+\examples{
+  
+}
+\keyword{classes}

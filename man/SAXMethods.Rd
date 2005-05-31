@@ -6,6 +6,12 @@
 \alias{processingInstruction.SAX}
 \alias{entityDeclaration.SAX}
 \alias{.InitSAXMethods}
+\alias{text.SAX,ANY,SAXState-method}
+\alias{comment.SAX,ANY,SAXState-method}
+\alias{endElement.SAX,ANY,SAXState-method}
+\alias{startElement.SAX,ANY,ANY,SAXState-method}
+\alias{processingInstruction.SAX,ANY,ANY,SAXState-method}
+\alias{entityDeclaration.SAX,ANY,ANY,ANY,ANY,ANY,SAXState-method}
 \title{Generic Methods for SAX callbacks}
 \description{
   This is a collection of generic functions
