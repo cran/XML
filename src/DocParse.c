@@ -658,6 +658,7 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 
     PROTECT(ans = NEW_LIST(n));
     PROTECT(elNames = NEW_CHARACTER(n));
+
     unProtect = 2;
 
     for(i = 0; i < n; i++, c = c->next) {
@@ -665,7 +666,8 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 	if(tmp && tmp != NULL_USER_OBJECT) {
 	    SET_VECTOR_ELT(ans, count, tmp); 
 	    if(c->name)
-		SET_STRING_ELT(elNames, count++, COPY_TO_USER_STRING(c->name));
+		SET_STRING_ELT(elNames, count, COPY_TO_USER_STRING(c->name));
+            count++;
 	}
     }
 

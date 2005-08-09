@@ -1,3 +1,8 @@
+Version 0.97-8
+
+  *  Fix error where CDATA nodes and potentially other types of nodes (without element names) were being 
+     omitted from the R tree in a simple call to xmlTreeParse("filename") (i.e. with no handlers).
+
 Version 0.97-7
 
   *  Documentation updates.
