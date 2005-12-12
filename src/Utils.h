@@ -9,6 +9,8 @@
 #include "RSCommon.h"
 
 
+#define XMLCHAR_TO_CHAR(val)  ((char *) val)
+
 int isBlank(const char *str);
 char *trim(char *str);
 
@@ -17,6 +19,8 @@ USER_OBJECT_ RS_XML(findFunction)(const char *opName, USER_OBJECT_ functions);
 
 void RS_XML(SetNames)(int n, const char *cnames[], USER_OBJECT_ ans);
 int RS_XML(SetClassName)(const char *name, USER_OBJECT_ target);
+
+SEXP R_makeRefObject(void *ref, const char *className);
 
 #ifndef SET_CLASS_NAME
 #define SET_CLASS_NAME(localClassName, target)  RS_XML(SetClassName)((localClassName), (target))
@@ -45,11 +49,18 @@ USER_OBJECT_ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
 			    USER_OBJECT_ asText, USER_OBJECT_ isURL);
 USER_OBJECT_ RS_XML(libxmlVersion)();
 
+
+USER_OBJECT_ 
+RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
+               USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
+                 USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
+                  USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion);
+/*
 USER_OBJECT_ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
 			   USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
 			   USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
-			   USER_OBJECT_ replaceEntities);
-
+			   USER_OBJECT_ replaceEntities, USER_OBJECT_ validate);
+*/
 
 USER_OBJECT_
 RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions, 
@@ -57,7 +68,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 		  USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ validate,
 		  USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
 		  USER_OBJECT_ addNamespaceAttributes, USER_OBJECT_ useInternalNodes,
-                   USER_OBJECT_ s_useHTML);
+		  USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema);
 
 USER_OBJECT_ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID);
 USER_OBJECT_ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces);

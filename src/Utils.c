@@ -256,3 +256,32 @@ RS_XML(findFunction)(const char *opName, USER_OBJECT_ _userObject)
   }
   return(fun);
 }          
+
+
+
+
+SEXP 
+R_makeRefObject(void *ref, const char *className)
+{
+   SEXP klass, obj, sref;
+
+   if(!ref) {
+      PROBLEM "NULL value for external reference"
+      WARN;
+      return(R_NilValue);
+   }
+
+   PROTECT(klass = MAKE_CLASS((char *) className)); /* XXX define MAKE_CLASS with const */
+   if(klass == R_NilValue) { /* Is this the right test? */
+      PROBLEM "Cannot find class %s for external reference", className
+      ERROR;
+   }
+   PROTECT(obj = NEW_OBJECT(klass));
+   PROTECT(sref = R_MakeExternalPtr(ref, Rf_install(className), R_NilValue));
+
+   obj = SET_SLOT(obj, Rf_install("ref"), sref);
+
+   UNPROTECT(3);
+   return(obj);
+}
+

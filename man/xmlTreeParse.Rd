@@ -12,7 +12,7 @@
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
               asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
                isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-               useInternalNodes = FALSE)
+               useInternalNodes = FALSE, isSchema = FALSE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
                isURL = FALSE, asTree = FALSE, 
@@ -94,7 +94,14 @@ return type.
   However, since the objects refer to volatile C-level objects,
   one cannot store these nodes for use in further computations within R.
   They \dQuote{disappear} after the processing the XML document is completed.
-  }
+
+  If this argument is \code{TRUE} and no handlers are provided, the
+  return value is a reference to the internal C-level document pointer.
+  This can be used to do post-processing via XPath expressions using
+  \code{\link{getNodeSet}}.
+}
+\item{isSchema}{a logical value indicating whether the document
+   is an XML schema (\code{TRUE}) and should be parsed as such.}
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -176,7 +183,7 @@ and another for entities. See \code{\link{parseDTD}}.
 }
 \references{\url{http://xmlsoft.org}, 
 \url{http://www.w3.org/xml}}
-\author{Duncan Temple Lang}
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 \note{Make sure that the necessary 3rd party libraries are available.}
 
 \seealso{ \link{xmlEventParse} }

@@ -19,6 +19,9 @@
 
 #include <stdarg.h>
 
+
+#include <libxml/xmlschemas.h>
+
 int RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans);
 USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *parserSettings);
 
@@ -29,6 +32,32 @@ void RS_XML(ValidationError)(void *ctx, const char *msg, ...);
 
 static USER_OBJECT_ convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings);
 static void NodeTraverse(xmlNodePtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *parserSettings);
+
+
+static USER_OBJECT_ makeSchemaReference(xmlSchemaPtr ref);
+
+
+USER_OBJECT_
+RS_XML(getDefaultValiditySetting)(USER_OBJECT_ val)
+{
+#ifdef HAVE_VALIDITY
+
+ extern int xmlDoValidityCheckingDefaultValue;
+ USER_OBJECT_ ans;
+ ans = NEW_INTEGER(1);
+ INTEGER_DATA(ans)[0] = xmlDoValidityCheckingDefaultValue;
+
+  if(GET_LENGTH(val))
+     xmlDoValidityCheckingDefaultValue = INTEGER_DATA(val)[0];
+  return(ans);
+
+#else
+
+  return(NEW_INTEGER(0));
+
+#endif
+}
+
 
 /**
   Entry point for reading, parsing and converting an XML tree
@@ -61,11 +90,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                       USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
                        USER_OBJECT_ addNamespaceAttributes,
                         USER_OBJECT_ internalNodeReferences, 
-                        USER_OBJECT_ s_useHTML)
+   	     	         USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema)
 {
-#ifdef HAVE_VALIDITY
-extern int xmlDoValidityCheckingDefaultValue;
-#endif
 
   char *name;
   xmlDocPtr doc;
@@ -88,12 +114,6 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 
 
-#ifdef HAVE_VALIDITY
-  previousValiditySetting = xmlDoValidityCheckingDefaultValue;
-
-   /* Control whether we are validating or not. */
-  xmlDoValidityCheckingDefaultValue = LOGICAL_DATA(validate)[0];
-#endif
 
 
   if(asTextBuffer == 0) {
@@ -104,19 +124,30 @@ extern int xmlDoValidityCheckingDefaultValue;
    name = CHARACTER_DATA(fileName)[0];
 #endif
     if(!isURLDoc && (name == NULL || stat(name, &tmp_stat) < 0)) {
-#ifdef HAVE_VALIDITY
-      xmlDoValidityCheckingDefaultValue = previousValiditySetting;
-#endif
       PROBLEM "Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0))
       ERROR;
     }
   } else {
+/* XXX take care of freeing this. */
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
   }
 
     /* If one wants entities expanded directly and to appear as text.  */
   if(LOGICAL_DATA(replaceEntities)[0]) 
       xmlSubstituteEntitiesDefault(1);   
+
+
+  if(LOGICAL_DATA(isSchema)[0]) {
+      xmlSchemaPtr schema = NULL;
+      xmlSchemaParserCtxtPtr ctxt;
+
+      ctxt = xmlSchemaNewParserCtxt(name);
+      schema = xmlSchemaParse(ctxt);
+
+/*XXX make certain to cleanup the settings. */
+      return(makeSchemaReference(schema));
+
+  }
 
   if(asTextBuffer) {
    doc = useHTML ? htmlParseDoc(name, NULL) : xmlParseMemory(name, strlen(name));
@@ -126,10 +157,6 @@ extern int xmlDoValidityCheckingDefaultValue;
   } else {
    doc = useHTML ? htmlParseFile(name, NULL) : xmlParseFile(name);
   }
-
-#ifdef HAVE_VALIDITY
-  xmlDoValidityCheckingDefaultValue = previousValiditySetting;
-#endif
 
   if(doc == NULL) {
     PROBLEM "error in creating parser for %s", name
@@ -184,6 +211,11 @@ extern int xmlDoValidityCheckingDefaultValue;
 
       UNPROTECT(2); /* release the ans */
       rdoc = ans;
+  }
+
+  if(parserSettings.internalNodeReferences && GET_LENGTH(converterFunctions) < 1) {
+     UNPROTECT(1);
+     return(R_createXMLDocRef(doc));
   }
 
   xmlFreeDoc(doc);
@@ -842,20 +874,31 @@ notifyError(const char *msg, va_list ap, Rboolean isError)
 
 
 void
-RS_XML(ValidationError)(void *ctx, const char *msg, ...)
+RS_XML(ValidationError)(void *ctx, const char *format, ...)
 {
+  char *msg = "Message unavailable";
   va_list(ap);
-  va_start(ap, msg);
+  va_start(ap, format);
+
+  if(strcmp(format, "%s") == 0)
+    msg = va_arg(ap, char *);
+
+  va_end(ap);
   notifyError(msg, ap, TRUE);
 }
 
 void
-RS_XML(ValidationWarning)(void *ctx, const char *msg, ...)
+RS_XML(ValidationWarning)(void *ctx, const char *format, ...)
 {
+  char *msg = "Message unavailable";
   va_list(ap);
-  va_start(ap, msg);
-  notifyError(msg, ap, FALSE);
+  va_start(ap, format);
+
+  if(strcmp(format, "%s") == 0)
+    msg = va_arg(ap, char *);
+
   va_end(ap);
+  notifyError(msg, ap, FALSE);
 }
 
 
@@ -943,5 +986,20 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
     UNPROTECT(1);
    
     return(ans);
+}
+
+
+
+static USER_OBJECT_
+makeSchemaReference(xmlSchemaPtr schema)
+{
+    return(R_makeRefObject(schema, "xmlSchemaRef"));
+/*
+    USER_OBJECT_ ans;
+    PROTECT(ans = R_MakeExternalPtr(schema, Rf_install("XMLSchema"), R_NilValue));
+    SET_CLASS(ans, mkString("XMLSchema"));
+    UNPROTECT(1);
+    return(ans);
+*/
 }
 

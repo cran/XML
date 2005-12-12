@@ -235,8 +235,28 @@ xmlElementsByTagName <-
 # Extract all the sub-nodes within an XML node
 # with the tag name `name'.
 #
-function(el, name) {
-  idx <-  (names(el$children) == name)
-      el$children[idx]
-}
+function(el, name, recursive = FALSE) {
+
+    idx <-  (names(el$children) == name)
+    els = el$children[idx]
+
+    if(!recursive  || xmlSize(el) == 0)
+      return(els)
+    
+    subs = xmlApply(el, xmlElementsByTagName, name, TRUE)
+    subs = unlist(subs, recursive = FALSE)
+    
+    append(els, subs[!sapply(subs, is.null)])
+  }
+
+
+
+getNodeSet =
+function(doc, path, namespaces = character())
+{
+  if(!is.character(namespaces) || ( length(namespaces) > 0 && length(names(namespaces)) == 0))
+     stop("Namespaces must be a named character vector")
+
+  .Call("RS_XML_xpathEval", doc, as.character(path), namespaces)
+}  
 

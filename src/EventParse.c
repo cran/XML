@@ -28,8 +28,6 @@ static void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
 
  */
 
-extern void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, int asText);
-
 typedef Rboolean Sboolean;
 
 Sboolean
@@ -53,7 +51,7 @@ USER_OBJECT_
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
-                  USER_OBJECT_ replaceEntities)
+                  USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -63,6 +61,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   RS_XML_ContentSourceType asTextBuffer;
   RS_XMLParserData *parserData;
   USER_OBJECT_ ans;
+
 
   if(IsConnection(fileName) || isFunction(fileName))
      asTextBuffer = RS_XML_CONNECTION;
@@ -105,6 +104,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
     R_PreserveObject(parserData->stateObject);
 
+
 #ifdef LIBEXPAT
   if(expat) {
       if(asTextBuffer == 0) {
@@ -122,8 +122,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
       xmlSubstituteEntitiesDefault(1);   
 
 
-  RS_XML(libXMLEventParse)(input, parserData, asTextBuffer);
-
+  RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0]);
 
   ans = parserData->stateObject ? parserData->stateObject : handlers;
   free(parserData->fileName);

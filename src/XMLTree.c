@@ -236,7 +236,7 @@ R_createXMLDocRef(xmlDocPtr doc)
 {
   SEXP ref, tmp;
 
-  PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), NULL));
+  PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
   SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLInternalDocument"));
   SET_CLASS(ref, tmp);
@@ -252,7 +252,7 @@ R_createXMLNodeRef(xmlNodePtr node)
 {
   SEXP ref, tmp;
 
-  PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), NULL));
+  PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
   SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLInternalNode"));
   SET_CLASS(ref, tmp);

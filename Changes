@@ -1,3 +1,64 @@
+Version 0.99-2
+ 
+  * Problems compiling with libxml2-2.5.11 and libxml2-2.6.{1,2}, so 
+    we now test for a recent version of libxml. The test uses sed -r
+    which may cause problems. If one really wants to avoid the tests
+    set the environment variable FORCE_XML2 to any value before running
+    R CMD INSTALL XML.
+
+  * Documentation for getNodeSet() didn't refer to the new namespaces argument.
+
+Version 0.99-1
+
+  * getNodeSet() takes a namespaces argument which is named character vector of 
+    prefix = URI pairs of namespaces used in the XPath expression.
+ 
+  * Handlers for xmlEventParse() can include startDocument and endDocument elements
+    to catch those particular events. Useful for closing connections and general cleanup,
+    especially in the "pull" data source, i.e. connections or functions.
+
+  * xmlEventParse() when called with a function as the data source now doesn't have 
+    a new line appended to each string returned to the parser by the function.
+
+  * Passing a connection to xmlEventParse() now uses a regular R function to call
+    readLines(con, 1) and no longer does this via C code to call readLines().
+
+  * Fix to the example in xmlEventParse() using the state variable.
+
+Version 0.99-0
+
+  * Implementation for the endElement in the xmlEventParse() for saxVersion == 2.
+
+  * In xmlEventParse( , saxVersion = 2), the namespaces come as a named vector
+    in the fourth argument.
+
+Version 0.98-1
+
+  * Messages from errors are now more informative. Using saxVersion = 2 in xmlEventParse(), you get
+    get the line and column information about the error.  
+
+Version 0.98
+
+  * Added saxVersion parameter to xmlEventParse() to control which interface is used at the C level.
+    This changes the arguments to the startElement handler, adding the namespace for the 
+    element.
+
+  * Added xmlValidity() function to set the value of the default validity action.  This allows us to do the
+    setting in the R code. This is currently not exported.
+
+  * Added recursive parameter to xmlElementsByTagName() function. This provides functionality
+    similar to getElementsByTagName() in XML parsing APIs for other languages.
+
+  * xmlTreeParse() called with no handlers and useInternalNodes returns a reference to the 
+    C-level xmlDocPtr instance.  This is an object of class "XMLInternalDocument". This can be 
+    used in much the same way as the regular "XMLDocument" tree returned by xmlTreeParse,
+    e.g. xmlRoot, etc.
+
+  * Added getNodeSet() to evaluate XPath expressions on an XMLInternalDocument object.
+
+  * Added a validate parameter to the xmlEventParse() function.
+
+
 Version 0.97-8
 
   *  Fix error where CDATA nodes and potentially other types of nodes (without element names) were being 
@@ -14,7 +75,7 @@ Version 0.97-6
     R objects for each handler function call.  Also, can access parents, siblings,
     etc. from within a handler function.
 
-  * Included parameterizations for Windows from Uwe Ligges to aid automate-building
+  * Included parameterizations for Windows from Uwe Ligges to aid automated-building
     and finding the libxml DLL at run time.
 
 Version 0.97-5
@@ -158,7 +219,7 @@ Version 0.93-0
 
 Version 0.92-2
 
-  *   Fixed C bug caused by using namespace without a prefix,
+  *   Fixed C bug caused by using namespace without a suffix,
       e.g. xmlns="http:...." assumed prefix was present.
       Thanks to David Meyer.
   

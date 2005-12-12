@@ -17,7 +17,8 @@
 \usage{
 xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext=TRUE,
                useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
-                state = NULL, replaceEntities = TRUE)
+                state = NULL, replaceEntities = TRUE, validate = FALSE,
+                 saxVersion = 1)
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -42,7 +43,7 @@ xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext
     more input.
 
     If invoking the \code{readLines} function to get each line is
-    excessively slow, one can provide a function as the value
+    excessively slow or is inappropriate, one can provide a function as the value
     of \code{fileName}. Again, when the XML parser needs more content
     to process, it invokes this function to get a string.
     This function is called with a single argument, the maximum size
@@ -64,9 +65,10 @@ as the XML components in the document are encountered by the parser.
 \code{startElement()}, \code{endElement()}
 \code{comment()}, \code{externalEntity()},
 \code{entityDeclaration()}, \code{processingInstruction()},
-\code{text()}, \code{cdata()}.
+\code{text()}, \code{cdata()},
+\code{startDocument()}, and \code{endDocument()}.
   }
- \item{ignoreBlanks}{ logical value indicating whether
+ \item{ignoreBlanks}{a logical value indicating whether
 text elements made up entirely of white space should be included
 in the resulting `tree'. }
  \item{addContext}{ logical value indicating whether the callback functions 
@@ -116,14 +118,41 @@ If this is True, each callback function  should support
   If this not specified in the call to \code{xmlEventParse},
   no \code{.state} argument is passed to the callbacks. This makes the
   interface compatible with previous releases.
-  .}
+  }
   \item{replaceEntities}{
    logical value indicating whether to substitute entity references
     with their text directly. This should be left as False.
     The text still appears as the value of the node, but there
     is more information about its source, allowing the parse to be reversed
     with full reference information.
-    }
+  }
+  \item{saxVersion}{an integer value which should be either 1 or 2.
+    This specifies which SAX interface to use in the C code.
+    The essential difference is the number of arguments passed to the
+    \code{startElement} handler function(s).  In addition to the name of
+    the element and the named-attributes vector, two additional arguments
+    are provided.
+    The first identifies the namespace of the element.
+    This is a named character vector of length 1,
+    with the value being the URI of the namespace and the name
+    being the prefix that identifies that namespace within the document.
+    For example, \code{xmlns:r="http://www.r-project.org"}
+    would be passed as \code{c(r = "http://www.r-project.org")}.
+    If there is no prefix because the namespace is being used as the
+    default, the result of calling \code{\link[base]{names}} on
+    the string is \code{""}.
+    The fourth argument gives the collection of all the namespaces
+    defined within this element.
+    Again, this is a named character vector.
+  }
+  \item{validate}{
+  Currently, this has no effect as the libxml2 parser uses a
+  document structure to do validation.
+  a logical indicating whether to use a validating parser or not, or in other words
+  check the contents against the DTD specification. If this is true, warning
+  messages will be displayed about errors in the DTD and/or document, but the parsing 
+  will proceed except for the presence of terminal errors.
+}
 }
 \details{
  This is now implemented using the libxml parser.
@@ -155,7 +184,9 @@ to connect to remote servers.
    # tag.
    # Uses the libxml SAX parser.
  xmlEventParse(fileName,
-                list(startElement=function(name, attrs){cat(name,"\n")}),
+                list(startElement=function(name, attrs){
+                                    cat(name,"\n")
+                                  }),
                 useTagName=FALSE, addContext = FALSE)
 
 
@@ -167,14 +198,29 @@ xmlText <- paste(scan(xmlURL, what="",sep="\n"),"\n",collapse="\n")
 xmlEventParse(xmlText, asText=TRUE)
 }
 
- # Using a state object to share mutable data across callbacks
+    # Using a state object to share mutable data across callbacks
 f <- system.file("exampleData", "gnumeric.xml", package = "XML")
 zz <- xmlEventParse(f,
-                    handlers = list(startElement=function(name, atts,.state) {
-                                                     state = .state + 1
+                    handlers = list(startElement=function(name, atts, .state) {
+                                                     .state = .state + 1
                                                      print(.state)
-                                                     .state}), state = 0)
+                                                     .state
+                                                 }), state = 0)
 print(zz)
+
+
+
+
+    # Illustrate the startDocument and endDocument handlers.
+xmlEventParse(fileName,
+               handlers = list(startDocument = function() {
+                                                 cat("Starting document\n")
+                                               },
+                               endDocument = function() {
+                                                 cat("ending document\n")
+                                             }),
+               saxVersion = 2)
+
 
 
 
@@ -187,6 +233,7 @@ if(libxmlVersion()$major >= 2) {
  xmlEventParse(file(f), handlers = list(startElement = startElement))
 
 
+ # Parse with a function providing the input as needed.
  xmlConnection = 
   function(con) {
 
@@ -218,13 +265,32 @@ if(libxmlVersion()$major >= 2) {
       return(tmp)
   
     x = paste(x, collapse="")
-    print(x)
+
     x
   }
  }
 
  ff = xmlConnection(f)
  xmlEventParse(ff, handlers = list(startElement = startElement))
+
+  # Parse from a connection. Each time the parser needs more input, it
+  # calls readLines(<con>, 1)
+ xmlEventParse(file(f),  handlers = list(startElement = startElement))
+
+
+  # using SAX 2
+ h = list(startElement = function(name, attrs, namespace, allNamespaces){ 
+                                 cat("Starting", name,"\n")
+                                 if(length(attrs))
+                                     print(attrs)
+                                 print(namespace)
+                                 print(allNamespaces)
+                         },
+          endElement = function(name, uri) {
+                          cat("Finishing", name, "\n")
+            }) 
+ xmlEventParse(system.file("exampleData", "namespaces.xml", package="XML"), handlers = h, saxVersion = 2)
+
 }
 }
 \keyword{file}

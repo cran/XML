@@ -1,6 +1,65 @@
 # Avoided if we are using Windows so that we can specify the directory to find the libxml DLL.
 # useDynLib(XML)
-exportPattern(".*")
+
+#exportPattern(".*")
+#XXX "append.xmlNode"                         
+export(
+ Doctype,
+ asXMLNode,
+ comment.SAX,
+ dtdElement,
+ dtdElementValidEntry,
+ dtdEntity,
+ dtdIsAttribute,
+ dtdValidElement,
+ endElement.SAX,
+ entityDeclaration.SAX,
+ genericSAXHandlers,
+ getNodeSet,
+ htmlTreeParse,
+ libxmlVersion,
+ newXMLDoc,
+ newXMLNode,
+ parseDTD,
+ processingInstruction.SAX,
+ saveXML,
+ startElement.SAX,
+ supportsExpat,
+ supportsLibxml,
+ text.SAX,
+ toString.XMLNode,
+ xmlApply,
+ xmlAttributeType,
+ xmlAttrs,
+ xmlCDataNode,
+ xmlChildren,
+ xmlCommentNode,
+ xmlContainsElement,
+ xmlContainsEntity,
+ xmlDOMApply,
+ xmlElementsByTagName,
+ xmlEventHandler,
+ xmlEventParse,
+ xmlGetAttr,
+ xmlHandler,
+ xmlName,
+ xmlNamespace,
+ xmlNode,
+ xmlOutputBuffer,
+ xmlOutputDOM,
+ xmlPINode,
+ xmlParent,
+ xmlRoot,
+ xmlSApply,
+ xmlSize,
+ xmlSize.default,
+ xmlTextNode,
+ xmlTree,
+ xmlTreeParse,
+ xmlValue)
+
+
+
 
 
 S3method(xmlChildren, XMLNode)
@@ -21,6 +80,8 @@ S3method(names, XMLNode)
 S3method(length, XMLNode)
 
 S3method(xmlAttrs, XMLNode)
+S3method(xmlAttrs, XMLInternalNode)
+S3method(xmlAttrs, XMLElementDef)
 
 S3method(xmlSize, XMLDocument)
 S3method(xmlSize, default)
@@ -68,7 +129,19 @@ S3method(dtdElementValidEntry, character)
 S3method(dtdElementValidEntry, XMLSequenceContent)
 
 
+# Not yet exported....
+#xmlValidity
 
 
 
+if(FALSE) {
+exportClasses("ExternalReference", "xmlSchemaRef", "libxmlTypeTable")
+exportClasses("SchemaElementTable", "xmlSchemaElementRef",
+              "SchemaTypeTable", "xmlSchemaTypeRef",
+	      "SchemaAttributeTable", "xmlSchemaAttributeRef",
+               "SchemaAttributeGroupTable", "xmlSchemaAttributeGroupRef",
+              "SchemaNotationTable", "xmlSchemaNotationRef"
+)
 
+exportMethods("names", "$", "$<-", "coerce")
+}

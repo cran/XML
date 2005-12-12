@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP XML_CONFIG EGREP DUMP_WITH_ENCODING UNAME LIBXML2 LANGUAGE_DEFS LIBXML_INCDIR XMLPARSE_INCDIR PKG_LIBS PKG_CPPFLAGS SUPPORTS_LIBXML SUPPORTS_EXPAT LD_PATH SPLUS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP SED XML_CONFIG EGREP DUMP_WITH_ENCODING UNAME LIBXML2 LANGUAGE_DEFS LIBXML_INCDIR XMLPARSE_INCDIR PKG_LIBS PKG_CPPFLAGS SUPPORTS_LIBXML SUPPORTS_EXPAT LD_PATH SPLUS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2460,12 +2460,59 @@ fi  # end of USE_SPLUS.
 
 
 
+for ac_prog in sed
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_SED+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $SED in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_SED="$SED" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_SED="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+SED=$ac_cv_path_SED
+
+if test -n "$SED"; then
+  echo "$as_me:$LINENO: result: $SED" >&5
+echo "${ECHO_T}$SED" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$SED" && break
+done
+
+
+
+
 if test -n "${USE_LIBXML}" ; then
 
      if test -n "${XML_CONFIG}" && test -x "${XML_CONFIG}" ; then
     USING_USER_XML_CONFIG="yes"
 
-    XML_VERSION="`${XML_CONFIG} --version | sed -e 's/\..*//g'`"
+    XML_VERSION="`${XML_CONFIG} --version | ${SED} -e 's/\..*//g'`"
     if test "${XML_VERSION}" = "2" ; then
        USE_XML2="yes"
        LIBXML2="-DLIBXML2=1";
@@ -2631,14 +2678,38 @@ done
          echo "Cannot find xml2-config"
          exit 1
        else
-         echo "Using libxml version 2."
+         echo "Using libxml version `$XML_CONFIG --version`"
        fi
      fi
    fi
 
-
-
    if test -n "${XML_CONFIG}" ; then
+
+       echo "USE_XML2 = ${USE_XML2}"
+       if test "${USE_XML2}" != "no" && test -z "${FORCE_XML2}"; then
+
+         MINOR=`${XML_CONFIG} --version | ${SED} -re  's/^2\.([0-9]+).*/\1/'`
+         PATCH=`${XML_CONFIG} --version | ${SED} -re  's/^2\.[0-9]+\.([0-9]+)$/\1/'`
+
+         echo "Minor $MINOR, Patch $PATCH for `$XML_CONFIG --version`"
+         if test $MINOR -lt 6 ;  then
+           echo ""
+           echo "****    You should use a recent version of libxml2, i.e. 2.6.22 or higher  ****"
+           echo ""
+           exit 1
+         fi
+
+         if test "$PATCH" -lt 3 ; then
+            echo ""
+            echo "**** There are problems compiling this package with libxml2-2.6.1 or libmxml2-2.6.2.  ****"
+            echo "**** You will probably encounter compilation errors, so we are terminating the build.  ****"
+            echo ""
+            exit 1
+         fi
+
+       fi
+
+
        LIBXML_INCDIR=`${XML_CONFIG} --cflags`
        LIBXML_LIBDIR=`${XML_CONFIG} --libs`
        FOUND_LIBXML_INCLUDES="Ok"
@@ -5641,6 +5712,7 @@ s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
+s,@SED@,$SED,;t t
 s,@XML_CONFIG@,$XML_CONFIG,;t t
 s,@EGREP@,$EGREP,;t t
 s,@DUMP_WITH_ENCODING@,$DUMP_WITH_ENCODING,;t t

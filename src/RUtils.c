@@ -99,8 +99,8 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_HtmlParseTree, 7),
 	ENTRY(RS_XML_getDTD, 4),
 	ENTRY(RS_XML_libxmlVersion, 0),
-	ENTRY(RS_XML_Parse, 10),
-	ENTRY(RS_XML_ParseTree, 12),
+	ENTRY(RS_XML_Parse, 12),
+	ENTRY(RS_XML_ParseTree, 13),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
 	ENTRY(R_newXMLNode, 4),
@@ -126,4 +126,5 @@ R_init_XML(DllInfo *dll)
    R_useDynamicSymbols(dll, FALSE);
    R_registerRoutines(dll, cmethods, callMethods, NULL, NULL);
 }
+
 

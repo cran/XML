@@ -95,8 +95,12 @@ if test -n "${USE_SPLUS}" ; then
  fi
 fi  # end of USE_SPLUS.
 
+
+
+
 dnl ======================================================
 
+AC_PATH_PROGS(SED, sed)
 
 dnl In this section, we try to find the different
 dnl characteristics of the libxml library.
@@ -113,7 +117,7 @@ if test -n "${USE_LIBXML}" ; then
   if test -n "${XML_CONFIG}" && test -x "${XML_CONFIG}" ; then
     USING_USER_XML_CONFIG="yes"
 
-    XML_VERSION="`${XML_CONFIG} --version | sed -e 's/\..*//g'`"
+    XML_VERSION="`${XML_CONFIG} --version | ${SED} -e 's/\..*//g'`"
     if test "${XML_VERSION}" = "2" ; then
        USE_XML2="yes"
        LIBXML2="-DLIBXML2=1";
@@ -159,14 +163,38 @@ if test -n "${USE_LIBXML}" ; then
          echo "Cannot find xml2-config"
          exit 1
        else
-         echo "Using libxml version 2."
+         echo "Using libxml version `$XML_CONFIG --version`"
        fi
      fi
    fi
 
-
-
    if test -n "${XML_CONFIG}" ; then
+
+       echo "USE_XML2 = ${USE_XML2}"
+       if test "${USE_XML2}" != "no" && test -z "${FORCE_XML2}"; then
+
+         MINOR=`${XML_CONFIG} --version | ${SED} -re  's/^2\.([[0-9]]+).*/\1/'`
+         PATCH=`${XML_CONFIG} --version | ${SED} -re  's/^2\.[[0-9]]+\.([[0-9]]+)$/\1/'`
+
+         echo "Minor $MINOR, Patch $PATCH for `$XML_CONFIG --version`"
+         if test $MINOR -lt 6 ;  then
+           echo ""
+           echo "****    You should use a recent version of libxml2, i.e. 2.6.22 or higher  ****"
+           echo ""
+           exit 1
+         fi
+
+         if test "$PATCH" -lt 3 ; then
+            echo ""
+            echo "**** There are problems compiling this package with libxml2-2.6.1 or libmxml2-2.6.2.  ****"
+            echo "**** You will probably encounter compilation errors, so we are terminating the build.  ****"
+            echo ""
+            exit 1
+         fi
+        
+       fi
+
+
        LIBXML_INCDIR=`${XML_CONFIG} --cflags`
        LIBXML_LIBDIR=`${XML_CONFIG} --libs`   
        FOUND_LIBXML_INCLUDES="Ok"
