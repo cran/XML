@@ -56,21 +56,22 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
  function(node) {
    kall <- getCurrentExpr()
   if(length(current) > 0){
-   lhs <- kall
-   kall <- call("append.xmlNode", kall, node)
-   kall <- call("<<-", lhs, kall)
+     lhs <- kall
+     kall <- call("append.xmlNode", kall, node)
+     kall <- call("<<-", lhs, kall)
   } else {
-   kall <- call("append.xmlNode", kall, node)
+     kall <- call("append.xmlNode", kall, node)
   }
-   val <- eval(kall) 
-   if(length(current) == 0)
+
+  val <- eval(kall) 
+  if(length(current) == 0)
      buf <<- val
 
   invisible(node)
  }
 
  addComment <- function(...) {
-    addNode(xmlCommentNode(paste(as.character(), sep="")))
+    addNode(xmlCommentNode(paste(sapply(list(...), as.character), sep="")))
  }
 
  addCData <- function(text) {

@@ -185,7 +185,7 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
 
   switch(asText) {
     case RS_XML_TEXT:
-      ctx = xmlCreateDocParserCtxt((char *)fileName);
+      ctx = xmlCreateDocParserCtxt(CHAR_TO_XMLCHAR(fileName));
       break;
 
     case RS_XML_FILENAME:
@@ -245,7 +245,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
 
   PROTECT(opArgs = NEW_LIST(4));
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
-  SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(localname)); 
+  SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(localname))); 
 
       /* Now convert the attributes list. */
   SET_VECTOR_ELT(opArgs, 1, createSAX2AttributesList(attributes, nb_attributes, nb_defaulted));
@@ -253,7 +253,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
 
   PROTECT(tmp = NEW_CHARACTER(1));
   if(URI) {
-     SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(URI)); 
+     SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(URI))); 
      SET_NAMES(tmp, mkString((void*)prefix ? XMLCHAR_TO_CHAR(prefix) : "")); /*XXX not S-Plus compatible!*/
   }
   SET_VECTOR_ELT(opArgs, 2, tmp);
@@ -263,16 +263,16 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   PROTECT(tmp = NEW_CHARACTER(n));
   PROTECT(names = NEW_CHARACTER(n));
   for(i = 0, n = 0; n < nb_namespaces; n++, i+=2) {
-      SET_STRING_ELT(tmp, n, COPY_TO_USER_STRING(namespaces[i+1]));
+      SET_STRING_ELT(tmp, n, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(namespaces[i+1])));
       if(namespaces[i])
-         SET_STRING_ELT(names, n, COPY_TO_USER_STRING(namespaces[i]));
+         SET_STRING_ELT(names, n, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(namespaces[i])));
   }
   SET_NAMES(tmp, names);
   SET_VECTOR_ELT(opArgs, 3, tmp);
   UNPROTECT(2);
 
 
-  RS_XML(callUserFunction)("startElement", localname, ((RS_XMLParserData*) userData), opArgs);
+  RS_XML(callUserFunction)("startElement", XMLCHAR_TO_CHAR(localname), ((RS_XMLParserData*) userData), opArgs);
 
   UNPROTECT(1);
 }
@@ -338,11 +338,11 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
   USER_OBJECT_ args, tmp;
 
   PROTECT(args = NEW_LIST(2));
-  SET_VECTOR_ELT(args, 0, mkString(localname));
+  SET_VECTOR_ELT(args, 0, mkString(XMLCHAR_TO_CHAR(localname)));
 
   PROTECT(tmp = mkString(( (XMLCHAR_TO_CHAR(URI)) ? XMLCHAR_TO_CHAR(URI) : ""))); 
   if(prefix)
-     SET_NAMES(tmp, mkString(prefix));
+     SET_NAMES(tmp, mkString(XMLCHAR_TO_CHAR(prefix)));
   SET_VECTOR_ELT(args, 1, tmp);
 
   RS_XML(callUserFunction)("endElement", NULL, (RS_XMLParserData *)ctx, args);
@@ -456,7 +456,7 @@ RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len)
 
  PROTECT(opArgs = NEW_LIST(1));
  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
-   SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(value));
+   SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(value)));
   RS_XML(callUserFunction)("cdata", (const char *)NULL, (RS_XMLParserData*)ctx, opArgs);
   UNPROTECT(1);
 }

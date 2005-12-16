@@ -10,6 +10,7 @@
 
 
 #define XMLCHAR_TO_CHAR(val)  ((char *) val)
+#define CHAR_TO_XMLCHAR(val)  ((xmlChar *) val)
 
 int isBlank(const char *str);
 char *trim(char *str);

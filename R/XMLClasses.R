@@ -158,16 +158,22 @@ function(obj)
 }
 
 
-print.XMLComment <-
-function(x, ..., indent = "")
+print.XMLComment <- print.XMLCommentNode <-
+function(x, ..., indent = "", tagSeparator = "\n")
 {
-  cat(indent, "<!--", xmlValue(x), "-->","\n", sep="")
+  if(is.logical(indent) && !indent)
+    indent <- ""
+  
+  cat(indent, "<!--", xmlValue(x), "-->", tagSeparator, sep="")
 }
 
 print.XMLTextNode <-
-function(x, ..., indent = "")
+function(x, ..., indent = "", tagSeparator = "\n")
 {
-  cat(indent, xmlValue(x),"\n", sep="")
+  if(is.logical(indent) && !indent)
+    indent <- ""
+  
+  cat(indent, xmlValue(x), tagSeparator, sep="")
 }  
 
 print.XMLNode <-
@@ -175,7 +181,7 @@ print.XMLNode <-
 # displays a node and attributes (and its children)
 # in its XML format.
 # 
-function(x, ..., indent = "")
+function(x, ..., indent = "", tagSeparator = "\n")
 {
  if(! is.null(xmlAttrs(x))) {
    tmp <- paste(names(xmlAttrs(x)),paste("\"", xmlAttrs(x),"\"", sep=""), sep="=", collapse=" ")
@@ -191,42 +197,60 @@ function(x, ..., indent = "")
  } else 
    ns <- ""
 
+
+   # Add one space to the indentation level for the children.
+   # This will accumulate across successive levels of recursion. 
+  subIndent <- paste(indent, " ", sep="")
+  if(is.logical(indent) && !indent) {
+    indent <- ""
+    subIndent <- FALSE
+  }
  
  cat(indent, paste("<",xmlName(x, TRUE),
-                     ifelse(tmp != ""," ",""), tmp,
-                     ifelse(ns != ""," ",""), ns,
-                   ">\n", sep=""))
-   # Add one space to the indentation level for the children.
-   # This will accumulate across successive levels of recursion.
-  subIndent <- paste(indent, " ", sep="")
-  for(i in xmlChildren(x)) {
-     print(i, indent= subIndent)
-  }
- cat(indent, paste("</",xmlName(x, TRUE),">\n",sep=""))
+                       ifelse(tmp != "", " ", ""), tmp,
+                       ifelse(ns != "", " ", ""), ns,
+                   ">",
+                   tagSeparator,
+                   sep=""), sep = "")
+ 
+
+  for(i in xmlChildren(x)) 
+     print(i, indent = subIndent, tagSeparator = tagSeparator)
+
+ cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, sep=""), sep = "")
 }
 
 print.XMLEntityRef <-
-function(x, ..., indent="")
+function(x, ..., indent="", tagSeparator = "\n")
 {
- cat(indent, x$value)
+  if(is.logical(indent) && !indent)
+    indent <- ""
+  
+  cat(indent, x$value)
 }
 
 
 
 print.XMLCDataNode <-
-function(x, ..., indent="")
+function(x, ..., indent="", tagSeparator = "\n")
 {
- cat(indent, "<![CDATA[\n")
+  if(is.logical(indent) && !indent)
+    indent <- ""
+  
+ cat(indent, "<![CDATA[", tagSeparator, sep = "")
    # Want new lines in value to be replaced by paste("\n", indent, sep="")
- cat(indent, x$value)
- cat(indent, "]]>\n")
+ cat(indent, x$value, sep = "")
+ cat(indent, "]]>", tagSeparator, sep = "")
 }
 
 
 print.XMLProcessingInstruction <-
-function(x, ..., indent="")
+function(x, ..., indent="", tagSeparator = "\n")
 {
- cat(indent, paste("<?", x$name," ", x$value, "?>\n", sep=""))
+  if(is.logical(indent) && !indent)
+    indent <- ""
+  
+ cat(indent, paste("<?", x$name," ", x$value, "?>", tagSeparator, sep=""), sep = "")
 }
 
 

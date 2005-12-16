@@ -127,7 +127,7 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
 
 
   if(localAsText) {
-    xmlCreateIntSubset(ctxt->myDoc, dtdName, NULL, NULL);
+    xmlCreateIntSubset(ctxt->myDoc, CHAR_TO_XMLCHAR(dtdName), NULL, NULL);
     while(ctxt->input->cur && ctxt->input->cur[0]) {
       SKIP_BLANKS;
       xmlParseMarkupDecl(ctxt);
@@ -136,11 +136,11 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
   }  else {
      /* Read the file. */
     /* Added for 2.2.12. May need to be conditional for 1.8.9 */
-    ctxt->sax->internalSubset(ctxt->userData, dtdName, extId, extId);
+    ctxt->sax->internalSubset(ctxt->userData, CHAR_TO_XMLCHAR(dtdName), CHAR_TO_XMLCHAR(extId), CHAR_TO_XMLCHAR(extId));
     /* Warnings will ensue about not being in internal subset if we don't go to level 2. */
 #ifdef USE_EXTERNAL_SUBSET
     ctxt->inSubset = 2;
-    ctxt->sax->externalSubset(ctxt->userData, dtdName, extId, extId);
+    ctxt->sax->externalSubset(ctxt->userData, CHAR_TO_XMLCHAR(dtdName), CHAR_TO_XMLCHAR(extId), CHAR_TO_XMLCHAR(extId));
     ctxt->inSubset = 0;
 #endif
     dtd = ctxt->myDoc->extSubset;
@@ -310,7 +310,7 @@ RS_xmlElementTableConverter(void *payload, void *data, xmlChar *name)
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
 
  SET_VECTOR_ELT(scanData->dtdEls, scanData->counter, RS_XML(createDTDElement)( payload));
- SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(name));
+ SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(name)));
 
  scanData->counter++;
 #ifndef NO_XML_HASH_SCANNER_RETURN
@@ -384,7 +384,7 @@ RS_xmlEntityTableConverter(void *payload, void *data, xmlChar *name)
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
 
  SET_VECTOR_ELT(scanData->dtdEls, scanData->counter, RS_XML(createDTDEntity)( payload));
- SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(name));
+ SET_STRING_ELT(scanData->dtdNames, scanData->counter, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(name)));
 
  scanData->counter++;
 #ifndef NO_XML_HASH_SCANNER_RETURN
@@ -419,7 +419,7 @@ RS_XML(createDTDEntity)(xmlEntityPtr entity)
   PROTECT(ans = NEW_LIST(DTD_ENTITY_NUM_SLOTS));
 
   SET_VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT, NEW_CHARACTER(1));
-   SET_VECTOR_ELT(VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT), 0, COPY_TO_USER_STRING(entity->name));
+   SET_VECTOR_ELT(VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(entity->name)));
 
    if(entity->content == NULL) {
      value = entity->SystemID;
@@ -430,11 +430,11 @@ RS_XML(createDTDEntity)(xmlEntityPtr entity)
    }
 
   SET_VECTOR_ELT(ans, DTD_ENTITY_CONTENT_SLOT, NEW_CHARACTER(1));
-   SET_STRING_ELT(VECTOR_ELT(ans, DTD_ENTITY_CONTENT_SLOT), 0, COPY_TO_USER_STRING(value));
+   SET_STRING_ELT(VECTOR_ELT(ans, DTD_ENTITY_CONTENT_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(value)));
 
    if(entity->orig) {
      SET_VECTOR_ELT(ans, DTD_ENTITY_ORIG_SLOT, NEW_CHARACTER(1));
-      SET_STRING_ELT(VECTOR_ELT(ans, DTD_ENTITY_ORIG_SLOT), 0, COPY_TO_USER_STRING(entity->orig));
+      SET_STRING_ELT(VECTOR_ELT(ans, DTD_ENTITY_ORIG_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(entity->orig)));
    }
 
    RS_XML(SetNames)(DTD_ENTITY_NUM_SLOTS, RS_XML(EntityNames), ans);
@@ -476,7 +476,7 @@ RS_XML(createDTDElement)(xmlElementPtr el)
    PROTECT(rel =  NEW_LIST(DTD_ELEMENT_NUM_SLOTS));
 
  SET_VECTOR_ELT(rel, DTD_ELEMENT_NAME_SLOT, NEW_CHARACTER(1));
- SET_STRING_ELT(VECTOR_ELT(rel, DTD_ELEMENT_NAME_SLOT), 0, COPY_TO_USER_STRING(el->name ? el->name : (xmlChar*)""));
+ SET_STRING_ELT(VECTOR_ELT(rel, DTD_ELEMENT_NAME_SLOT), 0, COPY_TO_USER_STRING( XMLCHAR_TO_CHAR( ( el->name ? el->name : (xmlChar*)""))));
 
  SET_VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT, NEW_INTEGER(1));
  INTEGER_DATA(VECTOR_ELT(rel, DTD_ELEMENT_TYPE_SLOT))[0] = el->type;
@@ -563,7 +563,7 @@ RS_XML(createDTDElementContents)(xmlElementContentPtr vals, xmlElementPtr el, in
     } else {
      if(vals->name) {
         SET_VECTOR_ELT(ans, DTD_CONTENT_ELEMENTS_SLOT,  NEW_CHARACTER(1));
-        SET_STRING_ELT(VECTOR_ELT(ans, DTD_CONTENT_ELEMENTS_SLOT), 0, COPY_TO_USER_STRING(vals->name)); 
+        SET_STRING_ELT(VECTOR_ELT(ans, DTD_CONTENT_ELEMENTS_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(vals->name)));
       }
    }
   }
@@ -663,7 +663,7 @@ RS_XML(createDTDElementAttributes)(xmlAttributePtr vals, xmlElementPtr el)
     PROTECT(names = NEW_CHARACTER(n));
     for(i=0; i < n; i++) {
        SET_VECTOR_ELT(ans, i,  RS_XML(createDTDAttribute)(tmp, el));
-       SET_STRING_ELT(names, i, COPY_TO_USER_STRING(tmp->name));
+       SET_STRING_ELT(names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(tmp->name)));
 #ifdef LIBXML2
     tmp = tmp->nexth;
 #else
@@ -712,7 +712,7 @@ RS_XML(createDTDAttribute)(xmlAttributePtr val, xmlElementPtr el)
   PROTECT(ans = NEW_LIST(DTD_ATTRIBUTE_NUM_SLOTS));
 
   SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_NAME_SLOT, NEW_CHARACTER(1));
-  SET_STRING_ELT(VECTOR_ELT(ans, DTD_ATTRIBUTE_NAME_SLOT), 0, COPY_TO_USER_STRING(val->name));
+  SET_STRING_ELT(VECTOR_ELT(ans, DTD_ATTRIBUTE_NAME_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(val->name)));
 
  SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT, NEW_INTEGER(1));
  INTEGER_DATA(VECTOR_ELT(ans, DTD_ATTRIBUTE_TYPE_SLOT))[0] =  val->type;
@@ -726,7 +726,7 @@ RS_XML(createDTDAttribute)(xmlAttributePtr val, xmlElementPtr el)
    SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_VALUE_SLOT, RS_XML(AttributeEnumerationList)(val->tree, val, el));
  } else {
     SET_VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_VALUE_SLOT, NEW_CHARACTER(1));
-    SET_STRING_ELT(VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_VALUE_SLOT), 0, COPY_TO_USER_STRING(val->defaultValue ? val->defaultValue : (xmlChar*)""));
+    SET_STRING_ELT(VECTOR_ELT(ans, DTD_ATTRIBUTE_DEFAULT_VALUE_SLOT), 0, COPY_TO_USER_STRING( XMLCHAR_TO_CHAR( (val->defaultValue ? val->defaultValue : (xmlChar*)""))));
  }
   RS_XML(SetNames)(DTD_ATTRIBUTE_NUM_SLOTS, RS_XML(AttributeSlotNames),  ans);
 
@@ -764,7 +764,7 @@ RS_XML(AttributeEnumerationList)(xmlEnumerationPtr list, xmlAttributePtr attr, x
     PROTECT(ans  = NEW_CHARACTER(n));
     tmp = list;
     for(i = 0; i < n; i++) {
-      SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(tmp->name));
+      SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(tmp->name)));
       tmp = tmp->next;
     }
     UNPROTECT(1);

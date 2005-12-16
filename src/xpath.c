@@ -80,8 +80,8 @@ R_namespaceArray(SEXP namespaces)
 
  for(i = 0; i < n; i++) {
 /*XXX who owns these strings. */
-   els[i] = xmlNewNs(NULL, strdup(CHAR_DEREF(STRING_ELT(namespaces, i))),
-                      strdup(CHAR_DEREF(STRING_ELT(names, i))));
+   els[i] = xmlNewNs(NULL, CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(namespaces, i)))),
+                           CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(names, i)))));
  }
 
  return(els);
@@ -105,7 +105,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces)
  }
 
 
- result = xmlXPathEvalExpression(CHAR_DEREF(STRING_ELT(path, 0)), ctxt);
+ result = xmlXPathEvalExpression(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(path, 0))), ctxt);
 
  if(result)
      ans = convertXPathObjectToR(result);

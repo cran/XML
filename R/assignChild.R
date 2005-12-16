@@ -35,5 +35,6 @@ function(to, ...)
    to$children[idx] <- args  
 #   names(to$children)[idx] <- names(args)
  }
+
  to
 }

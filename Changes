@@ -1,3 +1,17 @@
+Version 0.99-4
+
+  * Fix for addComment() in xmlOutputDOM().
+
+  * Removed all the compilation warnings about interchanging xmlChar* and char*.
+
+Version 0.99-3
+
+  * Added support in print methods for XML objects for indent = FALSE,
+    and tagSeparator, which defaults to "\n".  These can be used to print
+    a faithful representation of an original XML document, but only when
+    used in combination with 
+         xmlTreeParse( skipBlanks = FALSE, trim = FALSE)
+
 Version 0.99-2
  
   * Problems compiling with libxml2-2.5.11 and libxml2-2.6.{1,2}, so 

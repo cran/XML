@@ -26,6 +26,7 @@
 #include "RSCommon.h"
 #include "RS_XML.h"
 
+
 #ifdef FROM_GNOME_XML_DIR
 #include <gnome-xml/parserInternals.h>
 #include <gnome-xml/xmlmemory.h>
@@ -53,7 +54,7 @@ USER_OBJECT_
 R_xmlNewComment(USER_OBJECT_ str)
 {
     xmlNodePtr node;
-    node = xmlNewComment(CHAR_DEREF(STRING_ELT(str, 0)));
+    node = xmlNewComment(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(str, 0))));
 
     return(R_createXMLNodeRef(node));
 }
@@ -62,7 +63,7 @@ USER_OBJECT_
 R_newXMLTextNode(USER_OBJECT_ value)
 {
    xmlNodePtr node;
-   node = xmlNewText(CHAR_DEREF(STRING_ELT(value, 0)));
+   node = xmlNewText(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(value, 0))));
    return(R_createXMLNodeRef(node));
 }
 
@@ -78,7 +79,7 @@ R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value)
 
   tmp = CHAR_DEREF(STRING_ELT(value,0));
 
-  node = xmlNewCDataBlock(doc, tmp, strlen(tmp));
+  node = xmlNewCDataBlock(doc, CHAR_TO_XMLCHAR(tmp), strlen(tmp));
 
   return(R_createXMLNodeRef(node));
 }
@@ -93,7 +94,7 @@ R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
   if(GET_LENGTH(sdoc))
     doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
 
-  node = xmlNewPI(CHAR_DEREF(STRING_ELT(name, 0)), CHAR_DEREF(STRING_ELT(content, 0)));
+  node = xmlNewPI(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(content, 0))));
   return(R_createXMLNodeRef(node));
 }
 
@@ -114,14 +115,15 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
    }
 
 /*   ns = xmlNewNs(xmlGetRootElement(doc), ); */
-   node = xmlNewDocNode(doc, ns, CHAR_DEREF(STRING_ELT(name, 0)), NULL);
+   node = xmlNewDocNode(doc, ns, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), NULL);
 
    n = GET_LENGTH(attrs);
    if(n > 0) {
        int i;
        USER_OBJECT_ attrNames = GET_NAMES(attrs);
        for(i = 0; i < n ; i++) {
-	   xmlSetProp(node, CHAR_DEREF(STRING_ELT(attrNames, i)), CHAR_DEREF(STRING_ELT(attrs, i)));
+	   xmlSetProp(node, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrNames, i))),
+                            CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrs, i))));
        }
    }
 
@@ -183,7 +185,7 @@ USER_OBJECT_
 R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces)
 {
   xmlDocPtr doc;
-  doc = xmlNewDoc("1.0");
+  doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
 
   return(R_createXMLDocRef(doc));
 }
@@ -199,7 +201,9 @@ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USE
   char *sysID = CHAR_DEREF(STRING_ELT(ssysID, 0));
   xmlDtdPtr node;
 
-  node = xmlNewDtd(doc, externalID[0] ? externalID : NULL, sysID[0] ? sysID : NULL, dtdName);
+  node = xmlNewDtd(doc, CHAR_TO_XMLCHAR( (externalID[0] ? externalID : NULL)), 
+                        CHAR_TO_XMLCHAR((sysID[0] ? sysID : NULL)), 
+                        CHAR_TO_XMLCHAR(dtdName));
 /*     xmlAddChild((xmlNodePtr) doc, (xmlNodePtr) DTD); */
   return(R_createXMLNodeRef((xmlNodePtr) node));
 }
@@ -225,7 +229,7 @@ R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
   char *prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
   xmlNsPtr ns;
 
-  ns = xmlNewNs(doc, href, prefix);
+  ns = xmlNewNs(doc, CHAR_TO_XMLCHAR(href), CHAR_TO_XMLCHAR(prefix));
 
   return(R_createXMLNodeRef((xmlNodePtr) ns));
 }
@@ -261,7 +265,7 @@ R_createXMLNodeRef(xmlNodePtr node)
 }
 
 
-#define ValOrNULL(x)  x && x[0] ? x : NULL
+#define ValOrNULL(x) CHAR_TO_XMLCHAR ((x && x[0] ? x : NULL))
 
 
 /**
@@ -345,7 +349,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	    xmlFreeDtd(dtd);
 	}
 
-        SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(mem)); 
+        SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(mem))); 
         xmlFree(mem);
         UNPROTECT(1);
 

@@ -52,9 +52,9 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     xmlSubstituteEntitiesDefault(1);   
 
   if(asTextBuffer) {
-   doc = htmlParseDoc(name, NULL);
+   doc = htmlParseDoc(CHAR_TO_XMLCHAR(name), NULL);
    if(doc != NULL) {
-      doc->name = xmlStrdup("<buffer>");
+      doc->name = (char *) xmlStrdup(CHAR_TO_XMLCHAR("<buffer>"));
    }
   } else {
       doc = htmlParseFile(name, NULL);

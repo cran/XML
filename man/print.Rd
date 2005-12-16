@@ -22,12 +22,16 @@ Each typically outputs its contents in the way
 that they would appear in an XML document.
 }
 \usage{
+print.XMLNode(x, ..., indent= "", tagSeparator = "\n")
+print.XMLComment(x, ..., indent = "", tagSeparator = "\n")
+print.XMLTextNode(x, ..., indent = "", tagSeparator = "\n")
+print.XMLCDataNode(x, ..., indent="", tagSeparator = "\n")
+print.XMLProcessingInstruction(x, ..., indent="", tagSeparator = "\n")
 print.XMLAttributeDef(x, ...)
 print.XMLElementContent(x, ...)
 print.XMLElementDef(x, ...)
 print.XMLEntity(x, ...)
-print.XMLEntityRef(x, ..., indent= "")
-print.XMLNode(x, ..., indent= "")
+print.XMLEntityRef(x, ..., indent= "", tagSeparator = "\n")
 print.XMLOrContent(x, ...)
 print.XMLSequenceContent(x, ...)
 }
@@ -36,7 +40,19 @@ print.XMLSequenceContent(x, ...)
   \item{...}{additional arguments for controlling the output from
   print. Currently unused.}
   \item{indent}{a prefix that is emitted before the node to indent it relative to its
-   parent and child nodes. This is appended with a space at each succesive level of the tree.}
+    parent and child nodes. This is appended with a space at each
+    succesive level of the tree.
+    If no indentation is desired (e.g. when \code{\link{xmlTreeParse}}
+    is called with \code{trim} and \code{ignoreBlanks}
+    being \code{FALSE}) and \code{TRUE} respectively,
+    one can pass the value \code{FALSE} for this \code{indent} argument.
+  }
+  \item{tagSeparator}{when printing nodes, successive nodes and children
+    are by default displayed on new lines for easier reading.
+    One can specify a string for this argument to control how the
+    elements are separated in the output.  The primary purpose of this
+    argument is to allow no space between the elements, i.e. a value of \code{""}.
+  }
 }
 \value{
  Currently, \code{NULL}.
@@ -47,9 +63,24 @@ print.XMLSequenceContent(x, ...)
 \seealso{
 \code{\link{xmlTreeParse}}
 }
-
+\note{We could make the node classes self describing with information
+  about whether \code{ignoreBlanks} was \code{TRUE} or \code{FALSE} and
+  if trim was TRUE or FALSE.
+  This could then be used to determine the appropriate values for
+  \code{indent} and \code{tagSeparator}. Adding an S3 class element
+  would allow this to be done without the addition of an excessive
+  number of classes.
+}
 \examples{
+  fileName <- system.file("exampleData", "event.xml", package ="XML")
 
+     # Example of how to get faithful copy of the XML.
+  doc = xmlRoot(xmlTreeParse(fileName, trim = FALSE, ignoreBlanks = FALSE))
+  print(doc, indent = FALSE, tagSeparator = "")
+
+     # And now the default mechanism
+  doc = xmlRoot(xmlTreeParse(fileName))
+  print(doc)
 }
 \keyword{IO}
 \keyword{file}

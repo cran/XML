@@ -33,7 +33,8 @@ function(text)
 {
   node <- xmlTextNode(text)
   class(node) <- c("XMLCommentNode", class(node))
- node
+
+  node
 }
 
 xmlCDataNode <-
