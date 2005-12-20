@@ -2,8 +2,9 @@
 # useDynLib(XML)
 
 #exportPattern(".*")
-#XXX "append.xmlNode"                         
 export(
+ append.xmlNode,
+ append.XMLNode,
  Doctype,
  asXMLNode,
  comment.SAX,
@@ -117,7 +118,9 @@ S3method(xmlValue, XMLProcessingInstruction)
 
 S3method(xmlNamespace, XMLNode)
 
+# No effect if append is not generic.
 S3method(append, XMLNode)
+
 S3method(saveXML, XMLInternalDocument)
 S3method(saveXML, XMLInternalDOM)
 S3method(saveXML, XMLOutputStream)

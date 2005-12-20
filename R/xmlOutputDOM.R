@@ -80,7 +80,11 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 
  addPI <- function(name, text) {
     addNode(xmlPINode(name, text))  
- }   
+ }
+
+ addText <- function(text, namespace = "") {
+    addNode(xmlTextNode(text, namespace))  
+ }    
 
  closeTag <-
  function(name="", namespace=NULL)  {

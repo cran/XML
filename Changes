@@ -1,3 +1,8 @@
+Version 0.99-5
+
+  * Added append.XMLNode and append.xmlNode to the exported symbols from the NAMESPACE 
+    file.
+
 Version 0.99-4
 
   * Fix for addComment() in xmlOutputDOM().
