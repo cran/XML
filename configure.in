@@ -173,8 +173,8 @@ if test -n "${USE_LIBXML}" ; then
        echo "USE_XML2 = ${USE_XML2}"
        if test "${USE_XML2}" != "no" && test -z "${FORCE_XML2}"; then
 
-         MINOR=`${XML_CONFIG} --version | ${SED} -re  's/^2\.([[0-9]]+).*/\1/'`
-         PATCH=`${XML_CONFIG} --version | ${SED} -re  's/^2\.[[0-9]]+\.([[0-9]]+)$/\1/'`
+         MINOR=`${XML_CONFIG} --version | ${SED} -e 's/^2\.\([[0-9]]\{1,\}\).*/\1/'`
+         PATCH=`${XML_CONFIG} --version | ${SED} -e 's/^2\.[[0-9]]\{1,\}\.\([[0-9]]\{1,\}\)$/\1/'`
 
          echo "Minor $MINOR, Patch $PATCH for `$XML_CONFIG --version`"
          if test $MINOR -lt 6 ;  then
