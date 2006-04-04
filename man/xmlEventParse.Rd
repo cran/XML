@@ -165,15 +165,15 @@ argument. It is assumed that this is a closure and that
 the callback functions have manipulated variables
 local to it and that the caller knows how to extract this.
 }
-\Notes{
+
+\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml}}
+\author{Duncan Temple Lang}
+\note{
  The libxml parser can read URLs via http or ftp.
 It does not require the support of \textbf{wget} as used
 in other parts of \R, but uses its own facilities
 to connect to remote servers.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml}}
-\author{Duncan Temple Lang}
-\note{ This requires the Expat XML parser to be installed. }
 
 \seealso{ \link{xmlTreeParse} }
 

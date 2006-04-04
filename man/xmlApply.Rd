@@ -10,10 +10,9 @@
 \title{Applies a function to each of the children of an XMLNode}
 \description{
  These methods are simple wrappers for the 
-\code{\link{lapply}} and \code{\link{sapply}} functions.
-They operate on the 
-sub-nodes of the XML node,
-and not on the fields of the node object itself.
+ \code{\link{lapply}} and \code{\link{sapply}} functions.
+ They operate on the 
+ sub-nodes of the XML node, and not on the fields of the node object itself.
 }
 \usage{
 xmlApply(X, FUN, ...)
@@ -39,17 +38,21 @@ the \code{\link{apply}} or \code{\link{sapply}}
 on \code{xmlChildren(x)}.
 }
 
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
-\url{http://www.omegahat.org}  }
-\author{ Duncan Temple Lang }
+\references{
+  \url{http://www.w3.org/XML},
+  \url{http://www.jclark.com/xml},
+  \url{http://www.omegahat.org}
+}
+
+\author{Duncan Temple Lang}
 
 
 \seealso{
-\code{\link{xmlChildren}}
-\code{\link{xmlRoot}}
-\code{\link{[.XMLNode}}}
-\code{\link{sapply}}
-\code{\link{lapply}}
+ \code{\link{xmlChildren}}
+ \code{\link{xmlRoot}}
+ \code{\link{[.XMLNode}}
+ \code{\link{sapply}}
+ \code{\link{lapply}}
 }
 
 \examples{

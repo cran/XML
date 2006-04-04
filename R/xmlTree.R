@@ -155,6 +155,59 @@ function(x)
 }
 
 
+"[[.XMLInternalNode" <-
+function(x, i, j, ...)
+{
+  kids = xmlChildren(x)
+  if(is.numeric(i))
+     kids[[i]]
+  else {
+     id = as.character(i)
+     which = match(id, sapply(kids, xmlName))
+     kids[[which]]
+  }
+}  
+
+
+
+"[.XMLInternalNode" <-
+function(x, i, j, ...)
+{
+  kids = xmlChildren(x)
+  if(is.numeric(i))
+     kids[i]
+  else {
+     id = as.character(i)
+     which = (id == sapply(kids, xmlName))
+     kids[which]
+  }
+}  
+
+
+xmlValue.XMLInternalNode =
+function(x, ignoreComments = FALSE)
+{
+  .Call("R_xmlNodeValue", x)
+}  
+
+
+
+xmlApply.XMLInternalNode =
+function(X, FUN, ...)
+{
+   kids = xmlChildren(X)
+   lapply(kids, FUN, ...)
+}  
+
+xmlSApply.XMLInternalNode =
+function(X, FUN, ...)
+{
+   kids = xmlChildren(X)
+   sapply(kids, FUN, ...)
+}  
+
+
+
 xmlParent =
 function(x)
  UseMethod("xmlParent")

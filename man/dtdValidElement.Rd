@@ -21,16 +21,18 @@ to determine if it contains \code{name}.}
 test that accounds for sequences in which elements must appear in order.
 These are comma-separated entries in the element definition.}
 }
-
+\details{
+This applies to direct sub-elements
+or children of the \code{within} tag and not tags nested 
+within children of that tag, i.e. descendants.
+}
 \value{
  Returns a logical value.
 TRUE indicates that a \code{name} element
 can be used inside a \code{within} element.
 FALSE indicates that it cannot.
 }
-\Note{This applies to direct sub-elements of
-the \code{within} tag and not tags nested 
-within children of that tag.}
+
 
 \references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
 \url{http://www.omegahat.org}  }

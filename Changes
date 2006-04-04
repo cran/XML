@@ -1,3 +1,9 @@
+Version 0.99-7
+
+  * Example of reading HTML tables using XPath and internal nodes in bondsTables.R
+
+  * Some additional methods for XMLInternalNode.
+
 Version 0.99-6
  
   * configure does not require the GNU sed, but can use any version of sed now that the
@@ -31,6 +37,7 @@ Version 0.99-2
     R CMD INSTALL XML.
 
   * Documentation for getNodeSet() didn't refer to the new namespaces argument.
+
 
 Version 0.99-1
 

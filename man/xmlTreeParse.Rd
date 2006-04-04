@@ -101,7 +101,8 @@ return type.
   \code{\link{getNodeSet}}.
 }
 \item{isSchema}{a logical value indicating whether the document
-   is an XML schema (\code{TRUE}) and should be parsed as such.}
+  is an XML schema (\code{TRUE}) and should be parsed as such using
+  the built-in schema parser in libxml.}
 }
 \details{
  The \code{handlers} argument is used similarly

@@ -173,6 +173,18 @@ if test -n "${USE_LIBXML}" ; then
        echo "USE_XML2 = ${USE_XML2}"
        if test "${USE_XML2}" != "no" && test -z "${FORCE_XML2}"; then
 
+dnl This is not needed now, but is a way to test whether we should use -E or -r to get 
+dnl extended regular expression usage with this version of sed.
+         echo "foo" | sed -Ee 's/foo/bar/' 2>1 > /dev/null
+	 if test "$?" = "0" ; then
+           SED_EXTENDED_ARG="-E"
+         else
+           SED_EXTENDED_ARG="-r"
+         fi
+
+         echo  "SED_EXTENDED_ARG: ${SED_EXTENDED_ARG}"
+
+
          MINOR=`${XML_CONFIG} --version | ${SED} -e 's/^2\.\([[0-9]]\{1,\}\).*/\1/'`
          PATCH=`${XML_CONFIG} --version | ${SED} -e 's/^2\.[[0-9]]\{1,\}\.\([[0-9]]\{1,\}\)$/\1/'`
 

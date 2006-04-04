@@ -14,9 +14,13 @@ getNodeSet(doc, path, namespaces = character())
   \item{doc}{an object of class \code{XMLInternalDocument}}
   \item{path}{a string (character vector of length 1) giving the
     XPath expression to evaluate.}
-  \item{namespaces}{a named character vector giving
-    the name-URI pairs for the namespaces of interest in the
-    XPath query.}
+  \item{namespaces}{ a named character vector giving the
+    namespace prefix and URI pairs that are to be used
+    in the XPath expression and matching of nodes.
+    One only needs to specify the namespaces in the XPath expression and
+    for the nodes of interest rather than requiring all the
+    namespaces for the entire document.
+  }
 }
 \details{
   This calls the libxml routine \code{xmlXPathEval}.

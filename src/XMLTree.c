@@ -359,3 +359,35 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     xmlIndentTreeOutput = oldIndent;
     return(ans);
 }
+
+
+SEXP
+R_xmlNodeValue(SEXP node, SEXP raw)
+{
+   xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
+   xmlChar *tmp;
+   SEXP ans;
+
+   if(!n) {
+      PROBLEM  "null value for xml node reference"
+      ERROR;
+   }
+
+   tmp  = xmlNodeGetContent(n);
+/*
+  xmlGetNodeRawString
+  xmlGetNodeString
+
+   if(GET_LENGTH(raw) == 0)
+   else if(LOGICAL(raw)[0]) {
+   } else {
+
+   }
+*/
+   if(tmp)
+     ans = mkString(tmp);
+   else 
+     ans = NEW_CHARACTER(0);
+
+   return(ans);
+}

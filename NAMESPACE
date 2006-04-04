@@ -57,7 +57,9 @@ export(
  xmlTextNode,
  xmlTree,
  xmlTreeParse,
- xmlValue)
+ xmlValue,
+ names.XMLNode
+)
 
 
 
@@ -66,6 +68,9 @@ export(
 S3method(xmlChildren, XMLNode)
 S3method(xmlChildren, XMLInternalNode)
 
+
+S3method(xmlValue, XMLInternalNode)
+
 S3method(xmlName, XMLComment)
 S3method(xmlName, XMLNode)
 S3method(xmlName, XMLInternalNode)
@@ -73,6 +78,9 @@ S3method(xmlName, XMLInternalNode)
 S3method("[", XMLNode)
 S3method("[[", XMLNode)
 S3method("[[", XMLDocumentContent)
+
+S3method("[[", XMLInternalNode)
+S3method("[", XMLInternalNode)
 
 S3method("[<-", XMLNode)
 S3method("[[<-", XMLNode)
@@ -104,10 +112,12 @@ S3method(xmlRoot, XMLDocumentContent)
 S3method(xmlApply, XMLNode)
 S3method(xmlApply, XMLDocument)
 S3method(xmlApply, XMLDocumentContent)
+S3method(xmlApply, XMLInternalNode)
 
 S3method(xmlSApply, XMLNode)
 S3method(xmlSApply, XMLDocument)
 S3method(xmlSApply, XMLDocumentContent)
+S3method(xmlSApply, XMLInternalNode)
 
 S3method(xmlValue, XMLNode)
 S3method(xmlValue, XMLTextNode)
