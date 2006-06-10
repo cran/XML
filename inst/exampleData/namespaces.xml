@@ -3,7 +3,7 @@
 <a xmlns="http://www.omegahat.org"
    xmlns:omegahat="http://www.omegahat.org"
    xmlns:r="http://www.r-project.org">
-  <r:b>
+  <r:b omegahat:foo="myValue">
     <c:c xmlns:c="http://www.c.org"/>
   </r:b>
 </a>

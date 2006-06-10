@@ -133,6 +133,12 @@ function(x, ignoreComments = FALSE)
 }
 
 
+xmlNamespaceDefinitions <-
+function(x)
+{
+  unclass(x)$namespaceDefinitions
+}
+
 xmlNamespace <-
 function(x)
 {
@@ -143,7 +149,7 @@ function(x)
 xmlNamespace.XMLNode <-
 function(x)
 {
- x$namespace
+  x$namespace
 }
 
 

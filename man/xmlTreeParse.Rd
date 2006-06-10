@@ -32,11 +32,17 @@ text elements made up entirely of white space should be included
 in the resulting `tree'. }
  \item{handlers}{Optional collection of functions
   used to map the different XML nodes to R
-  objects. This is a named list of functions,
+  objects. Typically, this is a named list of functions,
    and a closure can be used to provide local data.
   This provides a way of filtering the tree as it is being
- created, adding or removing nodes, and generally processing
-  them as they are constructed in the C code.}
+  created, adding or removing nodes, and generally processing
+  them as they are constructed in the C code.
+
+   In a recent addition to the package (version 0.99-8),
+   if this is specified as a single function object,
+   we call that function for each node in the underlying DOM tree.
+   It is invoked with the new node and its parent node.
+  }
   \item{replaceEntities}{
    logical value indicating whether to substitute entity references
     with their text directly. This should be left as False.
@@ -325,6 +331,12 @@ m <- xmlTreeParse(fileName,
  h2 = getLinks()
  htmlTreeParse(system.file("examples", "index.html", package = "XML"), handlers = h2, useInternalNodes = TRUE)
  all(h1$links() == h2$links())
+
+  # Using flat trees
+ tt = xmlHashTree()
+ f = system.file("exampleData", "mtcars.xml", package="XML")
+ xmlTreeParse(f, handlers = tt[[".addNode"]])
+ xmlRoot(tt)
 }
 
 \keyword{file}

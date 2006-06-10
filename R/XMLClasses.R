@@ -259,10 +259,13 @@ xmlElementsByTagName <-
 # Extract all the sub-nodes within an XML node
 # with the tag name `name'.
 #
-function(el, name, recursive = FALSE) {
-
-    idx <-  (names(el$children) == name)
-    els = el$children[idx]
+function(el, name, recursive = FALSE)
+{
+    kids = xmlChildren(el)
+    idx  =  (names(kids) == name)
+    els  = kids[idx]    
+#    idx <-  (names(el$children) == name)
+#    els = el$children[idx]
 
     if(!recursive  || xmlSize(el) == 0)
       return(els)

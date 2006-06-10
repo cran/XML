@@ -58,10 +58,31 @@ export(
  xmlTree,
  xmlTreeParse,
  xmlValue,
- names.XMLNode
+ names.XMLNode,
+ xmlNamespaceDefinitions,
+ parseURI,
+ asXMLTreeNode,
+ xmlHashTree,
+ addNode
+# xmlFlatListTree       
 )
 
+#S3method(names, XMLFlatTree)
+#S3method("$", XMLFlatListTree)
 
+S3method(addNode, XMLHashTree)
+S3method(xmlRoot, XMLHashTree)
+S3method(print, XMLHashTree)
+
+
+S3method(xmlParent, XMLTreeNode)
+S3method(xmlChildren, XMLTreeNode)
+S3method(xmlParent, XMLHashTreeNode)
+S3method(xmlChildren, XMLHashTreeNode)
+S3method(xmlSize, XMLHashTreeNode)
+
+S3method(xmlSize, XMLHashTree)
+S3method(xmlRoot, XMLHashTree)
 
 
 

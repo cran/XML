@@ -285,3 +285,37 @@ R_makeRefObject(void *ref, const char *className)
    return(obj);
 }
 
+
+#include <libxml/uri.h>
+#define copyStrField(x) SET_VECTOR_ELT(ans, i, mkString(uri->x ? uri->x : "")); \
+                        SET_STRING_ELT(names, i, mkChar(#x)); i++;
+SEXP
+R_parseURI(SEXP r_uri)
+{
+  xmlURIPtr uri;
+  SEXP ans, names;
+  int i= 0;
+  uri = xmlParseURI( CHAR( STRING_ELT( r_uri, 0 )));
+  if(!uri) {
+     PROBLEM "cannot parse URI %s", CHAR( STRING_ELT( r_uri, 0) )
+     ERROR;
+  }
+
+  PROTECT(ans = NEW_LIST(8));
+  PROTECT(names = NEW_CHARACTER(8));
+ 
+  copyStrField(scheme);
+  copyStrField(authority);
+  copyStrField(server);
+  copyStrField(user);
+  copyStrField(path);
+  copyStrField(query);
+  copyStrField(fragment);
+  SET_VECTOR_ELT(ans, i, ScalarInteger(uri->port));
+  SET_STRING_ELT(names, i, mkChar("port"));
+
+  SET_NAMES(ans, names);
+  
+  UNPROTECT(2);
+  return(ans);
+}

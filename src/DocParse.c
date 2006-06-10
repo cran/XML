@@ -113,9 +113,6 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaceAttributes)[0];
 
 
-
-
-
   if(asTextBuffer == 0) {
     struct stat tmp_stat;  
 #ifdef USE_R
@@ -266,9 +263,9 @@ NodeTraverse(xmlNodePtr root, USER_OBJECT_ converterFunctions, R_XMLSettings *pa
 
 /**
    Returns a named list whose elements are
-    file:  the name of the file being processed.
-    version: the XML version.
-    root: the collection of children.
+   file:  the name of the file being processed.
+   version: the XML version.
+   root: the collection of children.
  */
 USER_OBJECT_
 RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, 
@@ -368,7 +365,7 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
 
 enum { NODE_NAME, NODE_ATTRIBUTES, NODE_CHILDREN, NODE_NAMESPACE, NODE_NAMESPACE_DEFS, NUM_NODE_ELEMENTS};
 
-USER_OBJECT_
+static USER_OBJECT_
 RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *parserSettings, USER_OBJECT_ parentUserNode)
 {
   int n = NUM_NODE_ELEMENTS;
@@ -463,10 +460,9 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 
   RS_XML(setNodeClass)(node, ans);
 
-     /* 
-          Now invoke any user-level converters. 
-      */
-  ans = convertNode(ans, node, parserSettings);
+     /* Now invoke any user-level converters.  */
+  if(recursive || direction)
+    ans = convertNode(ans, node, parserSettings);
 
   UNPROTECT(1);
   UNPROTECT(1);
@@ -476,7 +472,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 static USER_OBJECT_
 convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings)
 {
-    USER_OBJECT_ val = ans; /* R_NilValue; */
+    USER_OBJECT_ val = ans; 
 
   if(parserSettings != NULL) {
     USER_OBJECT_  fun = NULL;
@@ -642,6 +638,80 @@ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ defaultNodeValu
  return(fun);
 }
 
+/*
+ XXX Unravel this recursive call into a loop.
+
+  Starting at the top node, fix the id to be empty.
+  Then add the node and get the ID.
+  Then loop over the children, and the node and call the routine
+  on its children
+  
+
+ */
+
+/*
+   at a given node, make the node
+*/
+void
+addNodeAndChildrenToTree(xmlNodePtr node, SEXP id, SEXP e, R_XMLSettings *parserSettings, int *ctr)
+{
+   SEXP tmp;
+   xmlNodePtr n;
+
+   if(!node)
+     return;
+
+        /* Create a skeleton node with no children. */
+   tmp = RS_XML(createXMLNode)(node, 0, 0/* doesn't matter */, parserSettings, R_NilValue);/*XXX*/
+   if(!tmp) 
+     return;
+   SETCAR(CDR(e), tmp);
+   (*ctr)++;
+
+   id = Rf_eval(e, R_GlobalEnv);
+   PROTECT(id);
+
+   n = node->children;
+   while(n) {
+
+     SETCAR(CDR(CDR(e)), id);
+     addNodeAndChildrenToTree(n, id, e, parserSettings, ctr);
+     (*ctr)++;
+     n = n->next;
+   }
+
+   UNPROTECT(1);
+}
+
+
+
+SEXP
+addNodesToTree(xmlNodePtr node, R_XMLSettings *parserSettings)
+{
+   xmlNodePtr ptr = node;
+   SEXP e, id;
+   int ctr = 0;
+   PROTECT(e = allocVector(LANGSXP, 3));
+   SETCAR(e, parserSettings->converters);
+   id = NEW_CHARACTER(0);
+
+   ptr = node;
+
+   /* loop over the sibling nodes here in case we have multiple roots, 
+      e.g. a comment, PI and a real node. See xysize.svg
+    */
+   while(ptr) {
+      SETCAR(CDR(CDR(e)), id);
+      addNodeAndChildrenToTree(ptr, id, e, parserSettings, &ctr);
+      ptr = ptr->next;
+   }
+
+   UNPROTECT(1);
+   return(ScalarInteger(ctr));
+}
+
+
+
 /**
   Creates the R objects representing the children or siblings of the specified
   node, handling simple text cases with no children, as well as recursively
@@ -673,6 +743,10 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 #endif
 
   base = c;
+
+  if(IS_FUNCTION(parserSettings->converters)) {
+    return(addNodesToTree(node, parserSettings));
+  }
 
       /* Count the number of elements being converted. */
   while(c) {
@@ -758,8 +832,13 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
     }
 
   if(n > 0) {
+    SEXP ans_namespaces;
+    int nonTrivialAttrNamespaces = 0;
+
     PROTECT(ans = NEW_CHARACTER(n));
     PROTECT(ans_names = NEW_CHARACTER(n));
+    PROTECT(ans_namespaces = NEW_CHARACTER(n));
+
          /* Loop over the attributes and create the string elements
             and the elements of the name vector.
           */
@@ -774,10 +853,11 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
 #ifdef LIBXML2
          SET_STRING_ELT(ans, i, 
                          COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(
-                                          ((atts->xmlChildrenNode != (xmlNode*)NULL && atts->xmlChildrenNode->content != (xmlChar*)NULL )?
-                                                       atts->xmlChildrenNode->content : (xmlChar*)""))));
+                                          ((atts->xmlChildrenNode != (xmlNode*)NULL && atts->xmlChildrenNode->content != (xmlChar*)NULL )
+                                                       ? atts->xmlChildrenNode->content : (xmlChar*)""))));
 #else
-         SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(((atts->val != (xmlNode*)NULL && atts->val->content != (xmlChar*)NULL )? atts->val->content : (xmlChar*)""))));
+         SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(((atts->val != (xmlNode*)NULL && atts->val->content != (xmlChar*)NULL )
+                                                            ? atts->val->content : (xmlChar*)""))));
 
 #endif
          if(atts->name) {
@@ -787,16 +867,23 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
              SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(buf));
 	   } else
              SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->name)));
+
+	   if(atts->ns && atts->ns->prefix) {
+	     SET_STRING_ELT(ans_namespaces, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->ns->prefix)));
+	     nonTrivialAttrNamespaces++;
+	   }
 	 }
 
          atts = atts->next;
-      }
+     }
 
+    if(nonTrivialAttrNamespaces)
+        Rf_setAttrib(ans, Rf_install("namespaces"), ans_namespaces);
     SET_NAMES(ans, ans_names);
 
-    UNPROTECT(1);
-    UNPROTECT(1);
+    UNPROTECT(nonTrivialAttrNamespaces ? 3 : 3);
    }
+
   return(ans);
 }
 

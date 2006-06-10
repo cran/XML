@@ -1,3 +1,28 @@
+
+Version 0.99-8
+
+  * Introduced initial version of flat trees for storing the DOM in a
+    non-hierarchical data structure in R.  This allows us to work with
+    a mutable tree and to perform certain operations across all the
+    nodes more efficiently, i.e. non-recursively.  Importantly, one
+    can find the parent node of a given node in the tree which is not
+    possible with the list of list approach.  It does mean more
+    computation for some common operations, specifically parsing.
+    Indeed, it can be 25 times slower for a non-trivial file, i.e. one
+    with. However, for a file with 7700 nodes, it still only takes 2
+    1/2 seconds.  So there is a trade-off.  While there are a few
+    versions in the code, xmlHashTree() is the one to use for speed
+    reasons.  xmlFlatListTree() is another and xmlFlatTree() is
+    excruciatingly slow. See tests/timings.R for some comparisons.
+    xmlGetElementsByTagName and other facilities work on these types
+    of trees.
+
+  * add the R attribute 'namespaces' to an XML node's attributes
+    vector so that one can differentiate between conflicting attribute
+    names with different namespaces.
+
+ * added parseURI() to return the elements of a URI from a string. 
+
 Version 0.99-7
 
   * Example of reading HTML tables using XPath and internal nodes in bondsTables.R

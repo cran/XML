@@ -40,3 +40,12 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
 
  ans
 }
+
+
+
+
+parseURI =
+function(uri)
+{
+  .Call("R_parseURI", as.character(uri))
+}  
