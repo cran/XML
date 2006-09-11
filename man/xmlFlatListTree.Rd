@@ -2,7 +2,7 @@
 \alias{xmlFlatListTree}
 \alias{xmlHashTree}
 \title{Constructors for trees stored as flat list of nodes with
-    information about parents and children}
+    information about parents and children.}
 \description{
 
   These (and related internal) functions allow us to represent trees as
@@ -47,12 +47,44 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(), env = 
 
 }
 \value{
-  An object of class XMLFlatTree
-  which is specialized
+  An object of class XMLFlatTree which is specialized
   to \code{XMLFlatListTree} by the \code{xmlFlatListTree}
-  function and
-  \code{XMLHashTree} by the \code{xmlHasTree} function.
-  Both are simply the environment.
+  function and \code{XMLHashTree} by the \code{xmlHashTree} function.
+  Both objects are simply the environment which contains information
+  about the tree elements and functions to access this information.
+
+  An \code{xmlHashTree} object has an accessor method via
+  \code{$} for accessing individual  nodes within the tree.
+  One can use the node name/identifier in an expression such as
+  \code{tt$myNode} to obtain the element.
+  The name of a node is either its XML node name or if that is already
+  present in the tree, a machine generated name.
+
+  One can find the names of all the nodes using the
+  \code{objects} function since these trees are regular
+  environments in R.
+  Using the \code{all = TRUE} argument, one can also find the
+  \dQuote{hidden} elements that make define the tree's structure.
+  These are \code{.children} and \code{.parents}.
+  The former is an (hashed) environment. Each element is identified by the
+  node in the tree by the node's identifier (corresponding to the
+  name of the node in the tree's environment).
+  The value of that element is simply a character vector giving the
+  identifiers of all of the children of that node.
+
+  The \code{.parents} element is also an environemnt.
+  Each element in this gives the pair of node and parent identifiers
+  with the parent identifier being the value of the variable in the
+  environment. In other words, we look up the parent of a node
+  named 'kid' by retrieving the value of the variable 'kid' in the
+  \code{.parents} environment of this hash tree.
+
+  The function \code{.addNode} is used to insert a new node into the
+  tree.
+
+  The structure of this tree allows one to easily travers all nodes,
+  navigate up the tree from a node via its parent.  Certain tasks are
+  more complex as the hierarchy is not implicit within a node.
 }
 \references{\url{http://www.w3.org/XML}}
 \author{ Duncan Temple Lang }
@@ -64,7 +96,36 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(), env = 
   \code{\link{xmlOutputDOM}}    
 }
 \examples{
+ f = system.file("exampleData", "dataframe.xml", package = "XML")
+ tr  = xmlHashTree()
+ xmlTreeParse(f, handlers = tr[[".addNode"]])
 
+ tr # print the tree on the screen
+
+  # Get the two child nodes of the dataframe node.
+ xmlChildren(tr$dataframe)
+
+  # Find the names of all the nodes.
+ objects(tr)
+  # Which nodes have children
+ objects(tr$.children)
+
+  # Which nodes are leaves, i.e. do not have children
+ setdiff(objects(tr), objects(tr$.children))
+
+  # find the class of each of these leaf nodes.
+ sapply(setdiff(objects(tr), objects(tr$.children)),
+         function(id) class(tr[[id]]))
+
+  # distribution of number of children
+ sapply(tr$.children, length)
+
+
+  # Get the first A node
+ tr$A
+
+  # Get is parent node.
+ xmlParent(tr$A)
 }
 \keyword{IO}
 \concept{XML}

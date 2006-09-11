@@ -419,7 +419,7 @@ RS_XML(createDTDEntity)(xmlEntityPtr entity)
   PROTECT(ans = NEW_LIST(DTD_ENTITY_NUM_SLOTS));
 
   SET_VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT, NEW_CHARACTER(1));
-   SET_VECTOR_ELT(VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(entity->name)));
+  SET_STRING_ELT(VECTOR_ELT(ans, DTD_ENTITY_NAME_SLOT), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(entity->name)));
 
    if(entity->content == NULL) {
      value = entity->SystemID;

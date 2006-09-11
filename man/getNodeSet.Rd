@@ -17,9 +17,21 @@ getNodeSet(doc, path, namespaces = character())
   \item{namespaces}{ a named character vector giving the
     namespace prefix and URI pairs that are to be used
     in the XPath expression and matching of nodes.
+   The prefix is just a simple string that acts as a short-hand 
+   or alias for the URI that is the unique identifier for the
+   namespace.
+   The URI is the element in this vector and the prefix is the
+   corresponding element name.
     One only needs to specify the namespaces in the XPath expression and
     for the nodes of interest rather than requiring all the
     namespaces for the entire document.
+    Also note that the prefix used in this vector is local only to the
+    path. It does not have to be the same as the prefix used in the
+    document to identify the namespace. However, the URI in this
+    argument must be identical to the target namespace URI in the
+    document.  It is the namespace URIs that are matched (exactly)
+    to find correspondence. The prefixes are used only to refer to
+    that URI.
   }
 }
 \details{
@@ -61,6 +73,18 @@ getNodeSet(doc, path, namespaces = character())
  
  els = getNodeSet(doc, "/doc//a[@status]")
  sapply(els, function(el) xmlGetAttr(el, "status"))
+
+  # Using a namespace
+ f = system.file("exampleData", "SOAPNamespaces.xml", package = "XML") 
+ z = xmlTreeParse(f, useInternal = TRUE)
+ getNodeSet(z, "/a:Envelope/a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
+ getNodeSet(z, "//a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
+
+  # Get two items back with namespaces
+ f = system.file("exampleData", "gnumeric.xml", package = "XML") 
+ z = xmlTreeParse(f, useInternal = TRUE)
+ getNodeSet(z, "//gmr:Item/gmr:name", c(gmr="http://www.gnome.org/gnumeric/v2"))
+
 }
 \keyword{file}
 \keyword{IO}

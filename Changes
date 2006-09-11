@@ -1,3 +1,16 @@
+Version 0.99-92
+
+  *  Fix for setting DTD entity field uncovered by the strict type checking in R internals.
+
+Version 0.99-91
+
+  *  Added an encoding argument to saveXML(), initially for use in the Sxslt package.
+
+Version 0.99-9
+
+  * Example of using namespaces in getNodeSet()
+
+  * Examples for xmlHashTree().
 
 Version 0.99-8
 
@@ -17,11 +30,15 @@ Version 0.99-8
     xmlGetElementsByTagName and other facilities work on these types
     of trees.
 
+    More functions and methods can and should be provided to work with
+    these trees if they turn out to be used in any significant way.
+
   * add the R attribute 'namespaces' to an XML node's attributes
     vector so that one can differentiate between conflicting attribute
     names with different namespaces.
 
- * added parseURI() to return the elements of a URI from a string. 
+  * added parseURI() to return the elements of a URI from a string. 
+
 
 Version 0.99-7
 

@@ -1,9 +1,4 @@
 
-/*
- Copyright the Omegahat project 1999-2005.
- Distributed under the GPL license (version 2).
-*/
-
 #ifndef RSCOMMON_H
 #define RSCOMMON_H
 

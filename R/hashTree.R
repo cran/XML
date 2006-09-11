@@ -81,7 +81,6 @@ function(nodes = list(), parents = character(), children = list(),
   ans = structure(env, class = c("XMLHashTree", "XMLFlatTree"))
   .this = ans
 
- 
 
   ans
 }
@@ -103,7 +102,7 @@ function(x)
   if(!idx)
       return(NULL)
 
-  get(x$id, p)
+  get(get(x$id, p), x$env)
 }  
 
 

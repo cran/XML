@@ -256,13 +256,15 @@ function(name, ..., attrs=NULL, namespace="", doc = NULL)
 
 
 saveXML <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+         doctype = NULL, encoding = "")
 {
  UseMethod("saveXML")
 }
 
 saveXML.XMLInternalDocument <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+         doctype = NULL, encoding = "")
 {
   if(is(doctype, "Doctype")) {
        # Check that the value in the DOCTYPE for the top-level name is the same as that of the
@@ -282,14 +284,16 @@ function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.
 }
 
 saveXML.XMLInternalDOM <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+         doctype = NULL, encoding = "")
 {
   NextMethod("saveXML", object = doc$value())
 }
 
 
 saveXML.XMLOutputStream =
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
+         doctype = NULL, encoding = "")
 {
   NextMethod("saveXML", object = doc$value())
 }
@@ -298,7 +302,8 @@ saveXML.XMLNode =
 #
 # Need to handle a DTD here as the prefix argument..
 #
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n', doctype = NULL)
+function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
+         doctype = NULL, encoding = "")
 {
   sink(file)
   if(!is.null(prefix))
