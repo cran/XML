@@ -1,3 +1,10 @@
+Version 0.99-93
+   Changes from Martin Morgan
+
+  *  import normalizePath from utils.
+
+  *  Changes to configure.win to find 3rd party DLLs in bin/ directory, not lib/
+
 Version 0.99-92
 
   *  Fix for setting DTD entity field uncovered by the strict type checking in R internals.

@@ -180,3 +180,5 @@ exportClasses("SchemaElementTable", "xmlSchemaElementRef",
 
 exportMethods("names", "$", "$<-", "coerce")
 }
+
+importFrom(utils, normalizePath)
