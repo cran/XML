@@ -14,7 +14,7 @@ or with via the parser.
 }
 \usage{
 xmlNode(name, ..., attrs=NULL, namespace="")
-xmlTextNode(value, namespace="")
+xmlTextNode(value, namespace="", entities = XMLEntities)
 xmlPINode(sys, value, namespace="")
 xmlCDataNode(...)
 xmlCommentNode(text)
@@ -34,7 +34,16 @@ xmlCommentNode(text)
   \item{sys}{the name of the system for which the processing instruction
     is targeted. This is the value that appears in the
      \code{<?sys value?>}}
-  \item{text}{character string giving the contents of the comment.}
+   \item{text}{character string giving the contents of the comment.}
+   \item{entities}{a character vector giving the mapping
+     from special characters to their entity equivalent.
+     This provides the  character-expanded
+     entity pairings of 'character = entity' , e.g. '<' = "lt" which are
+     used to make the content valid XML
+     so that it can be used within a text node.  
+     The text searched sequentially
+     for instances of each character in the names and each instance is
+     replaced with the corresponding '&entity;' }
 }
 \value{
  An object of class \code{XMLNode}.

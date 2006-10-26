@@ -86,6 +86,23 @@ con$closeTag() # phone
 con$closeTag() # address
 
 saveXML(con$value(), file="out.xml")
+
+
+# Work with entities
+
+ f = system.file("exampleData", "test1.xml", package = "XML")
+ doc = xmlRoot(xmlTreeParse(f))
+ outFile = tempfile()
+ saveXML(doc, outFile)
+ alt = xmlRoot(xmlTreeParse(outFile))
+ if(! identical(doc, alt) )
+  stop("Problems handling entities!")
+
+ con = textConnection("test1.xml", "w")
+ saveXML(doc, con)
+ close(con)
+ alt = get("test1.xml")
+ identical(doc, alt)
 }
 \keyword{IO}
 \keyword{file}

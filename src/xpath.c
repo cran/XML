@@ -1,15 +1,13 @@
 #include "RS_XML.h"
-
 #include <libxml/xpath.h>
-
 #include "Utils.h"
 
 
 
 SEXP
-convertNodeSetToR(xmlNodeSetPtr obj)
+convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
 {
-  SEXP ans;
+  SEXP ans, expr = NULL, arg = NULL, ref;
   int i;
 
   if(!obj)
@@ -17,25 +15,47 @@ convertNodeSetToR(xmlNodeSetPtr obj)
 
   PROTECT(ans = NEW_LIST(obj->nodeNr));
 
-  for(i = 0; i < obj->nodeNr; i++) {
-     SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(obj->nodeTab[i]));
+  if(GET_LENGTH(fun) && TYPEOF(fun) == CLOSXP) {
+    PROTECT(expr = allocVector(LANGSXP, 2));
+    SETCAR(expr, fun);
+    arg = CDR(expr);
+  } else if(TYPEOF(fun) == LANGSXP) {
+    expr = fun;
+    arg = CDR(expr);
   }
 
-  SET_CLASS(ans, mkString("XMLNodeSet"));
+  for(i = 0; i < obj->nodeNr; i++) {
+    ref = R_createXMLNodeRef(obj->nodeTab[i]);
+    if(expr) {
+      PROTECT(ref);
+      SETCAR(arg, ref);
+      PROTECT(ref = Rf_eval(expr, R_GlobalEnv)); /*XXX do we want to catch errors here? Maybe to release the namespaces. */
+      SET_VECTOR_ELT(ans, i, ref);
+      UNPROTECT(2);
+    } else
+      SET_VECTOR_ELT(ans, i, ref);
+  }
+
+  if(expr) {
+    if(TYPEOF(fun) == CLOSXP) 
+      UNPROTECT(1);
+  } else
+    SET_CLASS(ans, mkString("XMLNodeSet"));
+
   UNPROTECT(1);
 
   return(ans);
 }
 
 SEXP
-convertXPathObjectToR(xmlXPathObjectPtr obj)
+convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun)
 {
   SEXP ans = NULL_USER_OBJECT;
 
   switch(obj->type) {
 
     case XPATH_NODESET:
-	ans = convertNodeSetToR(obj->nodesetval);
+        ans = convertNodeSetToR(obj->nodesetval, fun);
 	break;
     case XPATH_BOOLEAN:
 	ans = ScalarLogical(obj->boolval);
@@ -54,7 +74,7 @@ convertXPathObjectToR(xmlXPathObjectPtr obj)
     case XPATH_RANGE:
     case XPATH_LOCATIONSET:
     case XPATH_USERS:
-	PROBLEM "unsupported xmlXPathObject type %d in convertXPathObjectToR", obj->type
+	PROBLEM "currently unsupported xmlXPathObject type %d in convertXPathObjectToR. Please send mail to maintainer.", obj->type
         WARN
     default:
 	ans = R_NilValue;
@@ -89,14 +109,20 @@ R_namespaceArray(SEXP namespaces)
 
 
 SEXP
-RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces)
+RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
 {
  xmlXPathContextPtr ctxt = NULL;
  xmlXPathObjectPtr result;
  SEXP ans = NULL_USER_OBJECT;
 
-/*XXX */
- xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+ xmlDocPtr doc;
+
+ if(TYPEOF(sdoc) != EXTPTRSXP || R_ExternalPtrTag(sdoc) != Rf_install("XMLInternalDocument")) {
+   PROBLEM "xpathEval must be given an internal XML document object, 'XMLInternalDocument'"
+   ERROR;
+ }
+
+ doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
  ctxt = xmlXPathNewContext(doc);
 
  if(GET_LENGTH(namespaces)) {
@@ -108,7 +134,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces)
  result = xmlXPathEvalExpression(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(path, 0))), ctxt);
 
  if(result)
-     ans = convertXPathObjectToR(result);
+     ans = convertXPathObjectToR(result, fun);
  
  xmlXPathFreeObject(result);
  xmlXPathFreeContext(ctxt);

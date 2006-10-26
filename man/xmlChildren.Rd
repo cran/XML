@@ -1,11 +1,22 @@
 \name{xmlChildren}
 \alias{xmlChildren}
+\alias{xmlChildren<-}
 \alias{xmlChildren.XMLNode}
 \alias{xmlChildren.XMLInternalNode}
 \title{ Gets the sub-nodes within an XMLNode object. }
 \description{
- This returns a list of XMLNode objects within an
- XMLNode object.
+  These functions provide access to the children of the given
+  XML node.
+  The simple accessor returns a list of child XMLNode objects within an
+  XMLNode object.
+
+  The assignment operator (\code{xmlChildren<-}) sets the
+  children of the node to the given value and returns the
+  updated/modified node.  No checking is currently done
+  on the type and values of the right hand side. This allows
+  the children of the node to be arbitrary R objects.  This can
+  be useful but means that one cannot rely on any structure in a node
+  being present..
 }
 \usage{
 xmlChildren(x)

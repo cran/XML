@@ -1,14 +1,32 @@
 \name{getNodeSet}
 \alias{getNodeSet}
+\alias{xpathApply}
 \title{Find matching nodes in an internal XML tree/DOM}
 \description{
-  This function provides a way to find XML nodes that match a particular
+  These functions provide a way to find XML nodes that match a particular
   criterion. It uses the XPath syntax and allows quite powerful
   expressions for identifying nodes.  The XPath language requires some
-  knowledge, but tutorials are available.
+  knowledge, but tutorials are available on the Web and in books.
+  XPath queries can result in different types of values such as numbers,
+  strings, and node sets. 
+
+  These sets of matching nodes are returned in R
+  as a list.  And then one can iterate over these elements to process the 
+  nodes in whatever way one wants. Unfortunately, this involves two loops -
+  one in the XPath query over the entire tree, and another in R.
+  Typically, this is fine as the number of matching nodes is reasonably small.
+  However, if repeating this on numerous files, speed may become an issue.
+  We can avoid the second loop (i.e. the one in R) by applying a function to each node
+  before it is returned to R as part of the node set.  The result of the function
+  call is then returned, rather than the node itself.
+
+  One can provide an expression rather than a function. This is expected to be a call
+  and the first argument of the call will be replaced with the node.
+  
 }
 \usage{
-getNodeSet(doc, path, namespaces = character())
+getNodeSet(doc, path, namespaces = character(), fun = NULL, ...)
+xpathApply(doc, path, fun, ... , namespaces = character())
 }
 \arguments{
   \item{doc}{an object of class \code{XMLInternalDocument}}
@@ -33,6 +51,11 @@ getNodeSet(doc, path, namespaces = character())
     to find correspondence. The prefixes are used only to refer to
     that URI.
   }
+ \item{fun}{a function object, or an expression or call, which is used when the result is a node set
+     and evaluated for each node element in the node set.  If this is a call, the first argument is replaced 
+     with the current node.
+ }
+ \item{...}{any additional arguments to be passed to \code{fun} for each node in the node set.}
 }
 \details{
   This calls the libxml routine \code{xmlXPathEval}.
@@ -44,6 +67,9 @@ getNodeSet(doc, path, namespaces = character())
   \item{numeric}{a number}
   \item{logical}{a boolean}
   \item{character}{a string, i.e. a single character element.}
+
+  If \code{fun} is supplied and the result of the XPath query is a node set, 
+  the result in R is a list.
 }
 
 \references{\url{http://xmlsoft.org}, 
@@ -85,7 +111,46 @@ getNodeSet(doc, path, namespaces = character())
  z = xmlTreeParse(f, useInternal = TRUE)
  getNodeSet(z, "//gmr:Item/gmr:name", c(gmr="http://www.gnome.org/gnumeric/v2"))
 
+
+ #####
+ # European Central Bank (ECB) exchange rate data
+
+  # Data is available from "http://www.ecb.int/stats/eurofxref/eurofxref-hist.xml"
+  # or locally.
+
+ uri = system.file("exampleData", "eurofxref-hist.xml.gz", package = "XML")
+ doc = xmlTreeParse(uri, useInternalNodes = TRUE)
+
+   # The default namespace for all elements is given by
+ namespaces <- c(ns="http://www.ecb.int/vocabulary/2002-08-01/eurofxref")
+
+
+     # Get the data for Slovenian currency for all time periods.
+     # Find all the nodes of the form <Cube currency="SIT"...>
+
+ slovenia = getNodeSet(doc, "//ns:Cube[@currency='SIT']", namespaces )
+
+    # Now we have a list of such nodes, loop over them 
+    # and get the rate attribute
+ rates = as.numeric( sapply(slovenia, xmlGetAttr, "rate") )
+    # Now put the date on each element
+    # find nodes of the form <Cube time=".." ... >
+    # and extract the time attribute
+ names(rates) = sapply(getNodeSet(doc, "//ns:Cube[@time]", namespaces ), 
+                      xmlGetAttr, "time")
+
+    #  Or we could turn these into dates with strptime()
+ strptime(names(rates), "\%Y-\%m-\%d")
+
+
+   #  Using xpathApply, we can do
+ rates = xpathApply(doc, "//ns:Cube[@currency='SIT']", xmlGetAttr, "rate", namespaces = namespaces )
+ rates = as.numeric(unlist(rates))
+
+   # Using an expression rather than  a function and ...
+ rates = xpathApply(doc, "//ns:Cube[@currency='SIT']", quote(xmlGetAttr(x, "rate")), namespaces = namespaces )
 }
 \keyword{file}
 \keyword{IO}
+
 

@@ -103,4 +103,9 @@ RS_XMLParserData *RS_XML(createParserData)(USER_OBJECT_ handlers);
 
 int RS_XML(parseBufferWithParserData)(char *buf, RS_XMLParserData *parserData);
 int RS_XML(notStandAloneHandler)(void *userData);
+
+void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
+			      int saxVersion);
+
+
 #endif

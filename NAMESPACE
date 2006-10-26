@@ -17,6 +17,7 @@ export(
  entityDeclaration.SAX,
  genericSAXHandlers,
  getNodeSet,
+ xpathApply,
  htmlTreeParse,
  libxmlVersion,
  newXMLDoc,
@@ -63,7 +64,8 @@ export(
  parseURI,
  asXMLTreeNode,
  xmlHashTree,
- addNode
+ addNode,
+ "xmlChildren<-"
 # xmlFlatListTree       
 )
 

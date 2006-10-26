@@ -1,19 +1,67 @@
 xmlNode <-
-function(name, ..., attrs=NULL, namespace="")
+function(name, ..., attrs = NULL, namespace = "")
 {
   kids <- lapply(list(...), asXMLNode)
+  kids = addNames(kids)
+
   node <- list(name = name, attributes = attrs, children = kids, namespace=namespace)
   class(node) <- c("XMLNode")
 
   node
 }
 
-xmlTextNode <- 
-function(value, namespace="")
+addNames =
+function(kids, fromTag = TRUE)
 {
-  node <- xmlNode("text", namespace=namespace)
+  if(fromTag)
+     names(kids) = sapply(kids, xmlName)
+  else if(length(names(kids)) == 0)
+      names(kids) <- sapply(kids,xmlName)
+  else if(any( idx <- names(kids) == "")) 
+      names(kids)[idx] <- sapply(kids[idx], xmlName)
+
+  kids
+}
+
+"xmlChildren<-" <-
+function(x, value) {
+  value = addNames(value)
+  x$children <- value
+  x
+}
+
+# It would be better tokenize this, but ...
+XMLEntities =
+  c("&" = "amp",  # order is important as if we insert an entity, then the next time we will see the &.
+    ">" = "gt",
+    "<" = "lt",
+    "'" = "apos",
+    '"' = "quot")
+
+
+insertEntities =
+function(value, entities = XMLEntities)
+{
+    pat = names(entities)
+    subs = paste("&", entities, ";", sep = "")
+    for(i in seq(along = entities)) 
+      value = gsub(pat[i], subs[i], value)
+
+    value
+}
+
+xmlTextNode <- 
+function(value, namespace = "", entities = XMLEntities)
+{
+  node <- xmlNode("text", namespace = namespace)
+
+  if(length(entities)) 
+   value = insertEntities(value, XMLEntities)
+
   node$value <- value
   class(node) <- c("XMLTextNode", class(node))
+  if(length(entities))
+    class(node) <- c(class(node), "EntitiesEscaped")
  node
 }
 

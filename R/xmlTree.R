@@ -305,12 +305,20 @@ saveXML.XMLNode =
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
          doctype = NULL, encoding = "")
 {
-  sink(file)
+  if(is.character(file))
+    file = file(file, "w")
+  
+  if(inherits(file, "connection")) {
+    sink(file)
+    on.exit(sink())    
+  }
+
   if(!is.null(prefix))
     cat(as.character(prefix))
+
   if(!is.null(doctype))
     cat(as.character(doctype), '\n')
-  on.exit(sink())
+  
   print(doc)
 }
 

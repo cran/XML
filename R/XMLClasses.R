@@ -172,8 +172,13 @@ function(x, ..., indent = "", tagSeparator = "\n")
 {
   if(is.logical(indent) && !indent)
     indent <- ""
+
+  if(inherits(x, "EntitiesEscaped"))
+    txt = xmlValue(x)
+  else
+    txt = insertEntities( xmlValue(x) )
   
-  cat(indent, xmlValue(x), tagSeparator, sep="")
+  cat(indent, txt, tagSeparator, sep="")
 }  
 
 print.XMLNode <-
@@ -205,19 +210,51 @@ function(x, ..., indent = "", tagSeparator = "\n")
     indent <- ""
     subIndent <- FALSE
   }
- 
- cat(indent, paste("<",xmlName(x, TRUE),
-                       ifelse(tmp != "", " ", ""), tmp,
-                       ifelse(ns != "", " ", ""), ns,
-                   ">",
-                   tagSeparator,
-                   sep=""), sep = "")
- 
 
-  for(i in xmlChildren(x)) 
-     print(i, indent = subIndent, tagSeparator = tagSeparator)
 
- cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, sep=""), sep = "")
+    if (length(xmlChildren(x)) == 0) {
+      ## Empty Node - so difference is <nodename />
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
+          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, "/>", tagSeparator, 
+          sep = ""), sep = "")
+    } else if (length(xmlChildren(x))==1 &&
+               is(xmlChildren(x)[[1]],"XMLTextNode")) {
+      ## Sole child is text node, print without extra white space.
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
+          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">",
+          sep = ""), sep = "")
+      kid = xmlChildren(x)[[1]]
+      if(inherits(kid, "EntitiesEscaped"))
+        txt = xmlValue(kid)
+      else
+        txt = insertEntities( xmlValue(kid) )
+      
+      cat(txt,sep="")
+      cat(paste("</", xmlName(x, TRUE), ">", tagSeparator, 
+          sep = ""), sep = "")
+    } else {
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
+          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">", tagSeparator, 
+          sep = ""), sep = "")
+      for (i in xmlChildren(x))
+        print(i, indent = subIndent, tagSeparator = tagSeparator)
+      cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, 
+          sep = ""), sep = "")
+    }
+
+  
+##  cat(indent, paste("<",xmlName(x, TRUE),
+##                        ifelse(tmp != "", " ", ""), tmp,
+##                        ifelse(ns != "", " ", ""), ns,
+##                    ">",
+##                    tagSeparator,
+##                    sep=""), sep = "")
+##  
+##  
+##   for(i in xmlChildren(x)) 
+##      print(i, indent = subIndent, tagSeparator = tagSeparator)
+##  
+##  cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, sep=""), sep = "")
 }
 
 print.XMLEntityRef <-
@@ -279,11 +316,24 @@ function(el, name, recursive = FALSE)
 
 
 getNodeSet =
-function(doc, path, namespaces = character())
+function(doc, path, namespaces = character(), fun = NULL, ...)
+{
+  xpathApply(doc, path, fun, ...,  namespaces = namespaces)
+}  
+
+xpathApply =
+function(doc, path, fun, ... , namespaces = character())
 {
   if(!is.character(namespaces) || ( length(namespaces) > 0 && length(names(namespaces)) == 0))
      stop("Namespaces must be a named character vector")
 
-  .Call("RS_XML_xpathEval", doc, as.character(path), namespaces)
-}  
+  if(!is.null(fun) && !is.call(fun))
+    fun = match.fun(fun)
 
+  # create an expression of the form fun(x, ...) and the C code will insert x for each node.
+  args = list(...)
+  if(length(args))  
+    fun = as.call(c(fun, append(1, args)))
+
+  .Call("RS_XML_xpathEval", doc, as.character(path), namespaces, fun)  
+}
