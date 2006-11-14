@@ -84,8 +84,9 @@ convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun)
 }
 
 
+#include <libxml/xpathInternals.h> /* For xmlXPathRegisterNs() */
 xmlNsPtr *
-R_namespaceArray(SEXP namespaces)
+R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
 {
  int i, n;
  SEXP names = GET_NAMES(namespaces);
@@ -100,8 +101,13 @@ R_namespaceArray(SEXP namespaces)
 
  for(i = 0; i < n; i++) {
 /*XXX who owns these strings. */
-   els[i] = xmlNewNs(NULL, CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(namespaces, i)))),
-                           CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(names, i)))));
+   const xmlChar *prefix, *href;
+   href = CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(namespaces, i))));
+   prefix = names == NULL_USER_OBJECT ?  CHAR_TO_XMLCHAR("") /* NULL */ 
+                                      :  CHAR_TO_XMLCHAR(strdup(CHAR_DEREF(STRING_ELT(names, i))));
+   els[i] = xmlNewNs(NULL, href, prefix);
+   if(ctxt) 
+       xmlXPathRegisterNs(ctxt, prefix, href);
  }
 
  return(els);
@@ -126,8 +132,8 @@ RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
  ctxt = xmlXPathNewContext(doc);
 
  if(GET_LENGTH(namespaces)) {
-    ctxt->namespaces =  R_namespaceArray(namespaces); /* xmlCopyNamespaceList(doc); */
-    ctxt->nsNr = GET_LENGTH(namespaces);
+     ctxt->namespaces =  R_namespaceArray(namespaces, ctxt); /* xmlCopyNamespaceList(doc); */
+     ctxt->nsNr = GET_LENGTH(namespaces);
  }
 
 

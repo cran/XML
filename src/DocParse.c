@@ -365,6 +365,38 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
 
 enum { NODE_NAME, NODE_ATTRIBUTES, NODE_CHILDREN, NODE_NAMESPACE, NODE_NAMESPACE_DEFS, NUM_NODE_ELEMENTS};
 
+USER_OBJECT_
+RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node)
+{
+  USER_OBJECT_ nsDef = NULL_USER_OBJECT;
+  xmlNodePtr node;
+
+  if(TYPEOF(r_node) != EXTPTRSXP) {
+       PROBLEM "R_internalNodeNamespaceDefinitions expects InternalXMLNode objects"
+       ERROR;
+    }
+
+  node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+  if(node->nsDef) {
+      xmlNs *ptr = node->nsDef;
+      int n = 0;
+      while(ptr) {
+          n++;  ptr = ptr->next;
+      }
+
+      PROTECT(nsDef = NEW_LIST(n));
+      ptr = node->nsDef; n = 0;
+      while(ptr) {
+          SET_VECTOR_ELT(nsDef, n, RS_XML(createNameSpaceIdentifier)(ptr, node));
+          n++;  ptr = ptr->next;
+      }
+      SET_CLASS(nsDef, mkString("NamespaceDefinitionList"));
+      UNPROTECT(1);
+  }
+
+  return(nsDef);
+}
+
 static USER_OBJECT_
 RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *parserSettings, USER_OBJECT_ parentUserNode)
 {
@@ -1028,9 +1060,10 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     if(!ns)
 	return(NEW_CHARACTER(0));
 
-    PROTECT(ans = NEW_CHARACTER(2));
-    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix)));
+    PROTECT(ans = NEW_CHARACTER(1));
     SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
+    if(ns->prefix)
+        SET_NAMES(ans, mkString(ns->prefix)); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
     UNPROTECT(1);    
     return(ans);
 }

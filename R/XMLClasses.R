@@ -314,19 +314,35 @@ function(el, name, recursive = FALSE)
   }
 
 
+getDefaultNamespace =
+function(doc)
+{
+  ns = xmlNamespaceDefinitions(doc)
+  val = unlist(sapply(ns, function(x) if(x$id == "") x$uri))
+  if(length(val))
+     c("d" = val[1])
+  else   
+     character()
+}  
 
 getNodeSet =
-function(doc, path, namespaces = character(), fun = NULL, ...)
+function(doc, path, namespaces = getDefaultNamespace(xmlRoot(doc)), fun = NULL, ...)
 {
   xpathApply(doc, path, fun, ...,  namespaces = namespaces)
 }  
 
 xpathApply =
-function(doc, path, fun, ... , namespaces = character())
+function(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
 {
-  if(!is.character(namespaces) || ( length(namespaces) > 0 && length(names(namespaces)) == 0))
+  if(!inherits(doc, "XMLInternalDocument"))
+    stop("Need XMLInternalDocument object for XPath query")
+  
+  if(!is.character(namespaces) || ( length(namespaces) > 1 && length(names(namespaces)) == 0))
      stop("Namespaces must be a named character vector")
 
+  if(length(namespaces) && (length(names(namespaces)) == 0 || any(names(namespaces) == "")))
+     warning("namespaces without a name/prefix are not handled as you might expect in XPath. Use a prefix")
+  
   if(!is.null(fun) && !is.call(fun))
     fun = match.fun(fun)
 
@@ -335,5 +351,6 @@ function(doc, path, fun, ... , namespaces = character())
   if(length(args))  
     fun = as.call(c(fun, append(1, args)))
 
+ 
   .Call("RS_XML_xpathEval", doc, as.character(path), namespaces, fun)  
 }

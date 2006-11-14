@@ -303,7 +303,7 @@ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_d
       len = (ptr[4] - ptr[3] + 1);
       tmp = malloc(sizeof(char) * len);
       if(!tmp) {
-         PROBLEM "Cannot allocate space for attribute of length %d", (ptr[4] - ptr[3] + 2)
+         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
 	 ERROR;
       }
       memcpy(tmp, ptr[3], ptr[4] - ptr[3]);

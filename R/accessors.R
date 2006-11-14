@@ -134,10 +134,28 @@ function(x, ignoreComments = FALSE)
 
 
 xmlNamespaceDefinitions <-
-function(x)
+function(x, addNames = TRUE)
 {
-  unclass(x)$namespaceDefinitions
+  UseMethod("xmlNamespaceDefinitions")
 }
+
+xmlNamespaceDefinitions.XMLNode =
+  function(x, addNames = TRUE) {
+    ans = unclass(x)$namespaceDefinitions
+
+    if(addNames && length(names(ans)) == 0)
+        names(ans) = sapply(ans, function(x) x$id)
+
+    ans
+  }
+
+xmlNamespaceDefinitions.XMLInternalNode =
+  function(x, addNames = TRUE) {
+    ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x)
+    if(addNames && length(ans) > 0)
+      names(ans) = sapply(ans, function(x) x$id)
+    ans
+  }
 
 xmlNamespace <-
 function(x)

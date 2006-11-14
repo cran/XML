@@ -10,10 +10,14 @@
   in the nodes attributes via \code{\link{xmlAttrs}}.
 }
 \usage{
-xmlNamespaceDefinitions(x)
+xmlNamespaceDefinitions(x, addNames = TRUE)
 }
 \arguments{
-  \item{x}{the \code{XMLNode} object in which to find any namespace definitions}
+  \item{x}{the \code{XMLNode} object in which to find any namespace
+    definitions}
+  \item{addNames}{a logical indicating whether to compute the names for
+    the elements in the resulting list. The names are convenient, but
+    one can avoid the (very small) overhead of computing these with this parameter.}
 }
 \details{
 }

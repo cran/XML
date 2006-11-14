@@ -25,8 +25,8 @@
   
 }
 \usage{
-getNodeSet(doc, path, namespaces = character(), fun = NULL, ...)
-xpathApply(doc, path, fun, ... , namespaces = character())
+getNodeSet(doc, path, namespaces = getDefaultNamespace(xmlRoot(doc)), fun = NULL, ...)
+xpathApply(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
 }
 \arguments{
   \item{doc}{an object of class \code{XMLInternalDocument}}
@@ -80,12 +80,31 @@ xpathApply(doc, path, fun, ... , namespaces = character())
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \note{
+
+  In order to match nodes in the default name space for
+ documents with a non-trivial default namespace, e.g. given as
+  \code{xmlns="http://www.omegahat.org"}, you will need to use a prefix
+  for the default namespace in this call.
+  When specifying the namespaces, give a name - any name - to the
+  default namespace URI and then use this as the prefix in the
+  XPath expression, e.g.
+  \code{getNodeSet(d, "//d:myNode", c(d = "http://www.omegahat.org"))}
+  to match myNode in the default name space
+  \code{http://www.omegahat.org}.
+  
+  This default namespace of the document is now computed for us and
+  is the default value for the namespaces argument.
+  It can be referenced using the prefix 'd',
+  standing for default but sufficiently short to be
+  easily used within the XPath expression.
+
+  
   More of the XPath functionality provided by libxml can and may be
   made available to the R package.
   Facilities such as compiled XPath expressions, functions, ordered node
-  information,
+  information are examples.
    
-  Please send requests to the maintainer.
+  Please send requests to the package maintainer.
 }
 
 \seealso{
@@ -149,6 +168,29 @@ xpathApply(doc, path, fun, ... , namespaces = character())
 
    # Using an expression rather than  a function and ...
  rates = xpathApply(doc, "//ns:Cube[@currency='SIT']", quote(xmlGetAttr(x, "rate")), namespaces = namespaces )
+
+   #
+  uri = system.file("exampleData", "namespaces.xml", package = "XML")
+  d = xmlTreeParse(uri, useInternalNodes = TRUE)
+  getNodeSet(d, "//c:c", c(c="http://www.c.org"))
+
+   # the following, perhaps unexpectedly but correctly, returns an empty
+   # with no matches
+   
+  getNodeSet(d, "//defaultNs", "http://www.omegahat.org")
+
+   # But if we create our own prefix for the evaluation of the XPath
+   # expression and use this in the expression, things work as one
+   # might hope.
+  getNodeSet(d, "//dummy:defaultNs", c(dummy = "http://www.omegahat.org"))
+
+   # And since the default value for the namespaces argument is the
+   # default namespace of the document with the prefix 'd', we can use
+  getNodeSet(d, "//d:defaultNs")
+
+
+   # And the syntactic sugar is 
+  d["//d:defaultNs"]
 }
 \keyword{file}
 \keyword{IO}

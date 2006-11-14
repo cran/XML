@@ -1,3 +1,17 @@
+Version 1.2-0
+
+  *  names() method for XMLInternalNode
+
+  *  [ method for XMLInternalDocument and string using XPath notation.
+
+  *  getNodeSet() has support for default namespaces in the XML document.
+     It is available, by default, to the XPath expression with the prefix 'd'.
+
+  *  Exported xmlNamespace() method for XMLInternalNode.
+
+  *  xmlNamespaceDefinitions() made generic (S3) and new method for
+     XMLInternalNode class.
+
 Version 1.1-1
  
    *  Change to handling entities in printing of regular R-level XML text nodes 

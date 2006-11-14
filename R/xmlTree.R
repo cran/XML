@@ -130,6 +130,15 @@ setAs("XMLInternalNode", "XMLNode",
         })
 
 
+"[.XMLInternalDocument" =
+function(x, i, j, ...)
+{
+  if(is.character(i)) {
+    getNodeSet(x, i, ...)
+  } else
+     stop("No method for subsetting an XMLInternalDocument with ", class(i))
+}  
+
 xmlName.XMLInternalNode =
 function(node, full = FALSE)
 {
@@ -191,6 +200,9 @@ function(x, ignoreComments = FALSE)
 }  
 
 
+names.XMLInternalNode =
+function(x)
+  xmlSApply(x, xmlName)
 
 xmlApply.XMLInternalNode =
 function(X, FUN, ...)

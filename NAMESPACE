@@ -60,14 +60,17 @@ export(
  xmlTreeParse,
  xmlValue,
  names.XMLNode,
- xmlNamespaceDefinitions,
  parseURI,
  asXMLTreeNode,
  xmlHashTree,
  addNode,
+ xmlNamespaceDefinitions,
  "xmlChildren<-"
 # xmlFlatListTree       
 )
+
+S3method(xmlNamespaceDefinitions, XMLNode)
+S3method(xmlNamespaceDefinitions, XMLInternalNode)
 
 #S3method(names, XMLFlatTree)
 #S3method("$", XMLFlatListTree)
@@ -104,6 +107,9 @@ S3method("[[", XMLDocumentContent)
 
 S3method("[[", XMLInternalNode)
 S3method("[", XMLInternalNode)
+
+S3method("[", XMLInternalDocument)
+S3method("names", XMLInternalNode)
 
 S3method("[<-", XMLNode)
 S3method("[[<-", XMLNode)
@@ -150,6 +156,7 @@ S3method(xmlValue, XMLProcessingInstruction)
 
 
 S3method(xmlNamespace, XMLNode)
+S3method(xmlNamespace, XMLInternalNode)
 
 # No effect if append is not generic.
 S3method(append, XMLNode)
