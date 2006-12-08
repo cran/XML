@@ -69,6 +69,10 @@ export(
 # xmlFlatListTree       
 )
 
+exportClasses("XMLInternalDocument")
+exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode")
+exportMethods("coerce")
+
 S3method(xmlNamespaceDefinitions, XMLNode)
 S3method(xmlNamespaceDefinitions, XMLInternalNode)
 
@@ -83,6 +87,7 @@ S3method(print, XMLHashTree)
 S3method(xmlParent, XMLTreeNode)
 S3method(xmlChildren, XMLTreeNode)
 S3method(xmlParent, XMLHashTreeNode)
+S3method(xmlParent, XMLInternalNode)
 S3method(xmlChildren, XMLHashTreeNode)
 S3method(xmlSize, XMLHashTreeNode)
 
@@ -176,8 +181,6 @@ S3method(dtdElementValidEntry, XMLSequenceContent)
 # Not yet exported....
 #xmlValidity
 
-
-
 if(FALSE) {
 exportClasses("ExternalReference", "xmlSchemaRef", "libxmlTypeTable")
 exportClasses("SchemaElementTable", "xmlSchemaElementRef",
@@ -189,5 +192,6 @@ exportClasses("SchemaElementTable", "xmlSchemaElementRef",
 
 exportMethods("names", "$", "$<-", "coerce")
 }
+
 
 importFrom(utils, normalizePath)

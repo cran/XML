@@ -7,7 +7,8 @@ xmlEventParse <-
 #
 function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
           useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE, state = NULL,
-          replaceEntities = TRUE, validate = FALSE, saxVersion = 1) 
+          replaceEntities = TRUE, validate = FALSE, saxVersion = 1,
+          branches = NULL) 
 {
   if(libxmlVersion()$major < 2 && !is.character(file))
     stop("Without libxml2, the source of the XML can only be specified as a URI.")
@@ -54,14 +55,19 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
    file = as.character(file)
  }
 
+ branches = as.list(branches)
+ if(length(branches) > 0 && (length(names(branches)) == 0 || any(names(branches) == "")))
+    stop("All branch elements must have a name!")
+
  state <- .Call("RS_XML_Parse", file, handlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
                       as.logical(useExpat), state, as.logical(replaceEntities),
-                       as.logical(validate), as.integer(saxVersion))
+                       as.logical(validate), as.integer(saxVersion), branches)
 
   if(!is.null(state))
    return(state)
  else
    return(invisible(handlers))
 }
+

@@ -248,6 +248,42 @@ R_createXMLDocRef(xmlDocPtr doc)
   return(ref);
 }
 
+const char * 
+R_getInternalNodeClass(xmlElementType type)
+{
+    const char * p = "";
+    switch(type) {
+        case XML_ELEMENT_NODE:
+              p = "XMLInternalElementNode";
+              break;
+        case XML_TEXT_NODE:
+              p = "XMLInternalTextNode";
+              break;
+        case XML_CDATA_SECTION_NODE:
+              p = "XMLInternalCDataNode";
+              break;
+        case XML_ENTITY_NODE:
+              p = "XMLInternalEntityNode";
+              break;
+        case XML_ENTITY_REF_NODE:
+              p = "XMLInternalEntityRefNode";
+              break;
+        case XML_PI_NODE:
+              p = "XMLInternalPINode";
+              break;
+        case XML_COMMENT_NODE:
+              p = "XMLInternalCommentNode";
+              break;
+        case XML_NOTATION_NODE:
+              p = "XMLInternalNotationNode";
+              break;
+        default:
+              p = "XMLUnknownInternalNode";
+    }
+
+    return(p);
+}
+
 /**
 
  */
@@ -257,12 +293,15 @@ R_createXMLNodeRef(xmlNodePtr node)
   SEXP ref, tmp;
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
-  PROTECT(tmp = NEW_CHARACTER(1));
-  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLInternalNode"));
+  PROTECT(tmp = NEW_CHARACTER(2));
+  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(R_getInternalNodeClass(node->type)));
+  SET_STRING_ELT(tmp, 1, COPY_TO_USER_STRING("XMLInternalNode"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
 }
+
+
 
 
 #define ValOrNULL(x) CHAR_TO_XMLCHAR ((x && x[0] ? x : NULL))

@@ -51,7 +51,8 @@ USER_OBJECT_
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
-                  USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion)
+                  USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion,
+                   USER_OBJECT_ branches)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -95,12 +96,15 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   }
 
   parserData = RS_XML(createParserData)(handlers);
+  parserData->branches         = branches;
   parserData->fileName         = name; 
   parserData->callByTagName    = LOGICAL_DATA(useTagName)[0]; 
   parserData->addContextInfo   = LOGICAL_DATA(addContext)[0]; 
   parserData->trim             = LOGICAL_DATA(trim)[0]; 
   parserData->ignoreBlankLines = LOGICAL_DATA(ignoreBlanks)[0]; 
   parserData->stateObject = (stateObject == NULL_USER_OBJECT ? NULL : stateObject);
+  /*Is this necessary? Shouldn't it already be protected? Or is there a chance that we may 
+    be doing this asynchronously in a pull approach. */
   if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
     R_PreserveObject(parserData->stateObject);
 
@@ -172,6 +176,13 @@ void
 RS_XML(startElement)(void *userData, const char *name, const char **atts)
 {
   USER_OBJECT_ opArgs;
+  int i;
+  RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
+
+  if((i = R_isBranch(name, rinfo)) != -1) {
+      R_processBranch(rinfo, i, name, NULL, NULL, 0, NULL, 0, 0, atts);
+      return;
+  }
 
   PROTECT(opArgs = NEW_LIST(2));
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
@@ -226,6 +237,13 @@ RS_XML(createAttributesList)(const char **atts)
 void RS_XML(endElement)(void *userData, const char *name)
 {
  USER_OBJECT_ opArgs;
+ RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
+
+ if(rinfo->current) {
+     R_endBranch(rinfo, name, NULL, NULL);
+      return;
+ }
+
  ((RS_XMLParserData*)userData)->depth++;
 
   PROTECT(opArgs = NEW_LIST(1));
@@ -275,7 +293,17 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
  USER_OBJECT_ opArgs = NULL;
  RS_XMLParserData *parserData = (RS_XMLParserData*)userData; 
 
-  if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && s[0] == '\n'))
+  if(parserData->current) {
+      xmlChar *tmp = (xmlChar *) S_alloc((len + 1), sizeof(xmlChar));
+      memcpy(tmp, s, len); tmp[len] = '\0';
+      xmlAddChild(parserData->current, xmlNewText(tmp));
+      return;
+  }
+  /* Last case handles ignoring the new line between the two nodes if trim is TRUE.
+     <abc/>
+     <next>
+     */
+  if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && s[0] == '\n' && parserData->trim))
     return;
 
            /* 1 more than length so we can put a \0 on the end. */

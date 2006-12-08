@@ -12,6 +12,7 @@ function(where = "package:XML") {
    setGeneric("comment.SAX", function(content,  .state = NULL) { standardGeneric("comment.SAX")}, where = where)
    # Note that we drop the . here.
    setGeneric("text.SAX", function(content,  .state = NULL) { standardGeneric("text.SAX")}, where = where)
+   setGeneric("cdata.SAX", function(content,  .state = NULL) { standardGeneric("cdata.SAX")}, where = where)   
    setGeneric("processingInstruction.SAX", function(target, content, .state = NULL) { standardGeneric("processingInstruction.SAX")}, where = where)
    setGeneric("entityDeclaration.SAX", function(name, base, sysId, publicId, notationName, .state = NULL) { standardGeneric("entityDeclaration.SAX")}, where = where)
 

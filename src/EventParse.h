@@ -17,6 +17,11 @@
 typedef char XML_Char;
 #endif
 
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif
 
 
    /* Extensible Struct for carrying information about the parser and its 
@@ -70,8 +75,43 @@ typedef struct {
 
    /* S object used in event parsing to share state across calls. */
   USER_OBJECT_ stateObject;
+
+
+    /* For identifying which element names are to be created into regular nodes. */
+  USER_OBJECT_ branches;
+  xmlNodePtr current;
+  xmlNodePtr top;
+  int        branchIndex;
+
 } RS_XMLParserData;
 
+
+void
+R_processBranch(RS_XMLParserData * rinfo, 
+                int branchIndex, 
+                const xmlChar * localname, 
+                const xmlChar * prefix, 
+                const xmlChar * URI, 
+                int nb_namespaces, 
+                const xmlChar ** namespaces, 
+                int nb_attributes, 
+                int nb_defaulted, 
+                const xmlChar ** attributes);
+int
+R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo);
+void
+R_endBranch(RS_XMLParserData *rinfo,
+            const xmlChar * localname, 
+            const xmlChar * prefix, 
+            const xmlChar * URI);
+
+#if 0
+typedef struct NodeList NodeList;
+struct NodeList {
+  xmlNodePtr *el;
+  NodeList *next
+};
+#endif
 
 
 /* Allocate a data structure for use with the parser */

@@ -143,7 +143,7 @@ xmlNamespaceDefinitions.XMLNode =
   function(x, addNames = TRUE) {
     ans = unclass(x)$namespaceDefinitions
 
-    if(addNames && length(names(ans)) == 0)
+    if(addNames && length(ans) && length(names(ans)) == 0)
         names(ans) = sapply(ans, function(x) x$id)
 
     ans

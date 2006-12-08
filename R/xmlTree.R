@@ -122,13 +122,20 @@ function(x, ...)
   .Call("R_xmlRootNode", x)
 }
 
+setOldClass("XMLInternalDocument")
 setOldClass("XMLNode")
 setOldClass("XMLInternalNode")
-setAs("XMLInternalNode", "XMLNode",
-        function(from) {
-           .Call("R_createXMLNode", from, NULL)
-        })
 
+setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
+
+setAs("XMLInternalNode", "XMLNode",
+        function(from) 
+           asRXMLNode(from)
+        )
+
+asRXMLNode =
+function(node, converters = NULL, trim = TRUE, ignoreBlanks = TRUE)
+   .Call("R_createXMLNode", node, converters, as.logical(trim), as.logical(ignoreBlanks))
 
 "[.XMLInternalDocument" =
 function(x, i, j, ...)

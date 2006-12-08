@@ -180,7 +180,7 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
                           int saxVersion)
 {
  xmlSAXHandlerPtr xmlParserHandler;
- xmlParserCtxtPtr ctx; /* = (xmlParserCtxtPtr) calloc(1, sizeof(xmlParserCtxtPtr)); XXX */
+ xmlParserCtxtPtr ctx; 
  int status;
 
   switch(asText) {
@@ -227,6 +227,86 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
 
 
 
+int
+R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo)
+{
+    int n;
+    if(rinfo->current)
+        return(-2);
+
+    if((n = GET_LENGTH(rinfo->branches)) > 0) {
+        int i;
+        USER_OBJECT_ names = GET_NAMES(rinfo->branches);
+        for(i = 0 ; i < n ; i++) {
+            if(strcmp(localname, CHAR_DEREF(STRING_ELT(names, i))) == 0) {
+                return(i);
+            }
+        }
+
+    }
+     
+    return(-1);   
+}
+void
+R_processBranch(RS_XMLParserData * rinfo, 
+                int branchIndex, 
+                const xmlChar * localname, 
+                const xmlChar * prefix, 
+                const xmlChar * URI, 
+                int nb_namespaces, 
+                const xmlChar ** namespaces, 
+                int nb_attributes, 
+                int nb_defaulted, 
+                const xmlChar ** attributes)
+{
+    xmlNodePtr node;
+
+    node = xmlNewNode(NULL, localname);
+    if(attributes) {
+        const xmlChar **p = attributes;
+        int i;
+        for(i = 0; *p ; i += 2, p += 2) 
+            xmlSetProp(node, p[0], p[1]);
+    }
+    if(rinfo->current) {
+        /* Add to children */
+        xmlAddChild(rinfo->current, node);
+    } else {
+        rinfo->top = node;
+        rinfo->branchIndex = branchIndex;
+    }
+    rinfo->current = node;
+}
+
+void
+R_endBranch(RS_XMLParserData *rinfo,
+            const xmlChar * localname, 
+            const xmlChar * prefix, 
+            const xmlChar * URI)
+{
+    if(rinfo->current) {
+        xmlNodePtr tmp;
+        tmp = rinfo->current;
+        if(tmp->parent == NULL) {
+            /* Call the function.*/
+            SEXP e = allocVector(LANGSXP, 2), rnode, fun;
+            PROTECT(e);
+            fun = VECTOR_ELT(rinfo->branches, rinfo->branchIndex);
+            SETCAR(e, fun);
+            rnode = R_createXMLNodeRef(tmp);
+            SETCAR(CDR(e), rnode);
+            (void) Rf_eval(e, R_GlobalEnv);
+            UNPROTECT(1);
+#if 0
+            fprintf(stderr, "Finishing branch for %s %s\n", tmp->name, tmp->properties->children->content);
+#endif
+            xmlFreeNode(rinfo->top);
+            rinfo->top = NULL;
+        }
+
+        rinfo->current = rinfo->current->parent;
+    }
+}
 
 static void	
 RS_XML(xmlSAX2StartElementNs)(void * userData, 
@@ -242,6 +322,15 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   int i, n;
   USER_OBJECT_ tmp, names;
   USER_OBJECT_ opArgs;
+  RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
+
+  if(!localname)
+      return;
+
+  if((i = R_isBranch(localname, rinfo) != -1)) {
+      R_processBranch(rinfo, i, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes);
+      return;
+  }
 
   PROTECT(opArgs = NEW_LIST(4));
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
@@ -272,7 +361,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   UNPROTECT(2);
 
 
-  RS_XML(callUserFunction)("startElement", XMLCHAR_TO_CHAR(localname), ((RS_XMLParserData*) userData), opArgs);
+  RS_XML(callUserFunction)("startElement", XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
 
   UNPROTECT(1);
 }
@@ -336,6 +425,12 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
 			    const xmlChar * URI)
 {
   USER_OBJECT_ args, tmp;
+  RS_XMLParserData *rinfo = (RS_XMLParserData *) ctx;
+
+  if(rinfo->current) {
+      R_endBranch(rinfo, localname, prefix, URI);
+      return;
+  }
 
   PROTECT(args = NEW_LIST(2));
   SET_VECTOR_ELT(args, 0, mkString(XMLCHAR_TO_CHAR(localname)));
@@ -453,6 +548,12 @@ void
 RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len)
 {
  USER_OBJECT_ opArgs;
+ RS_XMLParserData *parserData = (RS_XMLParserData*) ctx;
+
+  if(parserData->current) {
+      xmlAddChild(parserData->current, xmlNewCDataBlock(NULL, value, len));
+      return;
+  }
 
  PROTECT(opArgs = NEW_LIST(1));
  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));

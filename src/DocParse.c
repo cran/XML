@@ -1025,12 +1025,14 @@ RS_XML(ValidationWarning)(void *ctx, const char *format, ...)
 
 
 USER_OBJECT_
-R_createXMLNode(USER_OBJECT_ snode, USER_OBJECT_ handlers)
+R_createXMLNode(USER_OBJECT_ snode, USER_OBJECT_ handlers, USER_OBJECT_ r_trim, USER_OBJECT_ r_skipBlankLines)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     R_XMLSettings parserSettings;
 
     parserSettings.converters = handlers;
+    parserSettings.trim = LOGICAL(r_trim)[0];
+    parserSettings.skipBlankLines = LOGICAL(r_skipBlankLines)[0];
 
     return(RS_XML(createNodeChildren)(node, SIDEWAYS, &parserSettings));
 }
@@ -1043,7 +1045,7 @@ RS_XML_xmlNodeName(USER_OBJECT_ snode)
     USER_OBJECT_ ans;
 
     PROTECT(ans = NEW_CHARACTER(1));
-    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->name)));
+    SET_STRING_ELT(ans, 0, node->name ? COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->name)) : R_NaString);
     UNPROTECT(1);    
     return(ans);
 }

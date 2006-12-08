@@ -2,6 +2,7 @@
 \docType{class}
 \alias{XMLNode-class}
 \alias{XMLInternalNode-class}
+\alias{XMLInternalElementNode-class}
 
 \title{Classes to describe an XML node object.}
 \description{These classes are intended to 

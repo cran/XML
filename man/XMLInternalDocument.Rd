@@ -1,0 +1,52 @@
+\name{XMLInternalDocument-class}
+\docType{class}
+\alias{XMLInternalDocument-class}
+
+\title{Class to represent reference to C-level data structure for an XML
+  document}
+\description{
+  This class is used to provide a handle/reference to a C-level
+  data structure that contains the information from parsing 
+  parsing XML content.
+  This leaves the nodes in the DOM or tree as C-level nodes
+  rather than converting them to explicit R \code{XMLNode}
+  objects.  One can then operate on this tree in much the same
+  way as one can the \code{XMLNode} representations,
+  but we a) avoid copying the nodes to R, and b) can navigate
+  the tree both down and up using \code{\link{xmlParent}}
+  giving greater flexibility.
+  Most importantly, one can use an \code{XMLInternalDocument}
+  class object with an XPath expression to easily and relatively efficiently
+  find nodes within a document that satisfy some criterion.
+  See \code{\link{getNodeSet}}.
+}
+\section{Objects from the Class}{
+  Objects of this type are created via
+  \code{\link{xmlTreeParse}}
+  and   \code{\link{htmlTreeParse}}
+  with the argument  \code{useInternalNodes} given as \code{TRUE}.
+}
+\section{Extends}{
+Class \code{\linkS4class{oldClass}}, directly.
+}
+\section{Methods}{
+}
+\references{
+  XPath
+}
+\seealso{
+
+  \code{\link{xmlTreeParse}}
+  \code{\link{htmlTreeParse}}
+  \code{\link{getNodeSet}}  
+}
+\examples{
+
+ f = system.file("exampleData", "mtcars.xml", package="XML")
+ doc = xmlTreeParse(f, useInternalNodes = TRUE)
+ getNodeSet(doc, "//variables[@count]")
+ getNodeSet(doc, "//record")
+
+ getNodeSet(doc, "//record[@id='Mazda RX4']")
+}
+\keyword{classes}

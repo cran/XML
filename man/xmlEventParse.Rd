@@ -3,22 +3,48 @@
 
 \title{ XML Event/Callback element-wise Parser}
 \description{
- Reads and processes the contents of an XML file
-  or string by
- invoking user-level functions associated with different
- components of the XML tree. These include beginning and end
- of XML elements, comments, CDATA (escaped character data), entities, processing
+  This is the event-driven or SAX (Simple API for XML)
+  style parser which process XML without building the tree
+  but rather identifies tokens in the stream of characters
+  and passes them to handlers which can make sense of them
+  in context.
+  This reads and processes the contents of an XML file or string by
+  invoking user-level functions associated with different
+  components of the XML tree. These components include
+  the beginning and end  of XML elements, e.g
+  \code{<myTag x="1">}
+  and \code{</myTag>} respectively,
+  comments, CDATA (escaped character data), entities, processing
  instructions, etc.
  This allows the caller to create the appropriate data structure from the
- XML document contents rather than the default tree (see \link{xmlTreeParse}).
- Functions for specific tags/elements can be used in addition to the 
- standard callback names.
+ XML document contents rather than the default tree (see
+ \link{xmlTreeParse})
+ and so avoids having the entire document in memory.
+ This is important for large documents and where we would end up with
+ essentially 2 copies of the data in memory at once, i.e
+ the tree and the R data structure containing the information taken
+ from the tree.
+ When dealing with classes of XML documents whose instances could be large,
+ this approach is desirable but a little more cumbersome to program
+ than the standard DOM (Document Object Model) approach provided
+ by \code{XMLTreeParse}.
+
+ Note that \code{xmlTreeParse} does  allow a hybrid style of
+ processing that allows us to apply handlers to nodes in the tree
+ as they are being converted to R objects.  This is a style of
+ event-driven or asynchronous calling
+
+ In addition to the generic token event handlers such as
+ "begin an XML element" (the \code{startElement} handler), one can 
+ also provide handler functions for specific tags/elements such
+ as \code{<myTag>} with handler elements  with the same name as the
+ XML element of interest, i.e. \code{"myTag" = function(x, attrs)}.
 }
 \usage{
 xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext=TRUE,
                useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
                 state = NULL, replaceEntities = TRUE, validate = FALSE,
-                 saxVersion = 1)
+                 saxVersion = 1, branches = NULL)
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -153,6 +179,27 @@ If this is True, each callback function  should support
   messages will be displayed about errors in the DTD and/or document, but the parsing 
   will proceed except for the presence of terminal errors.
 }
+\item{branches}{a named list of functions.
+  Each element identifies an XML element name.
+  If an XML element of that name is encountered in
+  the SAX stream, the stream is processed until the
+  end of that element and an internal node (see
+  \code{\link{xmlTreeParse}} and its \code{useInternalNodes} parameter)
+  is created. The function in our branches list corresponding to this
+  XML element is then invoked with the (internal) node as the only
+  argument.
+  This allows one to use the DOM model on a sub-tree of the entire
+  document and thus use both SAX and DOM together to get the
+  efficiency of SAX and the simpler programming model of DOM.
+
+  Note that the branches mechanism works top-down and does not
+  work for nested tags. If one specifies an element name in the
+  \code{branches} argument, e.g. myNode, and
+  there is a nested myNode instance within a branch, the branches
+  handler will not be called for that nested instance.
+  If there is an instance where this is problematic, please
+  contact the maintainer of this package.
+}
 }
 \details{
  This is now implemented using the libxml parser.
@@ -170,9 +217,15 @@ local to it and that the caller knows how to extract this.
 \author{Duncan Temple Lang}
 \note{
  The libxml parser can read URLs via http or ftp.
-It does not require the support of \textbf{wget} as used
-in other parts of \R, but uses its own facilities
-to connect to remote servers.
+ It does not require the support of \textbf{wget} as used
+ in other parts of \R, but uses its own facilities
+ to connect to remote servers.
+
+ The idea for the hybrid SAX/DOM mode where we consume tokens in the
+ stream to create an entire node for a sub-tree of the document was
+ first suggested to me by Seth Falcon at the Fred Hutchinson Cancer
+ Research Center.  It is similar to the  XML::Twig module in Perl
+ by Michel Rodriguez.
 }
 
 \seealso{ \link{xmlTreeParse} }
@@ -291,6 +344,28 @@ if(libxmlVersion()$major >= 2) {
             }) 
  xmlEventParse(system.file("exampleData", "namespaces.xml", package="XML"), handlers = h, saxVersion = 2)
 
+
+ # This example is not very realistic but illustrates how to use the
+ # branches argument. It forces the creation of complete nodes for
+ # elements named <b> and extracts the id attribute.
+ # This could be done directly on the startElement, but this just
+ # illustrates the mechanism.
+ filename = system.file("exampleData", "branch.xml", package="XML")
+ b.counter = function() {
+                nodes <- character()
+                f = function(node) { nodes <<- c(nodes, xmlGetAttr(node, "id"))}
+                list(b = f, nodes = function() nodes)
+             }
+
+  b = b.counter()
+  invisible(xmlEventParse(filename, branches = b["b"]))
+  b$nodes()
+
+
+  filename = system.file("exampleData", "branch.xml", package="XML")
+   
+  invisible(xmlEventParse(filename, branches = list(b = function(node) {print(names(node))})))
+  invisible(xmlEventParse(filename, branches = list(b = function(node) {print(xmlName(xmlChildren(node)[[1]]))})))
 }
 }
 \keyword{file}

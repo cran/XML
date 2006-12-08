@@ -1,3 +1,30 @@
+Version 1.3-2
+    Mainly fixes for internal nodes.
+
+  *  Export XMLNode, XMLInternalNode, XMLInternalElementNode classes
+
+  *  as() method for XMLInternalNode wasn't recognized properly because
+     the classes weren't exported.
+     Also, the internal function asRXMLNode() accepts trim and ignoreBlanks
+     arguments for cleaning up the XML node text elements that are created.
+
+  *  export coerce methods.
+
+Version 1.3-1
+
+  *  parseURI() sets the port to NA if the value is 0.
+
+Version 1.3-0
+
+  *  The SAX parser now has a branches argument that identifies XML elements
+     which are to be built into (internal) nodes and then the sub-tree/node
+     is passed to the handler function specified in the element of the branches
+     argument.  This mixes the efficient SAX event-driven parsing with the easier
+     programming tree-based model, i.e. DOM.
+
+  *  XMLInternalNode objects in R now have extra class information identifying them as
+     as regular element, text, CDATA, PI, ...
+
 Version 1.2-0
 
   *  names() method for XMLInternalNode

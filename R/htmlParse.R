@@ -47,5 +47,8 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
 parseURI =
 function(uri)
 {
-  .Call("R_parseURI", as.character(uri))
+  u = .Call("R_parseURI", as.character(uri))
+  if(u$port == 0)
+    u$port = as.integer(NA)
+  u
 }  

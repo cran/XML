@@ -14,6 +14,7 @@
  %testEnt;
  <?R sum(rnorm(100)) ?>
  <a>
+  <!-- A comment -->
   <b> 
     %extEnt;
   </b>
