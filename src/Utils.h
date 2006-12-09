@@ -70,7 +70,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 		  USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ validate,
 		  USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
 		  USER_OBJECT_ addNamespaceAttributes, USER_OBJECT_ useInternalNodes,
-		  USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema);
+		  USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema, USER_OBJECT_ fullNamespaceInfo);
 
 USER_OBJECT_ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID);
 USER_OBJECT_ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces);

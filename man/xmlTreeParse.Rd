@@ -12,7 +12,8 @@
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
               asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
                isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-               useInternalNodes = FALSE, isSchema = FALSE)
+               useInternalNodes = FALSE, isSchema = FALSE,
+               fullNamespaceInfo = FALSE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
                isURL = FALSE, asTree = FALSE, 
@@ -109,6 +110,14 @@ return type.
 \item{isSchema}{a logical value indicating whether the document
   is an XML schema (\code{TRUE}) and should be parsed as such using
   the built-in schema parser in libxml.}
+\item{fullNamespaceInfo}{a logical value indicating whether
+  to provide the namespace URI and prefix on each node
+  or just the prefix.  The latter (\code{FALSE}) is
+  currently the default as that was the original way the
+  package behaved.   However, using
+  \code{TRUE} is more informative and we will make this
+  the default in the future.
+  }
 }
 \details{
  The \code{handlers} argument is used similarly

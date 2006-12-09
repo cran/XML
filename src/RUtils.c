@@ -100,7 +100,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_getDTD, 4),
 	ENTRY(RS_XML_libxmlVersion, 0),
 	ENTRY(RS_XML_Parse, 13),
-	ENTRY(RS_XML_ParseTree, 13),
+	ENTRY(RS_XML_ParseTree, 14),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
 	ENTRY(R_newXMLNode, 4),

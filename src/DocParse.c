@@ -90,7 +90,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                       USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
                        USER_OBJECT_ addNamespaceAttributes,
                         USER_OBJECT_ internalNodeReferences, 
-   	     	         USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema)
+		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
+                         USER_OBJECT_ fullNamespaceInfo)
 {
 
   char *name;
@@ -107,6 +108,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   parserSettings.skipBlankLines = LOGICAL_DATA(skipBlankLines)[0];
   parserSettings.converters = converterFunctions;
   parserSettings.trim = LOGICAL_DATA(trim)[0];
+  parserSettings.fullNamespaceInfo = LOGICAL_DATA(fullNamespaceInfo)[0];
 
   parserSettings.internalNodeReferences = LOGICAL_DATA(internalNodeReferences)[0];
 
@@ -469,8 +471,18 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 
   if(node->ns) {
     PROTECT(nsDef = NEW_CHARACTER(1));
-    if(node->ns->prefix)
-       SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->ns->prefix)));
+    if(!parserSettings->fullNamespaceInfo) {
+	if(node->ns->prefix) {
+	    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->ns->prefix))); 
+	    SET_CLASS(nsDef, mkString("XMLNamespacePrefix"));
+	}
+    } else {
+	if(node->ns->href)
+	    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(node->ns->href));
+	if(node->ns->prefix)
+	    SET_NAMES(nsDef, mkString(XMLCHAR_TO_CHAR(node->ns->prefix))); /* XXX change! */
+	SET_CLASS(nsDef, mkString("XMLNamespace"));
+    }
     SET_VECTOR_ELT(ans, NODE_NAMESPACE, nsDef);
     UNPROTECT(1);
   }

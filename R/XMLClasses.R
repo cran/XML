@@ -56,12 +56,21 @@ xmlName.XMLNode <-
 #
 function(node, full = FALSE)
 {
-  if(full && !is.null(node$namespace) && node$namespace != "") {
-    tmp <- ifelse(is.character(node$namespace), node$namespace, node$namespace$id)
-    paste(tmp, node$name, sep=":")
-  }
+  if(!full || is.null(node$namespace) || node$namespace == "")
+    return(node$name)
+  
+  # 
+  if(!is.character(node$namespace)) {
+    tmp = node$namespace$id
+  } else if(inherits(node$namespace, "XMLNamespace"))
+    tmp = names(node$namespace)
   else
-    node$name
+    tmp = node$namespace
+
+  if(length(tmp))
+     paste(tmp, node$name, sep=":")
+  else
+     node$name
 }
 
 xmlAttrs <-
@@ -241,20 +250,6 @@ function(x, ..., indent = "", tagSeparator = "\n")
       cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, 
           sep = ""), sep = "")
     }
-
-  
-##  cat(indent, paste("<",xmlName(x, TRUE),
-##                        ifelse(tmp != "", " ", ""), tmp,
-##                        ifelse(ns != "", " ", ""), ns,
-##                    ">",
-##                    tagSeparator,
-##                    sep=""), sep = "")
-##  
-##  
-##   for(i in xmlChildren(x)) 
-##      print(i, indent = subIndent, tagSeparator = tagSeparator)
-##  
-##  cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, sep=""), sep = "")
 }
 
 print.XMLEntityRef <-

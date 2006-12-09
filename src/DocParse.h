@@ -25,6 +25,8 @@ typedef struct {
   USER_OBJECT_ converters;
   int addAttributeNamespaces;
   int internalNodeReferences;
+
+  int fullNamespaceInfo;
 } R_XMLSettings;
 
 

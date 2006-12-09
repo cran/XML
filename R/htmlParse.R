@@ -33,7 +33,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
           as.logical(asText), as.logical(trim), 
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
-           as.logical(useInternalNodes), TRUE, FALSE)
+           as.logical(useInternalNodes), TRUE, FALSE, FALSE)
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

@@ -1,3 +1,14 @@
+Version 1.4-0
+
+  *  Added fullNamespaceInfo parameter for xmlTreeParse() which, if TRUE,
+     provides the namespace for each node as a named character vector giving
+     the URI of the namespace and the prefix as the element name, i.e. c(prefix = uri)
+     The default is FALSE to preserve the earlier behavior. The namespace object
+     has a class XMLNamespacePrefix for the old-style, and XMLNamespace for the new 
+     style with c(name = uri) form.  
+     This information makes comparing namespaces a lot simpler, e.g. in SOAP.
+
+
 Version 1.3-2
     Mainly fixes for internal nodes.
 
