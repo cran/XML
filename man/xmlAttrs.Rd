@@ -10,12 +10,12 @@
  an XML document.
 }
 \usage{
- xmlAttrs(node)
+ xmlAttrs(node, ...)
 }
 \arguments{
   \item{node}{The \code{XMLNode} object
- whose attributes are to be extracted.
- }
+    whose attributes are to be extracted. }
+  \item{...}{additional arguments for the specific methods.}
 }
 \value{
  A named character vector, where the names

@@ -1,3 +1,9 @@
+Version 1.4-1
+	
+  *  Fix to ensure a connection is closed in saveXML. Identified by Herve Pages
+
+  *  Update definition and documentation for xmlAttrs to take ... arguments.
+
 Version 1.4-0
 
   *  Added fullNamespaceInfo parameter for xmlTreeParse() which, if TRUE,

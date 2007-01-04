@@ -74,7 +74,7 @@ function(node, full = FALSE)
 }
 
 xmlAttrs <-
-function(node)
+function(node, ...)
 {
   UseMethod("xmlAttrs", node)
 }
@@ -84,7 +84,7 @@ xmlAttrs.XMLNode <-
 # Get the named list of attributes
 # for an XMLNode object.
 #
-function(node)
+function(node, ...)
 {
  node$attributes
 }

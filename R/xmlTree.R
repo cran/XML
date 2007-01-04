@@ -159,7 +159,7 @@ function(x)
 }
 
 xmlAttrs.XMLInternalNode = 
-function(node, addNamespace = TRUE)
+function(node, addNamespace = TRUE, ...)
 {
   .Call("RS_XML_xmlNodeAttributes",  node, as.logical(addNamespace))
 }
@@ -282,7 +282,7 @@ function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.
 }
 
 saveXML.XMLInternalDocument <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+function(doc, file = NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
          doctype = NULL, encoding = "")
 {
   if(is(doctype, "Doctype")) {
@@ -324,8 +324,10 @@ saveXML.XMLNode =
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
          doctype = NULL, encoding = "")
 {
-  if(is.character(file))
+  if(is.character(file)) {
     file = file(file, "w")
+    on.exit(close(file))
+  }
   
   if(inherits(file, "connection")) {
     sink(file)
