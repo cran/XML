@@ -229,6 +229,11 @@ and another for entities. See \code{\link{parseDTD}}.
  xmlTreeParse(xmlText, asText=TRUE)
 
 
+    # with version 1.4.2 we can pass the contents of an XML
+    # stream without pasting them.
+ xmlTreeParse(readLines(fileName), asText=TRUE)
+
+
  # Read a MathML document and convert each node
  # so that the primary class is 
  #   <name of tag>MathML
@@ -322,6 +327,14 @@ m <- xmlTreeParse(fileName,
    h$counts()
 
 
+
+
+ f = system.file("examples", "index.html", package = "XML")
+ htmlTreeParse(readLines(f), asText = TRUE)
+ htmlTreeParse(readLines(f))
+
+  # Same as 
+ htmlTreeParse(paste(readLines(f), collapse = "\n"), asText = TRUE)
 
 
  getLinks = function() { 

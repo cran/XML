@@ -73,6 +73,8 @@ exportClasses("XMLInternalDocument")
 exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode")
 exportMethods("coerce")
 
+exportMethods("free")
+
 S3method(xmlNamespaceDefinitions, XMLNode)
 S3method(xmlNamespaceDefinitions, XMLInternalNode)
 

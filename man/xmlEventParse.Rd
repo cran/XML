@@ -48,7 +48,7 @@ xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext
 }
 \arguments{
   \item{file}{the source of the XML content.
-    This can be a string givinging the name of a file or remote URL,
+    This can be a string giving the name of a file or remote URL,
     the XML itself, a connection object, or a function.
     If this is a string, and \code{asText} is \code{TRUE},
     the value is the XML content.

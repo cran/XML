@@ -14,8 +14,16 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
            useInternalNodes = FALSE, isSchema = FALSE,
            fullNamespaceInfo = FALSE)
 {
+
+  if(length(file) > 1) {
+    file = paste(file, collapse = "\n")
+    if(!missing(asText) && !asText) 
+      stop("multiple URIs passed to xmlTreeParse. If this is the content of the file,  specify asText = TRUE")
+    asText = TRUE
+  }
+  
   if(missing(isURL)) 
-    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
+    isURL <- length(grep("^http://", file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
 
 
   oldValidate = xmlValidity()
@@ -33,6 +41,8 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      asText <- TRUE
  }
 
+ if(asText && length(file) > 1)
+   file = paste(file, collapse = "\n")
 
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),

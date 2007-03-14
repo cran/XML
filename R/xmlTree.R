@@ -133,6 +133,13 @@ setAs("XMLInternalNode", "XMLNode",
            asRXMLNode(from)
         )
 
+
+setGeneric("free", function(obj) standardGeneric("free"))
+
+setMethod("free", "XMLInternalDocument",
+           function(obj)  .Call("R_XMLInternalDocument_free", obj))
+
+
 asRXMLNode =
 function(node, converters = NULL, trim = TRUE, ignoreBlanks = TRUE)
    .Call("R_createXMLNode", node, converters, as.logical(trim), as.logical(ignoreBlanks))

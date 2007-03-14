@@ -657,6 +657,9 @@ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ defaultNodeValu
     case XML_ENTITY_REF_NODE:
       name = "entity";
       break;
+    case XML_ENTITY_NODE:
+      name = "entity";
+      break;
     case XML_ELEMENT_NODE:
       name = "startElement";
       break;

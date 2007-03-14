@@ -8,10 +8,20 @@ htmlTreeParse <-
 #       the XML text, and parse that.
 # See also xml
 #
-function(file, ignoreBlanks = TRUE, handlers=NULL,
-           replaceEntities=FALSE, asText=FALSE, trim=TRUE, 
-            isURL=FALSE, asTree = FALSE, useInternalNodes = FALSE)
+function(file, ignoreBlanks = TRUE, handlers = NULL,
+           replaceEntities = FALSE, asText = FALSE, trim = TRUE, 
+            isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE)
 {
+
+  if(length(file) > 1) {
+   file = paste(file, collapse = "\n")
+    if(!missing(asText) && !asText) 
+      stop("multiple URIs passed to xmlTreeParse. If this is the content of the file,  specify asText = TRUE")   
+   asText = TRUE
+ }
+
+
+  
   if(missing(isURL)) {
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
   }
@@ -24,9 +34,8 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      stop(paste("File", file, "does not exist "))
  }
 
-# ans <- .Call("RS_XML_HtmlParseTree", as.character(file), handlers, 
-#         as.logical(ignoreBlanks), as.logical(replaceEntities),
-#          as.logical(asText), as.logical(trim), as.logical(isURL))
+ if(!asText && !isURL)
+   file = path.expand(file)
 
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
          as.logical(ignoreBlanks), as.logical(replaceEntities),

@@ -1,3 +1,18 @@
+Version 1.5-1
+
+  *  updated documentation for the alias for free method for XMLInternalDocument.
+
+Version 1.5-0
+
+  *  added free() generic function and method for XMLInternalDocument
+
+Version 1.4-2
+
+  *  xmlTreeParse and htmlTreeParse will accept a character vector of length > 1
+     and treat it as the contents of the XML stream and so call
+     paste(file, collapse = "\n") before parsing.  The asText = TRUE is implied.
+     Thanks to Ingo Feinerer for prompting this addition.
+
 Version 1.4-1
 	
   *  Fix to ensure a connection is closed in saveXML. Identified by Herve Pages

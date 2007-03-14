@@ -113,6 +113,25 @@ R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
  return(els);
 }
 
+SEXP
+R_XMLInternalDocument_free(SEXP sdoc)
+{
+  xmlDocPtr doc;
+
+  if(TYPEOF(sdoc) != EXTPTRSXP || R_ExternalPtrTag(sdoc) != Rf_install("XMLInternalDocument")) {
+     PROBLEM "R_free must be given an internal XML document object, 'XMLInternalDocument'"
+     ERROR;
+  }
+
+  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+
+  if(!doc)
+      xmlFreeDoc(doc);
+  R_ClearExternalPtr(sdoc);
+  
+  return(sdoc);
+}
+
 
 SEXP
 RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
