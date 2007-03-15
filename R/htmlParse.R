@@ -10,7 +10,8 @@ htmlTreeParse <-
 #
 function(file, ignoreBlanks = TRUE, handlers = NULL,
            replaceEntities = FALSE, asText = FALSE, trim = TRUE, 
-            isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE)
+            isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
+            encoding = character())
 {
 
   if(length(file) > 1) {
@@ -42,7 +43,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
           as.logical(asText), as.logical(trim), 
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
-           as.logical(useInternalNodes), TRUE, FALSE, FALSE)
+           as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding))
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

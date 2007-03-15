@@ -11,12 +11,21 @@ function(system = "", public = "", name = "")
   new("Doctype", name = name, system = system, public = public)
 }
 
+ddQuote =
+function(x)
+{
+  if(length(x) == 0)
+    return(character())
+
+  paste('"', x, '"', sep = "")
+}  
+
 setAs("Doctype", "character",
        function(from) {
 
          if(sum(nchar(from@public), nchar(from@system)))
-            extra = c("SYSTEM", ifelse(from@public != "", dQuote(from@public), ""), 
-                                ifelse(from@system != "", dQuote(from@system), ""))
+            extra = c("SYSTEM", ifelse(from@public != "", ddQuote(from@public), ""), 
+                                ifelse(from@system != "", ddQuote(from@system), ""))
          paste("<!DOCTYPE", from@name, paste(extra, collapse = " "), ">")
        })
 

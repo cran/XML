@@ -1,3 +1,14 @@
+Version 1.6-0
+
+  *  In saveXML() method for XMLInternalDocument, we "support" the encoding argument by passing it to 
+     xmlDocDumpFormatMemoryEnc() or xmlSaveFileEnc() in the libxml2 C code.
+     We could also use the xmlSave() API of libxml2.
+
+  *  htmlTreeParse() supports an encoding argument, e.g. htmlTreeParse("9003.html", encoding = "UTF-8").
+     This allows one to correctly process HTML documents that do not contain their encoding information in the
+     <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=..."/> tag.
+     The argument is also present in xmlTreeParse() but currently ignored.
+
 Version 1.5-1
 
   *  updated documentation for the alias for free method for XMLInternalDocument.

@@ -13,11 +13,11 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
               asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
                isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
                useInternalNodes = FALSE, isSchema = FALSE,
-               fullNamespaceInfo = FALSE)
+               fullNamespaceInfo = FALSE, encoding = character())
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
                replaceEntities = FALSE, asText = FALSE, trim = TRUE,
                isURL = FALSE, asTree = FALSE, 
-               useInternalNodes = FALSE) 
+               useInternalNodes = FALSE, encoding = character()) 
 }
 
 \arguments{
@@ -117,7 +117,12 @@ return type.
   package behaved.   However, using
   \code{TRUE} is more informative and we will make this
   the default in the future.
-  }
+}
+\item{encoding}{ a character string (scalar) giving the encoding for the
+  document.  This is optional as the document should contain its own
+  encoding information. However, if it doesn't, the caller can specify
+  this for the parser.
+}
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -359,6 +364,18 @@ m <- xmlTreeParse(fileName,
  f = system.file("exampleData", "mtcars.xml", package="XML")
  xmlTreeParse(f, handlers = tt[[".addNode"]])
  xmlRoot(tt)
+
+
+  # character set encoding for HTML
+ f = system.file("exampleData", "9003.html", package = "XML")
+   # we specify the encoding
+ d = htmlTreeParse(f, encoding = "UTF-8")
+   # get a different result if we do not specify any encoding
+ d.no = htmlTreeParse(f)
+   # document with its encoding in the HEAD of the document.
+ d.self = htmlTreeParse(system.file("exampleData", "9003-en.html",package = "XML"))
+   # XXX want to do a test here to see the similarities between d and
+   # d.self and differences between d.no
 }
 
 \keyword{file}

@@ -12,7 +12,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
            replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
            isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
            useInternalNodes = FALSE, isSchema = FALSE,
-           fullNamespaceInfo = FALSE)
+           fullNamespaceInfo = FALSE, encoding = character())
 {
 
   if(length(file) > 1) {
@@ -49,7 +49,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
               as.logical(isURL), as.logical(addAttributeNamespaces),
               as.logical(useInternalNodes), FALSE, as.logical(isSchema),
-              as.logical(fullNamespaceInfo))
+              as.logical(fullNamespaceInfo), as.character(encoding))
 
 
  if(!missing(handlers) & !as.logical(asTree))

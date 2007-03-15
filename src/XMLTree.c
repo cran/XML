@@ -325,7 +325,7 @@ R_createXMLNodeRef(xmlNodePtr node)
  */
 USER_OBJECT_
 R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression, USER_OBJECT_ sindent,
-              USER_OBJECT_ prefix)
+	     USER_OBJECT_ prefix, USER_OBJECT_ r_encoding)
 {
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
     char *fileName = NULL;
@@ -333,11 +333,11 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     xmlDtdPtr dtd = NULL;
 
     int oldIndent = xmlIndentTreeOutput;
+    const char *encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
 
     xmlIndentTreeOutput = LOGICAL_DATA(sindent)[0];
 
     if(GET_LENGTH(prefix) == 3) {
-	fprintf(stderr, "setting DTD\n");fflush(stderr);
 	dtd = xmlNewDtd(doc, ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 0))), 
                              ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 1))), 
      	                     ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 2))));
@@ -364,7 +364,10 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	    compressionLevel = xmlGetDocCompressMode(doc);
 	    xmlSetDocCompressMode(doc, INTEGER_DATA(compression)[0]);
 	}
-	xmlSaveFile(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc);
+	if(encoding && encoding[0])
+	    xmlSaveFileEnc(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc, encoding);
+	else
+	    xmlSaveFile(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc);
         if(compressionLevel != -1) {
 	    xmlSetDocCompressMode(doc, compressionLevel);
 	}
@@ -373,11 +376,11 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
         xmlChar *mem;
         int size;
         PROTECT(ans = NEW_CHARACTER(1));
-#if DUMP_WITH_ENCODING
-	xmlDocDumpFormatMemoryEnc(doc, &mem, &size, NULL, LOGICAL_DATA(sindent)[0]);
-#else
-	xmlDocDumpMemory(doc, &mem, &size); 
-#endif
+	if(encoding && encoding[0])
+	    xmlDocDumpFormatMemoryEnc(doc, &mem, &size, encoding, LOGICAL_DATA(sindent)[0]);
+	else
+	    xmlDocDumpMemory(doc, &mem, &size); 
+
 
 	if(dtd) {
 	    xmlNodePtr tmp;

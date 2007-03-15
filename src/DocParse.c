@@ -91,7 +91,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                        USER_OBJECT_ addNamespaceAttributes,
                         USER_OBJECT_ internalNodeReferences, 
 		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
-                         USER_OBJECT_ fullNamespaceInfo)
+     	      	         USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding)
 {
 
   char *name;
@@ -104,6 +104,12 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   int asTextBuffer = LOGICAL_DATA(asText)[0];
   int isURLDoc = LOGICAL_DATA(isURL)[0];
   int useHTML = LOGICAL_DATA(s_useHTML)[0];
+
+  const char *encoding = NULL;
+
+
+  if(GET_LENGTH(r_encoding))
+      encoding = CHAR(STRING_ELT(r_encoding, 0));
 
   parserSettings.skipBlankLines = LOGICAL_DATA(skipBlankLines)[0];
   parserSettings.converters = converterFunctions;
@@ -149,12 +155,12 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(asTextBuffer) {
-   doc = useHTML ? htmlParseDoc(CHAR_TO_XMLCHAR(name), NULL) : xmlParseMemory(name, strlen(name));
+   doc = useHTML ? htmlParseDoc(CHAR_TO_XMLCHAR(name), encoding) : xmlParseMemory(name, strlen(name));
    if(doc != NULL) {
       doc->name = (char *) xmlStrdup(CHAR_TO_XMLCHAR("<buffer>"));
    }
   } else {
-   doc = useHTML ? htmlParseFile(XMLCHAR_TO_CHAR(name), NULL) : xmlParseFile(name);
+   doc = useHTML ? htmlParseFile(XMLCHAR_TO_CHAR(name), encoding) : xmlParseFile(name);
   }
 
   if(doc == NULL) {

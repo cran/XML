@@ -306,7 +306,8 @@ function(doc, file = NULL, compression=0, indent=TRUE, prefix = '<?xml version="
      prefix = c(doctype@name, doctype@public, doctype@system)
   }
 
-  .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent), as.character(prefix))
+  .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent),
+                         as.character(prefix), as.character(encoding))
 }
 
 saveXML.XMLInternalDOM <-
@@ -345,7 +346,7 @@ function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml versi
     cat(as.character(prefix))
 
   if(!is.null(doctype))
-    cat(as.character(doctype), '\n')
+    cat(as(doctype, "character"), '\n')
   
   print(doc)
 }
