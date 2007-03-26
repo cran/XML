@@ -65,12 +65,18 @@ export(
  xmlHashTree,
  addNode,
  xmlNamespaceDefinitions,
- "xmlChildren<-"
+ "xmlChildren<-",
+ catalogResolve
 # xmlFlatListTree       
 )
 
 exportClasses("XMLInternalDocument")
 exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode")
+exportClasses("XMLNamespace")
+
+exportClass("URI")
+
+
 exportMethods("coerce")
 
 exportMethods("free")
@@ -84,6 +90,8 @@ S3method(xmlNamespaceDefinitions, XMLInternalNode)
 S3method(addNode, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
 S3method(print, XMLHashTree)
+
+S3method("names<-", XMLNode)
 
 
 S3method(xmlParent, XMLTreeNode)
@@ -172,6 +180,7 @@ S3method(saveXML, XMLInternalDocument)
 S3method(saveXML, XMLInternalDOM)
 S3method(saveXML, XMLOutputStream)
 S3method(saveXML, XMLNode)
+S3method(saveXML, XMLFlatTree)
 
 S3method(dtdElementValidEntry, XMLElementDef)
 S3method(dtdElementValidEntry, XMLOrContent)

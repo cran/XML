@@ -1,3 +1,28 @@
+Version 1.6-2
+
+  *  Added a URI (old) class label to the result of parseURI, and exported that class for use in 
+     other packages (specifically SSOAP, at present).
+
+  *  For subsetting child nodes by name, there is a new all = FALSE parameter which allows the caller
+     to get the first element(s) that matches the name(s), or all of them with, e.g. 
+     node["bob", all = TRUE].  This allows us to avoid the equivalent idiom
+         node[ names(node) == "bob" ]
+     which is complicated when node is the result of an inline computation.
+
+  *  added method for setting names on an XMLNode (names<-.XMLNode), not just for retrieving them.
+
+Version 1.6-1
+
+  *  Added catalogResolve() function for looking up local files and aliases for URIs, and 
+     PUBLIC and SYSTEM identifiers, e.g. in DOCTYPE nodes.
+
+  *  saveXML method added for XMLFlatTree. (Identified by Alberto Monteiro.)
+
+  *  Fixed saveXML methods for various classes.
+
+  *  Doctype class:  added validity method, improved coercion to character, and slightly more flexible
+     constructor function.  Validates PUBLIC identifier. 
+
 Version 1.6-0
 
   *  In saveXML() method for XMLInternalDocument, we "support" the encoding argument by passing it to 

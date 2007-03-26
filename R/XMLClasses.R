@@ -97,11 +97,16 @@ function(node, ...)
 # the specified object identified by ...
 # and return these as a list
 #
-function(obj, ...)
+function(obj, ..., all = FALSE)
 {
  obj <- obj$children
- NextMethod("[")
+
+ if(all) # "all" %in% names(list(...)) && list(...)[["all"]] == TRUE)
+   obj[ names(obj) %in% list(...)[[1]] ]
+ else
+   obj[...] # NextMethod("[") 
 }
+
 
 "[[.XMLDocumentContent" <-
 function(obj, ...) 
@@ -126,6 +131,15 @@ function(x)
 {
  names(xmlChildren(x))
 }
+
+"names<-.XMLNode" <-
+function(x, value)
+{
+ names(x$children) <- value
+ x
+}
+
+
 
 length.XMLNode <-
 function(x)

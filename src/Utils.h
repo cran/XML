@@ -90,5 +90,7 @@ USER_OBJECT_ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT
 USER_OBJECT_ R_createXMLNodeRef(xmlNodePtr node);
 USER_OBJECT_ R_createXMLDocRef(xmlDocPtr doc);
 
+USER_OBJECT_ R_xmlCatalogResolve(SEXP r_id, SEXP type, USER_OBJECT_ debug);
+
 #endif
 

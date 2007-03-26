@@ -128,6 +128,9 @@ setOldClass("XMLInternalNode")
 
 setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
 
+setOldClass("XMLNamespace")
+
+
 setAs("XMLInternalNode", "XMLNode",
         function(from) 
            asRXMLNode(from)
@@ -314,7 +317,7 @@ saveXML.XMLInternalDOM <-
 function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
          doctype = NULL, encoding = "")
 {
-  NextMethod("saveXML", object = doc$value())
+  saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)
 }
 
 
@@ -322,10 +325,11 @@ saveXML.XMLOutputStream =
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
          doctype = NULL, encoding = "")
 {
-  NextMethod("saveXML", object = doc$value())
+  saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)  
 }
 
-saveXML.XMLNode =
+
+saveXML.sink =
 #
 # Need to handle a DTD here as the prefix argument..
 #
@@ -350,5 +354,12 @@ function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml versi
   
   print(doc)
 }
+  
+
+
+saveXML.XMLNode = saveXML.sink
+
+saveXML.XMLFlatTree = saveXML.sink
+
 
 

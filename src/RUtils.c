@@ -112,6 +112,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(R_xmlSetNs, 2),
 	ENTRY(R_insertXMLNode, 2),
 	ENTRY(R_saveXMLDOM, 6),
+	ENTRY(R_xmlCatalogResolve, 3),
 	{NULL, NULL, 0}
 };
 

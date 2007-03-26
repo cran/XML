@@ -60,5 +60,10 @@ function(uri)
   u = .Call("R_parseURI", as.character(uri))
   if(u$port == 0)
     u$port = as.integer(NA)
+
+  class(u) = "URI"
+  
   u
 }  
+
+setOldClass("URI")

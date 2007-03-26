@@ -2,6 +2,7 @@
 \alias{xmlNamespace}
 \alias{xmlNamespace.XMLNode}
 \alias{xmlNamespace.XMLInternalNode}
+\alias{XMLNamespace-class}
 \title{Retrieve the namespace value of an XML node.}
 \description{
 Each XML node has a namespace identifier which is a string indicating
@@ -12,7 +13,10 @@ meaning.
 To resolve the name space, i.e. 
  i.e. find out to where the identifier points,
 one can use the
- expression \code{xmlNamespace(xmlRoot(doc))}.
+expression \code{xmlNamespace(xmlRoot(doc))}.
+
+The class of the result is
+ is an S3-style object of class \code{XMLNamespace}.
 }
 \usage{
 xmlNamespace(x)

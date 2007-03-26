@@ -9,7 +9,7 @@ of an XML node.
 }
 \usage{
 obj[[i]]
-"[.XMLNode"(obj, ...)
+"[.XMLNode"(obj, ..., all = FALSE)
 "[[.XMLNode"(obj, ...)
 "[[.XMLDocumentContent"(obj, ...)
 }
@@ -24,6 +24,18 @@ obj[[i]]
   \item{\dots}{the identifiers for the children to be retrieved,
 given as integer indices, names, etc. in the usual format for the
 generic \code{link{[}} and \code{link{[[}} operators}
+  \item{all}{logical value.  When \dots is a character vector, a value
+    of \code{TRUE} for \code{all} means to retrieve all of the
+    nodes with those names rather than just the first one.
+    \code{FALSE} gives the usual result of subsetting a list by name
+    which gives just the first element.
+    This allows us to avoid the  idiom
+       \code{node[ names(node) == "bob" ]}
+       which is complicated when node is the result of an inline
+       computation
+       and instead we use
+       \code{node["bob", all = TRUE]}.
+  }
 }
 \value{
  A list or single element containing the
@@ -41,6 +53,23 @@ and identified by \dots.
 }
 
 \examples{
+
+ f = system.file("exampleData", "gnumeric.xml", package = "XML")
+
+ top = xmlRoot(xmlTreeParse(f))
+
+  # Get the first RowInfo element.
+ top[["Sheets"]][[1]][["Rows"]][["RowInfo"]]
+
+  # Get a list containing only the first row element
+ top[["Sheets"]][[1]][["Rows"]]["RowInfo"]
+ top[["Sheets"]][[1]][["Rows"]][1]
+
+  # Get all of the RowInfo elements by position
+ top[["Sheets"]][[1]][["Rows"]][1:xmlSize(top[["Sheets"]][[1]][["Rows"]])]
+
+  # But more succinctly and accurately, get all of the RowInfo elements
+ top[["Sheets"]][[1]][["Rows"]]["RowInfo", all = TRUE]
 
 }
 \keyword{IO}

@@ -1,5 +1,6 @@
 \name{parseURI}
 \alias{parseURI}
+\alias{URI-class}
 \title{Parse a URI string into its elements}
 \description{
   This breaks a URI given as a string into its different elements such as
@@ -7,6 +8,8 @@
   This information can be used, for example, when constructing URIs
   relative to a base URI.
 
+  The return value is an S3-style object of class \code{URI}.
+  
   This function uses libxml routines to perform the parsing.
 }
 \usage{
