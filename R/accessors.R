@@ -1,3 +1,7 @@
+if(!exists("Sys.setenv", baseenv()))
+    Sys.setenv <- base::Sys.putenv
+
+
 xmlRoot <-
 function(x, ...)
 {

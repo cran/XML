@@ -1,3 +1,7 @@
+Version 1.6-3
+
+  *  Handle change from Sys.putenv() to Sys.setenv().
+
 Version 1.6-2
 
   *  Added a URI (old) class label to the result of parseURI, and exported that class for use in 
