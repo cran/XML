@@ -393,6 +393,7 @@ main(int argc, char *argv)
 fi
 
 
+
 if test "${USE_XMLLIB_NAME}" = "xml2" ; then
   AC_CHECK_LIB(xml2, xmlHashSize, echo "Using built-in xmlHashSize", PKG_CPPFLAGS="${PKG_CPPFLAGS} -DOWN_XML_HASH_SIZE=1")
 fi
@@ -438,7 +439,29 @@ if test "${USE_LIBXML}" ; then
 
   AC_CHECK_LIB(${USE_XMLLIB_NAME},xmlHashSize, echo "Found xmlHashSize", echo "No xmlHashSize")
 
+
+
+  AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif],
+  [
+    xmlEntityPtr ent;
+    ent->checked = 1;
+  ], ENTITY_HAS_CHECKED="yes", ENTITY_HAS_CHECKED="no")
+
+ if test "${ENTITY_HAS_CHECKED}" = "no" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DNO_CHECKED_ENTITY_FIELD=1"
+ fi
+
+
+
 fi
+
+
+AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlOutputBufferCreateBuffer, [echo "have xmlOutputBufferCreateBuffer()"], [ echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"])
 
 
 AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlDocDumpFormatMemoryEnc, PKG_CPPFLAGS="${PKG_CPPFLAGS} -DDUMP_WITH_ENCODING=1")

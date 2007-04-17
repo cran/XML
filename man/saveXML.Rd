@@ -2,8 +2,12 @@
 \alias{saveXML}
 \alias{saveXML.XMLInternalDocument}
 \alias{saveXML.XMLInternalDOM}
+\alias{saveXML.XMLInternalNode}
 \alias{saveXML.XMLNode}
 \alias{saveXML.XMLOutputStream}
+\alias{coerce,XMLInternalDocument,character-method}
+\alias{coerce,XMLInternalDOM,character-method}
+\alias{coerce,XMLInternalNode,character-method}
 \title{Output internal XML Tree}
 \description{
   Methods for writing the representation of an XML tree to a string or
@@ -11,9 +15,19 @@
   Originally this was intended to be used only for
   DOMs (Document Object Models) stored in internal memory
   created via \code{\link{xmlTree}}, but methods for
-  \code{XMLNode} and \code{XMLOutputStream} objects
+  \code{XMLNode}, \code{XMLInternalNode} and \code{XMLOutputStream}
+  objects
+   (and others)
   allow it to be generic for different representations of the
   XML tree.
+
+  Note that the indentation when writing an internal C-based node
+  (XMLInternalNode) may not be as expected if there are text nodes
+  within the node.
+
+  Also, not all the parameters are meaningful for all methods.
+  For example, compressing when writing to a string is not
+  supported.
 }
 \usage{
 saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
@@ -103,6 +117,14 @@ saveXML(con$value(), file="out.xml")
  close(con)
  alt = get("test1.xml")
  identical(doc, alt)
+
+
+
+ x = newXMLNode("a", "some text", newXMLNode("c", "sub text"), "more text")
+
+ cat(saveXML(x), "\n")
+
+ cat(as(x, "character"), "\n")
 }
 \keyword{IO}
 \keyword{file}

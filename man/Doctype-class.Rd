@@ -6,8 +6,7 @@
 \description{This class is intended to identify a DTD by SYSTEM file and/or PUBLIC 
   catalog identifier.  This is used in the DOCTYPE element of an XML document.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("Doctype", ...)}.
-or \code{\link{Doctype}}.
+  Objects can be created by calls to the constructor function \code{\link{Doctype}}.
 }
 \section{Slots}{
   \describe{
@@ -21,7 +20,9 @@ or \code{\link{Doctype}}.
   }
 }
 \section{Methods}{
-No methods defined with class "Doctype" in the signature.
+  There is a constructor function
+  and also methods for \code{\link[methods]{coerce}} to convert an object
+  of this class to a character.
 }
 
 \references{\url{http://www.w3.org/XML}, \url{http://www.xmlsoft.org}}
@@ -32,6 +33,6 @@ No methods defined with class "Doctype" in the signature.
  \code{\link{saveXML}}
 }
 \examples{
-  
+  d = Doctype(name = "section", public = c("-//OASIS//DTD DocBook XML V4.2//EN", "http://oasis-open.org/docbook/xml/4.2/docbookx.dtd"))  
 }
 \keyword{classes}

@@ -22,6 +22,11 @@ export(
  libxmlVersion,
  newXMLDoc,
  newXMLNode,
+ newXMLPINode,
+ newXMLTextNode,
+ newXMLCommentNode,
+ newXMLCDataNode,
+ newXMLDTDNode,       
  parseDTD,
  processingInstruction.SAX,
  saveXML,
@@ -42,6 +47,8 @@ export(
  xmlElementsByTagName,
  xmlEventHandler,
  xmlEventParse,
+# new.xmlEventParse,
+# new.xmlTreeParse,              
  xmlGetAttr,
  xmlHandler,
  xmlName,
@@ -66,9 +73,19 @@ export(
  addNode,
  xmlNamespaceDefinitions,
  "xmlChildren<-",
- catalogResolve
+ catalogResolve,
+ toHTML,
+ addChildren,
+ removeChildren,
+ addAttributes,
+ removeAttributes,
+ "xmlName<-"      
 # xmlFlatListTree       
 )
+
+exportMethods("addAttributes", "removeAttributes")
+
+exportMethods("toHTML")
 
 exportClasses("XMLInternalDocument")
 exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode")
@@ -92,6 +109,8 @@ S3method(xmlRoot, XMLHashTree)
 S3method(print, XMLHashTree)
 
 S3method("names<-", XMLNode)
+S3method("xmlName<-", XMLNode)
+S3method("xmlName<-", XMLInternalElementNode)
 
 
 S3method(xmlParent, XMLTreeNode)
@@ -108,6 +127,7 @@ S3method(xmlRoot, XMLHashTree)
 
 S3method(xmlChildren, XMLNode)
 S3method(xmlChildren, XMLInternalNode)
+S3method(xmlSize, XMLInternalNode)
 
 
 S3method(xmlValue, XMLInternalNode)
@@ -178,6 +198,7 @@ S3method(append, XMLNode)
 
 S3method(saveXML, XMLInternalDocument)
 S3method(saveXML, XMLInternalDOM)
+S3method(saveXML, XMLInternalNode)
 S3method(saveXML, XMLOutputStream)
 S3method(saveXML, XMLNode)
 S3method(saveXML, XMLFlatTree)
@@ -188,6 +209,7 @@ S3method(dtdElementValidEntry, XMLElementContent)
 S3method(dtdElementValidEntry, character)
 S3method(dtdElementValidEntry, XMLSequenceContent)
 
+exportClass("SAXState")
 
 # Not yet exported....
 #xmlValidity

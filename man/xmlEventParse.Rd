@@ -44,7 +44,8 @@
 xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext=TRUE,
                useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
                 state = NULL, replaceEntities = TRUE, validate = FALSE,
-                 saxVersion = 1, branches = NULL)
+                 saxVersion = 1, branches = NULL,
+                 useDotNames = length(grep("^\\.", names(handlers))) > 0)
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -87,13 +88,57 @@ xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext
 }
  \item{handlers}{ a closure object that contains  functions which will be invoked
 as the XML components in the document are encountered by the parser. 
- The standard functions are 
+ The standard function or handler names are
 \code{startElement()}, \code{endElement()}
-\code{comment()}, \code{externalEntity()},
+\code{comment()}, \code{getEntity},
 \code{entityDeclaration()}, \code{processingInstruction()},
 \code{text()}, \code{cdata()},
-\code{startDocument()}, and \code{endDocument()}.
-  }
+\code{startDocument()}, and \code{endDocument()},
+or alternatively and preferrably,
+these names  prefixed with a '.',
+i.e. .startElement, .comment, ...
+
+
+The call signature for the entityDeclaration function was changed in
+version 1.7-0.  Note that in earlier versions, the C routine did not
+invoke any R function and so no code will actually break.
+Also, we have renamed \code{externalEntity} to \code{getEntity}.
+These were based on the expat parser.
+
+The new signature is
+\code{c(name = "character",
+        type = "integer",
+	content = "",
+        system = "character",
+        public = "character"
+)}
+\code{name} gives the name of the entity being
+defined.
+The \code{type} identifies
+the type of the entity using the value
+of a C-level enumerated constant used in libxml2,
+but also gives the human-readable form
+as the name of the single element in the integer vector.
+The possible values are
+\code{"Internal_General"},
+\code{"External_General_Parsed"},
+\code{"External_General_Unparsed"}, \code{"Internal_Parameter"},
+\code{"External_Parameter"}, \code{"Internal_Predefined"}.
+
+If we are dealing with an internal entity,
+the content will be the string containing
+the value of the entity.
+If we are dealing with an external entity,
+then \code{content} will be a character vector of length
+0, i.e. empty.
+Instead, either or both of the system and public
+arguments will be non-empty and identify the
+location of the external content.
+\code{system} will be a string containing a URI, if non-empty,
+and \code{public} corresponds to the PUBLIC identifier used
+to identify content using an SGML-like approach.
+The use of PUBLIC identifiers is less common.
+}
  \item{ignoreBlanks}{a logical value indicating whether
 text elements made up entirely of white space should be included
 in the resulting `tree'. }
@@ -199,6 +244,20 @@ If this is True, each callback function  should support
   handler will not be called for that nested instance.
   If there is an instance where this is problematic, please
   contact the maintainer of this package.
+}
+\item{useDotNames}{a logical value
+  indicating whether to use the
+  newer format for identifying general element function handlers
+  with the '.' prefix, e.g. .text, .comment, .startElement.
+  If this is \code{FALSE}, then the older format
+  text, comment, startElement, ...
+  are used. This causes problems when there are indeed nodes
+  named text or comment or startElement as a
+  node-specific handler are confused with the corresponding
+  general handler of the same name. Using \code{TRUE}
+  means that your list of handlers should have names that use
+  the '.' prefix for these general element handlers.
+  This is the preferred way to write new code.
 }
 }
 \details{

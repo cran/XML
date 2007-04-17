@@ -1,4 +1,4 @@
-#include "RUtils.h"
+#include "Utils.h"
 
 /*
   Utilities used in the R XML parsing facilities for invoking user-level functions from C.
@@ -87,6 +87,16 @@ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klass
   return(tmp);
 }
 
+USER_OBJECT_
+RS_XML_SubstituteEntitiesDefault(USER_OBJECT_ replaceEntities)
+{
+    int value;
+    USER_OBJECT_ ans;
+    value = xmlSubstituteEntitiesDefault(LOGICAL_DATA(replaceEntities)[0]);   
+    ans = NEW_LOGICAL(1);
+    LOGICAL_DATA(ans)[0] = value;
+    return(ans);
+}
 
 #include <R_ext/Rdynload.h>
 
@@ -99,20 +109,32 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_HtmlParseTree, 7),
 	ENTRY(RS_XML_getDTD, 4),
 	ENTRY(RS_XML_libxmlVersion, 0),
-	ENTRY(RS_XML_Parse, 13),
-	ENTRY(RS_XML_ParseTree, 15),
+	ENTRY(RS_XML_Parse, 14),
+	ENTRY(RS_XML_ParseTree, 16),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
 	ENTRY(R_newXMLNode, 4),
-	ENTRY(R_newXMLTextNode, 1),
-	ENTRY(R_xmlNewComment, 1),
+	ENTRY(R_newXMLTextNode, 2),
+	ENTRY(R_xmlNewComment, 2),
 	ENTRY(R_newXMLCDataNode, 2),
 	ENTRY(R_newXMLPINode, 3),
 	ENTRY(R_xmlNewNs, 3),
-	ENTRY(R_xmlSetNs, 2),
+	ENTRY(R_xmlSetNs, 3),
 	ENTRY(R_insertXMLNode, 2),
 	ENTRY(R_saveXMLDOM, 6),
 	ENTRY(R_xmlCatalogResolve, 3),
+	ENTRY(RS_XML_xmlNodeNumChildren, 1),
+        ENTRY(RS_XML_unsetDoc, 1),
+        ENTRY(RS_XML_setDoc, 2),
+        ENTRY(RS_XML_printXMLNode, 5),
+        ENTRY(RS_XML_removeChildren, 3),
+        ENTRY(RS_XML_clone, 2),
+        ENTRY(RS_XML_addNodeAttributes, 2),
+        ENTRY(RS_XML_removeNodeAttributes, 3),
+        ENTRY(RS_XML_getNsList, 2),
+        ENTRY(RS_XML_setNodeName, 2),
+        ENTRY(R_xmlNsAsCharacter, 1),
+        ENTRY(RS_XML_SubstituteEntitiesDefault, 1),
 	{NULL, NULL, 0}
 };
 
@@ -129,3 +151,23 @@ R_init_XML(DllInfo *dll)
 }
 
 
+
+
+
+Rboolean
+R_isInstanceOf(USER_OBJECT_ obj, const char *klass)
+{
+
+    USER_OBJECT_ klasses;
+    int n, i;
+
+    klasses = GET_CLASS(obj);
+    n = GET_LENGTH(klasses);
+    for(i = 0; i < n ; i++) {
+	if(strcmp(CHAR_DEREF(STRING_ELT(klasses, i)), klass) == 0)
+	    return(TRUE);
+    }
+
+
+    return(FALSE);
+}

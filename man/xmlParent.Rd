@@ -3,9 +3,20 @@
 \alias{xmlParent.XMLInternalNode}
 \title{Get parent node of XMLInternalNode}
 \description{
- This operates on an internal C-level XML node
+ This operates on an XML node
  and returns a reference to its parent node 
  within the document tree.
+ This works for an internal, C-level
+ \code{XMLInternalNode} object
+ created, for examply, using \code{\link{newXMLNode}}
+ and related functions or \code{\link{xmlTree}}
+ or  from \code{\link{xmlTreeParse}} with the
+ \code{useInternalNodes} parameter.
+
+ It is possible to find the parent of an R-level
+ XML node when using a tree
+ created with, for example,  \code{\link{xmlHashTree}}
+ as the parent information is stored separately.
 }
 \usage{
 xmlParent(x)
@@ -32,6 +43,32 @@ xmlParent(x)
 }
 \examples{
 
+  top = newXMLNode("doc")
+  s = newXMLNode("section", attr = c(title = "Introduction"))
+  a = newXMLNode("article", s)
+  addChildren(top, a)
+
+  xmlName(xmlParent(s))
+  xmlName(xmlParent(xmlParent(s)))
+
+
+    # Find the root node.
+  root = a
+  while(!is.null(xmlParent(root)))
+      root = xmlParent(root)
+
+   # find the names of the parent nodes of each 'h' node.
+   # use a global variable to "simplify" things and not use a closure.
+
+  filename = system.file("exampleData", "branch.xml", package = "XML")
+  parentNames <- character()
+  xmlTreeParse(filename,
+                handlers =
+                  list(h = function(x) {
+                   parentNames <<- c(parentNames, xmlName(xmlParent(x)))
+                  }), useInternalNodes = TRUE)
+
+  table(parentNames)
 }
 \keyword{file}
 \keyword{IO}

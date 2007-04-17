@@ -1,5 +1,5 @@
 if(!exists("Sys.setenv", baseenv()))
-    Sys.setenv <- base::Sys.putenv
+    Sys.setenv <- get("Sys.putenv", "package:base")
 
 
 xmlRoot <-

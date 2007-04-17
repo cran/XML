@@ -17,7 +17,8 @@ function() {
   externalEntity <- function(ctxt, baseURI, sysId, publicId,...) {
     cat("externalEntity", ctxt, baseURI, sysId, publicId,"\n")
   }
-  entityDeclaration <- function(name, baseURI, sysId, publicId,notation,...) {
+  entityDeclaration <- function(name, baseURI, sysId, publicId, notation, ...) {
+    # just writing to screen at this point.
     cat("externalEntity", name, baseURI, sysId, publicId, notation,"\n")
   }
 
@@ -25,6 +26,12 @@ function() {
    con$addNode(xmlPINode(sys, value))
  }
 
- list(startElement=startElement, endElement=endElement, processingInstruction=processingInstruction, text=text, comment=comment, externalEntity=externalEntity, entityDeclaration=entityDeclaration, dom=function(){con})
+ list(startElement=startElement, endElement=endElement,
+      processingInstruction=processingInstruction,
+      text=text,
+      comment=comment,
+      externalEntity=externalEntity,
+      entityDeclaration=entityDeclaration,
+      dom=function(){con})
 }
 

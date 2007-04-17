@@ -13,17 +13,41 @@ constructed in R and exported to another system
 such as XSLT (\url{http://www.omegahat.org/Sxslt})
 }
 \usage{
-xmlTree(tag, attrs = NULL, dtd=NULL, namespaces=list())
+xmlTree(tag, attrs = NULL, dtd=NULL, namespaces=list(),
+          doc = newXMLDoc(dtd, namespaces))
 }
 \arguments{
-  \item{tag}{the tagname of the top-level element. This is basically
-    ignored!}
+  \item{tag}{the node or element name to use to create the new top-level node in the tree
+    or alternatively, an \code{XMLInternalNode} that was already
+    created.
+    This is optional. If it is not specified, no top-most node is
+    created but can be added using \code{addNode}.
+    If a top-level tag is added in the call to
+    \code{xmlTree},  that becomes the currently active or open
+    node (e.g. same as \code{addNode( ..., close = FALSE)})
+    and nodes subsequently added to this
+    }
   \item{attrs}{attributes for the top-level node, in the form of a named
-    vector or list.}
-  \item{dtd}{the name of the external DTD for this document. See \code{\link{newXMLDoc}}}
+    character vector.}
+  \item{dtd}{the name of the external DTD for this document.
+    If specified, this adds the DOCTYPE node to the resulting document.
+    This can be a node created earlier with a call to 
+    \code{\link{newXMLDTDNode}}, or alternatively it can be a
+    character vector with 1, 2 or 3 elements
+    giving the name of the top-level node, and the public identifier
+    and the system identifier for the DTD in that order.
+  }
   \item{namespaces}{a named character vector with each element giving the name space identifier and the
     corresponding URI, \\
-    e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
+    e.g \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}
+    If \code{tag} is specified as a character vector, these name spaces
+    are defined within that new node.
+  }
+  \item{doc}{an internal XML document object, typically created with
+    \code{\link{newXMLDoc}}. This is used as the host document for all
+    the new nodes that will be created  as part of this document.
+    If one wants to create nodes without an internal document ancestor,
+    one can alternatively specify this is as  \code{NULL}.}
 }
 \details{
  This creates a collection of functions that manipulate a shared
@@ -85,5 +109,19 @@ of the minor details.}
   tr$addPI("S", "plot(1:10)")
   tr$closeTag()
   cat(saveXML(tr$value()))
+
+
+  # Creating a node
+x = rnorm(3)
+z = xmlTree("r:data", namespaces = c(r = "http://www.r-project.org"))
+z$addNode("numeric", attrs = c("r:length" = length(x)))
+
+
+  # shows namespace prefix on an attribute, and different from the one on the node.
+  z = xmlTree()
+z$addNode("r:data",  namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org"), close = FALSE)
+x = rnorm(3)
+z$addNode("r:numeric", attrs = c("omg:length" = length(x)))
+
 }
 \keyword{IO}

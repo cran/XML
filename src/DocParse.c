@@ -91,7 +91,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                        USER_OBJECT_ addNamespaceAttributes,
                         USER_OBJECT_ internalNodeReferences, 
 		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
-     	      	         USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding)
+		        USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding,
+                        USER_OBJECT_ useDotNames)
 {
 
   char *name;
@@ -99,7 +100,6 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   USER_OBJECT_ rdoc;
   USER_OBJECT_ className;
   R_XMLSettings parserSettings;
-  int previousValiditySetting;
 
   int asTextBuffer = LOGICAL_DATA(asText)[0];
   int isURLDoc = LOGICAL_DATA(isURL)[0];
@@ -113,6 +113,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
   parserSettings.skipBlankLines = LOGICAL_DATA(skipBlankLines)[0];
   parserSettings.converters = converterFunctions;
+  parserSettings.useDotNames = LOGICAL_DATA(useDotNames)[0];
   parserSettings.trim = LOGICAL_DATA(trim)[0];
   parserSettings.fullNamespaceInfo = LOGICAL_DATA(fullNamespaceInfo)[0];
 
@@ -137,9 +138,11 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
   }
 
+#if 0 /* Done in R now.*/
     /* If one wants entities expanded directly and to appear as text.  */
   if(LOGICAL_DATA(replaceEntities)[0]) 
       xmlSubstituteEntitiesDefault(1);   
+#endif
 
 
   if(LOGICAL_DATA(isSchema)[0]) {
@@ -441,6 +444,10 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
     n++;
 
 
+  /* If we have a */
+  if(node->type != XML_ELEMENT_DECL)  {
+
+
      /* Create the default return value being a list of name, attributes, children 
         and possibly value. 
 
@@ -499,6 +506,9 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
     SET_STRING_ELT(ans_el_names, NUM_NODE_ELEMENTS, COPY_TO_USER_STRING("value"));
     SET_VECTOR_ELT(ans, NUM_NODE_ELEMENTS, NEW_CHARACTER(1));
     SET_STRING_ELT(VECTOR_ELT(ans, NUM_NODE_ELEMENTS), 0, COPY_TO_USER_STRING(contentValue));
+
+    if(node->type == XML_ENTITY_REF_NODE) 
+	SET_NAMES(VECTOR_ELT(ans, NUM_NODE_ELEMENTS), mkString(XMLCHAR_TO_CHAR(node->name)));
   }
 
   SET_NAMES(ans, ans_el_names);
@@ -509,7 +519,12 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
      */
 
   RS_XML(setNodeClass)(node, ans);
-
+  } else {
+      /* XML_ELEMENT_DECL */
+      ans = NULL_USER_OBJECT;
+      PROTECT(ans);
+      PROTECT(ans);
+  }
      /* Now invoke any user-level converters.  */
   if(recursive || direction)
     ans = convertNode(ans, node, parserSettings);
@@ -657,29 +672,30 @@ USER_OBJECT_
 RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ defaultNodeValue, 
                                      R_XMLSettings *parserSettings)
 {
+#define DOT(x) parserSettings->useDotNames ? "." x : x
   char *name;
   USER_OBJECT_ fun = NULL;
   switch(node->type) {
     case XML_ENTITY_REF_NODE:
-      name = "entity";
+	name = DOT("entity");
       break;
     case XML_ENTITY_NODE:
-      name = "entity";
+	name = DOT("entity");
       break;
     case XML_ELEMENT_NODE:
-      name = "startElement";
+	name = DOT("startElement");
       break;
     case XML_PI_NODE:
-      name = "proccesingInstruction";
+	name = DOT("proccesingInstruction");
       break;
     case XML_COMMENT_NODE:
-      name = "comment";
+	name = DOT("comment");
       break;
     case XML_TEXT_NODE:
-      name = "text";
+	name = DOT("text");
       break;
     case XML_CDATA_SECTION_NODE:
-      name = "cdata";
+	name = DOT("cdata");
       break;
   default:
       name = NULL;     
@@ -1109,6 +1125,19 @@ RS_XML_xmlNodeParent(USER_OBJECT_ snode)
 }
 
 
+USER_OBJECT_
+RS_XML_xmlNodeNumChildren(USER_OBJECT_ snode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    int count = 0;
+    xmlNodePtr ptr =  node->children;
+
+    while(ptr) {
+	count++;
+	ptr = ptr->next;
+    }
+    return(ScalarInteger(count));
+}
 
 USER_OBJECT_
 RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)

@@ -66,12 +66,26 @@ and
 \author{ Duncan Temple Lang }
 
 \seealso{
-\code{\link{xmlTreeParse}}
-\code{\link{asXMLNode}}
+ \code{\link{xmlTreeParse}}
+ \code{\link{asXMLNode}}
+ \code{\link{newXMLNode}}
+ \code{\link{newXMLPINode}}
+ \code{\link{newXMLCDataNode}}
+ \code{\link{newXMLCommentNode}}
 }
 
 \examples{
-a <- xmlNode("arg", attrs = c(default="T"),
+
+ # node named arg with two children: name and defaultValue
+ # Both of these have a text node as their child.
+a <- xmlNode("arg", attrs = c(default="TRUE"),
                xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
+
+
+  # internal C-level node.
+ newXMLNode("arg", attrs = c(default = "TRUE"),
+             newXMLNode("name", "foo"),
+             newXMLNode("defaultValue", "1:10"))
+
 }
 \keyword{file}

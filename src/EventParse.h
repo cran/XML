@@ -83,7 +83,17 @@ typedef struct {
   xmlNodePtr top;
   int        branchIndex;
 
+    /* */
+  int        useDotNames;
+
 } RS_XMLParserData;
+
+/* The name of the R element to call fo the general case.
+   if useDotNames is on, then we paste a . to the regular name.
+*/
+#define HANDLER_FUN_NAME(ctx, txt) \
+    ((RS_XMLParserData *)(ctx))->useDotNames ? "." txt : txt
+
 
 
 void

@@ -1,76 +1,90 @@
 xmlTree <-
-function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
+function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
+          doc = newXMLDoc(dtd, namespaces))
+  # Allows a DOCTYPE, etc. at the beginning by specifying dtd as 
+  # a vector of 1, 2, 3 elements passed to newXMLDTDNode() or
+  # as an XMLDTDNode directly.
+  
+  # With namespaces, we do the following....
+  #
 {
- doc <- newXMLDoc(dtd, namespaces)
  currentNodes <- list(doc)
-
-
+ 
  isXML2 <- libxmlVersion()$major != "1" 
- 
- 
- if(!is.null(dtd) && dtd != "") {
+
+    # if we are given a DTD, add it to the document.
+ if(!is.null(dtd)) {
    if(isXML2) {
-     node = .Call("R_newXMLDtd", doc, dtd, "", "")
-     .Call("R_insertXMLNode", node, doc)
-     currentNodes[[2]] <- node
+     node = NULL
+     if(is(dtd, "XMLDTDNode"))
+       node = dtd
+     else if(is.character(dtd) && dtd[1] != "")
+       node = newXMLDTDNode(dtd, doc = doc)
+
+     if(!is.null(node)) {
+       addChildren(doc, node)
+       currentNodes[[2]] <- node #???XXX
+     }
    } else
      warning("DTDs not supported in R for libxml 1.*. Use libxml2 instead.")
  }
  
  definedNamespaces = list()
+ defaultNamespace = NULL
+ setActiveNamespace = function(ns) {
+                         defaultNamespace <<- ns
+                      }
  
  asXMLNode <- function(x) {
-        if(is.character(x)) {
-          v <- .Call("R_newXMLTextNode", x)
-        } else if(is.list(x)) {
+        if(is(x, "XMLInternalNode"))
+          return(x)
+        
+        if(is.list(x)) {
           v <- lapply(x, asXMLNode)
         }  else {
-          # Problem!
-          browser()
+          v <- newXMLTextNode(as.character(x), doc)
         }
-
         v 
- }
+      }
 
- setNamespace <- function(node, namespace) {
-     if(is.null(namespace))
+
+ 
+ setNamespace <- function(node, namespace = defaultNamespace) {
+     if(length(namespace) == 0 || !(length(namespace) == 1 && is.null(names(namespace))))
        return(NULL)
 
+     if(is.list(namespace))
+       return(NULL)
+     
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
        ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace)
        definedNamespaces[[namespace]] <<- ns
      }
-     
-     .Call("R_xmlSetNs", node, definedNamespaces[[namespace]])
+
+     setInternalNamespace( node, definedNamespaces[[namespace]])
  }
 
  
- addTag <- function(name, ..., attrs=NULL, close=TRUE, namespace=NULL) {
+ addTag <- function(name, ..., attrs = NULL, close = TRUE, namespace = defaultNamespace, .children = list(...) ) {
 
    if(!is.null(attrs))
-    storage.mode(attrs) <- "character"
+      storage.mode(attrs) <- "character"
 
-   node <- .Call("R_newXMLNode", name, attrs, namespace, doc)
+   node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc)
 
    setNamespace(node, namespace)
 
    if(length(currentNodes) > 1)
-     .Call("R_insertXMLNode", node, currentNodes[[1]])
+      addChildren(currentNodes[[1]], node)
 
-   if(close == FALSE) {
-    currentNodes <<- c(node, currentNodes)
-   }
+   currentNodes <<- c(node, currentNodes)
 
-   kids <- list(...)
-   if(length(kids)) {
-    for(i in kids) {
-      if(!inherits(i, "XMLNode")) {
-        i <- asXMLNode(i)
-      }
-      .Call("R_insertXMLNode", i, node)
-    }
-   }
+   for(i in .children) 
+      addChildren(node, asXMLNode(i))  # vectorize XXX
 
+   if(close == TRUE)
+     closeTag()
+   
    invisible(return(node))
  }
 
@@ -81,33 +95,50 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
   invisible(return(tmp))
  }
 
+
+ add = function(node, parent = currentNodes[[1]]) {
+        if(!is.null(parent))
+            addChildren(currentNodes[[1]], node)
+        invisible(node)
+       }
+ 
  addComment <- function(...) {
-  node <- .Call("R_xmlNewComment", paste(as.character(list(...)), sep=""))
-  .Call("R_insertXMLNode", node, currentNodes[[1]])   
+   add(newXMLCommentNode(paste(as.character(list(...)), sep=""), doc))
  }
 
 
  addCData <- function(text) {
-   node <- .Call("R_newXMLCDataNode", doc, as.character(text))
-   if(length(currentNodes) > 1)
-     .Call("R_insertXMLNode", node, currentNodes[[1]])
-   node
+   add(newXMLCDataNode(text, doc))
  }
 
  addPI <- function(name, text) {
-   node <- .Call("R_newXMLPINode", doc, as.character(name), as.character(text))
-   if(length(currentNodes) > 1)
-     .Call("R_insertXMLNode", node, currentNodes[[1]])
-   node
- }  
+   add(newXMLPINode(name, text, doc))
+ }
+
+
+ if(!is.null(tag)) {
+
+   if(is.character(tag)) {
+     node = addTag(tag, attrs = attrs, namespace = namespaces, close = FALSE)
+   } else if(is(tag, "XMLInternalNode")) {
+     if(is.null(xmlParent(node))) # if we have a DTD node, need to add it to that or parallel to that?
+       addChildren(doc, node)
+   }
+   
+
+ }
 
  v <- list(
          addTag = addTag,
+         addNode = addTag,           
          addCData = addCData,
          addPI = addPI,
          closeTag = closeTag,
+         closeNode = closeTag,
          addComment = addComment,
+         setNamespace = setActiveNamespace,
          value = function() doc,
+         doc = function() doc,
          add = function(...){}
        )
 
@@ -116,250 +147,6 @@ function(tag=NULL, attrs = NULL, dtd=NULL, namespaces=list())
 }
 
 
-xmlRoot.XMLInternalDocument = 
-function(x, ...)
-{
-  .Call("R_xmlRootNode", x)
-}
-
-setOldClass("XMLInternalDocument")
-setOldClass("XMLNode")
-setOldClass("XMLInternalNode")
-
-setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
-
-setOldClass("XMLNamespace")
-
-
-setAs("XMLInternalNode", "XMLNode",
-        function(from) 
-           asRXMLNode(from)
-        )
-
-
-setGeneric("free", function(obj) standardGeneric("free"))
-
-setMethod("free", "XMLInternalDocument",
-           function(obj)  .Call("R_XMLInternalDocument_free", obj))
-
-
-asRXMLNode =
-function(node, converters = NULL, trim = TRUE, ignoreBlanks = TRUE)
-   .Call("R_createXMLNode", node, converters, as.logical(trim), as.logical(ignoreBlanks))
-
-"[.XMLInternalDocument" =
-function(x, i, j, ...)
-{
-  if(is.character(i)) {
-    getNodeSet(x, i, ...)
-  } else
-     stop("No method for subsetting an XMLInternalDocument with ", class(i))
-}  
-
-xmlName.XMLInternalNode =
-function(node, full = FALSE)
-{
-  .Call("RS_XML_xmlNodeName", node)
-}
-
-xmlNamespace.XMLInternalNode =
-function(x)
-{
-  .Call("RS_XML_xmlNodeNamespace", x)
-}
-
-xmlAttrs.XMLInternalNode = 
-function(node, addNamespace = TRUE, ...)
-{
-  .Call("RS_XML_xmlNodeAttributes",  node, as.logical(addNamespace))
-}
-
-xmlChildren.XMLInternalNode =
-function(x)
-{
- .Call("RS_XML_xmlNodeChildrenReferences", x)
-}
-
-
-"[[.XMLInternalNode" <-
-function(x, i, j, ...)
-{
-  kids = xmlChildren(x)
-  if(is.numeric(i))
-     kids[[i]]
-  else {
-     id = as.character(i)
-     which = match(id, sapply(kids, xmlName))
-     kids[[which]]
-  }
-}  
-
-
-
-"[.XMLInternalNode" <-
-function(x, i, j, ...)
-{
-  kids = xmlChildren(x)
-  if(is.numeric(i))
-     kids[i]
-  else {
-     id = as.character(i)
-     which = (id == sapply(kids, xmlName))
-     kids[which]
-  }
-}  
-
-
-xmlValue.XMLInternalNode =
-function(x, ignoreComments = FALSE)
-{
-  .Call("R_xmlNodeValue", x)
-}  
-
-
-names.XMLInternalNode =
-function(x)
-  xmlSApply(x, xmlName)
-
-xmlApply.XMLInternalNode =
-function(X, FUN, ...)
-{
-   kids = xmlChildren(X)
-   lapply(kids, FUN, ...)
-}  
-
-xmlSApply.XMLInternalNode =
-function(X, FUN, ...)
-{
-   kids = xmlChildren(X)
-   sapply(kids, FUN, ...)
-}  
-
-
-
-xmlParent =
-function(x)
- UseMethod("xmlParent")
-
-xmlParent.XMLInternalNode =
-function(x)
-{
-  .Call("RS_XML_xmlNodeParent", x)
-}
-
-
-
-
-newXMLDoc <-
-#
-# Creates internal C-level libxml object for representing
-# an XML document/tree of nodes.
-#
-function(dtd, namespaces = NULL)
-{
-  .Call("R_newXMLDoc", dtd, namespaces)
-}
-
-newXMLNode <-
-#
-# Create an internal C-level libxml node
-#
-function(name, ..., attrs=NULL, namespace="", doc = NULL)
-{
- if(!is.null(attrs)) {
-   tmp <- names(attrs)
-   attrs <- as.character(attrs)
-   names(attrs) <- tmp
- }
-
- children <- list(...)
-
- node <- .Call("R_newXMLNode", as.character(name), attrs, as.character(namespace), doc)
- if(!is.null(children)) {
-   for(i in children)
-     .Call("R_insertXMLNode", i, node)
- }
-
- node
-}
-
-
-saveXML <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
-{
- UseMethod("saveXML")
-}
-
-saveXML.XMLInternalDocument <-
-function(doc, file = NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
-{
-  if(is(doctype, "Doctype")) {
-       # Check that the value in the DOCTYPE for the top-level name is the same as that of the
-       # root element
-       
-     topname = xmlName(xmlRoot(doc))
-
-     if(doctype@name == "")
-        doctype@name = topname
-     else if(topname == doctype@name)
-       stop("The top-level node and the name for the DOCTYPE must agree", doctype@name, " ", topname)
-
-     prefix = c(doctype@name, doctype@public, doctype@system)
-  }
-
-  .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent),
-                         as.character(prefix), as.character(encoding))
-}
-
-saveXML.XMLInternalDOM <-
-function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
-{
-  saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)
-}
-
-
-saveXML.XMLOutputStream =
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
-{
-  saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)  
-}
-
-
-saveXML.sink =
-#
-# Need to handle a DTD here as the prefix argument..
-#
-function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
-{
-  if(is.character(file)) {
-    file = file(file, "w")
-    on.exit(close(file))
-  }
-  
-  if(inherits(file, "connection")) {
-    sink(file)
-    on.exit(sink())    
-  }
-
-  if(!is.null(prefix))
-    cat(as.character(prefix))
-
-  if(!is.null(doctype))
-    cat(as(doctype, "character"), '\n')
-  
-  print(doc)
-}
-  
-
-
-saveXML.XMLNode = saveXML.sink
-
-saveXML.XMLFlatTree = saveXML.sink
 
 
 

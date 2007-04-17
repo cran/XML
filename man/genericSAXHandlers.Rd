@@ -13,7 +13,7 @@
   the elements to include or exclude.
 }
 \usage{
-genericSAXHandlers(include, exclude)
+genericSAXHandlers(include, exclude, useDotNames = FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -24,6 +24,10 @@ genericSAXHandlers(include, exclude)
     this gives the names of the elements to remove from the list of
     functions.
   }
+  \item{useDotNames}{ a logical value.
+    If this is \code{TRUE}, the names of the elements in the list of
+    handler functions are prefixed with '.'. This is the newer format
+   used to differentiate general element handlers and node-name-specific handlers.}
 }
 \value{
   A list of functions.

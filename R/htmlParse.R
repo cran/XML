@@ -11,7 +11,8 @@ htmlTreeParse <-
 function(file, ignoreBlanks = TRUE, handlers = NULL,
            replaceEntities = FALSE, asText = FALSE, trim = TRUE, 
             isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
-            encoding = character())
+            encoding = character(),
+            useDotNames = length(grep("^\\.", names(handlers))) > 0)
 {
 
   if(length(file) > 1) {
@@ -38,12 +39,16 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  if(!asText && !isURL)
    file = path.expand(file)
 
+ old = setEntitySubstitution(replaceEntities)
+ on.exit(setEntitySubstitution(old))
+  
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
          as.logical(ignoreBlanks), as.logical(replaceEntities),
           as.logical(asText), as.logical(trim), 
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
-           as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding))
+           as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding),
+           as.logical(useDotNames))
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

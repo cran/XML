@@ -43,7 +43,11 @@ catalogResolve(id, type = "uri", debug = FALSE)
 }
 \examples{
 
-Sys.putenv("XML_CATALOG_FILES" = system.file("exampleData", "catalog.xml", package = "XML"))
+if(!exists("Sys.setenv")) Sys.setenv = Sys.putenv
+
+Sys.setenv("XML_CATALOG_FILES" = system.file("exampleData", "catalog.xml", package = "XML"))
+
+
 
 catalogResolve("-//OASIS//DTD DocBook XML V4.4//EN", "public")
 

@@ -27,6 +27,8 @@ typedef struct {
   int internalNodeReferences;
 
   int fullNamespaceInfo;
+
+  int useDotNames;
 } R_XMLSettings;
 
 

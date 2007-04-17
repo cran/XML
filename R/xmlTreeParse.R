@@ -1,3 +1,4 @@
+
 xmlTreeParse <- 
 #
 # XML parser that reads the entire `document' tree into memory
@@ -6,13 +7,14 @@ xmlTreeParse <-
 #
 # asText  treat the value of file as XML text, not the name of a file containing
 #       the XML text, and parse that.
-# See also xml
+#
 #
 function(file, ignoreBlanks = TRUE, handlers=NULL,
            replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
            isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
            useInternalNodes = FALSE, isSchema = FALSE,
-           fullNamespaceInfo = FALSE, encoding = character())
+           fullNamespaceInfo = FALSE, encoding = character(),
+           useDotNames = length(grep("^\\.", names(handlers))) > 0)# will be switched to TRUE in the future.
 {
 
   if(length(file) > 1) {
@@ -25,6 +27,13 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
   if(missing(isURL)) 
     isURL <- length(grep("^http://", file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
 
+
+  checkHandlerNames(handlers, "DOM")
+
+
+  if(missing(fullNamespaceInfo) && inherits(handlers, "RequiresNamespaceInfo"))
+    fullNamespaceInfo = TRUE
+  
 
   oldValidate = xmlValidity()
   xmlValidity(validate)
@@ -44,12 +53,15 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
  if(asText && length(file) > 1)
    file = paste(file, collapse = "\n")
 
+ old = setEntitySubstitution(replaceEntities)
+ on.exit(setEntitySubstitution(old))
+  
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
               as.logical(isURL), as.logical(addAttributeNamespaces),
               as.logical(useInternalNodes), FALSE, as.logical(isSchema),
-              as.logical(fullNamespaceInfo), as.character(encoding))
+              as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames))
 
 
  if(!missing(handlers) & !as.logical(asTree))

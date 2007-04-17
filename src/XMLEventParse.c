@@ -37,6 +37,7 @@ void RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len);
 void RS_XML(piHandler)(void *ctx, const xmlChar *target, const xmlChar *data);
 void RS_XML(entityDeclaration)(void *ctx, const xmlChar *name, int type, const xmlChar *publicId, 
                                 const xmlChar *systemId, xmlChar *content);
+xmlEntityPtr RS_XML(getEntityHandler)(void *userData, const xmlChar *name);
 
 
 int RS_XML(isStandAloneHandler)(void *ctx);
@@ -44,6 +45,8 @@ void RS_XML(warningHandler)(void *ctx, const char *msg, ...);
 void RS_XML(errorHandler)(void *ctx, const char *format, ...); 
 void RS_XML(fatalErrorHandler)(void *ctx, const char *msg, ...);
 void RS_XML(structuredErrorHandler)(void *ctx, xmlErrorPtr err);
+
+
 
 
 static void RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion);
@@ -361,7 +364,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   UNPROTECT(2);
 
 
-  RS_XML(callUserFunction)("startElement", XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
+  RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
 
   UNPROTECT(1);
 }
@@ -440,7 +443,7 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
      SET_NAMES(tmp, mkString(XMLCHAR_TO_CHAR(prefix)));
   SET_VECTOR_ELT(args, 1, tmp);
 
-  RS_XML(callUserFunction)("endElement", NULL, (RS_XMLParserData *)ctx, args);
+  RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endElement"), NULL, (RS_XMLParserData *)ctx, args);
 
   UNPROTECT(2);
 }
@@ -473,8 +476,12 @@ RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion)
      xmlParserHandler->endElement = RS_XML(endElementHandler);
   }
 
-  xmlParserHandler->comment = RS_XML(commentElementHandler);
   xmlParserHandler->entityDecl = RS_XML(entityDeclaration);
+  xmlParserHandler->getEntity = RS_XML(getEntityHandler);
+
+
+  xmlParserHandler->comment = RS_XML(commentElementHandler);
+
   xmlParserHandler->characters = RS_XML(charactersHandler);
   xmlParserHandler->processingInstruction = RS_XML(piHandler);
   xmlParserHandler->cdataBlock = RS_XML(cdataBlockHandler);
@@ -494,7 +501,7 @@ RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion)
   xmlParserHandler->hasInternalSubset = NULL;
   xmlParserHandler->hasExternalSubset = NULL;
   xmlParserHandler->resolveEntity = NULL;
-  xmlParserHandler->getEntity = NULL;
+
   xmlParserHandler->getParameterEntity = NULL;
   xmlParserHandler->attributeDecl = NULL;
   xmlParserHandler->elementDecl = NULL;
@@ -507,6 +514,7 @@ RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion)
 
 
 }
+
 
 void
 RS_XML(startElementHandler)(void *userData, const xmlChar *name, const xmlChar **atts)
@@ -535,13 +543,13 @@ RS_XML(charactersHandler)(void *user_data, const xmlChar *ch, int len)
 void
 RS_XML(startDocumentHandler)(void *ctx)
 {
-  RS_XML(callUserFunction)("startDocument", NULL, ((RS_XMLParserData*) ctx), NULL_USER_OBJECT);
+    RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "startDocument"), NULL, ((RS_XMLParserData*) ctx), NULL_USER_OBJECT);
 }
 
 void
 RS_XML(endDocumentHandler)(void *ctx)
 {
-  RS_XML(callUserFunction)("endDocument", NULL, ((RS_XMLParserData*) ctx), NULL_USER_OBJECT);
+    RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endDocument"), NULL, ((RS_XMLParserData*) ctx), NULL_USER_OBJECT);
 }
 
 void
@@ -558,7 +566,7 @@ RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len)
  PROTECT(opArgs = NEW_LIST(1));
  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
    SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(value)));
-  RS_XML(callUserFunction)("cdata", (const char *)NULL, (RS_XMLParserData*)ctx, opArgs);
+   RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "cdata"), (const char *)NULL, (RS_XMLParserData*)ctx, opArgs);
   UNPROTECT(1);
 }
 
@@ -568,13 +576,84 @@ RS_XML(piHandler)(void *ctx, const xmlChar *target, const xmlChar *data)
   RS_XML(processingInstructionHandler)(ctx, (const XML_Char*)target, (const XML_Char*)data);
 }
 
+
+#define RString(x) (x ? mkString(XMLCHAR_TO_CHAR((x))) : NEW_CHARACTER(1))
+
+
+/* Relies on the order and numbering of xmlEntityType from entities.h */
+static const char * const EntityTypeNames[]  = {
+
+    "Internal_General",
+    "External_General_Parsed",
+    "External_General_Unparsed",
+    "Internal_Parameter",
+    "External_Parameter",
+    "Internal_Predefined"
+};
+
 void
 RS_XML(entityDeclaration)(void *ctx,
                             const xmlChar *name, int type, const xmlChar *publicId,
 			    const xmlChar *systemId, xmlChar *content)
 {
+    USER_OBJECT_ fun, opArgs, tmp;
+    RS_XMLParserData *parserData = (RS_XMLParserData*) ctx;
 
+    /* check if there is a function to call before making the list of 5 elements. */
+    fun = RS_XML(findFunction)(HANDLER_FUN_NAME(parserData, "entityDeclaration"), parserData->methods); 
+    if(fun == NULL || fun == NULL_USER_OBJECT) 
+	return;
+
+    PROTECT(fun);
+    PROTECT(opArgs = NEW_LIST(5));
+    SET_VECTOR_ELT(opArgs, 0, RString(name));
+    PROTECT(tmp = ScalarInteger(type));
+    SET_NAMES(tmp, mkString(EntityTypeNames[type-1]));
+    SET_VECTOR_ELT(opArgs, 1, tmp);
+    UNPROTECT(1);
+    SET_VECTOR_ELT(opArgs, 2, RString(content));
+    SET_VECTOR_ELT(opArgs, 3, RString(systemId));
+    SET_VECTOR_ELT(opArgs, 4, RString(publicId));
+
+    (void) RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject);    
+    UNPROTECT(2);
 }
+
+
+xmlEntityPtr
+RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
+{
+    
+    SEXP opArgs, r_ans;
+    xmlEntityPtr ans = NULL;
+
+    PROTECT(opArgs = NEW_LIST(1)) ;
+    SET_VECTOR_ELT(opArgs, 0, mkString(name));
+    r_ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(userData, "getEntity"), NULL, (RS_XMLParserData *) userData, opArgs);
+    
+    PROTECT(r_ans) ;
+    if(r_ans != NULL_USER_OBJECT && GET_LENGTH(r_ans) > 0) {
+	if(TYPEOF(r_ans) == STRSXP) {
+	    const char *value;
+	    value = CHAR_DEREF(STRING_ELT(r_ans, 0));
+	    ans = (xmlEntityPtr) malloc(sizeof(xmlEntity));
+	    memset(ans, 0, sizeof(xmlEntity));
+	    ans->type = XML_ENTITY_DECL;
+	    ans->etype = XML_INTERNAL_GENERAL_ENTITY;
+	    ans->name = xmlStrdup(name);
+	    ans->orig = NULL; // xmlStrdup(CHAR_TO_XMLCHAR(value));
+	    ans->content = xmlStrdup(CHAR_TO_XMLCHAR(value));	    
+	    ans->length = strlen(value);
+#ifndef NO_CHECKED_ENTITY_FIELD
+	    ans->checked = 1;
+#endif
+	}
+    }
+    UNPROTECT(2);
+
+    return(ans);
+}
+
 
 
 int

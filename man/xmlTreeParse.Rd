@@ -10,14 +10,16 @@
 }
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-               isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-               useInternalNodes = FALSE, isSchema = FALSE,
-               fullNamespaceInfo = FALSE, encoding = character())
+             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
+             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+             useInternalNodes = FALSE, isSchema = FALSE,
+             fullNamespaceInfo = FALSE, encoding = character(),
+             useDotNames = length(grep("^\\.", names(handlers))) > 0)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
-               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
-               isURL = FALSE, asTree = FALSE, 
-               useInternalNodes = FALSE, encoding = character()) 
+              replaceEntities = FALSE, asText = FALSE, trim = TRUE,
+              isURL = FALSE, asTree = FALSE, 
+              useInternalNodes = FALSE, encoding = character(),
+              useDotNames = length(grep("^\\.", names(handlers))) > 0) 
 }
 
 \arguments{
@@ -123,6 +125,21 @@ return type.
   encoding information. However, if it doesn't, the caller can specify
   this for the parser.
 }
+
+\item{useDotNames}{a logical value
+  indicating whether to use the
+  newer format for identifying general element function handlers
+  with the '.' prefix, e.g. .text, .comment, .startElement.
+  If this is \code{FALSE}, then the older format
+  text, comment, startElement, ...
+  are used. This causes problems when there are indeed nodes
+  named text or comment or startElement as a
+  node-specific handler are confused with the corresponding
+  general handler of the same name. Using \code{TRUE}
+  means that your list of handlers should have names that use
+  the '.' prefix for these general element handlers.
+  This is the preferred way to write new code.
+}
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -212,6 +229,7 @@ and another for entities. See \code{\link{parseDTD}}.
 \examples{
  fileName <- system.file("exampleData", "test.xml", package="XML")
    # parse the document and return it in its standard format.
+print(getwd())
  xmlTreeParse(fileName)
 
    # parse the document, discarding comments.
@@ -231,6 +249,7 @@ and another for entities. See \code{\link{parseDTD}}.
  # Read the text from the file
  xmlText <- paste(readLines(fileName), "\n", collapse="")
 
+ print(xmlText)
  xmlTreeParse(xmlText, asText=TRUE)
 
 

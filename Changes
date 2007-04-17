@@ -1,3 +1,61 @@
+Version 1.7-0
+
+      This a quite comprehensive enhancement to the facilities in the XML package. A lot of work on
+      the tools for creating or authoring XML from within R were added and improved. Using internal
+      nodes directly with newXMLNode() and friends, or using xmlTree() is probably the simplest.
+      But xmlHashTree() creates them in R.
+
+
+  * IMPORTANT:  one can and should use the names .comment, .startElement, .processingInstruction,
+     .text, etc. when identifying general element handlers that apply to all elements of a particular type
+     in  an XML document rather than to nodes that have a particular name.  This differentiates between
+     a handler for a node named, say, text and a handler for all text elements found in the document.
+     To use this new approach, call xmlTreeParse() or xmlEventParse() with 
+          useDotNames = TRUE
+     This will become the default in future releases.
+
+  *  namespaceHandlers() function provided to deal with node handler functions with XML name spaces where
+     there may be multiple handlers for the same node name but which are in different XML name spaces.
+
+  *  signature for entityDeclaration function in SAX interface is changed so that the second argument
+     identifies the type of entity. Also, to query the value of an entity, the C code calls the 
+     getEntity() method of the handlers.
+
+  *  addChildren() & removeChildren() and addAttributes() & removeAttributes() for an existing node allows for 
+     post-creation modification of an XML node.
+
+  *  Improved support for name spaces on node attributes.
+
+  *  xmlName<-() methods for internal and R-level XML nodes to change the name of a node.
+
+  *  saveXML() and as(, "character") method for XMLInternalNode objects now to create a text representation of the  
+     internal nodes.
+
+  *  xmlTree() allows for creating a top-level node in the call to xmlTree() directly and does not 
+     ignore these arguments.
+
+  *  DTD and associated DOCTYPE can be created separately or directly in xmlTree().
+
+  *  xmlTree() now allows the caller to specify the doc object as an argument, including NULL
+     for when the nodes do not need to have a document object.
+
+  *  Better support in xmlTree() for namespaces and maintaining a default/active namespace prefix that is to be
+     inserted on each subsequent node.
+
+  *  new functions for creating different internal node types - newXMLCDataNode, newXMLPINode, newXMLCommentNode, newXMLDTDNode.
+
+  *  newXMLNode() handles text, using the new newXMLTextNode() and coerce methods.
+
+  *  xmlTree() supports an active/default name space prefix which is used for new nodes.
+
+  *  Resetting the state of the xmlSubstituteEntities variable is handled correctly in the case of an error.
+
+
+
+Version 1.6-4
+
+  *  xmlSize() method for an XMLInternalNode.
+
 Version 1.6-3
 
   *  Handle change from Sys.putenv() to Sys.setenv().

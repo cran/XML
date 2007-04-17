@@ -77,9 +77,13 @@ The following are specific to \code{xmlOutputDOM}:
 \author{Duncan Temple Lang}
 
 \seealso{
+\code{\link{xmlTree}} for an internal (C-level) representation of the tree,
 \code{\link{xmlNode}},
 \code{\link{xmlTextNode}},
 \code{\link{append.xmlNode}}
+
+And a different representation of a tree is available
+via \code{\link{xmlHashTree}}.
 }
 
 \examples{

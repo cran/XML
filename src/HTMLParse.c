@@ -47,9 +47,12 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
      name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
   }
 
+
+#if 0
     /* If one wants entities expanded directly and to appear as text.  */
   if(LOGICAL_DATA(replaceEntities)[0])
     xmlSubstituteEntitiesDefault(1);   
+#endif
 
   if(asTextBuffer) {
    doc = htmlParseDoc(CHAR_TO_XMLCHAR(name), NULL);

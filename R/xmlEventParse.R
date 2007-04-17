@@ -1,3 +1,28 @@
+
+
+GeneralHandlerNames =
+  list(SAX =  c("text", "startElement", "endElement", "comment",
+                 "startDocument", "endDocument",
+                 "processingInstruction", "entityDeclaration",  "externalEntity"),
+       DOM =  c("text", "startElement", "comment", "entity", "cdata",
+                 "processingInstruction"))
+
+       checkHandlerNames =
+function(handlers, id = "SAX")
+{
+  if(is.null(handlers))
+    return(TRUE)
+
+  ids = names(handlers)
+  i = match(ids, GeneralHandlerNames)
+  prob = any(!is.na(i))  
+  if(prob) {
+    warning("future versions of the XML package will require names of general handler functions to be prefixed by a . to distinguish them from handlers for nodes with those names.  This _may_ affect the ", paste(names(handlers)[!is.na(i)], collapse = ", "))
+  }
+
+  !prob
+}
+
 xmlEventParse <- 
 #
 # Parses an XML file using an event parser which calls user-level functions in the
@@ -8,11 +33,12 @@ xmlEventParse <-
 function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
           useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE, state = NULL,
           replaceEntities = TRUE, validate = FALSE, saxVersion = 1,
-          branches = NULL) 
-{
+          branches = NULL,  useDotNames =  length(grep("^\\.", names(handlers))) > 0) 
+{  
   if(libxmlVersion()$major < 2 && !is.character(file))
     stop("Without libxml2, the source of the XML can only be specified as a URI.")
 
+  checkHandlerNames(handlers, "SAX")
 
   if(validate)
     warning("Currently, libxml2 does support validation using SAX/event-driven parsing. It requires a DOM.")
@@ -59,15 +85,18 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
  if(length(branches) > 0 && (length(names(branches)) == 0 || any(names(branches) == "")))
     stop("All branch elements must have a name!")
 
+  old = setEntitySubstitution(replaceEntities)
+  on.exit(setEntitySubstitution(old))
+  
  state <- .Call("RS_XML_Parse", file, handlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
                       as.logical(useExpat), state, as.logical(replaceEntities),
-                       as.logical(validate), as.integer(saxVersion), branches)
+                       as.logical(validate), as.integer(saxVersion), branches, as.logical(useDotNames))
 
   if(!is.null(state))
-   return(state)
- else
-   return(invisible(handlers))
+     return(state)
+  else
+     return(invisible(handlers))
 }
 

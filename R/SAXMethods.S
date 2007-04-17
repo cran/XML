@@ -61,7 +61,7 @@ if(!.useNamespacesInXMLPackage) {
 
 
 genericSAXHandlers  <-
-function(include, exclude)
+function(include, exclude, useDotNames = FALSE)
 {
  if(!exists("startElement.SAX"))
    stop("You must call .InitSAXMethods before calling genericSAXHandlers()n")
@@ -81,7 +81,10 @@ function(include, exclude)
    ans <- ans[-which]
  }
 
-  ans
+  if(useDotNames)
+    names(ans) = paste(".", names(ans), sep = "")
+
+ ans
 }
 
 

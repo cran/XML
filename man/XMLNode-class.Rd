@@ -9,7 +9,7 @@
 represent an XML node, either directly in S or a reference to an internal
  libxml node.  Such nodes respond to queries about 
  their name, attributes, namespaces and children.  
- These are old-style, S3 classes at present.
+ These are old-style, S3 class definitions at present.
 }
 \section{Slots}{
   \describe{
@@ -25,8 +25,14 @@ No methods defined with class "XMLNode" in the signature.
 \seealso{
  \code{\link{xmlTreeParse}}
  \code{\link{xmlTree}}
+ \code{\link{newXMLNode}}
+ \code{\link{xmlNode}}
 }
 \examples{
+
+ # An R-level XMLNode object
+a <- xmlNode("arg", attrs = c(default="T"),
+               xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
   
 }
 \keyword{classes}

@@ -1,13 +1,18 @@
 \name{xmlName}
 \alias{xmlName}
+\alias{xmlName<-}
 \alias{xmlName.XMLComment}
 \alias{xmlName.XMLNode}
 \alias{xmlName.XMLInternalNode}
 \title{ Extraces the tag name of an XMLNode object.}
 \description{
-  Each XMLNode object has a tag name introduced
+  Each XMLNode object has an element or tag name introduced
 in the \code{<name ...>} entry in an XML document.
 This function returns that name.
+
+We can also set that name using \code{xmlName(node) <- "name"}
+and the value can have an XML name space prefix, e.g.
+\code{"r:name"}.
 }
 \usage{
 xmlName(node, full = FALSE)
@@ -38,5 +43,20 @@ xmlName(node, full = FALSE)
  fileName <- system.file("exampleData", "test.xml", package="XML") 
  doc <- xmlTreeParse(fileName)
  xmlName(xmlRoot(doc)[[1]])
+
+ tt = xmlRoot(doc)[[1]]
+ xmlName(tt)
+ xmlName(tt) <- "bob"
+
+
+  # We can set the node on an internal object also.
+ n = newXMLNode("x")
+
+ xmlName(n)
+ xmlName(n) <- "y"
+
+ 
+ xmlName(n) <- "r:y"
+
 }
 \keyword{file}
