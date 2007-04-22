@@ -48,5 +48,7 @@ Class \code{\linkS4class{oldClass}}, directly.
  getNodeSet(doc, "//record")
 
  getNodeSet(doc, "//record[@id='Mazda RX4']")
+
+ free(doc)
 }
 \keyword{classes}

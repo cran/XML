@@ -224,12 +224,15 @@ and another for entities. See \code{\link{parseDTD}}.
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 \note{Make sure that the necessary 3rd party libraries are available.}
 
-\seealso{ \link{xmlEventParse} }
+\seealso{ \link{xmlEventParse},
+  \code{\link{free}} for releasing the memory when
+  an \code{XMLInternalDocument} object is returned.
+}
 
 \examples{
  fileName <- system.file("exampleData", "test.xml", package="XML")
    # parse the document and return it in its standard format.
-print(getwd())
+
  xmlTreeParse(fileName)
 
    # parse the document, discarding comments.
@@ -352,7 +355,6 @@ m <- xmlTreeParse(fileName,
 
 
 
-
  f = system.file("examples", "index.html", package = "XML")
  htmlTreeParse(readLines(f), asText = TRUE)
  htmlTreeParse(readLines(f))
@@ -383,6 +385,14 @@ m <- xmlTreeParse(fileName,
  f = system.file("exampleData", "mtcars.xml", package="XML")
  xmlTreeParse(f, handlers = tt[[".addNode"]])
  xmlRoot(tt)
+
+
+
+ doc = xmlTreeParse(f, useInternalNodes = TRUE)
+
+ sapply(getNodeSet(doc, "//variable"), xmlValue)
+         
+ free(doc) 
 
 
   # character set encoding for HTML

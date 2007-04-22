@@ -1178,3 +1178,9 @@ makeSchemaReference(xmlSchemaPtr schema)
 */
 }
 
+
+void
+RS_XML_MemoryShow()
+{
+    xmlMemDisplay(stderr);
+}

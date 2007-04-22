@@ -1,3 +1,11 @@
+Version 1.7-2
+
+  *  Trivial error in free() for XMLInternalDocument objects fixed so the memory is released.
+
+Version 1.7-1
+
+  *  addition to configuration to detect whether the checked field of the xmlEntity structure is present.
+
 Version 1.7-0
 
       This a quite comprehensive enhancement to the facilities in the XML package. A lot of work on

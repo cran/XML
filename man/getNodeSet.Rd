@@ -119,17 +119,22 @@ xpathApply(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
  els = getNodeSet(doc, "/doc//a[@status]")
  sapply(els, function(el) xmlGetAttr(el, "status"))
 
+ free(doc) 
+
   # Using a namespace
  f = system.file("exampleData", "SOAPNamespaces.xml", package = "XML") 
  z = xmlTreeParse(f, useInternal = TRUE)
  getNodeSet(z, "/a:Envelope/a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
  getNodeSet(z, "//a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
+ free(z)
+
 
   # Get two items back with namespaces
  f = system.file("exampleData", "gnumeric.xml", package = "XML") 
- z = xmlTreeParse(f, useInternal = TRUE)
+ z = xmlTreeParse(f, useInternalNodes = TRUE)
  getNodeSet(z, "//gmr:Item/gmr:name", c(gmr="http://www.gnome.org/gnumeric/v2"))
 
+ free(z)
 
  #####
  # European Central Bank (ECB) exchange rate data
@@ -169,6 +174,8 @@ xpathApply(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
    # Using an expression rather than  a function and ...
  rates = xpathApply(doc, "//ns:Cube[@currency='SIT']", quote(xmlGetAttr(x, "rate")), namespaces = namespaces )
 
+ free(doc)
+
    #
   uri = system.file("exampleData", "namespaces.xml", package = "XML")
   d = xmlTreeParse(uri, useInternalNodes = TRUE)
@@ -188,9 +195,10 @@ xpathApply(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
    # default namespace of the document with the prefix 'd', we can use
   getNodeSet(d, "//d:defaultNs")
 
-
    # And the syntactic sugar is 
   d["//d:defaultNs"]
+
+  free(d)
 }
 \keyword{file}
 \keyword{IO}

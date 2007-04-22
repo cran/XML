@@ -125,7 +125,7 @@ R_XMLInternalDocument_free(SEXP sdoc)
 
   doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
 
-  if(!doc)
+  if(doc)
       xmlFreeDoc(doc);
   R_ClearExternalPtr(sdoc);
   
