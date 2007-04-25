@@ -1,3 +1,7 @@
+Version 1.7-3
+
+  *  addChildren() coerces a string to an internal text node before adding the child.
+     
 Version 1.7-2
 
   *  Trivial error in free() for XMLInternalDocument objects fixed so the memory is released.

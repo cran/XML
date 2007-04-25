@@ -1,6 +1,6 @@
 library(XML)
-# original file came from http://finance.yahoo.com/bonds/composite_bond_rates
-doc = htmlTreeParse("~/Downloads/composite_bond_rates.html", useInternalNodes = TRUE)
+
+doc = htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates", useInternalNodes = TRUE)
 
 # Use XPath expression to find the nodes 
 #  <div><table class="yfirttbl">..
@@ -17,7 +17,8 @@ function(tb)
   vals = sapply(tb[["tbody"]]["tr"],  function(x) sapply(x["td"], xmlValue))
   matrix(as.numeric(vals[-1,]),
              nrow = ncol(vals),
-             dimnames = list(vals[1,], colNames[-1])
+             dimnames = list(vals[1,], colNames[-1]),
+             byrow = TRUE
          )
 }  
 

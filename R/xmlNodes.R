@@ -9,6 +9,7 @@ setOldClass("XMLNode")
 setOldClass("XMLInternalNode")
 
 setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
+setOldClass(c("XMLInternalTextNode", "XMLInternalNode"))
 
 setOldClass("XMLNamespace")
 
@@ -307,8 +308,11 @@ function(text, doc = NULL)  # doc is not used.XXX
 addChildren =
 function(node, ..., kids = list(...))
 {
-  for(i in kids)
-     .Call("R_insertXMLNode", i, node)  
+  for(i in kids) {
+     if(is.character(i))
+       i = newXMLTextNode(i)
+     .Call("R_insertXMLNode", i, node)
+  }
 }
 
 removeChildren =

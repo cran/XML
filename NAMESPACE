@@ -88,7 +88,7 @@ exportMethods("addAttributes", "removeAttributes")
 exportMethods("toHTML")
 
 exportClasses("XMLInternalDocument")
-exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode")
+exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode", "XMLInternalTextNode")
 exportClasses("XMLNamespace")
 
 exportClass("URI")
