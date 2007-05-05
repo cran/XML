@@ -26,6 +26,16 @@ setAs("XMLInternalDocument", "character", function(from) saveXML(from))
 setAs("XMLInternalDOM", "character", function(from) saveXML(from))
 
 
+setAs("XMLInternalDocument", "XMLInternalNode",
+       function(from) xmlRoot(from))
+
+setAs("XMLInternalNode", "XMLInternalDocument",
+        function(from)
+           .Call("R_getXMLNodeDocument", from)
+      )
+
+
+
 setGeneric("free", function(obj) standardGeneric("free"))
 
 setMethod("free", "XMLInternalDocument",
@@ -48,7 +58,15 @@ function(x, i, j, ...)
 xmlName.XMLInternalNode =
 function(node, full = FALSE)
 {
-  .Call("RS_XML_xmlNodeName", node)
+  ans = .Call("RS_XML_xmlNodeName", node)
+  if((is.logical(full) && full) || length(full)) {
+    tmp = xmlNamespace(node)
+    if(length(tmp) && length(names(tmp)) > 0 && names(tmp) != "")
+       ans = paste(names(tmp), ans, sep = ":")
+    else if(is.character(full) && full != "")
+       ans = paste(full, ans, sep = ":")
+  }
+  ans
 }
 
 xmlNamespace.XMLInternalNode =

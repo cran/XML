@@ -21,6 +21,8 @@
 
 
 #include <libxml/xmlschemas.h>
+#include <libxml/xinclude.h>
+
 
 int RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans);
 USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *parserSettings);
@@ -92,7 +94,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                         USER_OBJECT_ internalNodeReferences, 
 		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
 		        USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding,
-                        USER_OBJECT_ useDotNames)
+		        USER_OBJECT_ useDotNames,
+                        USER_OBJECT_ xinclude)
 {
 
   char *name;
@@ -115,6 +118,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   parserSettings.converters = converterFunctions;
   parserSettings.useDotNames = LOGICAL_DATA(useDotNames)[0];
   parserSettings.trim = LOGICAL_DATA(trim)[0];
+  parserSettings.xinclude = LOGICAL_DATA(xinclude)[0];
   parserSettings.fullNamespaceInfo = LOGICAL_DATA(fullNamespaceInfo)[0];
 
   parserSettings.internalNodeReferences = LOGICAL_DATA(internalNodeReferences)[0];
@@ -127,14 +131,13 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 #ifdef USE_R
     name = R_ExpandFileName(CHAR(STRING_ELT(fileName, 0)));
 #else
-   name = CHARACTER_DATA(fileName)[0];
+    name = CHARACTER_DATA(fileName)[0];
 #endif
     if(!isURLDoc && (name == NULL || stat(name, &tmp_stat) < 0)) {
       PROBLEM "Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0))
       ERROR;
     }
   } else {
-/* XXX take care of freeing this. */
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
   }
 
@@ -167,8 +170,17 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(doc == NULL) {
-    PROBLEM "error in creating parser for %s", name
-    ERROR;
+      if(asTextBuffer && name)
+	  free(name);
+
+      PROBLEM "error in creating parser for %s", name
+      ERROR;
+  }
+
+  if(TYPEOF(xinclude) == LGLSXP && LOGICAL_DATA(xinclude)[0]) {
+      int status = xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE);
+  } else if(TYPEOF(xinclude) == INTSXP && GET_LENGTH(xinclude) > 0) {
+      int status = xmlXIncludeProcessFlags(doc, INTEGER(xinclude)[0]);
   }
 
   if(!useHTML && LOGICAL_DATA(validate)[0]) {
@@ -177,6 +189,10 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
       ctxt.warning = RS_XML(ValidationWarning);
 
       if(!xmlValidateDocument(&ctxt, doc)) {
+	  if(asTextBuffer && name)
+	      free(name);
+
+
 	  PROBLEM "XML document is invalid"
           ERROR;
       }
@@ -377,7 +393,52 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
 enum { NODE_NAME, NODE_ATTRIBUTES, NODE_CHILDREN, NODE_NAMESPACE, NODE_NAMESPACE_DEFS, NUM_NODE_ELEMENTS};
 
 USER_OBJECT_
-RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node)
+getNamespaceDefs(xmlNodePtr node, int recursive)
+{
+  USER_OBJECT_ nsDef = NULL_USER_OBJECT;
+  
+  if(node->nsDef || recursive) {
+      int numProtects = 0;
+      xmlNs *ptr = node->nsDef;
+      int n = 0;
+      while(ptr) {
+          n++;  ptr = ptr->next;
+      }
+
+      PROTECT(nsDef = NEW_LIST(n)); numProtects++;
+      ptr = node->nsDef; n = 0;
+      while(ptr) {
+          SET_VECTOR_ELT(nsDef, n, RS_XML(createNameSpaceIdentifier)(ptr, node));
+          n++;  ptr = ptr->next;
+      }
+
+      if(recursive && node->children) {
+	  xmlNodePtr ptr = node->children;
+	  USER_OBJECT_ tmp;
+	  int i;
+
+	  while(ptr) {
+	      tmp = getNamespaceDefs(ptr, 1);
+/*	  nsDef = Rf_appendList(nsDef, tmp); */
+	      if(Rf_length(tmp)) {
+		  n = Rf_length(nsDef); 
+		  PROTECT(nsDef = SET_LENGTH(nsDef, Rf_length(nsDef) + Rf_length(tmp)));
+		  numProtects++;
+		  for(i = 0; i < Rf_length(tmp); i++) 
+		      SET_VECTOR_ELT(nsDef, n + i, VECTOR_ELT(tmp, i));
+	      }
+	      ptr = ptr->next;
+	  }
+      }
+
+      SET_CLASS(nsDef, mkString("NamespaceDefinitionList"));
+      UNPROTECT(numProtects);
+  }
+  return(nsDef);
+}
+
+USER_OBJECT_
+RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node, USER_OBJECT_ recursive)
 {
   USER_OBJECT_ nsDef = NULL_USER_OBJECT;
   xmlNodePtr node;
@@ -388,24 +449,7 @@ RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node)
     }
 
   node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-  if(node->nsDef) {
-      xmlNs *ptr = node->nsDef;
-      int n = 0;
-      while(ptr) {
-          n++;  ptr = ptr->next;
-      }
-
-      PROTECT(nsDef = NEW_LIST(n));
-      ptr = node->nsDef; n = 0;
-      while(ptr) {
-          SET_VECTOR_ELT(nsDef, n, RS_XML(createNameSpaceIdentifier)(ptr, node));
-          n++;  ptr = ptr->next;
-      }
-      SET_CLASS(nsDef, mkString("NamespaceDefinitionList"));
-      UNPROTECT(1);
-  }
-
-  return(nsDef);
+  return(getNamespaceDefs(node, LOGICAL(recursive)[0]));
 }
 
 static USER_OBJECT_
@@ -491,7 +535,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 	}
     } else {
 	if(node->ns->href)
-	    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(node->ns->href));
+	    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->ns->href)));
 	if(node->ns->prefix)
 	    SET_NAMES(nsDef, mkString(XMLCHAR_TO_CHAR(node->ns->prefix))); /* XXX change! */
 	SET_CLASS(nsDef, mkString("XMLNamespace"));
@@ -542,6 +586,12 @@ convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings)
   if(parserSettings != NULL) {
     USER_OBJECT_  fun = NULL;
     const char *funName;
+
+    if(parserSettings->xinclude && (node->type == XML_XINCLUDE_START || node->type == XML_XINCLUDE_END)) {
+	return(NULL);
+    }
+
+
        if(node->name) {
           funName = XMLCHAR_TO_CHAR(node->name);
           fun = RS_XML(findFunction)(funName, parserSettings->converters);
@@ -1102,7 +1152,7 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     PROTECT(ans = NEW_CHARACTER(1));
     SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
     if(ns->prefix)
-        SET_NAMES(ans, mkString(ns->prefix)); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
+        SET_NAMES(ans, mkString(XMLCHAR_TO_CHAR(ns->prefix))); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
     UNPROTECT(1);    
     return(ans);
 }
@@ -1121,6 +1171,8 @@ USER_OBJECT_
 RS_XML_xmlNodeParent(USER_OBJECT_ snode)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    if(node->parent && node->parent->type == XML_DOCUMENT_NODE)
+	return(NULL_USER_OBJECT);
     return(R_createXMLNodeRef(node->parent));
 }
 

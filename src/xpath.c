@@ -93,7 +93,8 @@ R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
  xmlNsPtr *els;
 
  n = GET_LENGTH(namespaces);
- els = xmlMallocAtomic(sizeof(xmlNsPtr) * n);
+ els = xmlMallocAtomic(sizeof(xmlNsPtr) * n); 
+ 
  if(!els) {
    PROBLEM  "Failed to allocated space for namespaces"
    ERROR;
@@ -148,6 +149,59 @@ RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
  }
 
  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+ ctxt = xmlXPathNewContext(doc);
+
+ if(GET_LENGTH(namespaces)) {
+     ctxt->namespaces =  R_namespaceArray(namespaces, ctxt); /* xmlCopyNamespaceList(doc); */
+     ctxt->nsNr = GET_LENGTH(namespaces);
+ }
+
+
+ result = xmlXPathEvalExpression(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(path, 0))), ctxt);
+
+ if(result)
+     ans = convertXPathObjectToR(result, fun);
+ 
+ xmlXPathFreeObject(result);
+ xmlXPathFreeContext(ctxt);
+
+ if(!result) {
+   PROBLEM  "error evaluating xpath expression %s", CHAR_DEREF(STRING_ELT(path, 0))
+   ERROR;
+ }
+
+ return(ans);
+}
+
+USER_OBJECT_
+RS_XML_createDocFromNode(USER_OBJECT_ s_node)
+{
+ xmlDocPtr doc;
+ xmlNodePtr node, ptr;
+
+ node = (xmlDocPtr) R_ExternalPtrAddr(s_node);
+ doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+ ptr = xmlDocCopyNode(node, doc, 1);
+ doc->children = ptr;
+ return(R_createXMLDocRef(doc));
+}
+
+
+SEXP
+RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
+{
+ xmlXPathContextPtr ctxt = NULL;
+ xmlXPathObjectPtr result;
+ SEXP ans = NULL_USER_OBJECT;
+
+ xmlDocPtr doc;
+ xmlNodePtr node, ptr;
+
+ if(TYPEOF(s_node) != EXTPTRSXP || R_ExternalPtrTag(s_node) != Rf_install("XMLInternalNode")) {
+   PROBLEM "xpathEval must be given an internal XML document object, 'XMLInternalNode'"
+   ERROR;
+ }
+
  ctxt = xmlXPathNewContext(doc);
 
  if(GET_LENGTH(namespaces)) {

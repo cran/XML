@@ -6,7 +6,7 @@
 USER_OBJECT_
 R_xmlCatalogResolve(USER_OBJECT_ r_id, USER_OBJECT_ type, USER_OBJECT_ debug)
 {
-    char *id  = CHAR_DEREF(STRING_ELT(r_id, 0));
+    xmlChar *id  = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(r_id, 0)));
     SEXP r_ans = R_NilValue;
     xmlChar* ans;
     int debugLevel = -1;
@@ -30,7 +30,7 @@ R_xmlCatalogResolve(USER_OBJECT_ r_id, USER_OBJECT_ type, USER_OBJECT_ debug)
     xmlCatalogSetDebug(debugLevel);
 
     if(ans) {
-	r_ans = mkString(ans);
+	r_ans = mkString(XMLCHAR_TO_CHAR(ans));
 	xmlFree(ans);
     } else
 	r_ans = NEW_CHARACTER(0);

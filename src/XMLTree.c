@@ -78,7 +78,7 @@ R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc)
 
     txt = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(value, 0)));
     if(doc)
-	node = xmlNewDocTextLen(doc, txt, strlen(txt));
+	node = xmlNewDocTextLen(doc, txt, strlen(XMLCHAR_TO_CHAR(txt)));
     else
 	node = xmlNewText(txt);
 	
@@ -157,6 +157,15 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 
    return(R_createXMLNodeRef(node));
 }
+
+USER_OBJECT_
+RS_XML_getNextSibling(USER_OBJECT_ s_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+
+    return(node->next ? R_createXMLNodeRef(node->next) : NULL_USER_OBJECT);
+}
+
 
 /*
   Add attributes to an existing node.
@@ -245,8 +254,8 @@ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
 	PROTECT(names = NEW_CHARACTER(n));    
 	for(i = 0; i < n ; i++, el = el->next) {
 	    if(el->prefix)
-		SET_STRING_ELT(names, i, COPY_TO_USER_STRING(el->prefix));
-	    SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(el));
+		SET_STRING_ELT(names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->prefix)));
+	    SET_VECTOR_ELT(ans, i, R_createXMLNsRef(el));
 	}
     } else {
 	
@@ -254,8 +263,8 @@ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
 	PROTECT(names = NEW_CHARACTER(n));    
 	for(i = 0; i < n ; i++, el = el->next) {
 	    if(el->prefix)
-		SET_STRING_ELT(names, i, COPY_TO_USER_STRING(el->prefix));
-	    SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(el->href));
+		SET_STRING_ELT(names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->prefix)));
+	    SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->href)));
 	}
     }
 
@@ -383,7 +392,7 @@ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sdtdName, USER_OBJECT_ sexternalID, 
 
 #define  GET_STR_VAL(x)  \
     if(GET_LENGTH(s##x) > 0) { \
-           x =  CHAR_DEREF(STRING_ELT(s##x, 0)); \
+   	   x =  CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(s##x, 0)));	\
            if(!x[0]) \
                x = NULL; \
     }
@@ -419,7 +428,7 @@ R_xmlSetNs(USER_OBJECT_ s_node, USER_OBJECT_ s_ns, USER_OBJECT_ append)
   if(LOGICAL(append)[0]) {
       xmlNsPtr el;
       if(!node->ns)  
-	  xmlSetNs(node, xmlNewNs(node->doc, NULL, NULL));
+	  xmlSetNs(node, xmlNewNs(node, NULL, NULL));
       el = node->ns;
       while(el->next) 
 	  el = el->next;
@@ -446,7 +455,7 @@ R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 
   ns = xmlNewNs(doc, CHAR_TO_XMLCHAR(href), CHAR_TO_XMLCHAR(prefix));
 
-  return(R_createXMLNodeRef((xmlNodePtr) ns)); /*XXX */
+  return(R_createXMLNsRef(ns)); /*XXX */
 }
 
 
@@ -493,6 +502,21 @@ R_createXMLDocRef(xmlDocPtr doc)
   UNPROTECT(2);
   return(ref);
 }
+
+
+USER_OBJECT_
+R_createXMLNsRef(xmlNsPtr ns)
+{
+  SEXP ref, tmp;
+
+  PROTECT(ref = R_MakeExternalPtr(ns, Rf_install("XMLNamespaceRef"), R_NilValue));
+  PROTECT(tmp = NEW_CHARACTER(1));
+  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLNamespaceRef"));
+  SET_CLASS(ref, tmp);
+  UNPROTECT(2);
+  return(ref);
+}
+
 
 const char * 
 R_getInternalNodeClass(xmlElementType type)
@@ -675,7 +699,7 @@ RS_XML_setDoc(USER_OBJECT_ snode, USER_OBJECT_ sdoc)
     if(sdoc != NULL_USER_OBJECT) {
        doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
     } else
-	doc = xmlNewDoc("1.0");
+	doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
  
     xmlDocSetRootElement(doc, node);
     return(R_createXMLDocRef(doc));
@@ -743,10 +767,9 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 {
     USER_OBJECT_ ans, tmp;
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-    xmlChar *encoding = NULL;
+    char *encoding = NULL;
     xmlOutputBufferPtr buf;
     xmlBufferPtr xbuf;
-    xmlDocPtr doc;
 
     int oldIndent = xmlIndentTreeOutput;
     xmlIndentTreeOutput =  LOGICAL(indent)[0];
@@ -802,9 +825,9 @@ R_xmlNodeValue(SEXP node, SEXP raw)
    }
 */
    if(tmp)
-     ans = mkString(tmp);
+       ans = mkString(XMLCHAR_TO_CHAR(tmp));
    else 
-     ans = NEW_CHARACTER(0);
+       ans = NEW_CHARACTER(0);
 
    return(ans);
 }
@@ -823,11 +846,21 @@ R_xmlNsAsCharacter(USER_OBJECT_ s_ns)
   SET_STRING_ELT(names, 1, COPY_TO_USER_STRING("href"));
 
   if(ns->prefix)
-      SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(ns->prefix));
+      SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix)));
   if(ns->href)
-      SET_STRING_ELT(ans, 1, COPY_TO_USER_STRING(ns->href));
+      SET_STRING_ELT(ans, 1, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
 
   SET_NAMES(ans, names);
   UNPROTECT(2);
   return(ans);
+}
+
+USER_OBJECT_
+R_getXMLNodeDocument(USER_OBJECT_ s_node)
+{
+    xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    if(!n->doc)
+	return(NULL_USER_OBJECT);
+
+    return(R_createXMLDocRef(n->doc));
 }

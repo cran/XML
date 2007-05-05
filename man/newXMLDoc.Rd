@@ -6,29 +6,36 @@
 \alias{newXMLCommentNode}
 \alias{newXMLTextNode}
 \alias{newXMLDTDNode}
+\alias{xmlDoc}
 \alias{coerce,vector,XMLInternalNode-method}
 \title{Create internal XML node or document object}
 \description{
-These are used to create internal `libxml' nodes
-and top-level document objects 
-that are used to write XML trees.
-While the functions are available,
-their direct use is not encouraged.
-Instead, use \code{\link{xmlTree}}
-as the functions need to be 
-used within a strict regime
-to avoid corrupting C level structures.
+These are used to create internal `libxml' nodes and top-level document objects 
+that are used to write XML trees.  While the functions are available,
+their direct use is not encouraged. Instead, use \code{\link{xmlTree}}
+as the functions need to be used within a strict regime to avoid
+corrupting C level structures.
+
+\code{xmlDoc} creates a new XMLInternalDocument
+object by copying the given node and all of its
+descendants and putting them into a new document.
+This is useful when we want to work with sub-trees
+with general tools that work on documents, e.g. XPath queries.
+
 }
 \usage{
+xmlDoc(node)
 newXMLDoc(dtd, namespaces=NULL)
 newXMLNode(name, ..., attrs = NULL, namespace="", doc=NULL, .children = list(...))
 newXMLTextNode(text, doc = NULL)
 newXMLCDataNode(text, doc = NULL)
 newXMLCommentNode(text, doc = NULL)
-newXMLPINode(name,  text, doc = NULL)
+newXMLPINode(name, text, doc = NULL)
 newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = NULL)  
 }
 \arguments{
+  \item{node}{a \code{XMLInternalNode} object that will be copied to
+    create a subtree for a new document.}
   \item{dtd}{the name of the DTD to use for the XML document.}
   \item{namespaces}{a named character vector
   with each element specifying a name space identifier and the

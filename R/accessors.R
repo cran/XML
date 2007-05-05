@@ -137,25 +137,61 @@ function(x, ignoreComments = FALSE)
 }
 
 
+getNextSibling =
+  # Access the next field in the xmlNodePtr object.
+  # not exported.
+function(x)
+{
+  if(!inherits(x, "XMLInternalNode"))
+    stop("can only operate on an internal node")
+
+  .Call("RS_XML_getNextSibling", x)
+}
+
 xmlNamespaceDefinitions <-
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, recursive = FALSE)
 {
   UseMethod("xmlNamespaceDefinitions")
 }
 
+xmlNamespaceDefinitions.XMLInternalDocument =
+function(x, addNames = TRUE, recursive = FALSE)
+{
+  r = xmlRoot(x)
+  while(!is.null(r) && !inherits(r, "XMLInternalElementNode")) 
+     r = getNextSibling(r)
+
+  if(is.null(r))
+    return(NULL)
+  
+  xmlNamespaceDefinitions(r)
+}
+
 xmlNamespaceDefinitions.XMLNode =
-  function(x, addNames = TRUE) {
+  function(x, addNames = TRUE, recursive = FALSE) {
     ans = unclass(x)$namespaceDefinitions
+
+
+    if(recursive == TRUE) {
+                   #      warning("recursive facility not yet implemented.")
+      f = function(node) {
+            if(!inherits(node, "XMLNode") || xmlName(node) == "")
+              return(FALSE)
+            ans <<- append(ans, unclass(node)$namespaceDefinitions)
+            xmlApply(node, f)
+          }
+      xmlApply(x, f)
+    }
 
     if(addNames && length(ans) && length(names(ans)) == 0)
         names(ans) = sapply(ans, function(x) x$id)
-
+    
     ans
   }
 
 xmlNamespaceDefinitions.XMLInternalNode =
-  function(x, addNames = TRUE) {
-    ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x)
+  function(x, addNames = TRUE, recursive = FALSE) {
+    ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x, as.logical(recursive))
     if(addNames && length(ans) > 0)
       names(ans) = sapply(ans, function(x) x$id)
     ans

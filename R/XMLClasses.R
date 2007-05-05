@@ -329,28 +329,131 @@ function(doc)
   ns = xmlNamespaceDefinitions(doc)
   val = unlist(sapply(ns, function(x) if(x$id == "") x$uri))
   if(length(val))
-     c("d" = val[1])
+     val[1]
   else   
      character()
 }  
 
-getNodeSet =
-function(doc, path, namespaces = getDefaultNamespace(xmlRoot(doc)), fun = NULL, ...)
-{
-  xpathApply(doc, path, fun, ...,  namespaces = namespaces)
-}  
+matchNamespaces =
+  # d = xmlTreeParse("data/namespaces.xml", useInternal = TRUE)
 
-xpathApply =
-function(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
+  #   "omg"
+  #   c("ns", "omegahat", "r")
+  #   c("ns", omegahat = "http://www.omegahat.org", "r")  
+  #   c("ns" = "http://www.omegahat.org", "omg" = "http://www.omegahat.org/XML", "r")
+  #
+  #  Error because z and rs are not defined in the document.
+  #  matchNamespaces(d, c("omg", "z", "rs"))
+  #
+  #
+function(doc, namespaces,
+          nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE),
+          defaultNs = getDefaultNamespace(doc)
+        )
 {
-  if(!inherits(doc, "XMLInternalDocument"))
-    stop("Need XMLInternalDocument object for XPath query")
+
+
+    # 3 cases:
+    #  i) we are given a single string (e.g. "r") which we use as a prefix for the default namespace
+    # ii) we are given a vector of namespaces, but one has no name and we want to use that as the
+    #  prefix for the default namespace
+    #    e.g.  sum(names(namespaces) == "") == 1)
+    # iii) given several elements with no name and we match these to those in the document
+    #    if the first doesn't have a match, we use it as the default one.
+    # iv) mixture of prefix = uri values and strings with no names.
+    #
+
+    # if it is a single "prefix" and we have a default namespace, then map the prefix to the default URI
+    # and return.
+  if(is.character(namespaces) && length(namespaces) == 1 && is.null(names(namespaces)) && length(defaultNs) > 0) {
+       tmp = defaultNs
+       names(tmp)[names(tmp) == ""] = namespaces
+       namespaces = tmp
+       return(namespaces)       
+   }
+
+    # fix the names so that we empty ones.
+  if(is.null(names(namespaces)))
+    names(namespaces) = rep("", length(namespaces))
+
+   # which need to be fixed.
+  i = (names(namespaces) == "")
+  
+  if(any(i)) {
+
+     # from parameters now: nsDefs = xmlNamespaceDefinitions(xmlRoot(doc), recursive = TRUE)
+
+      # deal with the first one as a special case. If this has no match,
+      # we will map it to the default namespace's URI.
+    if(i[1] && is.na(match(namespaces[1], names(nsDefs)))) {
+      names(namespaces)[1] = namespaces[1]
+      namespaces[1] = defaultNs
+      warning("using ", names(namespaces)[i[1]], " as prefix for default namespace ", namespaces[i[1]])
+      i[1] = FALSE
+    }
+    
+    if(sum(i) > 0) {
+        dups = names(nsDefs)[duplicated(names(nsDefs))]
+        tmp = match(namespaces[i], dups)
+        if(length(dups) > 0 && any(is.na(tmp)))
+          stop("cannot match namespace prefix(es) ",
+                paste(namespaces[i][is.na(tmp)], collapse = ", "),
+                " in ", paste(unique(names(nsDefs)), collapse= ", "))
+
+        idx = match(namespaces[i], names(nsDefs))
+        if(any(is.na(idx)))
+           stop("cannot find defined namespace(s) with prefix(es) ", paste(namespaces[i][is.na(idx)], collapse = ", "))
+        names(namespaces)[i] = namespaces[i]
+        namespaces[i] = sapply(nsDefs[idx], function(x) x$uri)
+      
+      #  warning("namespaces without a name/prefix are not handled as you might expect in XPath. Use a prefix")
+    } else if(length(defaultNs) == 0)
+        stop("There is no default namespace on the target XML document")
+  }
+
   
   if(!is.character(namespaces) || ( length(namespaces) > 1 && length(names(namespaces)) == 0))
      stop("Namespaces must be a named character vector")
 
   if(length(namespaces) && (length(names(namespaces)) == 0 || any(names(namespaces) == "")))
      warning("namespaces without a name/prefix are not handled as you might expect in XPath. Use a prefix")
+
+  namespaces
+}  
+
+
+
+getNodeSet =
+function(doc, path, namespaces = getDefaultNamespace(doc), fun = NULL, ...)
+{
+  xpathApply(doc, path, fun, ...,  namespaces = namespaces)
+}
+
+
+
+xpathApply =
+  #
+  # the caller can give the same prefixes of the namespaces defined in 
+  # the target document as simple names.
+  #
+  #   xpathApply(d, "/o:a//c:c", fun = NULL, namespaces = c("o", "c"))
+  #
+  #
+function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+          resolveNamespaces = TRUE)
+{
+  UseMethod("xpathApply")
+}  
+
+xpathApply.XMLInternalDocument =
+function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+          resolveNamespaces = TRUE)
+{
+#  if(!inherits(doc, "XMLInternalDocument"))
+#    stop("Need XMLInternalDocument object for XPath query")
+
+  if(resolveNamespaces)
+    namespaces = matchNamespaces(doc, namespaces)
   
   if(!is.null(fun) && !is.call(fun))
     fun = match.fun(fun)
@@ -360,6 +463,75 @@ function(doc, path, fun, ... , namespaces = getDefaultNamespace(xmlRoot(doc)))
   if(length(args))  
     fun = as.call(c(fun, append(1, args)))
 
- 
-  .Call("RS_XML_xpathEval", doc, as.character(path), namespaces, fun)  
+
+  ans = .Call("RS_XML_xpathEval", doc, as.character(path), namespaces, fun)
+
+  if(length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
+    tmp = strsplit(path, "/")[[1]]
+       # if they have a function call, ignore.
+    tmp = tmp[ - grep("\\(", path) ]
+    if(length(grep(":", tmp)) != length(tmp))
+        warning("the XPath query has no namespace, but the target document has a default namespace. This is often an error and may explain why you obtained no results")
+  }
+
+  ans
 }
+
+
+xmlDoc =
+function(node)
+{
+  .Call("RS_XML_createDocFromNode", node)
+}
+
+
+xpathApply.XMLInternalNode =
+function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+          resolveNamespaces = TRUE)
+{
+  if(FALSE) {
+    node = doc
+    doc = as(doc, "XMLInternalDocument")
+    ns = getDefaultNamespace(doc)
+    prefix = ""
+    if(length(ns)) 
+      prefix = if(length(names(ns)))  names(ns)[1] else "ns"
+
+    path = paste(XML:::getXMLPath(node, prefix), path, sep = "/")
+  } else {
+    doc = xmlDoc(doc)
+  }
+
+  xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+}
+
+
+
+# d = xmlTreeParse("data/book.xml", useInternal = TRUE)
+# ch = getNodeSet(d, "//chapter")
+# xpathApply(ch[[1]], "//section/title", xmlValue)
+
+
+# d = xmlTreeParse("data/mtcars.xml", useIntern = TRUE); z = getNodeSet(d, "/dataset/variables")
+#  xpathApply(z[[1]], "variable[@unit]", NULL, namespaces = character())
+
+getXMLPath =
+function(node, defaultPrefix = "ns")
+{
+  paste(unlist(c("", XML:::xmlAncestors(node, xmlName, defaultPrefix))), collapse = "/")
+}
+
+xmlAncestors =
+function(x, fun = NULL, ...)
+{
+  ans = list()
+  tmp = x
+  while(!is.null(tmp)) {
+    if(!is.null(fun))
+      ans = c(fun(tmp, ...), ans)
+    else
+      ans = c(tmp, ans)
+    tmp = xmlParent(tmp)    
+  }
+  ans
+}  

@@ -1,6 +1,8 @@
 \name{XMLInternalDocument-class}
 \docType{class}
 \alias{XMLInternalDocument-class}
+\alias{coerce,XMLInternalNode,XMLInternalDocument-method}
+\alias{coerce,XMLInternalDocument,XMLInternalNode-method}
 
 \title{Class to represent reference to C-level data structure for an XML
   document}
@@ -30,9 +32,14 @@
 Class \code{\linkS4class{oldClass}}, directly.
 }
 \section{Methods}{
+  There are methods to serialize (dump) a document to a file or as a
+  string, and to coerce it to a node by finding the top-level node of
+  the document.
+  There are functions to search the document for nodes specified by
+  an XPath expression.
 }
 \references{
-  XPath
+ \url{http://www.w3.org/TR/xpath}{XPath}
 }
 \seealso{
 

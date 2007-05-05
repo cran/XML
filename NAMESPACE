@@ -20,6 +20,7 @@ export(
  xpathApply,
  htmlTreeParse,
  libxmlVersion,
+ xmlDoc,
  newXMLDoc,
  newXMLNode,
  newXMLPINode,
@@ -58,6 +59,7 @@ export(
  xmlOutputDOM,
  xmlPINode,
  xmlParent,
+ xmlAncestors,       
  xmlRoot,
  xmlSApply,
  xmlSize,
@@ -72,6 +74,8 @@ export(
  xmlHashTree,
  addNode,
  xmlNamespaceDefinitions,
+ matchNamespaces,
+ getDefaultNamespace,
  "xmlChildren<-",
  catalogResolve,
  toHTML,
@@ -98,7 +102,13 @@ exportMethods("coerce")
 
 exportMethods("free")
 
+
+S3method(xpathApply, XMLInternalNode)
+S3method(xpathApply, XMLInternalDocument)
+
+
 S3method(xmlNamespaceDefinitions, XMLNode)
+S3method(xmlNamespaceDefinitions, XMLInternalDocument)
 S3method(xmlNamespaceDefinitions, XMLInternalNode)
 
 #S3method(names, XMLFlatTree)

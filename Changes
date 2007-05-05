@@ -1,3 +1,39 @@
+Version 1.9-0
+
+  *  Added xmlAncestors() functions for finding chain of parent nodes, and optionally applying a 
+     function to each.
+
+  *  xmlDoc() allows one to create a new XML document by copying an existing internal node, allowing
+     for work with sub-trees as regular documents, e.g. XPath queries restricted to a subset of the 
+     tree.
+
+  *  Ability to do XPath searches on sub-nodes within a document.  getNodeSet() and xpathApply() 
+     can now operate on an XMLInternalNode by creating a copy of the node and its sub-nodes into a 
+     new document. However, these is memory leak associated with this and you should us xmlDoc()
+     to create a new document from the node and then perform the XPath query on that and free the
+     document.
+
+Version 1.8-0
+
+  *  Added xinclude argument to xmlTreeParse() and htmlTreeParse() to control whether 
+     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"> should be resolved and 
+     the appropriate nodes inserted and the actual <include> node discarded.
+
+  *  The namespaces argument of getNodeSet() (and implicitly of the [ method for an 
+     XMLInternalDocument object) can be a simple prefix name when referring to the 
+     default namespace of the document, e.g. 
+        getNodeSet(doc, "/r:help/r:keyword", "r")
+     when the document has a default namespace.
+
+  *  Added a 'recursive = FALSE' parameter to xmlNamespaceDefinitions() to be able to 
+     process all descendant nodes and so fetch the namespace definitions in an entire
+     sub-tree.  This can be used as input to getNodeSet(), for example.
+
+  *  as() method for converting an XMLInternalDocument to a node.
+
+  *  xmlNamespaceDefinitions() handles the case where the top-level element
+     is not the first node, e.g. when there is a DOCTYPE node and/or a comment.
+
 Version 1.7-3
 
   *  addChildren() coerces a string to an internal text node before adding the child.

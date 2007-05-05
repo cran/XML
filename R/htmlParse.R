@@ -12,7 +12,9 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            replaceEntities = FALSE, asText = FALSE, trim = TRUE, 
             isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
             encoding = character(),
-            useDotNames = length(grep("^\\.", names(handlers))) > 0)
+            useDotNames = length(grep("^\\.", names(handlers))) > 0,
+            xinclude = FALSE
+         )
 {
 
   if(length(file) > 1) {
@@ -41,6 +43,13 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
  old = setEntitySubstitution(replaceEntities)
  on.exit(setEntitySubstitution(old))
+
+ if(!is.logical(xinclude)) {
+   if(is(xinclude, "numeric"))
+    xinclude = bitlist(xinclude)
+   else
+     xinclude = as.logical(xinclude)   
+ }
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
          as.logical(ignoreBlanks), as.logical(replaceEntities),
@@ -48,7 +57,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
            as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding),
-           as.logical(useDotNames))
+           as.logical(useDotNames), xinclude)
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

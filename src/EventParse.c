@@ -183,8 +183,8 @@ RS_XML(startElement)(void *userData, const char *name, const char **atts)
   int i;
   RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
 
-  if((i = R_isBranch(name, rinfo)) != -1) {
-      R_processBranch(rinfo, i, name, NULL, NULL, 0, NULL, 0, 0, atts);
+  if((i = R_isBranch(CHAR_TO_XMLCHAR(name), rinfo)) != -1) {
+      R_processBranch(rinfo, i, CHAR_TO_XMLCHAR(name), NULL, NULL, 0, NULL, 0, 0, (const xmlChar ** /*XXX*/) atts);
       return;
   }
 
@@ -247,7 +247,7 @@ void RS_XML(endElement)(void *userData, const char *name)
  RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
 
  if(rinfo->current) {
-     R_endBranch(rinfo, name, NULL, NULL);
+     R_endBranch(rinfo, CHAR_TO_XMLCHAR(name), NULL, NULL);
       return;
  }
 

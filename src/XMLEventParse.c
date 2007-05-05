@@ -241,7 +241,7 @@ R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo)
         int i;
         USER_OBJECT_ names = GET_NAMES(rinfo->branches);
         for(i = 0 ; i < n ; i++) {
-            if(strcmp(localname, CHAR_DEREF(STRING_ELT(names, i))) == 0) {
+            if(strcmp(XMLCHAR_TO_CHAR(localname), CHAR_DEREF(STRING_ELT(names, i))) == 0) {
                 return(i);
             }
         }
@@ -628,7 +628,7 @@ RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
     xmlEntityPtr ans = NULL;
 
     PROTECT(opArgs = NEW_LIST(1)) ;
-    SET_VECTOR_ELT(opArgs, 0, mkString(name));
+    SET_VECTOR_ELT(opArgs, 0, mkString(XMLCHAR_TO_CHAR(name)));
     r_ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(userData, "getEntity"), NULL, (RS_XMLParserData *) userData, opArgs);
     
     PROTECT(r_ans) ;

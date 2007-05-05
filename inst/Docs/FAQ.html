@@ -147,13 +147,61 @@ causes an error in the parser something like
       <code>xmlParseElementChildrenContentDecl()</code> in parser.c
       The problem lies in the transition between the different input
       buffers introduced by the entity expansion.      
+
+
+  <dt>
+  <li> I am trying to use XPath and getNodeSet(). But I am not
+      matching any nodes.
       
+  <dd>
+    If you are certain that the XPath  expression should match what you
+    want, then it is probably a matter of namespaces.
+    If the document in which you are trying to find the nodes has a
+    default   namespace  (at the top-level node or a sub-node
+    involved in your match), then you have to explicitly identify
+    the namespace. Unfortunately, XPath doesn't use the default
+    namespace of the target document, but requires the namespace
+    to be explicitly mentioned in the XPath expression.
+      <p/>
+    For example, suppose we have a document that looks like
+<pre>
+<![CDATA[
+ <doc xmlns="http://www.omegahat.org">
+     <topic><title>My Title</title></topic>
+ </doc>      
+]]>
+</pre>      
+ and we want to use an XPath expression to find the title node.
+ We might think that   <code>"/doc/topic/title"</code>
+      would do the trick. But in fact, we need
+<pre>
+  /ns:doc/ns:topci/ns:title    
+</pre>
+  And then we need to map ns to the URI "http://www.omegahat.org".
+  We do this in a call to getNodeSet() as
+<pre>
+  getNodeSet(doc, "/ns:doc/ns:topci/ns:title", c(ns = "http://www.omegahat.org"))
+</pre>
+
+<p/>
+      As a simplification, getNodeSet() will create the map between
+      the prefix and the URI of the default namespace of the XML
+      document if you specify a single string with no name as the
+      value
+      of the <code>namespaces</code> argument, e.g.
+<pre>
+  getNodeSet(doc, "/ns:doc/ns:topci/ns:title", "ns")
+</pre>
+      
+      <p/>
+      
+    There are some additional comments <a href="http://plasmasturm.org/log/259/">here</a>.
 </dl>
 
 <hr>
 <address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Tue Aug 19 10:50:20 EDT 2003
+Last modified: Thu May  3 09:04:23 PDT 2007
 <!-- hhmts end -->
 </body> </html>

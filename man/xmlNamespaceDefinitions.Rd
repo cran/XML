@@ -1,23 +1,44 @@
 \name{xmlNamespaceDefinitions}
 \alias{xmlNamespaceDefinitions}
+\alias{getDefaultNamespace}
 \title{Get definitions of any namespaces defined in this XML node}
 \description{
   If the given node has any namespace definitions declared within it,
   i.e. of the form \code{xmlns:myNamespace="http://www.myNS.org"},
-  this function provides access to these definitions.
+  \code{xmlNamespaceDefinitions} provides access to these definitions.
   While they appear in the XML node in the document as attributes,
   they are treated differently by the parser and so do not show up
   in the nodes attributes via \code{\link{xmlAttrs}}.
+
+  \code{getDefaultNamespace} is used to get the default namespace
+  for the top-level node in a document.
+
+  The \code{recursive} parameter allows one to   conveniently find all the namespace
+  definitions in a document or sub-tree without having to examine the file.
+  This can be useful when working with XPath queries via
+  \code{\link{getNodeSet}}.
 }
 \usage{
-xmlNamespaceDefinitions(x, addNames = TRUE)
+xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE)
+getDefaultNamespace(doc) 
 }
 \arguments{
   \item{x}{the \code{XMLNode} object in which to find any namespace
     definitions}
   \item{addNames}{a logical indicating whether to compute the names for
     the elements in the resulting list. The names are convenient, but
-    one can avoid the (very small) overhead of computing these with this parameter.}
+    one can avoid the (very small) overhead of computing these with this
+    parameter.}
+  \item{doc}{the XMLInternalDocument object obtained from a call to
+    \code{xmlTreeParse(, useInternalNodes = TRUE)}
+  }
+  \item{recursive}{a logical value indicating whether to extract the
+    namespace definitions for just this node (\code{FALSE})
+    or all of the descendant nodes as well (\code{TRUE}).
+    If this is \code{TRUE}, all the namespace definitions are
+    collected into a single "flat" list and so there may be duplicate
+    names.
+  }
 }
 \details{
 }
@@ -27,6 +48,10 @@ xmlNamespaceDefinitions(x, addNames = TRUE)
   containing fields giving the local identifier, the associated defining
   URI and a logical value indicating whether the definition is local to
   this node.
+  The name of each element is the prefix or alias used  for that
+  namespace definition, i.e. the value of the \code{id} field in the
+  namespace definition. For default namespaces, i.e. those that have no
+  prefix/alias, the name is \code{""}.
 }
 \references{\url{http://www.w3.org/XML}}
 \author{ Duncan Temple Lang }
@@ -40,6 +65,14 @@ xmlNamespaceDefinitions(x, addNames = TRUE)
   f = system.file("exampleData", "longitudinalData.xml", package = "XML")
   n = xmlRoot(xmlTreeParse(f))
   xmlNamespaceDefinitions(n)
+  xmlNamespaceDefinitions(n, recursive = TRUE)
+
+
+  f = system.file("exampleData", "namespaces.xml", package = "XML")
+  n = xmlRoot(xmlTreeParse(f, useInternal = TRUE))
+  xmlNamespaceDefinitions(n)
+
+  xmlNamespaceDefinitions(n, recursive = TRUE)
 }
 \keyword{IO}
 \concept{XML}

@@ -20,15 +20,16 @@
 
 
 typedef struct {
-  int skipBlankLines;
-  int trim;
-  USER_OBJECT_ converters;
-  int addAttributeNamespaces;
-  int internalNodeReferences;
+    int skipBlankLines;
+    int trim;
+    int xinclude;
+    USER_OBJECT_ converters;
+    int addAttributeNamespaces;
+    int internalNodeReferences;
 
-  int fullNamespaceInfo;
+    int fullNamespaceInfo;
 
-  int useDotNames;
+    int useDotNames;
 } R_XMLSettings;
 
 

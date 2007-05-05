@@ -110,7 +110,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_getDTD, 4),
 	ENTRY(RS_XML_libxmlVersion, 0),
 	ENTRY(RS_XML_Parse, 14),
-	ENTRY(RS_XML_ParseTree, 16),
+	ENTRY(RS_XML_ParseTree, 17),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
 	ENTRY(R_newXMLNode, 4),
@@ -135,6 +135,9 @@ static R_CallMethodDef callMethods[] = {
         ENTRY(RS_XML_setNodeName, 2),
         ENTRY(R_xmlNsAsCharacter, 1),
         ENTRY(RS_XML_SubstituteEntitiesDefault, 1),
+        ENTRY(RS_XML_getNextSibling, 1),
+        ENTRY(R_getXMLNodeDocument, 1),
+        ENTRY(RS_XML_createDocFromNode, 1),
 	{NULL, NULL, 0}
 };
 

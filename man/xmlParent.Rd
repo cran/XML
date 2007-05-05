@@ -1,9 +1,10 @@
 \name{xmlParent}
 \alias{xmlParent}
+\alias{xmlAncestors}
 \alias{xmlParent.XMLInternalNode}
-\title{Get parent node of XMLInternalNode}
+\title{Get parent node of XMLInternalNode or ancestor nodes}
 \description{
- This operates on an XML node
+ \code{xmlParent} operates on an XML node
  and returns a reference to its parent node 
  within the document tree.
  This works for an internal, C-level
@@ -17,12 +18,23 @@
  XML node when using a tree
  created with, for example,  \code{\link{xmlHashTree}}
  as the parent information is stored separately.
+
+ \code{xmlAncestors} walks the chain of parens to the
+ top of the document and either returns a list of those
+ nodes, or alternatively a list of the values obtained
+ by applying a function to each of the nodes.
+ 
 }
 \usage{
 xmlParent(x)
+xmlAncestors(x, fun = NULL, ...)
 }
 \arguments{
   \item{x}{an object of class \code{XMLInternalNode} whose parent is being requested. }
+  \item{fun}{an R function which is invoked for each  node as we walk up
+    the tree.}
+  \item{\dots}{any additional arguments that are passed in calls to
+    \code{fun} after the node object.}
 }
 \details{
  This uses the internal libxml structures to access the parent in the DOM tree. 
@@ -30,7 +42,16 @@ xmlParent(x)
  if we so want in the future.
 }
 \value{
- An object of class \code{XMLInternalNode}.
+  \code{xmlParent} returns object of class \code{XMLInternalNode}.
+
+  If \code{fun} is \code{NULL}, \code{xmlAncestors} returns a list of the nodes in order of
+  top-most node or root of the tree, then its child, then the child of
+  that child, etc. This is the reverse order in which the nodes are
+  visited/found.
+
+  If \code{fun} is a function, \code{xmlAncestors} returns a list
+  whose elements are the results of calling that function for
+  each node. Again, the order is top down.
 }
 
 \references{\url{http://www.w3.org/XML}}

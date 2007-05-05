@@ -71,7 +71,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 		  USER_OBJECT_ getDTD, USER_OBJECT_ isURL,
 		  USER_OBJECT_ addNamespaceAttributes, USER_OBJECT_ useInternalNodes,
 		  USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema, USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding,
-                  USER_OBJECT_ useDotNames);
+                  USER_OBJECT_ useDotNames, USER_OBJECT_ xinclude);
 
 USER_OBJECT_ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID);
 USER_OBJECT_ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces);
@@ -115,5 +115,11 @@ USER_OBJECT_ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef);
 USER_OBJECT_ RS_XML_setNodeName(USER_OBJECT_ s_node, USER_OBJECT_ s_name);
 USER_OBJECT_ R_xmlNsAsCharacter(USER_OBJECT_ s_ns);
 
+
+USER_OBJECT_ R_createXMLNsRef(xmlNsPtr ns);
+USER_OBJECT_ RS_XML_getNextSibling(USER_OBJECT_ node);
+
+USER_OBJECT_ R_getXMLNodeDocument(USER_OBJECT_ s_node);
+USER_OBJECT_ RS_XML_createDocFromNode(USER_OBJECT_ s_node);
 #endif
 

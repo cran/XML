@@ -14,12 +14,14 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
              useInternalNodes = FALSE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) > 0)
+             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             xinclude = TRUE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
               isURL = FALSE, asTree = FALSE, 
               useInternalNodes = FALSE, encoding = character(),
-              useDotNames = length(grep("^\\.", names(handlers))) > 0) 
+              useDotNames = length(grep("^\\.", names(handlers))) > 0,
+              xinclude = FALSE) 
 }
 
 \arguments{
@@ -139,6 +141,17 @@ return type.
   means that your list of handlers should have names that use
   the '.' prefix for these general element handlers.
   This is the preferred way to write new code.
+}
+\item{xinclude}{a logical value indicating whether
+  to process nodes of the form \code{<xi:include xmlns:xi="http://www.w3.org/2001/XInclude">}
+  to insert content from other parts of (potentially different)
+  documents. \code{TRUE} means resolve the external references;
+  \code{FALSE} means leave the node as is.
+  Of course, one can process these nodes oneself after document has
+  been parse using handler functions or working on the DOM.
+  Please note that the syntax for inclusion using XPointer
+  is not the same as XPath and the results can be a little
+  unexpected and confusing. See the libxml2 documentation for more details.
 }
 }
 \details{
@@ -405,6 +418,15 @@ m <- xmlTreeParse(fileName,
  d.self = htmlTreeParse(system.file("exampleData", "9003-en.html",package = "XML"))
    # XXX want to do a test here to see the similarities between d and
    # d.self and differences between d.no
+
+
+  # include
+ f = system.file("exampleData", "nodes1.xml", package = "XML")
+ xmlRoot(xmlTreeParse(f, xinclude = FALSE))
+ xmlRoot(xmlTreeParse(f, xinclude = TRUE))
+
+ f = system.file("exampleData", "nodes2.xml", package = "XML")
+ xmlRoot(xmlTreeParse(f, xinclude = TRUE))
 }
 
 \keyword{file}
