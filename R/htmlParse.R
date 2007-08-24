@@ -13,8 +13,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
             isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
             encoding = character(),
             useDotNames = length(grep("^\\.", names(handlers))) > 0,
-            xinclude = FALSE
-         )
+            xinclude = FALSE, addFinalizer = TRUE)
 {
 
   if(length(file) > 1) {
@@ -61,6 +60,9 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)
+
+  if(inherits(ans, "XMLInternalDocument"))
+    addDocFinalizer(ans, addFinalizer)  
 
  ans
 }

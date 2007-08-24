@@ -16,12 +16,12 @@
 }
 \usage{
 xmlApply(X, FUN, ...)
-xmlApply.XMLNode(X, FUN, ...)
-xmlApply.XMLDocument(X, FUN, ...)
-xmlApply.XMLDocumentContent(X, FUN, ...)
+\method{xmlApply}{XMLNode}(X, FUN, ...)
+\method{xmlApply}{XMLDocument}(X, FUN, ...)
+\method{xmlApply}{XMLDocumentContent}(X, FUN, ...)
 xmlSApply(X, FUN, ...)
-xmlSApply.XMLNode(X, FUN, ...)
-xmlSApply.XMLDocument(X, FUN, ...)
+\method{xmlSApply}{XMLNode}(X, FUN, ...)
+\method{xmlSApply}{XMLDocument}(X, FUN, ...)
 }
 
 \arguments{

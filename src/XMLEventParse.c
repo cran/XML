@@ -74,7 +74,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
   SEXP e, tmp, arg;
   int n;
   int errorOccurred;
-  char *str;
+  const char *str;
   int left = len-1, count;
 
 #ifdef R_XML_DEBUG

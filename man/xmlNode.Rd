@@ -13,7 +13,7 @@ integrated with other trees generated manually
 or with via the parser.
 }
 \usage{
-xmlNode(name, ..., attrs=NULL, namespace="")
+xmlNode(name, ..., attrs=NULL, namespace="", .children = list(...))
 xmlTextNode(value, namespace="", entities = XMLEntities)
 xmlPINode(sys, value, namespace="")
 xmlCDataNode(...)
@@ -26,6 +26,11 @@ xmlCommentNode(text)
     These can be objects of class \code{XMLNode}
    or arbitrary values that will be converted to a string
    to form an \code{XMLTextNode} object.}
+ \item{.children}{an alternative mechanism to specifying the children
+   which is useful for programmatic use when one has the children
+   in an existing list.  The \dots mechanism is for use when the
+    children are specified directly and individually.
+ }
   \item{attrs}{A named character vector giving the 
      name, value pairs of attributes for this XML node.}
   \item{value}{This is the text that is to be used when forming

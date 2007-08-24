@@ -39,6 +39,7 @@ export(
  xmlApply,
  xmlAttributeType,
  xmlAttrs,
+ "xmlAttrs<-",       
  xmlCDataNode,
  xmlChildren,
  xmlCommentNode,
@@ -81,6 +82,7 @@ export(
  toHTML,
  addChildren,
  removeChildren,
+ removeNodes,       
  addAttributes,
  removeAttributes,
  "xmlName<-"      
@@ -92,7 +94,10 @@ exportMethods("addAttributes", "removeAttributes")
 exportMethods("toHTML")
 
 exportClasses("XMLInternalDocument")
-exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode", "XMLInternalTextNode")
+exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode",
+              "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
+              "XMLInternalCommentNode")
+
 exportClasses("XMLNamespace")
 
 exportClass("URI")
@@ -101,6 +106,9 @@ exportClass("URI")
 exportMethods("coerce")
 
 exportMethods("free")
+
+S3method(removeChildren, XMLNode)
+S3method(removeChildren, XMLInternalNode)
 
 
 S3method(xpathApply, XMLInternalNode)
@@ -122,6 +130,8 @@ S3method("names<-", XMLNode)
 S3method("xmlName<-", XMLNode)
 S3method("xmlName<-", XMLInternalElementNode)
 
+
+exportMethods("xmlAttrs<-")
 
 S3method(xmlParent, XMLTreeNode)
 S3method(xmlChildren, XMLTreeNode)
@@ -154,6 +164,7 @@ S3method("[[", XMLInternalNode)
 S3method("[", XMLInternalNode)
 
 S3method("[", XMLInternalDocument)
+S3method("[[", XMLInternalDocument)
 S3method("names", XMLInternalNode)
 
 S3method("[<-", XMLNode)
@@ -221,6 +232,9 @@ S3method(dtdElementValidEntry, XMLSequenceContent)
 
 exportClass("SAXState")
 
+export(xmlSource)
+exportMethods("xmlSource")
+
 # Not yet exported....
 #xmlValidity
 
@@ -237,4 +251,4 @@ exportMethods("names", "$", "$<-", "coerce")
 }
 
 
-importFrom(utils, normalizePath)
+#importFrom(utils, normalizePath)

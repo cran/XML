@@ -138,6 +138,7 @@ static R_CallMethodDef callMethods[] = {
         ENTRY(RS_XML_getNextSibling, 1),
         ENTRY(R_getXMLNodeDocument, 1),
         ENTRY(RS_XML_createDocFromNode, 1),
+        ENTRY(R_removeInternalNode, 2),
 	{NULL, NULL, 0}
 };
 

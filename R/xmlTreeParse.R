@@ -15,13 +15,14 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
            useInternalNodes = FALSE, isSchema = FALSE,
            fullNamespaceInfo = FALSE, encoding = character(),
            useDotNames = length(grep("^\\.", names(handlers))) > 0,  # will be switched to TRUE in the future.
-           xinclude = TRUE)
+           xinclude = TRUE, addFinalizer = TRUE)
 {
 
   if(length(file) > 1) {
     file = paste(file, collapse = "\n")
     if(!missing(asText) && !asText) 
-      stop("multiple URIs passed to xmlTreeParse. If this is the content of the file,  specify asText = TRUE")
+      stop(structure(list(message = "multiple URLs passed to xmlTreeParse. If this is the content of the file, specify asText = TRUE"),
+                     class = c("MultipleURLError", "XMLParserError", "simpleError", "error", "condition")))
     asText = TRUE
   }
   
@@ -45,8 +46,11 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
     # Otherwise, check if the file exists and report an error.
  if(isURL == FALSE) {
   if(file.exists(file) == FALSE)
-    if(!missing(asText) && asText == FALSE)
-     stop(paste("File", file, "does not exist "))
+    if(!missing(asText) && asText == FALSE) {
+     e = simpleError(paste("File", file, "does not exist"))
+     class(e) = c("FileNotFound", class(e))
+     stop(e)
+    }
     else
      asText <- TRUE
  }
@@ -57,6 +61,12 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
  old = setEntitySubstitution(replaceEntities)
  on.exit(setEntitySubstitution(old))
 
+  if(asText && length(grep("^\\s*<", file, perl = TRUE)) == 0) {
+    e = simpleError(paste(file, " does not seem to be XML, nor to identify a file name"))
+    class(e) = c("XMLInputError", class(e))
+    stop(e)
+  }
+  
 
  if(!is.logical(xinclude)) {
    # if(is(xinclude, "numeric"))
@@ -74,11 +84,13 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
               as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames),
               xinclude)
 
+  if(!missing(handlers) & !as.logical(asTree))
+    return(handlers)
 
- if(!missing(handlers) & !as.logical(asTree))
-   return(handlers)
+  if(inherits(ans, "XMLInternalDocument"))
+    addDocFinalizer(ans, addFinalizer)
 
- ans
+  ans
 }
 
 

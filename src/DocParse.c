@@ -109,7 +109,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   int useHTML = LOGICAL_DATA(s_useHTML)[0];
 
   const char *encoding = NULL;
-
+  int freeName = 0;
 
   if(GET_LENGTH(r_encoding))
       encoding = CHAR(STRING_ELT(r_encoding, 0));
@@ -139,6 +139,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     }
   } else {
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
+    freeName = 1;
   }
 
 #if 0 /* Done in R now.*/
@@ -170,8 +171,9 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(doc == NULL) {
-      if(asTextBuffer && name)
-	  free(name);
+      if(freeName && name) {
+          free(name);
+      }
 
       PROBLEM "error in creating parser for %s", name
       ERROR;
@@ -189,7 +191,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
       ctxt.warning = RS_XML(ValidationWarning);
 
       if(!xmlValidateDocument(&ctxt, doc)) {
-	  if(asTextBuffer && name)
+	  if(freeName && name)
 	      free(name);
 
 
@@ -295,7 +297,7 @@ NodeTraverse(xmlNodePtr root, USER_OBJECT_ converterFunctions, R_XMLSettings *pa
    root: the collection of children.
  */
 USER_OBJECT_
-RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, 
+RS_XML(convertXMLDoc)(const char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, 
                     R_XMLSettings *parserSettings)
 {
   USER_OBJECT_ rdoc;

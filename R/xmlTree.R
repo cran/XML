@@ -74,8 +74,9 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
 
    setNamespace(node, namespace)
 
-   if(length(currentNodes) > 1)
+   if(length(currentNodes) > 1) {
       addChildren(currentNodes[[1]], node)
+   }
 
    currentNodes <<- c(node, currentNodes)
 
@@ -88,17 +89,28 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
    invisible(return(node))
  }
 
- closeTag <- function(name="") {
-  tmp <- currentNodes[[1]]
-  currentNodes <<- currentNodes[-1]
+ closeTag <- function(name="", num = 1) {
+#   return(closeTag(num = name))
+
+   if(!missing(num)) {
+     if(is.na(num) || num == -1)
+       closeTag(num = length(currentNodes))
+     else
+      replicate(closeTag())
+   } else {
+     tmp <- currentNodes[[1]]
+     currentNodes <<- currentNodes[-1]
+   }
 
   invisible(return(tmp))
  }
 
 
  add = function(node, parent = currentNodes[[1]]) {
-        if(!is.null(parent))
-            addChildren(currentNodes[[1]], node)
+        if(!is.null(parent)) {
+            addChildren(parent, node)
+            currentNodes <<- c(node, currentNodes)
+        }
         invisible(node)
        }
  
@@ -116,8 +128,8 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
  }
 
 
+   # deal with the top-level node the user may have supplied.
  if(!is.null(tag)) {
-
    if(is.character(tag)) {
      node = addTag(tag, attrs = attrs, namespace = namespaces, close = FALSE)
    } else if(is(tag, "XMLInternalNode")) {

@@ -264,7 +264,7 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
 #endif
 
   if(n > 0) {
-    USER_OBJECT_ dtdNames;
+    USER_OBJECT_ dtdNames = NULL_USER_OBJECT;
 
     PROTECT(dtdEls = NEW_LIST(n));
     PROTECT(dtdNames = NEW_CHARACTER(n));
@@ -279,7 +279,6 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
 
    dtdEls = SET_LENGTH(dtdEls, scanData.counter);
    dtdNames = SET_LENGTH(dtdNames, scanData.counter);
-
  }
 #else
       for(i = 0; i < n; i++) {

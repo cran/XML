@@ -1,6 +1,7 @@
 \name{addChildren}
 \alias{addChildren}
 \alias{removeChildren}
+\alias{removeNodes}
 \alias{addAttributes}
 \alias{removeAttributes}
 \alias{addAttributes,XMLInternalElementNode-method}
@@ -23,8 +24,10 @@
 \usage{
 addChildren(node, ..., kids = list(...))
 removeChildren(node, ..., kids = list(...), free = FALSE)
+removeNodes(node, free = rep(FALSE, length(node)))
 addAttributes(node, ..., .attrs = NULL)
-removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE)
+removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
+                  .all = (length(list(...)) + length(.attrs)) == 0)
 }
 \arguments{
   \item{node}{the XML node whose state is to be modified,
@@ -79,6 +82,8 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE)
       tree-based context spanning both R and C data structures and
       memory managers. 
     }
+    \item{.all}{a logical value indicating whether to remove all of the
+      attributes within the XML node without having to specify them by name.}
 }
 \details{
 
@@ -113,6 +118,10 @@ cat(saveXML(b), "\n")
 removeAttributes(b, "a", "r:version")
 cat(saveXML(b), "\n")
 
+
+removeAttributes(b, .attrs = names(xmlAttrs(b)))
+
+
 addChildren(b, newXMLNode("el", "Red", "Blue", "Green",
                            attrs = c(lang ="en")))
 
@@ -134,6 +143,21 @@ xmlName(i)
 
  # have the identifiers
 removeChildren(b, kids = c("m", "n", "q"))
+
+
+
+x <- xmlNode("a", 
+               xmlNode("b", "1"),
+	       xmlNode("c", "1"),
+	       "some basic text")
+
+v = removeChildren(x, "b")
+
+  # remove c and b
+v = removeChildren(x, "c", "b")
+
+  # remove the text and "c" leaving just b
+v = removeChildren(x, 3, "c")
 
 \dontrun{
     # this won't work as the 10 gets coerced to a 

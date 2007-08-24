@@ -6,15 +6,15 @@
 # See XML Elements of Style by Simon St. Laurent.
 
 validatePublicIdentifier =
-function(obj)
+function(object)
 {
-             els = strsplit(obj, "//")[[1]]
-             if(length(els) != 4)
-               return("a PUBLIC identifier must have 4 parts, separated by //")
-             if(! (els[1] %in%  c("+", "-")))
-               return("first element of PUBLIC identifier must be + or -")
+    els = strsplit(object, "//")[[1]]
+    if(length(els) != 4)
+      return("a PUBLIC identifier must have 4 parts, separated by //")
+    if(! (els[1] %in%  c("+", "-")))
+      return("first element of PUBLIC identifier must be + or -")
 
-             TRUE
+    TRUE
 }  
 
 setClass("DTDPublicIdentifier",
@@ -26,15 +26,15 @@ setClass("DTDPublicIdentifier",
 setClass("Doctype", representation(name = "character",
                                    system = "character",
                                    public = "character"),
-                    validity = function(obj) {
-                        if(length(nchar(obj@system)) > 0 && length(obj@public) > 0)
+                    validity = function(object) {
+                        if(length(nchar(object@system)) > 0 && length(object@public) > 0)
                            return("only one of system and public can be specified")
 
-                        if(length(obj@public) > 0 && length(obj@public) != 2)
+                        if(length(object@public) > 0 && length(object@public) != 2)
                           return("the public part of the Doctype must have exactly 2 elements.")
 
-                        if(length(obj@public) > 0) {
-                           tmp = validatePublicIdentifier(obj@public[1])
+                        if(length(object@public) > 0) {
+                           tmp = validatePublicIdentifier(object@public[1])
                            if(!is.logical(tmp))
                              return(tmp)
                          }

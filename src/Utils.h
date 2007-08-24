@@ -121,5 +121,8 @@ USER_OBJECT_ RS_XML_getNextSibling(USER_OBJECT_ node);
 
 USER_OBJECT_ R_getXMLNodeDocument(USER_OBJECT_ s_node);
 USER_OBJECT_ RS_XML_createDocFromNode(USER_OBJECT_ s_node);
+
+SEXP R_removeInternalNode(SEXP r_node, SEXP r_free);
+
 #endif
 

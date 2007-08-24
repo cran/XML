@@ -32,13 +32,13 @@
 \usage{
 saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
         doctype = NULL, encoding = "")
-saveXML.XMLInternalDocument(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+\method{saveXML}{XMLInternalDocument}(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
                             doctype = NULL, encoding = "")
-saveXML.XMLInternalDOM(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+\method{saveXML}{XMLInternalDOM}(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
                        doctype = NULL, encoding = "")
-saveXML.XMLNode(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+\method{saveXML}{XMLNode}(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
                  doctype = NULL, encoding = "")
-saveXML.XMLOutputStream(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
+\method{saveXML}{XMLOutputStream}(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
                          doctype = NULL, encoding = "")
 }
 \arguments{

@@ -12,9 +12,9 @@ via the assignment operator, such as
 \code{x[["myTag"]] <- xmlNode("mySubTag")}.
 }
 \usage{
-x[i] <- value
-"[<-.XMLNode"(x, i, value)
-"[[<-.XMLNode"(x, i, value)
+\method{[}{XMLNode}(x, i) <- value
+\method{[}{XMLNode}(x, i) <-  value
+\method{[[}{XMLNode}(x, i) <- value
 }
 \arguments{
   \item{x}{the \code{XMLNode} object to which the sub-node is to be assigned.}

@@ -37,7 +37,7 @@ enum {DOWN, SIDEWAYS};
 
 
 
-USER_OBJECT_ RS_XML(convertXMLDoc)(char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *settings);
+USER_OBJECT_ RS_XML(convertXMLDoc)(const char *fileName, xmlDocPtr doc, USER_OBJECT_ converterFunctions, R_XMLSettings *settings);
 /*USER_OBJECT_ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettings *settings, USER_OBJECT_ parentUserNode);*/
 USER_OBJECT_ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *settings);
 USER_OBJECT_ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parserSettings);

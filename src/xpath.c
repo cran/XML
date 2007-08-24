@@ -114,21 +114,50 @@ R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
  return(els);
 }
 
+static void
+freeXMLDocument(SEXP sdoc)
+{
+  xmlDocPtr doc;
+  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+
+  /* fprintf(stderr, "Cleaning up document %p\n", (void *) doc); */
+
+  if(doc)
+      xmlFreeDoc(doc);
+  R_ClearExternalPtr(sdoc);
+}
+
+
+SEXP
+R_addXMLInternalDocument_finalizer(SEXP sdoc, SEXP fun)
+{
+    R_CFinalizer_t action;
+
+    if(TYPEOF(fun) == CLOSXP) {
+	R_RegisterFinalizer(sdoc, fun);	
+	return(sdoc);
+    }
+
+    if(fun == R_NilValue)    {
+	action = freeXMLDocument;
+    } else if(TYPEOF(fun) == EXTPTRSXP)
+	action = (R_CFinalizer_t) R_ExternalPtrAddr(fun);
+    
+
+    R_RegisterCFinalizer(sdoc, action);
+    return(sdoc);
+}
+
+
 SEXP
 R_XMLInternalDocument_free(SEXP sdoc)
 {
-  xmlDocPtr doc;
-
   if(TYPEOF(sdoc) != EXTPTRSXP || R_ExternalPtrTag(sdoc) != Rf_install("XMLInternalDocument")) {
      PROBLEM "R_free must be given an internal XML document object, 'XMLInternalDocument'"
      ERROR;
   }
 
-  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-
-  if(doc)
-      xmlFreeDoc(doc);
-  R_ClearExternalPtr(sdoc);
+  freeXMLDocument(sdoc);
   
   return(sdoc);
 }
@@ -178,13 +207,35 @@ RS_XML_createDocFromNode(USER_OBJECT_ s_node)
 {
  xmlDocPtr doc;
  xmlNodePtr node, ptr;
+ SEXP ans;
 
- node = (xmlDocPtr) R_ExternalPtrAddr(s_node);
+ node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
  doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
  ptr = xmlDocCopyNode(node, doc, 1);
  doc->children = ptr;
- return(R_createXMLDocRef(doc));
+ ans = R_createXMLDocRef(doc);
+ return(ans);
 }
+
+/*
+ Thoughts that we could set the kids to NULL and then free the doc
+  after we createDocFromNode but the return of xpathApply will return
+  these nodes and we need to be able to get to a document
+ */
+SEXP
+RS_XML_killNodesFreeDoc(SEXP sdoc)
+{
+   xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+   if(!doc) {
+       PROBLEM "null xmlDocPtr passed as externalptr to RS_XML_killNodesFreeDoc"
+	   WARN;
+       return(ScalarLogical(FALSE));
+   }
+   doc->children = NULL;
+   xmlFree(doc);
+   return(ScalarLogical(TRUE));
+}
+
 
 
 SEXP
@@ -195,7 +246,6 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
  SEXP ans = NULL_USER_OBJECT;
 
  xmlDocPtr doc;
- xmlNodePtr node, ptr;
 
  if(TYPEOF(s_node) != EXTPTRSXP || R_ExternalPtrTag(s_node) != Rf_install("XMLInternalNode")) {
    PROBLEM "xpathEval must be given an internal XML document object, 'XMLInternalNode'"

@@ -335,15 +335,19 @@ So we would use
    # From bondsTables.R in examples/
 
   doc = htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates", useInternalNodes = TRUE)
+  if(is.null(xmlRoot(doc))) 
+     doc = htmlTreeParse("http://finance.yahoo.com/bonds", useInternalNodes = TRUE)
 
      # Use XPath expression to find the nodes 
      #  <div><table class="yfirttbl">..
      # as these are the ones we want.
 
-  o = getNodeSet(doc, "//div/table[@class='yfirttbl']")
+  if(!is.null(xmlRoot(doc))) {
+
+   o = getNodeSet(doc, "//div/table[@class='yfirttbl']")
 
     # Write a function that will extract the information out of a given table node.
-  readHTMLTable =
+   readHTMLTable =
    function(tb)
     {
           # get the header information.
@@ -360,7 +364,7 @@ So we would use
      # Now process each of the table nodes in the o list.
     tables = lapply(o, readHTMLTable)
     names(tables) = lapply(o, function(x) xmlValue(x[["caption"]]))
-
+  }
 
 
      # this illustrates an approach to doing queries on a sub tree

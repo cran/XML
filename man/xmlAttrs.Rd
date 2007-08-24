@@ -1,6 +1,11 @@
 \name{xmlAttrs}
 \alias{xmlAttrs}
+\alias{xmlAttrs<-}
 \alias{xmlAttrs.XMLElementDef}
+\alias{xmlAttrs<-,XMLNode}
+\alias{xmlAttrs<-,XMLInternalNode}
+\alias{xmlAttrs<-,XMLNode-method}
+\alias{xmlAttrs<-,XMLInternalElementNode-method}
 \alias{xmlAttrs.XMLNode}
 \alias{xmlAttrs.XMLInternalNode}
 \title{ Get the list of attributes of an XML node. }
@@ -11,11 +16,15 @@
 }
 \usage{
  xmlAttrs(node, ...)
+ 'xmlAttrs<-'(node, value)
 }
 \arguments{
   \item{node}{The \code{XMLNode} object
     whose attributes are to be extracted. }
-  \item{...}{additional arguments for the specific methods.}
+  \item{...}{additional arguments for the specific methods, currently
+    ignored but present for future extensions.}
+  \item{value}{a named character vector giving the new attributes to be
+    added to the node.}
 }
 \value{
  A named character vector, where the names
@@ -34,9 +43,25 @@ pairs in the XML tag
  fileName <- system.file("exampleData", "mtcars.xml", package="XML") 
  doc <- xmlTreeParse(fileName)
 
- xmlAttrs(doc$doc$children[["dataset"]])
+ xmlAttrs(xmlRoot(doc))
 
- xmlAttrs(doc$doc$children[["dataset"]][["variables"]])
+ xmlAttrs(xmlRoot(doc)[["variables"]])
+
+
+ doc <- xmlTreeParse(fileName, useInternalNodes = TRUE)
+ d = xmlRoot(doc)
+   # skip over the comment
+ d = XML:::getNextSibling(d)
+
+ xmlAttrs(d)
+ xmlAttrs(d) <- c(name = "Motor Trend fuel consumption data",
+                  author = "Motor Trends")
+ xmlAttrs(d)
+
+   # clear all the attributes and then set new ones.
+ removeAttributes(d)
+ xmlAttrs(d) <- c(name = "Motor Trend fuel consumption data",
+                  author = "Motor Trends")
 }
 \keyword{IO}
 \keyword{file}

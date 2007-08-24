@@ -1,7 +1,7 @@
 xmlNode <-
-function(name, ..., attrs = NULL, namespace = "")
+function(name, ..., attrs = NULL, namespace = "", .children = list(...))
 {
-  kids <- lapply(list(...), asXMLNode)
+  kids <- lapply(.children, asXMLNode)
   kids = addNames(kids)
 
   node <- list(name = name, attributes = attrs, children = kids, namespace=namespace)

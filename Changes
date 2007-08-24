@@ -1,3 +1,43 @@
+Version 1.92-0
+
+  *  Added removeNodes function for unlinking XMLInternalNode objects directly by reference.
+
+  *  xmlRoot() handles empty documents. 
+
+  *  Documentation cleanups.
+
+Version 1.91-1
+
+  *  Remove output about "cleaning"/releasing an internal document pointer.
+
+  *  The warning from getNodeSet/xpathApply about using a prefix for the default namespace
+     now has a class/type of condition, specificall "XPathDefaultNamespace".
+
+Version 1.91-0
+
+  *  argument to add a finalizer for an XMLInternalDocument in xmlTreeParse()/htmlTreeParse() when 
+     useInternalNodes = TRUE.  If this is set, automatic garbage collection is done which will free
+     any sub-nodes. If you want to work with any of these nodes after the top-level tree variable
+     has been released, specify addFinalizer = FALSE and explicitly free the document yourself with the
+     free() function.
+
+  *  Sme improvements on namespace prefixes in internal nodes. See newXMLNode().
+
+  *  classes for additional XMLInternalNodes (e.g. XMLInternalCDataNode) now exported
+
+  *  removeAttributes() has a .all argument to easily remove all the attributes within a node.
+     Supported for both R and internal style nodes.
+
+  *  xmlAttrs<-() function for simply appending attributes to a node.
+
+  *  If xmlTreeParse() is called with asText = FALSE and the file is not found, an error of class
+     "FileNotFound" is raised.
+
+  *  [[ opertor for XMLInternalDocument to get the first/only entry in
+     the node set from an XPath query.  This is a convenience
+     mechansim for accessing the element when there is only one.
+
+
 Version 1.9-0
 
   *  Added xmlAncestors() functions for finding chain of parent nodes, and optionally applying a 

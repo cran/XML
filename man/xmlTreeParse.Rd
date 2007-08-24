@@ -15,13 +15,13 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              useInternalNodes = FALSE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
              useDotNames = length(grep("^\\.", names(handlers))) > 0,
-             xinclude = TRUE)
+             xinclude = TRUE, addFinalizer = TRUE)
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
               isURL = FALSE, asTree = FALSE, 
               useInternalNodes = FALSE, encoding = character(),
               useDotNames = length(grep("^\\.", names(handlers))) > 0,
-              xinclude = FALSE) 
+              xinclude = FALSE, addFinalizer = TRUE) 
 }
 
 \arguments{
@@ -153,6 +153,12 @@ return type.
   is not the same as XPath and the results can be a little
   unexpected and confusing. See the libxml2 documentation for more details.
 }
+ \item{addFinalizer}{a logical value indicating whether the
+   default finalizer routine should be registered to
+   free the internal xmlDoc when R no longer has a reference to this
+   external pointer object. This is only relevant when
+   \code{useInternalNodes} is \code{TRUE}.
+ }
 }
 \details{
  The \code{handlers} argument is used similarly

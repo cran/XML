@@ -15,17 +15,18 @@ that is returned as part of the parsing.
 }
 \usage{
 xmlRoot(x, ...)
-xmlRoot.XMLDocumentContent(x, ...)
-xmlRoot.XMLInternalDocument(x, ...)
-xmlRoot.HTMLDocument(x, ...)
+\method{xmlRoot}{XMLDocumentContent}(x, ...)
+\method{xmlRoot}{XMLInternalDocument}(x, skip = TRUE, ...)
+\method{xmlRoot}{HTMLDocument}(x, ...)
 }
 \arguments{
   \item{x}{the object whose root/top-level XML node is to be returned.}
-%  \item{skip}{a logical value that controls whether XMLComment objects that appear
-%    before the real top-leve node of the document should be ignored
-%%   or not.}
+  \item{skip}{a logical value that controls whether DTD nodes and/or
+    XMLComment objects that appear
+    before the \dQuote{real} top-level node of the document should be ignored (\code{TRUE})
+   or not (\code{FALSE}) when returning the root node.}
   \item{...}{arguments that are passed by the generic to the different specialized 
-       methods of this generic.}
+    methods of this generic.}
 }
 \value{
  An object of class \code{XMLNode}.

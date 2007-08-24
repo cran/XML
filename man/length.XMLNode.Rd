@@ -9,7 +9,7 @@ It is provided as a convenient form of calling the
 \code{\link{xmlSize}} function.
 }
 \usage{
- length.XMLNode(x)
+\method{length}{XMLNode}(x)
 }
 \arguments{
 \item{x}{the \code{XMLNode} object whose length is to be queried.}

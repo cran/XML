@@ -25,7 +25,7 @@ with general tools that work on documents, e.g. XPath queries.
 }
 \usage{
 xmlDoc(node)
-newXMLDoc(dtd, namespaces=NULL)
+newXMLDoc(dtd, namespaces=NULL, addFinalizer = TRUE)
 newXMLNode(name, ..., attrs = NULL, namespace="", doc=NULL, .children = list(...))
 newXMLTextNode(text, doc = NULL)
 newXMLCDataNode(text, doc = NULL)
@@ -42,6 +42,11 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   corresponding URI for that namespace
   that are to be declared and used in the XML document, \\
    e.g. \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
+ \item{addFinalizer}{a logical value indicating whether the
+   default finalizer routine should be registered to
+   free the internal xmlDoc when R no longer has a reference to this
+   external pointer object.
+ }
  \item{name}{the tag/element name for the XML node and
    the for a Processing Instruction (PI) node, this is the "target",
    e.g. the identifier for the system for whose attention this PI node is intended.}
@@ -89,7 +94,7 @@ and \code{XMLInternalNode}, respectively
 
 \note{These functions are used to build up an internal XML tree.
 This can be used in the Sxslt package (\url{http://www.omegahat.org/Sxslt})
-when creating content in R that is to be dynamicall inserted into an XML
+when creating content in R that is to be dynamically inserted into an XML
 document.}
 
 \seealso{

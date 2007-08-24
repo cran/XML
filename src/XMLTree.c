@@ -90,7 +90,7 @@ R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value)
 {
   xmlDocPtr  doc = NULL;
   xmlNodePtr node;
-  char *tmp;
+  const char *tmp;
 
   if(GET_LENGTH(sdoc))
     doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
@@ -273,6 +273,33 @@ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
     return(ans);
 }
 
+SEXP
+R_removeInternalNode(SEXP r_node, SEXP r_free)
+{
+    xmlNodePtr node;
+    int n = GET_LENGTH(r_node), i;
+
+    for(i = 0; i < n; i++) {
+	SEXP el = VECTOR_ELT(r_node, i);
+	if(TYPEOF(el) != EXTPTRSXP) {
+	    PROBLEM "removeInternalNode needs ans external pointer object"
+	    ERROR;
+	}
+
+	node = (xmlNodePtr) R_ExternalPtrAddr(el);
+	if(!node) {
+	    PROBLEM "removeInternalNode ignoring a NULL external pointer object"
+		WARN;	
+	}
+	xmlUnlinkNode(node);
+    
+	if(LOGICAL(r_free)[i])
+	    xmlFreeNode(node);
+    }
+
+    return(NULL_USER_OBJECT);
+}
+
 
 /**
  Add the internal XML node represented by the S object @node
@@ -311,8 +338,28 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
     p = (xmlNodePtr) R_ExternalPtrAddr(parent);
     n = (xmlNodePtr) R_ExternalPtrAddr(node);
 
-    xmlAddChild(p, n);
+    if(!p || !n) {
+	PROBLEM "either the parent or child node is NULL"
+        ERROR;
+    }
+	
 
+    switch(p->type) {
+    case XML_ELEMENT_NODE:
+    case XML_DOCUMENT_NODE:	
+	xmlAddChild(p, n);
+	break;
+    case XML_PI_NODE:
+	xmlAddSibling(p, n);
+	break;
+    default:
+       {
+	   PROBLEM "ignoring request to add child (types parent: %d, child %d)",
+               p->type, n->type
+	    WARN
+       }
+	break;
+    }
     return(NULL_USER_OBJECT);     
 }
 
@@ -357,11 +404,28 @@ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeN
 }
 
 USER_OBJECT_
-R_xmlRootNode(USER_OBJECT_ sdoc)
+R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
 {
   xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+  xmlNodePtr node = doc->children;
   
-  return(R_createXMLNodeRef(doc->children));  
+  if(!node) {
+      PROBLEM "empty XML document"
+	  WARN;
+      return(NULL);
+  }
+
+  if(LOGICAL(skipDtd)[0]) {
+      while(node && node->type == XML_DTD_NODE) {
+	  node = node->next;
+      }
+  }
+
+  if(node == NULL) 
+      return(NULL_USER_OBJECT);
+
+
+  return(R_createXMLNodeRef(node));  
 }
 
 
@@ -444,8 +508,8 @@ USER_OBJECT_
 R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 {
   xmlNodePtr doc = (xmlNodePtr) R_ExternalPtrAddr(sdoc);
-  char *href = CHAR_DEREF(STRING_ELT(shref, 0));
-  char *prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
+  const char *href = CHAR_DEREF(STRING_ELT(shref, 0));
+  const char *prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
   xmlNsPtr ns;
 
   if(!prefix[0])
@@ -607,7 +671,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	     USER_OBJECT_ prefix, USER_OBJECT_ r_encoding)
 {
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-    char *fileName = NULL;
+    const char *fileName = NULL;
     USER_OBJECT_ ans = NULL_USER_OBJECT;
     xmlDtdPtr dtd = NULL;
 
@@ -767,7 +831,7 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 {
     USER_OBJECT_ ans, tmp;
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-    char *encoding = NULL;
+    const char *encoding = NULL;
     xmlOutputBufferPtr buf;
     xmlBufferPtr xbuf;
 
@@ -788,14 +852,26 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 
     PROTECT(ans = NEW_CHARACTER(1));
     if(xbuf->use > 0) {
+        /*XXX this const char * in CHARSXP means we have to make multiple copies. */
+#if 0
 	PROTECT(tmp = allocVector(CHARSXP, xbuf->use));
 	memcpy(CHAR_DEREF(tmp), xbuf->content, xbuf->use);
+#else
+	char *rbuf = malloc(sizeof(char) * xbuf->use);
+	if(!rbuf) {
+	    PROBLEM "cannot allocate memory (%d) for internal buffer in XML package ", (int)xbuf->use
+            ERROR;
+	}
+	memcpy(rbuf, xbuf->content, xbuf->use);
+	PROTECT(tmp = mkChar(rbuf));
+	Free(rbuf);
+#endif
+	SET_STRING_ELT(ans, 0, tmp);
+	UNPROTECT(1);
     }
 
     xmlOutputBufferClose(buf);
-
-    SET_STRING_ELT(ans, 0, tmp);
-    UNPROTECT(2);
+    UNPROTECT(1);
 
     return(ans);
 }

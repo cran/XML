@@ -22,18 +22,18 @@ Each typically outputs its contents in the way
 that they would appear in an XML document.
 }
 \usage{
-print.XMLNode(x, ..., indent= "", tagSeparator = "\n")
-print.XMLComment(x, ..., indent = "", tagSeparator = "\n")
-print.XMLTextNode(x, ..., indent = "", tagSeparator = "\n")
-print.XMLCDataNode(x, ..., indent="", tagSeparator = "\n")
-print.XMLProcessingInstruction(x, ..., indent="", tagSeparator = "\n")
-print.XMLAttributeDef(x, ...)
-print.XMLElementContent(x, ...)
-print.XMLElementDef(x, ...)
-print.XMLEntity(x, ...)
-print.XMLEntityRef(x, ..., indent= "", tagSeparator = "\n")
-print.XMLOrContent(x, ...)
-print.XMLSequenceContent(x, ...)
+\method{print}{XMLNode}(x, ..., indent= "", tagSeparator = "\n")
+\method{print}{XMLComment}(x, ..., indent = "", tagSeparator = "\n")
+\method{print}{XMLTextNode}(x, ..., indent = "", tagSeparator = "\n")
+\method{print}{XMLCDataNode}(x, ..., indent="", tagSeparator = "\n")
+\method{print}{XMLProcessingInstruction}(x, ..., indent="", tagSeparator = "\n")
+\method{print}{XMLAttributeDef}(x, ...)
+\method{print}{XMLElementContent}(x, ...)
+\method{print}{XMLElementDef}(x, ...)
+\method{print}{XMLEntity}(x, ...)
+\method{print}{XMLEntityRef}(x, ..., indent= "", tagSeparator = "\n")
+\method{print}{XMLOrContent}(x, ...)
+\method{print}{XMLSequenceContent}(x, ...)
 }
 \arguments{
   \item{x}{the XML object to be displayed}

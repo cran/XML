@@ -4,6 +4,9 @@
 \alias{XMLInternalNode-class}
 \alias{XMLInternalTextNode-class}
 \alias{XMLInternalElementNode-class}
+\alias{XMLInternalCommentNode-class}
+\alias{XMLInternalPINode-class}
+\alias{XMLInternalCDataNode-class}
 
 \title{Classes to describe an XML node object.}
 \description{These classes are intended to 

@@ -97,9 +97,9 @@ function(node, ...)
 # the specified object identified by ...
 # and return these as a list
 #
-function(obj, ..., all = FALSE)
+function(x, ..., all = FALSE)
 {
- obj <- obj$children
+ obj <- x$children
 
  if(all) # "all" %in% names(list(...)) && list(...)[["all"]] == TRUE)
    obj[ names(obj) %in% list(...)[[1]] ]
@@ -109,9 +109,9 @@ function(obj, ..., all = FALSE)
 
 
 "[[.XMLDocumentContent" <-
-function(obj, ...) 
+function(x, ...) 
 {
-  obj$children[[...]]
+  x$children[[...]]
 }
 
 "[[.XMLNode" <-
@@ -119,11 +119,9 @@ function(obj, ...)
 # Extract the  children (sub-nodes) within
 # the specified object identified by ...
 #
-function(obj, ...)
+function(x, ...)
 {
-# print("[.XMLNode")
- obj <- obj$children
- NextMethod("[[")
+ x$children[[...]]
 }
 
 names.XMLNode <-
@@ -388,7 +386,10 @@ function(doc, namespaces,
     if(i[1] && is.na(match(namespaces[1], names(nsDefs)))) {
       names(namespaces)[1] = namespaces[1]
       namespaces[1] = defaultNs
-      warning("using ", names(namespaces)[i[1]], " as prefix for default namespace ", namespaces[i[1]])
+      msg = paste("using", names(namespaces)[1], "as prefix for default namespace", defaultNs)
+      e = simpleWarning(msg)
+      class(e) = c("XPathDefaultNamespace", class(e))
+      warning(e)
       i[1] = FALSE
     }
     
