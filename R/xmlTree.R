@@ -70,13 +70,15 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
    if(!is.null(attrs))
       storage.mode(attrs) <- "character"
 
-   node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc)
-
-   setNamespace(node, namespace)
-
-   if(length(currentNodes) > 1) {
-      addChildren(currentNodes[[1]], node)
+   if(inherits(name, "XMLInternalNode"))
+      node = name
+   else {
+      node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc)
+      setNamespace(node, namespace)
    }
+
+   if(length(currentNodes) > 1) 
+      addChildren(currentNodes[[1]], node)
 
    currentNodes <<- c(node, currentNodes)
 

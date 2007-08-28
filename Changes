@@ -1,3 +1,13 @@
+Version 1.92-1
+
+  *  Make addNode()/addTag() in XMLInternalDOM work with previously created XML nodes via newXMLNode().
+     Thanks to Seth Falcon for pointing out this omission. More improvements in the pipeline for generating
+     XML.
+
+  *  addChildren for an XMLInternalNode can be given a list of XMLInternalNodes and/or character strings.
+
+  *  xmlSource() handles r:codeIds better.
+
 Version 1.92-0
 
   *  Added removeNodes function for unlinking XMLInternalNode objects directly by reference.

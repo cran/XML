@@ -133,11 +133,12 @@ function(url, ..., envir =globalenv(),
     # i.e. a single entry on each line which identifies the nodes that are to be read.
   if(missing(ids) && missing(xnodes) && length(ids <- getNodeSet(doc, "/*/r:codeIds|/*/invisible/r:codeIds",
                                                namespaces = c(r = "http://www.r-project.org")))) {
-     if(length(ids) > 1)
-       txt = paste(sapply(ids, xmlValue))
-     else
-       txt = xmlValue(ids)
-     ids = strsplit(txt, "\\\n")[[1]]
+
+     if(length(ids) > 1) {
+       warning("more than one r:codeIds node. Using the first one")
+     }
+#     txt = paste(sapply(ids, xmlValue))
+     ids = strsplit(xmlValue(ids[[1]]), "\\\n")[[1]]
      ids = unique(ids)
      ids = ids[ids != ""]
    }

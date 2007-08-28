@@ -397,10 +397,17 @@ addChildren =
 function(node, ..., kids = list(...))
 {
   for(i in kids) {
-     if(is.character(i))
-       i = newXMLTextNode(i)
+     if(is.list(i)) {
+       for(k in i)
+         addChildren(node, k)
+     } else {
+       if(is.character(i))
+          i = newXMLTextNode(i)
      .Call("R_insertXMLNode", i, node)
+     }
   }
+
+  node
 }
 
 
@@ -551,8 +558,8 @@ setAs("XMLInternalNode", "character",
           function(from) saveXML.XMLInternalNode(from))
 
 saveXML.XMLInternalDocument <-
-function(doc, file = NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
+function(doc, file = NULL, compression = 0, indent = TRUE,
+          prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "")
 {
   if(is(doctype, "Doctype")) {
        # Check that the value in the DOCTYPE for the top-level name is the same as that of the
