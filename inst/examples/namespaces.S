@@ -14,4 +14,7 @@ gg$closeTag() # variables
 gg$closeTag() # data
 gg$closeTag() # ggobidata
 
-cat(saveXML(gg$value()))
+# or gg$closeTag(3)
+# or gg$closeTag("ggobidata")
+
+cat(saveXML(gg))

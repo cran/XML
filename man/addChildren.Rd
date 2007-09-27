@@ -4,6 +4,8 @@
 \alias{removeNodes}
 \alias{addAttributes}
 \alias{removeAttributes}
+\alias{addChildren,XMLInternalNode-method}
+\alias{addChildren,XMLNode-method}
 \alias{addAttributes,XMLInternalElementNode-method}
 \alias{addAttributes,XMLNode-method}
 \alias{removeAttributes,XMLInternalElementNode-method}
@@ -108,7 +110,7 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
 }
 \examples{
 
-b = newXMLNode("bob", namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org", ""))
+b = newXMLNode("bob", namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org"))
 
 cat(saveXML(b), "\n")
 
@@ -148,7 +150,7 @@ removeChildren(b, kids = c("m", "n", "q"))
 
 x <- xmlNode("a", 
                xmlNode("b", "1"),
-	       xmlNode("c", "1"),
+               xmlNode("c", "1"),
 	       "some basic text")
 
 v = removeChildren(x, "b")
@@ -165,6 +167,17 @@ v = removeChildren(x, 3, "c")
     # and there is no node name 10.
  removeChildren(b, kids = c(10, "w"))
 }
+
+
+ # for R-level nodes (not internal)
+
+z = xmlNode("arg", attrs = c(default="TRUE"),
+              xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
+
+o = addChildren(z,
+                "some text",
+                xmlNode("a", "a link", attrs = c(href = "http://www.omegahat.org/RSXML")))
+o
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

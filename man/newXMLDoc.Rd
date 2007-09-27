@@ -1,3 +1,4 @@
+% insert facilities
 \name{newXMLDoc}
 \alias{newXMLDoc}
 \alias{newXMLNode}
@@ -22,15 +23,39 @@ descendants and putting them into a new document.
 This is useful when we want to work with sub-trees
 with general tools that work on documents, e.g. XPath queries.
 
+
+\code{newXMLDoc} allows one to create a regular XML node
+with a name and attributes.
+One can provide new namespace definitions via
+\code{namespaceDefinitions}. While these might also
+be given in the attributes in the slightly more verbose
+form of \code{c('xmlns:prefix' = 'http://...')},
+the result is that the XML node does not interpret that
+as a namespace definition but merely an attribute with
+a name 'xmlns:prefix'.
+Instead, one should specify the namespace definitions via
+the \code{namespaceDefinitions} parameter.
+
+In addition to namespace definitions, a node name can also have a
+namespace definition.  This can be specified in the \code{name} argument
+as \code{prefix:name} and \code{newXMLDoc} will do the right thing in
+separating this into the namespace and regular name.  Alternatively, one
+can specify a namespace separately via the \code{namespace} argument.
+This can be either a simple name or an internal namespace object defined
+earlier.
+
+How do we define a default namespace?
 }
 \usage{
 xmlDoc(node)
 newXMLDoc(dtd, namespaces=NULL, addFinalizer = TRUE)
-newXMLNode(name, ..., attrs = NULL, namespace="", doc=NULL, .children = list(...))
-newXMLTextNode(text, doc = NULL)
-newXMLCDataNode(text, doc = NULL)
-newXMLCommentNode(text, doc = NULL)
-newXMLPINode(name, text, doc = NULL)
+newXMLNode(name, ..., attrs = NULL, namespace="",
+            namespaceDefinitions = character(),
+             doc = NULL, .children = list(...), parent = NULL)
+newXMLTextNode(text, parent = NULL, doc = NULL)
+newXMLCDataNode(text, parent = NULL, doc = NULL)
+newXMLCommentNode(text, parent = NULL, doc = NULL)
+newXMLPINode(name, text, parent = NULL, doc = NULL)
 newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = NULL)  
 }
 \arguments{
@@ -42,11 +67,11 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   corresponding URI for that namespace
   that are to be declared and used in the XML document, \\
    e.g. \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
- \item{addFinalizer}{a logical value indicating whether the
-   default finalizer routine should be registered to
-   free the internal xmlDoc when R no longer has a reference to this
-   external pointer object.
- }
+\item{addFinalizer}{a logical value indicating whether the
+  default finalizer routine should be registered to
+  free the internal xmlDoc when R no longer has a reference to this
+  external pointer object.
+}
  \item{name}{the tag/element name for the XML node and
    the for a Processing Instruction (PI) node, this is the "target",
    e.g. the identifier for the system for whose attention this PI node is intended.}
@@ -54,9 +79,40 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   earlier or R strings that are converted to text nodes and added as children
   to this newly created node.}
   \item{attrs}{a named list of name-value pairs to be used as 
-  attributes for the XML node.}
-  \item{namespace}{the short or alias for the namespace to use for
-      this XML node}
+    attributes for the XML node.
+    One should not use this argument to define namespaces,
+    i.e. attributes of the form \code{xmlns:prefix='http:/...'}.
+    Instead, such definitions should be specified
+    ideally via the \code{namespaceDefinitions} argument,
+    or even the \code{namespace} argument.
+    The reason is that namespace definitions are special attributes
+    that are shared across nodes wherease regular attributes are
+    particular to a node. So a namespace needs to be explicitly defined
+    so that the XML representation can recognize it as such.
+  }
+  \item{namespace}{a character vector specifying the namespace for this
+    new node.
+    Typically this is used to specify  i) the prefix
+    of the namespace to use, or ii) one or more namespace definitions,
+    or iii) a combination of both.
+    If this is a character vector with a) one element
+    and b) with an empty \code{names} attribute
+    and c) whose value does not start with \code{http:/} or
+    \code{ftp:/}, then it is assumed that the value is a
+    namespace prefix for a namespace defined in an ancestor node.
+    To be able to resolve this prefix to a namespace definition,
+    \code{parent} must be specified so that we can traverse the chain of ancestor nodes.
+    However, if c) does not hold, i.e. the string starts with \code{http:/} or
+    \code{ftp:/},
+    then we take this single element to be a namespace definition and
+    the since it has no name b), this is the definition for the default namespace for this
+    new node, i.e. corresponding to \code{xmlns='http:/...}.
+    It is cumbersome to specify \code{""} as a  name for an element in a
+    character vector (as \code{c('' = 'value') gives an unnecessary
+      error!}.
+    Elements with names are expanded to namespace definitions
+    with the name as the prefix and the value as the namespace URI.
+  }
   \item{doc}{the \code{XMLInternalDocument} object created with
     \code{newXMLDoc} that is used to root the node.}
   \item{.children}{a list containing XML node elements or content.
@@ -73,7 +129,22 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   C is the name of the format; and language is an encoding for the
   language that comes from the ISO 639 document.}
 \item{systemID}{the SYSTEM identifier for the DTD for the document.
-     This is a URI}
+  This is a URI}
+\item{namespaceDefinitions}{a character vector or a list
+  with each element being a string.
+  These give the URIs identifying the namespaces uniquely.
+  The elements should have names which are used as prefixes.
+  A default namespace has "" as the name.
+  This argument can be used to remove any ambiguity
+  that arises when specifying a single string
+  with no names attribute as the value for \code{namespace}.
+  The values here are used only for defining new namespaces
+  and not for determining the namespace to use for this
+  particular node.
+}
+\item{parent}{the node which will act as the parent of this newly
+  created node. This need not be specified and one can add the new node
+  to another node in a separate operation via \code{\link{addChildren}}.}
 }
 \details{
 These create internal C level objects/structure instances
@@ -102,7 +173,32 @@ document.}
 \code{saveXML}
 }
 
+
 \examples{
+
+ # Simple creation of an XML tree using these functions
+top = newXMLNode("a")
+newXMLNode("b", attrs = c(x = 1, y = 'abc'), parent = top)
+newXMLNode("c", "With some text", parent = top)
+d = newXMLNode("d", newXMLTextNode("With text as an explicit node"), parent = top)
+newXMLCDataNode("x <- 1\n x > 2", parent = d)
+
+newXMLPINode("R", "library(XML)", top)
+newXMLCommentNode("This is a comment", parent = top)
+
+o = newXMLNode("ol", parent = top)
+
+kids = lapply(letters[1:3],
+               function(x)
+                  newXMLNode("li", x))
+addChildren(o, kids)
+
+cat(saveXML(top))
+
+
+
+
+
 x = summary(rnorm(1000))
 d = xmlTree()
 d$addNode("table", close = FALSE)
@@ -138,7 +234,6 @@ z = xmlTree()
 z$addNode("r:data",  namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org"), close = FALSE)
 x = rnorm(3)
 z$addNode("r:numeric", attrs = c("omg:length" = length(x)))
-
 
 
 z = xmlTree("people", namespaces = list(r = "http://www.r-project.org"))

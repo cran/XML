@@ -2,6 +2,7 @@
 \alias{xmlNamespace}
 \alias{xmlNamespace.XMLNode}
 \alias{xmlNamespace.XMLInternalNode}
+\alias{xmlNamespace.character}
 \alias{XMLNamespace-class}
 \title{Retrieve the namespace value of an XML node.}
 \description{

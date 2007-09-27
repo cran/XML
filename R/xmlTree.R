@@ -1,18 +1,24 @@
 xmlTree <-
+  #
+  # Create an XML document using internal nodes and help to manage
+  # the state for the user rather than requiring them to manage
+  # the individual nodes. For the most part, the two approaches
+  # are relatively similar in complexity.
+  #
+  #
 function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
           doc = newXMLDoc(dtd, namespaces))
   # Allows a DOCTYPE, etc. at the beginning by specifying dtd as 
   # a vector of 1, 2, 3 elements passed to newXMLDTDNode() or
   # as an XMLDTDNode directly.
   
-  # With namespaces, we do the following....
   #
 {
- currentNodes <- list(doc)
+ currentNodes <- list(doc)  # the stack of nodes
  
  isXML2 <- libxmlVersion()$major != "1" 
 
-    # if we are given a DTD, add it to the document.
+     # if we are given a DTD, add it to the document.
  if(!is.null(dtd)) {
    if(isXML2) {
      node = NULL
@@ -31,6 +37,8 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
  
  definedNamespaces = list()
  defaultNamespace = NULL
+ addNamespaceDefinitions = is.null(tag)
+ 
  setActiveNamespace = function(ns) {
                          defaultNamespace <<- ns
                       }
@@ -39,48 +47,99 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
         if(is(x, "XMLInternalNode"))
           return(x)
         
-        if(is.list(x)) {
-          v <- lapply(x, asXMLNode)
-        }  else {
-          v <- newXMLTextNode(as.character(x), doc)
-        }
+        v = if(is.list(x)) 
+               lapply(x, asXMLNode)
+            else 
+               newXMLTextNode(as.character(x), doc = doc)
+
         v 
       }
 
 
  
  setNamespace <- function(node, namespace = defaultNamespace) {
-     if(length(namespace) == 0 || !(length(namespace) == 1 && is.null(names(namespace))))
+  
+         # if there is no namespace or if we have one and no names on the namespace
+      if(length(namespace) == 0 || ! ( length(namespace) == 1 && is.null(names(namespace)) ) )
        return(NULL)
 
      if(is.list(namespace))
        return(NULL)
-     
+
+#debugging
+if(FALSE) {      
+a =    xmlNamespaceDefinitions(node)
+b = namespaceDeclarations(node, TRUE)      
+}
+#end debugging
+      
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
        ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace)
        definedNamespaces[[namespace]] <<- ns
      }
 
-     setInternalNamespace( node, definedNamespaces[[namespace]])
+     setXMLNamespace(node,  definedNamespaces[[namespace]])
+#old     setInternalNamespace( node, definedNamespaces[[namespace]])
  }
 
- 
- addTag <- function(name, ..., attrs = NULL, close = TRUE, namespace = defaultNamespace, .children = list(...) ) {
+ # namespace is intended to be the namespace for this node
+ # and not any definitions.
+ # How do we define new namespaces with this function?
+ # Can we add them to attrs. No!
+ addTag <- function(name, ..., attrs = NULL,
+                    close = TRUE, namespace = defaultNamespace, .children = list(...) )
+ {
 
+   if(inherits(name, "XMLInternalNode")) {
+     addChildren(currentNodes[[1]], name)
+     currentNodes <<- c(node, currentNodes)
+     addChildren(node, kids = .children)
+     if(close)
+       currentNodes <<- currentNodes[-1]
+     return(name)
+   }
+   
+   # if the user gives us something like "r" for the namespace as opposed to
+   #  c(r = "http:...") then we try to match the prefix in an earlier node
+   # ??? Should we use the defined namespaces in the document?
+if(FALSE) {   
+   if(length(namespace) == 1 && length(names(namespace)) == 0) {
+     tmp = namespace
+     if(length(currentNodes)) {
+       defs = namespaceDeclarations(currentNodes[[1]], TRUE)
+       i = match(namespace, names(defs))
+       if(!is.na(i))
+         namespace = defs[[i]]
+     } 
+   }
+ }
+
+   
    if(!is.null(attrs))
       storage.mode(attrs) <- "character"
 
    if(inherits(name, "XMLInternalNode"))
       node = name
    else {
-      node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc)
-      setNamespace(node, namespace)
+      node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc,
+                            parent = if(length(currentNodes) > 1) currentNodes[[1]] else xmlRoot(currentNodes[[1]]),
+                          namespaceDefinitions = if(addNamespaceDefinitions) namespaces else NULL)
+
+      if(addNamespaceDefinitions) {
+#       lapply(seq(along = namespaces),
+#               function(i)
+#                   setXMLNamespace(node, namespaces[[i]], names(namespaces)[i]))
+        addNamespaceDefinitions <<- FALSE
+      }
    }
 
-   if(length(currentNodes) > 1) 
-      addChildren(currentNodes[[1]], node)
+#   if(length(currentNodes) > 1) 
+#      addChildren(currentNodes[[1]], node)
 
    currentNodes <<- c(node, currentNodes)
+
+#   if(!inherits(name, "XMLInternalNode"))
+#      setNamespace(node, namespace)      
 
    for(i in .children) 
       addChildren(node, asXMLNode(i))  # vectorize XXX
@@ -88,45 +147,68 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
    if(close == TRUE)
      closeTag()
    
-   invisible(return(node))
+   invisible(node)
  }
 
- closeTag <- function(name="", num = 1) {
-#   return(closeTag(num = name))
 
-   if(!missing(num)) {
-     if(is.na(num) || num == -1)
-       closeTag(num = length(currentNodes))
-     else
-      replicate(closeTag())
-   } else {
+ closeTag <- function(name="") {
+
+   if(nargs() == 0) {
      tmp <- currentNodes[[1]]
      currentNodes <<- currentNodes[-1]
+   } else if( is.character(name) ) {
+
+     w = sapply(currentNodes, inherits, "XMLInternalElementNode")
+     useNamespace = length(grep(":", name)) > 0
+     ids = sapply(currentNodes[ w ], xmlName, useNamespace)
+     tmp = list()
+     for(id in name) {
+        i = which(id == ids)
+        if(length(i) == 0)
+          stop("Cannot close tag for node with name ", id, " - no such node open")
+        tmp = c(tmp, currentNodes[1:i])
+        currentNodes <<- currentNodes[-c(1:i)]
+        ids = ids[-(1:i)]
+     }
+     
+   } else if(is(name, "numeric")) {
+       num = name
+       if(is.na(num) || num == -1) 
+              # close all of the nodes, except the document node.
+           w = seq(along = currentNodes[- length(currentNodes)])
+       else if(length(num) == 1) 
+           w = 1:num
+       else
+           w = num
+       tmp = currentNodes[ w ]
+       currentNodes <<- currentNodes[ - w ]
    }
 
-  invisible(return(tmp))
+
+  invisible(tmp)
  }
 
 
- add = function(node, parent = currentNodes[[1]]) {
+ add = function(node, parent = currentNodes[[1]], close = TRUE) {
         if(!is.null(parent)) {
             addChildren(parent, node)
-            currentNodes <<- c(node, currentNodes)
+            if(!close)
+              currentNodes <<- c(node, currentNodes)
         }
         invisible(node)
        }
  
  addComment <- function(...) {
-   add(newXMLCommentNode(paste(as.character(list(...)), sep=""), doc))
+   add(newXMLCommentNode(paste(as.character(list(...)), sep=""), doc = doc))
  }
 
 
  addCData <- function(text) {
-   add(newXMLCDataNode(text, doc))
+   add(newXMLCDataNode(text, doc = doc))
  }
 
  addPI <- function(name, text) {
-   add(newXMLPINode(name, text, doc))
+   add(newXMLPINode(name, text, doc = doc), NULL)
  }
 
 
@@ -163,4 +245,31 @@ function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
 
 
 
+# Also in xmlNodes.R
 
+setAs("XMLInternalNode", "XMLNode",
+        function(from) 
+           asRXMLNode(from)
+        )
+
+
+setGeneric("free", function(obj) standardGeneric("free"))
+
+setMethod("free", "XMLInternalDocument",
+           function(obj)  .Call("R_XMLInternalDocument_free", obj))
+
+
+
+xmlRoot.XMLInternalDOM =
+function(x, ...)
+{
+  xmlRoot(x$doc())
+}  
+
+
+xmlRoot.XMLInternalElement =
+function(x, ...)
+{
+  xmlRoot(as(x, "XMLInternalDocument"))
+}
+  

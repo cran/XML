@@ -1,3 +1,29 @@
+Version 1.93-1
+
+  *  Method for xmlNamespace with a character is now exported!  Needed for cases that arise in
+     SSOAP.
+
+Version 1.93-0
+
+  *  The closeTag() function within an XMLInternalDOM object returned by xmlTree() provides
+     support for closing nodes by name or position in the stack of open nodes.
+
+  *  xmlRoot() method for an XMLInternalDOM tree.
+
+  *  Added a parent argument to the constructor functions for internal nodes, e.g. newXMLNode, 
+     newXMLPINode, newXMLCDataNode, etc.
+
+  *  doc argument for the constructor functions for internal nodes is now moved from second to third.
+     Calling 
+
+  *  Potentially changed the details about creating XML documents and nodes with namespaces. If these
+     negatively effect your code, please send me email (duncan@wald.ucdavis.edu).
+
+  *  Enhancements and fixes for creating XML nodes and trees, especially with name spaces.
+
+  *  Many minor changes to catch special cases in working with internal nodes.
+
+
 Version 1.92-1
 
   *  Make addNode()/addTag() in XMLInternalDOM work with previously created XML nodes via newXMLNode().

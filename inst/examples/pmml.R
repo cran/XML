@@ -43,3 +43,8 @@ setAs("rpart", "PMMLTree",
 
         xmlRoot(tt$value())
       })
+
+
+library(rpart)
+fit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis)
+cat(saveXML( as(fit, "PMMLTree") ))

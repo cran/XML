@@ -118,12 +118,13 @@ R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
 
 
 USER_OBJECT_
-R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc)
+R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc,
+              USER_OBJECT_ nameSpaceDefinitions)
 {
    xmlDocPtr doc = NULL;
    xmlNsPtr ns = NULL;
    xmlNodePtr node;
-   int n;
+   int n, i;
 
    if(GET_LENGTH(sdoc))
        doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
@@ -137,9 +138,16 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 /*   ns = xmlNewNs(xmlGetRootElement(doc), ); */
    node = xmlNewDocNode(doc, ns, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), NULL);
 
+   if((n = GET_LENGTH(nameSpaceDefinitions)) > 0) {
+       /* Need the default namespace and then also any other */
+     USER_OBJECT_ prefixes = GET_NAMES(nameSpaceDefinitions);
+     for(i = 0; i < n ; i++) {
+         xmlNewNs(node, CHAR_DEREF(STRING_ELT(nameSpaceDefinitions, i)), CHAR_DEREF(STRING_ELT(prefixes, i)));
+     }
+   }
+
    n = GET_LENGTH(attrs);
    if(n > 0) {
-       int i;
        USER_OBJECT_ attrNames = GET_NAMES(attrs);
        if(GET_LENGTH(attrNames) != n) {
 	   PROBLEM "names of attributes is not the same length of attributes"
@@ -150,6 +158,8 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 			  CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrs, i))));
        }
    }
+
+
 
    if(doc && XML_ROOT(doc) == NULL) {
        XML_ROOT(doc) = node;
@@ -264,7 +274,8 @@ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
 	for(i = 0; i < n ; i++, el = el->next) {
 	    if(el->prefix)
 		SET_STRING_ELT(names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->prefix)));
-	    SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->href)));
+	    if(el->href)
+   	        SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(el->href)));
 	}
     }
 
@@ -407,7 +418,10 @@ USER_OBJECT_
 R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
 {
   xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-  xmlNodePtr node = doc->children;
+  xmlNodePtr node = NULL;
+
+  if(doc)
+      node = doc->children;
   
   if(!node) {
       PROBLEM "empty XML document"
@@ -838,7 +852,7 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
     int oldIndent = xmlIndentTreeOutput;
     xmlIndentTreeOutput =  LOGICAL(indent)[0];
 
-    xbuf =xmlBufferCreate();
+    xbuf = xmlBufferCreate();
    
     if(GET_LENGTH(r_encoding))
 	encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
@@ -857,12 +871,12 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 	PROTECT(tmp = allocVector(CHARSXP, xbuf->use));
 	memcpy(CHAR_DEREF(tmp), xbuf->content, xbuf->use);
 #else
-	char *rbuf = malloc(sizeof(char) * xbuf->use);
+	char *rbuf = malloc(sizeof(char) * (xbuf->use + 1));
 	if(!rbuf) {
 	    PROBLEM "cannot allocate memory (%d) for internal buffer in XML package ", (int)xbuf->use
             ERROR;
 	}
-	memcpy(rbuf, xbuf->content, xbuf->use);
+	memcpy(rbuf, xbuf->content, xbuf->use + 1);
 	PROTECT(tmp = mkChar(rbuf));
 	Free(rbuf);
 #endif

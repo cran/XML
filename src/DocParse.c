@@ -1152,7 +1152,8 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
 	return(NEW_CHARACTER(0));
 
     PROTECT(ans = NEW_CHARACTER(1));
-    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
+    if(ns->href)
+        SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
     if(ns->prefix)
         SET_NAMES(ans, mkString(XMLCHAR_TO_CHAR(ns->prefix))); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
     UNPROTECT(1);    

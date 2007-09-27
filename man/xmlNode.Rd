@@ -71,6 +71,7 @@ and
 \author{ Duncan Temple Lang }
 
 \seealso{
+ \code{\link{addChildren}}  
  \code{\link{xmlTreeParse}}
  \code{\link{asXMLNode}}
  \code{\link{newXMLNode}}

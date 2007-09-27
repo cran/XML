@@ -1,6 +1,6 @@
 Package: XML
-Version: 1.92-1
-Date: 2007/08/28
+Version: 1.93-1
+Date: 2007/09/27
 Author:  Duncan Temple Lang (duncan@wald.ucdavis.edu)
 Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
 Title: Tools for parsing and generating XML within R and S-Plus.
@@ -12,4 +12,5 @@ Note: This is released by the Omegahat Project for Statistical
      Computing. Bug reports should be submitted via
       http://www.omegahat.org/bugs
 URL:  http://www.omegahat.org/RSXML
-License: BSD. 
+License: BSD
+ 

@@ -30,6 +30,28 @@ function(x, value) {
   x
 }
 
+addChildren =
+function(node, ..., kids = list(...))
+  UseMethod("addChildren")
+
+addChildren.XMLNode =  
+function(node, ..., kids = list(...))
+{
+  kids = lapply(kids,
+                function(i) {
+                  if(!is(i, "XMLNode"))
+                    xmlTextNode(as.character(i))
+                  else
+                    i
+                })
+
+  node$children = c(node$children, kids)
+  node$children = addNames(node$children)
+  
+  node
+}
+
+
 # It would be better tokenize this, but ...
 XMLEntities =
   c("&" = "amp",  # order is important as if we insert an entity, then the next time we will see the &.

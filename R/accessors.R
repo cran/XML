@@ -210,6 +210,17 @@ function(x)
   x$namespace
 }
 
+#setMethod("xmlNamespace", "character",
+xmlNamespace.character = 
+           function(x) {
+             a = strsplit(x, ":")[[1]]
+             if(length(a) == 1)
+               character()
+             else
+               a[1]
+          }
+#)
+
 
 xmlGetAttr <-
 function(node, name, default = NULL, converter = NULL)

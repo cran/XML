@@ -2,9 +2,11 @@
 \alias{xmlRoot}
 \alias{xmlRoot.XMLDocument}
 \alias{xmlRoot.XMLInternalDocument}
+\alias{xmlRoot.XMLInternalDOM}
 \alias{xmlRoot.XMLDocumentRoot}
 \alias{xmlRoot.XMLDocumentContent}
 \alias{xmlRoot.HTMLDocument}
+
 \title{Get the top-level XML node.}
 \description{
  These are a collection of methods for providing easy access to the

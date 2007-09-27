@@ -96,7 +96,7 @@ exportMethods("toHTML")
 exportClasses("XMLInternalDocument")
 exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
-              "XMLInternalCommentNode")
+              "XMLInternalCommentNode", "XMLDTDNode")
 
 exportClasses("XMLNamespace")
 
@@ -142,6 +142,12 @@ S3method(xmlSize, XMLHashTreeNode)
 
 S3method(xmlSize, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
+
+S3method(xmlRoot, XMLInternalDOM)
+
+
+S3method(addChildren, XMLInternalNode)
+S3method(addChildren, XMLNode)
 
 
 
@@ -213,6 +219,7 @@ S3method(xmlValue, XMLProcessingInstruction)
 
 S3method(xmlNamespace, XMLNode)
 S3method(xmlNamespace, XMLInternalNode)
+S3method(xmlNamespace, character)
 
 # No effect if append is not generic.
 S3method(append, XMLNode)

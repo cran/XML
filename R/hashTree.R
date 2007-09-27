@@ -88,7 +88,7 @@ function(nodes = list(), parents = character(), children = list(),
 
 "$.XMLHashTree" =
 function(x, name)
-  get(x, name, inherits = FALSE)
+  get(name, x, inherits = FALSE)
 
 
 xmlParent.XMLHashTreeNode =

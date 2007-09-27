@@ -1,9 +1,9 @@
 doc <- xmlTree()
-doc$addTag("EXAMPLE", close=F, attrs=c("prop1"="gnome is great", prop2="& linux too"))
+doc$addTag("EXAMPLE", close= FALSE, attrs=c("prop1" = "gnome is great", prop2 = "& linux too"))
   doc$addComment("A comment")
-  doc$addTag("head", close=F)
+  doc$addTag("head", close= FALSE)
    doc$addTag("title", "Welcome to Gnome")
-   doc$addTag("chapter", close=F)
+   doc$addTag("chapter", close= FALSE)
      doc$addTag("title", "The Linux Adventure")
      doc$addTag("p")
 
