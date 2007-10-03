@@ -237,7 +237,7 @@ RS_XML_killNodesFreeDoc(SEXP sdoc)
 }
 
 
-
+#if 0
 SEXP
 RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
 {
@@ -275,3 +275,5 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
 
  return(ans);
 }
+#endif
+

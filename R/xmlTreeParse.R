@@ -75,6 +75,8 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      xinclude = as.logical(xinclude)
  }
 
+if(!asText)
+   file = path.expand(as.character(file))
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),

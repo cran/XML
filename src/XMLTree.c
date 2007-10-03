@@ -337,8 +337,12 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
 
 
     if(TYPEOF(node) == STRSXP) {
+        int i;
 	p = (xmlNodePtr) R_ExternalPtrAddr(parent);	
-	xmlAddChild(p, n);
+	for(i = 0; i < GET_LENGTH(node); i++) {
+  	    n = xmlNewText(CHAR(STRING_ELT(node, i)));
+   	    xmlAddChild(p, n);
+	}
     }
 
     if(TYPEOF(node) != EXTPTRSXP) {

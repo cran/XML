@@ -285,13 +285,34 @@ causes an error in the parser something like
        To find the nodes of interest took 8.9 seconds on the Mac, and
         (apparently) 1.1 seconds on the AMD.
 
-      
+
+   <dt>
+   <li> I want to include one document inside another. How can I do this?
+       
+   <dd> Firstly, you want to look into XInclude.
+       When processing the document in R, use <code>xinclude = TRUE</code>,  which
+       is the default, in calls to xmlTreeParse().
+
+   <dt>
+   <li>  I want to use XInclude to include part of the same
+       document. I can't figure out how to do it. Any ideas?
+
+   <dd>
+       Yes. Use
+<pre>
+ &lt;xi:include xpointer="xpointer(//mynode)"/&gt;
+</pre>
+ adapting that to what you want.
+       Note that the attribute is named xpointer.
+       There is no href so the XInclude  defaults to this document
+       and the expression for the xpointer attribute
+       uses the function xpointer. This is not element.
 </dl>
 
 <hr>
 <address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Wed Sep 26 11:55:42 NZST 2007
+Last modified: Sat Sep 29 12:07:53 PDT 2007
 <!-- hhmts end -->
 </body> </html>

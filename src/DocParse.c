@@ -98,7 +98,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                         USER_OBJECT_ xinclude)
 {
 
-  char *name;
+  const char *name;
   xmlDocPtr doc;
   USER_OBJECT_ rdoc;
   USER_OBJECT_ className;
@@ -129,7 +129,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   if(asTextBuffer == 0) {
     struct stat tmp_stat;  
 #ifdef USE_R
-    name = R_ExpandFileName(CHAR(STRING_ELT(fileName, 0)));
+    name = CHAR(STRING_ELT(fileName, 0));
 #else
     name = CHARACTER_DATA(fileName)[0];
 #endif
@@ -172,7 +172,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
   if(doc == NULL) {
       if(freeName && name) {
-          free(name);
+	  free((char *) name);
       }
 
       PROBLEM "error in creating parser for %s", name
@@ -192,7 +192,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
       if(!xmlValidateDocument(&ctxt, doc)) {
 	  if(freeName && name)
-	      free(name);
+   	      free((char *) name);
 
 
 	  PROBLEM "XML document is invalid"
@@ -219,7 +219,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(asTextBuffer && name)
-    free(name);
+      free((char *) name);
 
 
   if(!useHTML && !parserSettings.internalNodeReferences && LOGICAL_DATA(getDTD)[0]) {

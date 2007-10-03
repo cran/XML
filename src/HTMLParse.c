@@ -19,7 +19,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
                        USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities,
                        USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ isURL)
 {
-  char *name;
+  const char *name;
   xmlDocPtr doc;
   USER_OBJECT_ rdoc;
   USER_OBJECT_ className;
@@ -36,7 +36,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   if(asTextBuffer == 0) {
     struct stat tmp_stat;  
 #ifdef USE_R
-    name = R_ExpandFileName(CHAR(STRING_ELT(fileName, 0)));
+    name = CHAR(STRING_ELT(fileName, 0));
 #else
     name = CHARACTER_DATA(fileName)[0];
 #endif
@@ -67,7 +67,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
   if(doc == NULL) {
     if(freeName && name)
-       free(name);
+        free((char *) name);
     PROBLEM "error in creating parser for %s", name
     ERROR;
   }
@@ -75,7 +75,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));
 
   if(freeName && name)
-    free(name);
+      free((char *) name);
 
 
   xmlFreeDoc(doc);
