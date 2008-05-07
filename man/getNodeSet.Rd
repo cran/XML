@@ -1,6 +1,7 @@
 \name{getNodeSet}
 \alias{getNodeSet}
 \alias{xpathApply}
+\alias{xpathSApply}
 \alias{matchNamespaces}
 \title{Find matching nodes in an internal XML tree/DOM}
 \description{
@@ -39,6 +40,12 @@
 
   Dealing with expressions that relate to the default namespaces in the
   XML document can be confusing. 
+
+  \code{xpathSApply} is a version of \code{xpathApply}
+  which attempts to simplify the result if it can be converted
+  to a vector or matrix rather than left as a list.
+  In this way, it has the same relationship to  \code{xpathApply}
+  as \code{\link[base]{sapply}} has to  \code{\link[base]{lapply}}.
 
   \code{matchNamespaces} is a separate function that is used to
   facilitate
@@ -80,12 +87,15 @@
    See the 'Details' section below for some more information.
 }
 \usage{
-getNodeSet(doc, path, namespaces = getDefaultNamespace(doc), fun = NULL, ...)
-xpathApply(doc, path, fun, ... , namespaces = getDefaultNamespace(doc),
-            resolveNamespaces = TRUE)
+getNodeSet(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), 
+                    fun = NULL, ...)
+xpathApply(doc, path, fun, ... , namespaces =  xmlNamespaceDefinitions(doc, simplify = TRUE),
+                    resolveNamespaces = TRUE)
+xpathSApply(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+                    resolveNamespaces = TRUE, simplify = TRUE)
 matchNamespaces(doc, namespaces,
-                 nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE),
-                  defaultNs = getDefaultNamespace(doc))
+                               nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE),
+                                 defaultNs = getDefaultNamespace(doc))
 }
 \arguments{
   \item{doc}{an object of class \code{XMLInternalDocument}}
@@ -128,6 +138,12 @@ matchNamespaces(doc, namespaces,
   This is used when matching a simple prefix that has no corresponding
   entry in \code{nsDefs} and is the first element in the
   \code{namespaces} vector.
+ }
+ \item{simplify}{a logical value indicating whether the function
+   should attempt to perform the simplification of the result
+   into a vector rather  than leaving it as a list.
+   This is the same as \code{\link[base]{sapply}} does
+   in comparison to \code{\link[base]{lapply}}.
  }
 }
 \details{
@@ -217,7 +233,7 @@ So we would use
  ns = structure(sapply(nsDefs, function(x) x$uri), names = names(nsDefs))
  getNodeSet(doc, "/doc//b[@omegahat:status='foo']", ns)[[1]]
 
- free(doc) 
+ # free(doc) 
 
  #####
  f = system.file("exampleData", "eurofxref-hist.xml.gz", package = "XML") 
@@ -227,7 +243,7 @@ So we would use
 
   # or equivalently
  ans = xpathApply(e, "//o:Cube[@currency='USD']", xmlGetAttr, "rate", namespaces = "o")
- free(e)
+ # free(e)
 
 
 
@@ -236,7 +252,7 @@ So we would use
  z = xmlTreeParse(f, useInternal = TRUE)
  getNodeSet(z, "/a:Envelope/a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
  getNodeSet(z, "//a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
- free(z)
+ # free(z)
 
 
   # Get two items back with namespaces
@@ -244,7 +260,7 @@ So we would use
  z = xmlTreeParse(f, useInternalNodes = TRUE)
  getNodeSet(z, "//gmr:Item/gmr:name", c(gmr="http://www.gnome.org/gnumeric/v2"))
 
- free(z)
+ #free(z)
 
  #####
  # European Central Bank (ECB) exchange rate data
@@ -284,7 +300,7 @@ So we would use
    # Using an expression rather than  a function and ...
  rates = xpathApply(doc, "//ns:Cube[@currency='SIT']", quote(xmlGetAttr(x, "rate")), namespaces = namespaces )
 
- free(doc)
+ #free(doc)
 
    #
   uri = system.file("exampleData", "namespaces.xml", package = "XML")
@@ -328,7 +344,7 @@ So we would use
   xmlName(tmp[[1]])
 
 
-  free(d)
+  #free(d)
 
 
    # Work with the nodes and their content (not just attributes) from the node set.
@@ -383,6 +399,27 @@ So we would use
     subDoc = xmlDoc(ch[[2]])
     xpathApply(subDoc, "//section/title", xmlValue)
     free(subDoc)
+
+
+    txt = '<top xmlns="http://www.r-project.org" xmlns:r="http://www.r-project.org"><r:a><b/></r:a></top>'
+    doc = xmlInternalTreeParse(txt, asText = TRUE)
+
+\dontrun{
+     # Will fail because it doesn't know what the namespace x is
+     # and we have to have one eventhough it has no prefix in the document.
+    xpathApply(doc, "//x:b")
+}    
+      # So this is how we do it - just  say x is to be mapped to the
+      # default unprefixed namespace which we shall call x!
+    xpathApply(doc, "//x:b", namespaces = "x")
+
+       # Here r is mapped to the the corresponding definition in the document.
+    xpathApply(doc, "//r:a", namespaces = "r")
+       # Here, xpathApply figures this out for us, but will raise a warning.
+    xpathApply(doc, "//r:a")
+
+       # And here we use our own binding.
+    xpathApply(doc, "//x:a", namespaces = c(x = "http://www.r-project.org"))
 }
 \keyword{file}
 \keyword{IO}

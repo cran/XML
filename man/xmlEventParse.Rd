@@ -45,7 +45,8 @@ xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext
                useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
                 state = NULL, replaceEntities = TRUE, validate = FALSE,
                  saxVersion = 1, branches = NULL,
-                 useDotNames = length(grep("^\\.", names(handlers))) > 0)
+                 useDotNames = length(grep("^\\.", names(handlers))) > 0,
+                  error = xmlErrorCumulator())
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -149,13 +150,23 @@ path indices for the node relative the root, etc.
 If this is True, each callback function  should support 
 \dots.
 }
- \item{useTagName}{ logical value indicating whether 
- the callback mechanism should look  for a function
- matching the tag name in the startElement and
- endElement events, before calling the default handler
- functions. This allows the caller to handle different
- element types for a particular DTD with their own functions directly, rather
- than performing a second dispatch in \code{startElement()}.
+ \item{useTagName}{ a logical value.
+ If this is \code{TRUE}, when the SAX parser signals an event for the
+ start of an XML element, it will first look for an element in the
+ list of handler functions whose name matches (exactly) the name of
+ the XML element.  If such an element is found, that function is
+ invoked.  Otherwise, the generic \code{startElement} handler function
+ is invoked.  The benefit of this is that the author of the handler
+ functions can write node-specific handlers for the different element
+ names in a document and not have to establish a mechanism to invoke
+ these functions within the \code{startElement} function. This is done
+ by the XML package directly.
+ 
+ If the value is \code{FALSE}, then the \code{startElement} handler
+ function will be called without any effort to find a node-specific
+ handler.  If there are no node-specific handlers, specifying
+ \code{FALSE} for this parameter will make the computations very
+ slightly faster.
 }
   \item{asText}{logical value indicating that the first argument,
     `file', 
@@ -259,6 +270,10 @@ If this is True, each callback function  should support
   the '.' prefix for these general element handlers.
   This is the preferred way to write new code.
 }
+\item{error}{a function that is called when an XML error is encountered.
+   This is called with 6 arguments and is described in \code{\link{xmlTreeParse}}.
+ }
+
 }
 \details{
  This is now implemented using the libxml parser.
@@ -287,7 +302,11 @@ local to it and that the caller knows how to extract this.
  by Michel Rodriguez.
 }
 
-\seealso{ \link{xmlTreeParse} }
+\seealso{
+  \code{\link{xmlTreeParse}}
+  \code{\link{xmlStopParser}}
+  XMLParserContextFunction
+}
 
 \examples{
  fileName <- system.file("exampleData", "mtcars.xml", package="XML")
@@ -426,6 +445,27 @@ if(libxmlVersion()$major >= 2) {
   invisible(xmlEventParse(filename, branches = list(b = function(node) {print(names(node))})))
   invisible(xmlEventParse(filename, branches = list(b = function(node) {print(xmlName(xmlChildren(node)[[1]]))})))
 }
+
+  
+  ############################################
+  # Stopping the parser mid-way and an example of using XMLParserContextFunction.
+
+  startElement =
+  function(ctxt, name, attrs, ...)  {
+    print(ctxt)
+      print(name)
+      if(name == "rewriteURI") {
+           cat("Terminating parser\n")
+	   xmlStopParser(ctxt)
+      }
+  }
+  class(startElement) = "XMLParserContextFunction"  
+  endElement =
+  function(name, ...) 
+    cat("ending", name, "\n")
+
+  fileName = system.file("exampleData", "catalog.xml", package = "XML")
+  xmlEventParse(fileName, handlers = list(startElement = startElement, endElement = endElement))
 }
 \keyword{file}
 \keyword{IO}

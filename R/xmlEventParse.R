@@ -33,7 +33,8 @@ xmlEventParse <-
 function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
           useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE, state = NULL,
           replaceEntities = TRUE, validate = FALSE, saxVersion = 1,
-          branches = NULL,  useDotNames =  length(grep("^\\.", names(handlers))) > 0) 
+          branches = NULL,  useDotNames =  length(grep("^\\.", names(handlers))) > 0,
+          error = xmlErrorCumulator()) 
 {  
   if(libxmlVersion()$major < 2 && !is.character(file))
     stop("Without libxml2, the source of the XML can only be specified as a URI.")
@@ -74,7 +75,8 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
      isURL <- length(grep("http://",file)) | length(grep("ftp://",file)) | length(grep("file://",file))
    }
 
-   if(isURL == FALSE & asText == FALSE) {
+   if(isURL == FALSE && asText == FALSE) {
+    file = path.expand(file)
     if(file.exists(file) == FALSE)
      stop(paste("File", file, "does not exist "))
    }
@@ -87,12 +89,18 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
 
   old = setEntitySubstitution(replaceEntities)
   on.exit(setEntitySubstitution(old))
+
+  if(!is.function(error))
+    stop("error must be a function")
+  
+  .oldErrorHandler = setXMLErrorHandler(error)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
   
  state <- .Call("RS_XML_Parse", file, handlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
                       as.logical(useExpat), state, as.logical(replaceEntities),
-                       as.logical(validate), as.integer(saxVersion), branches, as.logical(useDotNames))
+                       as.logical(validate), as.integer(saxVersion), branches, as.logical(useDotNames), error)
 
   if(!is.null(state))
      return(state)
@@ -100,3 +108,13 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
      return(invisible(handlers))
 }
 
+
+
+xmlStopParser =
+function(parser)
+{
+  if(!inherits(parser, "XMLParserContext"))
+    stop("Need an XMLParserContext object for xmlStopParser")
+
+  .Call("RS_XML_xmlStopParser", parser)
+}  

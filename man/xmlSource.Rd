@@ -15,10 +15,12 @@
   a heterogeneous collection of related material, some of which
   is R code.
   In the literate programming parlance, this function essentially
-  dynamically "tangles" the document within R.
-
-  This particular version (as opposed to other implementations) uses
-  XPath to conveniently find the nodes of interest.
+  dynamically "tangles" the document within R, but can work on
+  small subsets of it that are easily specified in the
+  \code{xmlSource} function call.
+  This is a convenient way to annotate code in a rich way
+  and work with source files in a new and potentially more effective
+  manner.
 
   This style of authoring code supports mixed language support
   in which we put, for example, C and R code together in the same
@@ -39,20 +41,26 @@
   
   We can also use XSL to extract the code. See \code{getCode.xsl}
   in the Omegahat XSL collection.
+
+  This particular version (as opposed to other implementations) uses
+  XPath to conveniently find the nodes of interest.
 }
 \usage{
 xmlSource(url, ...,
-          envir =globalenv(),
+          envir = globalenv(),
           xpath = character(),
           ids = character(),
           omit = character(),
           ask = FALSE,
           example = NA,
-          fatal = TRUE, verbose = FALSE,
-          xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),         
-          namespaces = DefaultXPathNamespaces)
+          fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
+          xnodes = c("//r:function", 
+                     "//r:init[not(@eval='false')]",
+                     "//r:code[not(@eval='false')]",
+                     "//r:plot[not(@eval='false')]"),
+          namespaces = DefaultXPathNamespaces, section = character(),
+          eval = TRUE)
 }
-%- maybe also `usage' for other objects documented here.
 \arguments{
   \item{url}{the name of the file, URL  containing the XML document, or
     an XML string. This is passed to \code{\link[XML]{xmlTreeParse}}
@@ -113,11 +121,17 @@ xmlSource(url, ...,
     segments.  We could recover from errors and continue processing
     subsequent nodes.}
   \item{verbose}{a logical value. If \code{TRUE}, information about what
-   code segments are being evaluated is displayed on the console.}
+   code segments are being evaluated is displayed on the console.
+   \code{echo} controls whether code is displayed, but this controls
+   whether additional informatin is also displayed.
+   See \code{\link[base]{source}}.
+  }
   \item{xnodes}{a character vector.  This is a collection of xpath
     expressions given as individual strings which find the
     nodes whose contents we evaluate.
   }
+ \item{echo}{a logical value indicating whether to display the code
+    before it is evaluated.}
   \item{namespaces}{a named character vector (i.e. name = value pairs of
     strings) giving the prefix - URI pairings for the namespaces used in
     the XPath expressions. The URIs must match those in the document,
@@ -125,6 +139,20 @@ xmlSource(url, ...,
     The default provides mappings for the prefixes "r", "omg",
     "perl", "py", and so on. See \code{XML:::DefaultXPathNamespaces}.
   }    
+ \item{section}{a vector of numbers or  strings.  This allows the caller to 
+   specify that the function should only look for R-related 
+  nodes within the specified section(s). This is useful
+  for being able to easily  process only the code in a particular subset of the document
+  identified by a DocBook \code{section} node.  A string value is used to
+    match  the \code{id} attribute of the \code{section} node.
+   A number (assumed to be an integer) is used to index the set of 
+  \code{section} nodes. These amount to XPath expressions of the form
+  \code{//section[number]} and \code{//section[@id = string]}.
+  }
+  \item{print}{a logical value indicating whether to print the results}
+  \item{eval}{a logical value indicating whether to evaluate the code in
+  the specified nodes or to just return the result of parsing the text
+  in each node.}
 }
 \details{
   This evaluates the \code{code}, \code{function} and \code{example}
@@ -145,11 +173,8 @@ xmlSource(url, ...,
   A list giving the pairs of expressions and evaluated objects
   for each of the different XML elements processed.
 }
-\references{}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{
 
-  }
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{
  \code{\link[XML]{xmlTreeParse}}

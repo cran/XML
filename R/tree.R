@@ -97,7 +97,7 @@ function(x)
 
 
 xmlChildren.XMLTreeNode =
-function(x)
+function(x, addNames = TRUE)
 {
   e = x$env
   kids = get(".children", e)

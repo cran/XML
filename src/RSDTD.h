@@ -28,7 +28,7 @@
 #include <libxml/entities.h>
 #endif
 
-USER_OBJECT_ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,  USER_OBJECT_ asText, USER_OBJECT_ isURL);
+
 USER_OBJECT_ RS_XML(createDTDElement)(xmlElementPtr el);
 USER_OBJECT_ RS_XML(createDTDElementContents)(xmlElementContentPtr vals, xmlElementPtr el, int recursive);
 USER_OBJECT_ RS_XML(createDTDElementAttributes)(xmlAttributePtr vals, xmlElementPtr el);

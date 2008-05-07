@@ -1,5 +1,5 @@
 
-xmlTreeParse <- 
+ xmlTreeParse <- 
 #
 # XML parser that reads the entire `document' tree into memory
 # and then converts it to an R/S object. 
@@ -9,15 +9,14 @@ xmlTreeParse <-
 #       the XML text, and parse that.
 #
 #
-function(file, ignoreBlanks = TRUE, handlers=NULL,
-           replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-           isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+function(file, ignoreBlanks = TRUE, handlers = NULL,
+           replaceEntities = FALSE, asText = FALSE, trim = TRUE, validate = FALSE, getDTD = TRUE,
+           isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
            useInternalNodes = FALSE, isSchema = FALSE,
            fullNamespaceInfo = FALSE, encoding = character(),
            useDotNames = length(grep("^\\.", names(handlers))) > 0,  # will be switched to TRUE in the future.
-           xinclude = TRUE, addFinalizer = TRUE)
+           xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
 {
-
   if(length(file) > 1) {
     file = paste(file, collapse = "\n")
     if(!missing(asText) && !asText) 
@@ -26,7 +25,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
     asText = TRUE
   }
   
-  if(missing(isURL)) 
+  if(missing(isURL) && !asText) 
     isURL <- length(grep("^http://", file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
 
 
@@ -44,7 +43,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
     # check whether we are treating the file name as
     # a) the XML text itself, or b) as a URL.
     # Otherwise, check if the file exists and report an error.
- if(isURL == FALSE) {
+ if(!asText && isURL == FALSE) {
   if(file.exists(file) == FALSE)
     if(!missing(asText) && asText == FALSE) {
      e = simpleError(paste("File", file, "does not exist"))
@@ -59,8 +58,9 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
    file = paste(file, collapse = "\n")
 
  old = setEntitySubstitution(replaceEntities)
- on.exit(setEntitySubstitution(old))
+ on.exit(setEntitySubstitution(old), add = TRUE)
 
+     # Look for a < in the string.
   if(asText && length(grep("^\\s*<", file, perl = TRUE)) == 0) {
     e = simpleError(paste(file, " does not seem to be XML, nor to identify a file name"))
     class(e) = c("XMLInputError", class(e))
@@ -75,8 +75,16 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
      xinclude = as.logical(xinclude)
  }
 
-if(!asText)
+ if(!asText && !isURL)
    file = path.expand(as.character(file))
+
+  if(useInternalNodes && trim) {
+    prevBlanks = .Call("RS_XML_setKeepBlanksDefault", 0L)
+    on.exit(.Call("RS_XML_setKeepBlanksDefault", prevBlanks), add = TRUE)
+  }
+
+  .oldErrorHandler = setXMLErrorHandler(error)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
@@ -84,15 +92,53 @@ if(!asText)
               as.logical(isURL), as.logical(addAttributeNamespaces),
               as.logical(useInternalNodes), FALSE, as.logical(isSchema),
               as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames),
-              xinclude)
+              xinclude, error)
 
+
+#  if(inherits(ans, "XMLParseError"))
+#    stop(ans)
+  
   if(!missing(handlers) & !as.logical(asTree))
     return(handlers)
 
   if(inherits(ans, "XMLInternalDocument"))
     addDocFinalizer(ans, addFinalizer)
+  else if(!getDTD) {
+       #??? is this a good idea.
+     class(ans) = "XMLDocumentContent"
+  }
 
   ans
+}
+
+
+
+xmlInternalTreeParse = xmlTreeParse
+formals(xmlInternalTreeParse)[["useInternalNodes"]] = TRUE
+
+if(FALSE) {
+   # Another approach is to just change the call, as below, but this is tricky
+   # to get evaluation of arguments, etc. right.
+tmp.xmlInternalTreeParse =
+function(file, ignoreBlanks = TRUE, handlers=NULL,
+           replaceEntities=FALSE, asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
+           isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+           isSchema = FALSE,
+           fullNamespaceInfo = FALSE, encoding = character(),
+           useDotNames = length(grep("^\\.", names(handlers))) > 0,  # will be switched to TRUE in the future.
+           xinclude = TRUE, addFinalizer = TRUE)
+{
+  e = sys.call()
+  e[[1]] = as.name("xmlTreeParse")
+  e[[length(e) + 1]] = FALSE
+  names(e)[length(e)] = "useInternalNodes"
+  eval(e, parent.env())
+}
+
+ # Could try adding this to the top of xmlTreeParse
+    # But it won't work with, e.g. lapply(fileNames, xmlInternalTreeParse)
+#  if(missing(useInternalNodes) && as.character(sys.call()[[1]]) == "xmlInternalTreeParse")
+#     useInternalNodes = FALSE
 }
 
 
@@ -106,3 +152,29 @@ function(val = integer(0))
 
 
 
+
+processXInclude =
+function(node, flags = 0L)
+  UseMethod("processXInclude")
+
+processXInclude.list =
+function(node, flags = 0L)
+{
+  lapply(node, processXInclude, flags)
+}
+
+processXInclude.XMLInternalDocument =
+function(node, flags = 0L)
+
+{
+  .Call("RS_XML_xmlXIncludeProcessFlags", node, as.integer(flags))
+}  
+
+processXInclude.XMLInternalElementNode =
+function(node, flags = 0L)
+{
+#  if(xmlName(node) != "include")  # Should check name space also
+#    stop("can only process XInclude on include nodes")
+
+  .Call("RS_XML_xmlXIncludeProcessTreeFlags", node, as.integer(flags))
+} 

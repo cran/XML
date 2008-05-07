@@ -1,6 +1,7 @@
 #include "EventParse.h"
 #include "DocParse.h"
 
+#define USE_XML_ENCODING 1
 #include "Utils.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -10,7 +11,7 @@
 #endif
 
 
-static USER_OBJECT_ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_defaulted);
+static USER_OBJECT_ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_defaulted, const xmlChar *encoding);
 
 
 
@@ -51,6 +52,58 @@ void RS_XML(structuredErrorHandler)(void *ctx, xmlErrorPtr err);
 
 static void RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion);
 
+
+
+USER_OBJECT_
+createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_defaulted, const xmlChar *encoding)
+{
+  int  i;
+  const char **ptr;
+  USER_OBJECT_ attr_names;
+  USER_OBJECT_ attr_values;
+  USER_OBJECT_ nsURI, nsNames;
+
+ 
+  if(nb_attributes < 1)
+    return(NULL_USER_OBJECT);
+
+  PROTECT(attr_values = NEW_CHARACTER(nb_attributes));
+  PROTECT(attr_names = NEW_CHARACTER(nb_attributes));
+
+  PROTECT(nsURI = NEW_CHARACTER(nb_attributes));
+  PROTECT(nsNames = NEW_CHARACTER(nb_attributes));
+
+  ptr = (const char **) attributes; /*XXX */
+  for(i=0; i < nb_attributes; i++, ptr+=5) {
+      char *tmp;
+      int len;
+
+      len = (ptr[4] - ptr[3] + 1);
+      tmp = malloc(sizeof(char) * len);
+      if(!tmp) {
+         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
+	 ERROR;
+      }
+      memcpy(tmp, ptr[3], ptr[4] - ptr[3]);
+      tmp[len-1] = '\0'; /*XXX*/
+      SET_STRING_ELT(attr_values, i,  COPY_TO_USER_STRING(tmp));
+      free(tmp);
+
+      SET_STRING_ELT(attr_names, i, COPY_TO_USER_STRING(ptr[0]));
+
+      if(ptr[2]) {
+         SET_STRING_ELT(nsURI, i,  COPY_TO_USER_STRING(ptr[2]));
+         if(ptr[1])
+            SET_STRING_ELT(nsNames, i,  COPY_TO_USER_STRING(ptr[1]));
+      }
+  }
+  SET_NAMES(nsURI, nsNames);
+  SET_NAMES(attr_values, attr_names);
+  Rf_setAttrib(attr_values, Rf_install("namespaces"), nsURI);
+  UNPROTECT(4);
+
+  return(attr_values);
+}
 
 
 
@@ -178,7 +231,7 @@ RS_XML_xmlCreateConnectionParserCtxt(USER_OBJECT_ con)
       return(ctx);
 }
 
-void
+int
 RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
                           int saxVersion)
 {
@@ -210,12 +263,13 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
   }
 
 
-  xmlParserHandler = (xmlSAXHandlerPtr) S_alloc(sizeof(xmlSAXHandler), 1);/*XXX should this be S_alloc */
+  xmlParserHandler = (xmlSAXHandlerPtr) S_alloc(sizeof(xmlSAXHandler), 1);
   /* Make certain this is initialized so that we don't have any references  to unwanted routines!  */
   memset(xmlParserHandler, '\0', sizeof(xmlSAXHandler));
 
   RS_XML(initXMLParserHandler)(xmlParserHandler, saxVersion);
 
+  parserData->ctx = ctx;
   ctx->userData = parserData;
   ctx->sax = xmlParserHandler;
 
@@ -224,10 +278,10 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
   ctx->sax = NULL;
   xmlFreeParserCtxt(ctx);
 
+  return(status);
+
 /*  Free(xmlParserHandler); */
 }
-
-
 
 
 int
@@ -326,6 +380,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   USER_OBJECT_ tmp, names;
   USER_OBJECT_ opArgs;
   RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
+  DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
   if(!localname)
       return;
@@ -340,13 +395,13 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(localname))); 
 
       /* Now convert the attributes list. */
-  SET_VECTOR_ELT(opArgs, 1, createSAX2AttributesList(attributes, nb_attributes, nb_defaulted));
+  SET_VECTOR_ELT(opArgs, 1, createSAX2AttributesList(attributes, nb_attributes, nb_defaulted, encoding));
 
 
   PROTECT(tmp = NEW_CHARACTER(1));
   if(URI) {
      SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(URI))); 
-     SET_NAMES(tmp, mkString((void*)prefix ? XMLCHAR_TO_CHAR(prefix) : "")); /*XXX not S-Plus compatible!*/
+     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding, (void*)prefix ? XMLCHAR_TO_CHAR(prefix) : ""))); 
   }
   SET_VECTOR_ELT(opArgs, 2, tmp);
   UNPROTECT(1);
@@ -369,55 +424,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   UNPROTECT(1);
 }
 
-USER_OBJECT_
-createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_defaulted)
-{
-  int  i;
-  const char **ptr;
-  USER_OBJECT_ attr_names;
-  USER_OBJECT_ attr_values;
-  USER_OBJECT_ nsURI, nsNames;
- 
-  if(nb_attributes < 1)
-    return(NULL_USER_OBJECT);
 
-  PROTECT(attr_values = NEW_CHARACTER(nb_attributes));
-  PROTECT(attr_names = NEW_CHARACTER(nb_attributes));
-
-  PROTECT(nsURI = NEW_CHARACTER(nb_attributes));
-  PROTECT(nsNames = NEW_CHARACTER(nb_attributes));
-
-  ptr = (const char **) attributes; /*XXX */
-  for(i=0; i < nb_attributes; i++, ptr+=5) {
-      char *tmp;
-      int len;
-
-      len = (ptr[4] - ptr[3] + 1);
-      tmp = malloc(sizeof(char) * len);
-      if(!tmp) {
-         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
-	 ERROR;
-      }
-      memcpy(tmp, ptr[3], ptr[4] - ptr[3]);
-      tmp[len-1] = '\0'; /*XXX*/
-      SET_STRING_ELT(attr_values, i,  COPY_TO_USER_STRING(tmp));
-      free(tmp);
-
-      SET_STRING_ELT(attr_names, i, COPY_TO_USER_STRING(ptr[0]));
-
-      if(ptr[2]) {
-         SET_STRING_ELT(nsURI, i,  COPY_TO_USER_STRING(ptr[2]));
-         if(ptr[1])
-            SET_STRING_ELT(nsNames, i,  COPY_TO_USER_STRING(ptr[1]));
-      }
-  }
-  SET_NAMES(nsURI, nsNames);
-  SET_NAMES(attr_values, attr_names);
-  Rf_setAttrib(attr_values, Rf_install("namespaces"), nsURI);
-  UNPROTECT(4);
-
-  return(attr_values);
-}
 
 
 
@@ -429,6 +436,7 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
 {
   USER_OBJECT_ args, tmp;
   RS_XMLParserData *rinfo = (RS_XMLParserData *) ctx;
+  DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
   if(rinfo->current) {
       R_endBranch(rinfo, localname, prefix, URI);
@@ -436,11 +444,11 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
   }
 
   PROTECT(args = NEW_LIST(2));
-  SET_VECTOR_ELT(args, 0, mkString(XMLCHAR_TO_CHAR(localname)));
+  SET_VECTOR_ELT(args, 0, ScalarString(COPY_TO_USER_STRING(localname)));
 
-  PROTECT(tmp = mkString(( (XMLCHAR_TO_CHAR(URI)) ? XMLCHAR_TO_CHAR(URI) : ""))); 
+  PROTECT(tmp = ScalarString(COPY_TO_USER_STRING((XMLCHAR_TO_CHAR(URI)) ? XMLCHAR_TO_CHAR(URI) : ""))); 
   if(prefix)
-     SET_NAMES(tmp, mkString(XMLCHAR_TO_CHAR(prefix)));
+      SET_NAMES(tmp, ScalarString(COPY_TO_USER_STRING(prefix)));
   SET_VECTOR_ELT(args, 1, tmp);
 
   RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endElement"), NULL, (RS_XMLParserData *)ctx, args);
@@ -557,6 +565,7 @@ RS_XML(cdataBlockHandler)(void *ctx, const xmlChar *value, int len)
 {
  USER_OBJECT_ opArgs;
  RS_XMLParserData *parserData = (RS_XMLParserData*) ctx;
+ DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
   if(parserData->current) {
       xmlAddChild(parserData->current, xmlNewCDataBlock(NULL, value, len));
@@ -577,8 +586,9 @@ RS_XML(piHandler)(void *ctx, const xmlChar *target, const xmlChar *data)
 }
 
 
-#define RString(x) (x ? mkString(XMLCHAR_TO_CHAR((x))) : NEW_CHARACTER(1))
 
+//#define RString(x) (x ? mkString(XMLCHAR_TO_CHAR((x))) : NEW_CHARACTER(1))
+#define RString(x) (x ? ScalarString(COPY_TO_USER_STRING(XMLCHAR_TO_CHAR((x)))) : NEW_CHARACTER(1))
 
 /* Relies on the order and numbering of xmlEntityType from entities.h */
 static const char * const EntityTypeNames[]  = {
@@ -598,6 +608,7 @@ RS_XML(entityDeclaration)(void *ctx,
 {
     USER_OBJECT_ fun, opArgs, tmp;
     RS_XMLParserData *parserData = (RS_XMLParserData*) ctx;
+    DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
     /* check if there is a function to call before making the list of 5 elements. */
     fun = RS_XML(findFunction)(HANDLER_FUN_NAME(parserData, "entityDeclaration"), parserData->methods); 
@@ -615,7 +626,7 @@ RS_XML(entityDeclaration)(void *ctx,
     SET_VECTOR_ELT(opArgs, 3, RString(systemId));
     SET_VECTOR_ELT(opArgs, 4, RString(publicId));
 
-    (void) RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject);    
+    (void) RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject, parserData->ctx);    
     UNPROTECT(2);
 }
 
@@ -626,9 +637,11 @@ RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
     
     SEXP opArgs, r_ans;
     xmlEntityPtr ans = NULL;
+    RS_XMLParserData *parserData = (RS_XMLParserData*) userData;
+    DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
     PROTECT(opArgs = NEW_LIST(1)) ;
-    SET_VECTOR_ELT(opArgs, 0, mkString(XMLCHAR_TO_CHAR(name)));
+    SET_VECTOR_ELT(opArgs, 0, ScalarString(COPY_TO_USER_STRING(name))); /*XXX should we encode this? Done now! */
     r_ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(userData, "getEntity"), NULL, (RS_XMLParserData *) userData, opArgs);
     
     PROTECT(r_ans) ;
@@ -685,9 +698,6 @@ RS_XML(fatalErrorHandler)(void *ctx, const char *format, ...)
 void
 RS_XML(errorHandler)(void *ctx, const char *format, ...)
 {
-/*XXX Need to be smarter here about the msg coming from libxml containing formatting instructions
-  e.g. %s and then picking up the ... */
-
   const char *msg = "error message unavailable";
   va_list args;
   va_start(args, format);
@@ -726,3 +736,26 @@ RS_XML(warningHandler)(void *ctx, const char *msg, ...)
  WARN;
 
 }
+
+
+
+SEXP 
+RS_XML_xmlStopParser(SEXP r_context)
+{
+    xmlParserCtxtPtr context;
+
+    if(TYPEOF(r_context) != EXTPTRSXP || R_ExternalPtrTag(r_context) != Rf_install(XML_PARSER_CONTEXT_TYPE_NAME)) {
+	PROBLEM "xmlStopParser requires an " XML_PARSER_CONTEXT_TYPE_NAME " object"
+	    ERROR;
+    }
+    context = (xmlParserCtxtPtr) R_ExternalPtrAddr(r_context);
+
+    if(!context) {
+	PROBLEM "NULL value passed to RS_XML_xmlStopParser. Is it a value from a previous session?"
+	    ERROR;
+    }
+    
+    xmlStopParser(context);
+    return(ScalarLogical(1));
+}
+

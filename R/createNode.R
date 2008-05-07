@@ -31,16 +31,16 @@ function(x, value) {
 }
 
 addChildren =
-function(node, ..., kids = list(...))
+function(node, ..., kids = list(...), at = NA, cdata = FALSE)
   UseMethod("addChildren")
 
 addChildren.XMLNode =  
-function(node, ..., kids = list(...))
+function(node, ..., kids = list(...), at = NA, cdata = FALSE)
 {
   kids = lapply(kids,
                 function(i) {
                   if(!is(i, "XMLNode"))
-                    xmlTextNode(as.character(i))
+                    xmlTextNode(as.character(i), cdata = cdata)
                   else
                     i
                 })
@@ -73,13 +73,16 @@ function(value, entities = XMLEntities)
 }
 
 xmlTextNode <- 
-function(value, namespace = "", entities = XMLEntities)
+function(value, namespace = "", entities = XMLEntities, cdata = FALSE)
 {
   node <- xmlNode("text", namespace = namespace)
 
   if(length(entities)) 
    value = insertEntities(value, XMLEntities)
 
+  if(cdata)
+    value = xmlCDataNode(value)
+  
   node$value <- value
   class(node) <- c("XMLTextNode", class(node))
   if(length(entities))

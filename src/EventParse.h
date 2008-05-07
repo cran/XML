@@ -86,6 +86,9 @@ typedef struct {
     /* */
   int        useDotNames;
 
+
+    /* The XML context */
+  xmlParserCtxtPtr ctx;
 } RS_XMLParserData;
 
 /* The name of the R element to call fo the general case.
@@ -128,7 +131,7 @@ struct NodeList {
 RS_XMLParserData *createRSXMLParserData(USER_OBJECT_ handlers) ;
 
 USER_OBJECT_ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserData *parser, USER_OBJECT_ opArgs) ;
-USER_OBJECT_ RS_XML(createAttributesList)(const char **atts);
+/*Made static now: USER_OBJECT_ RS_XML(createAttributesList)(const char **atts); */
 
 
 void RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName, 
@@ -154,7 +157,7 @@ RS_XMLParserData *RS_XML(createParserData)(USER_OBJECT_ handlers);
 int RS_XML(parseBufferWithParserData)(char *buf, RS_XMLParserData *parserData);
 int RS_XML(notStandAloneHandler)(void *userData);
 
-void RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
+int RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
 			      int saxVersion);
 
 

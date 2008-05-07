@@ -32,7 +32,7 @@ free(obj)
   An updated version of the object with the external address set to NIL.
  This is up to the individual methods. 
 }
-\references{}
+
 \author{ Duncan Temple Lang}
 \seealso{
 \code{\link{xmlTreeParse}} with \code{useInternalNodes = TRUE} 
@@ -42,7 +42,7 @@ free(obj)
  doc = xmlTreeParse(f, useInternalNodes = TRUE)
  nodes = getNodeSet(doc, "//path")
  rm(nodes)
- free(doc)
+ # free(doc)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

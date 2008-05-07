@@ -9,21 +9,64 @@
 
 #include "Rinternals.h" /* Macros, etc. */
 
+
+USER_OBJECT_
+R_makeXMLContextRef(xmlParserCtxtPtr ctx)
+{
+  USER_OBJECT_ ans;
+  PROTECT(ans = R_MakeExternalPtr(ctx, Rf_install(XML_PARSER_CONTEXT_TYPE_NAME), R_NilValue));
+  SET_CLASS(ans, mkString(XML_PARSER_CONTEXT_TYPE_NAME));
+  UNPROTECT(1); 
+  return(ans);
+}
+
 USER_OBJECT_ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klasses);
 
 USER_OBJECT_
-RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ data)
+RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ data, xmlParserCtxtPtr context)
 {
   int i;
   long n;
   USER_OBJECT_ c, call;
   USER_OBJECT_ ans;
+  int addContext = 0;
 
-  n = GET_LENGTH(opArgs);
+  if(context && TYPEOF(fun) == CLOSXP && OBJECT(fun) && R_isInstanceOf(fun, XML_PARSE_CONTEXT_FUNCTION))
+      addContext = 1;
+
+  n = Rf_length(opArgs) + addContext + 1;
   if(data)
     n++;
+
+
   if(n  > 0) {
+#if 1
+    PROTECT(call = allocVector(LANGSXP, n));      
+    c = call;
+    SETCAR(call, fun); c = CDR(c);
+
+    if(addContext)  {
+	SETCAR(c, R_makeXMLContextRef(context));
+	c = CDR(c);
+    }
+
+    for (i = 0; i < Rf_length(opArgs); i++) {
+      SETCAR(c, VECTOR_ELT(opArgs, i));
+      c = CDR(c);
+    }
+
+
+    if(data) {
+       SETCAR(c, data);
+       SET_TAG(c, Rf_install(".state"));
+    }    
+#else
     PROTECT(c = call = allocList(n));
+    if(addContext)  {
+	SETCAR(c, R_makeXMLContextRef(context));
+	c = CDR(c);
+    }
+
     for (i = 0; i < GET_LENGTH(opArgs); i++) {
       SETCAR(c, VECTOR_ELT(opArgs, i));
       c = CDR(c);
@@ -35,13 +78,16 @@ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ data)
 
     call = LCONS(fun, call);
     UNPROTECT(1);
+#endif
   } else  {
-     call = allocVector(LANGSXP,1);
+     PROTECT(call = allocVector(LANGSXP, 1 + addContext));
      SETCAR(call, fun);
+     if(addContext)
+	 SETCAR(CDR(call), R_makeXMLContextRef(context));
   }  
 
-  PROTECT(call);
-   ans = eval(call, R_GlobalEnv);
+
+  ans = eval(call, R_GlobalEnv);
   UNPROTECT(1);
 
   return(ans);
@@ -81,7 +127,7 @@ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klass
 
   PROTECT(args = NEW_LIST(1));
   SET_VECTOR_ELT(args, 0, top);
-  tmp =  RS_XML(invokeFunction)(func, args, NULL);
+  tmp =  RS_XML(invokeFunction)(func, args, NULL, NULL); /*XXX get the context and user data!!! */
   UNPROTECT(1);
 
   return(tmp);
@@ -107,10 +153,10 @@ RS_XML_SubstituteEntitiesDefault(USER_OBJECT_ replaceEntities)
 static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_RecursiveApply, 3),
 	ENTRY(RS_XML_HtmlParseTree, 7),
-	ENTRY(RS_XML_getDTD, 4),
+	ENTRY(RS_XML_getDTD, 5),
 	ENTRY(RS_XML_libxmlVersion, 0),
-	ENTRY(RS_XML_Parse, 14),
-	ENTRY(RS_XML_ParseTree, 17),
+	ENTRY(RS_XML_Parse, 15),
+	ENTRY(RS_XML_ParseTree, 18),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
 	ENTRY(R_newXMLNode, 5),
@@ -120,11 +166,11 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(R_newXMLPINode, 3),
 	ENTRY(R_xmlNewNs, 3),
 	ENTRY(R_xmlSetNs, 3),
-	ENTRY(R_insertXMLNode, 2),
+	ENTRY(R_insertXMLNode, 4),
 	ENTRY(R_saveXMLDOM, 6),
 	ENTRY(R_xmlCatalogResolve, 3),
 	ENTRY(RS_XML_xmlNodeNumChildren, 1),
-        ENTRY(RS_XML_unsetDoc, 1),
+        ENTRY(RS_XML_unsetDoc, 3),
         ENTRY(RS_XML_setDoc, 2),
         ENTRY(RS_XML_printXMLNode, 5),
         ENTRY(RS_XML_removeChildren, 3),
@@ -135,10 +181,18 @@ static R_CallMethodDef callMethods[] = {
         ENTRY(RS_XML_setNodeName, 2),
         ENTRY(R_xmlNsAsCharacter, 1),
         ENTRY(RS_XML_SubstituteEntitiesDefault, 1),
-        ENTRY(RS_XML_getNextSibling, 1),
+        ENTRY(RS_XML_getNextSibling, 2),
         ENTRY(R_getXMLNodeDocument, 1),
         ENTRY(RS_XML_createDocFromNode, 1),
         ENTRY(R_removeInternalNode, 2),
+	ENTRY(RS_XML_replaceXMLNode, 2),
+	ENTRY(RS_XML_xmlAddSiblingAt, 3),
+	ENTRY(RS_XML_loadCatalog, 1),
+	ENTRY(RS_XML_clearCatalog, 0),
+	ENTRY(RS_XML_catalogAdd, 3),
+	ENTRY(RS_XML_catalogDump, 1),
+	ENTRY(RS_XML_setDocumentName, 2),
+	ENTRY(RS_XML_setKeepBlanksDefault, 1),
 	{NULL, NULL, 0}
 };
 
@@ -174,4 +228,65 @@ R_isInstanceOf(USER_OBJECT_ obj, const char *klass)
 
 
     return(FALSE);
+}
+
+
+SEXP
+RS_XML_getStructuredErrorHandler()
+{
+    SEXP ans;
+    PROTECT(ans = NEW_LIST(2));
+    SET_VECTOR_ELT(ans, 0, R_MakeExternalPtr(xmlGenericErrorContext, Rf_install("xmlGenericErrorContext"), R_NilValue));
+    SET_VECTOR_ELT(ans, 1, R_MakeExternalPtr(xmlStructuredError, Rf_install("xmlStructuredErrorFunc"), R_NilValue));
+    UNPROTECT(1);
+    return(ans);
+}
+
+SEXP
+RS_XML_setStructuredErrorHandler(SEXP els)
+{
+    void *ctx;
+    xmlStructuredErrorFunc handler;
+    SEXP fun, sym;
+    
+    fun = VECTOR_ELT(els, 0);
+    sym = VECTOR_ELT(els, 1);
+
+    if(sym != R_NilValue & TYPEOF(sym) != EXTPTRSXP) {
+	PROBLEM "invalid symbol object for XML error handler. Need an external pointer, e.g from getNativeSymbolInfo"
+        ERROR;
+    }
+
+    if(fun == R_NilValue)
+	ctx = NULL;
+    else if(TYPEOF(fun) == EXTPTRSXP)
+        ctx = R_ExternalPtrAddr(fun);
+    else
+	ctx = fun;
+
+
+    handler = (sym == R_NilValue) ? NULL : (xmlStructuredErrorFunc) R_ExternalPtrAddr(sym);
+    xmlSetStructuredErrorFunc(ctx, handler);
+
+    return(ScalarLogical(TRUE));
+}
+
+
+SEXP
+CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
+{
+    cetype_t enc = CE_NATIVE;
+    SEXP ans;
+    if(encoding == (const xmlChar *) NULL || encoding == (const xmlChar *) "") {
+  	    enc = CE_NATIVE;
+    } else if(xmlStrcmp(encoding, "UTF-8") == 0 || xmlStrcmp(encoding, "utf-8") == 0)
+	    enc = CE_UTF8;
+    else if(xmlStrcmp(encoding, "ISO-8859-1") == 0 || xmlStrcmp(encoding, "iso-8859-1") == 0)
+	    enc = CE_LATIN1;
+    else {
+	str = translateChar(mkChar(str));
+    }
+
+    ans = mkCharCE(str, enc);
+    return(ans);
 }

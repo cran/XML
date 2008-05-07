@@ -68,7 +68,7 @@ convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun)
 	    REAL(ans)[0] = NA_REAL;
 	break;
     case XPATH_STRING:
-	ans = mkString(XMLCHAR_TO_CHAR(obj->stringval));
+        ans = mkString(XMLCHAR_TO_CHAR(obj->stringval)); //XXX encoding 
 	break;
     case XPATH_POINT:
     case XPATH_RANGE:
@@ -114,18 +114,6 @@ R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
  return(els);
 }
 
-static void
-freeXMLDocument(SEXP sdoc)
-{
-  xmlDocPtr doc;
-  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-
-  /* fprintf(stderr, "Cleaning up document %p\n", (void *) doc); */
-
-  if(doc)
-      xmlFreeDoc(doc);
-  R_ClearExternalPtr(sdoc);
-}
 
 
 SEXP
@@ -139,7 +127,7 @@ R_addXMLInternalDocument_finalizer(SEXP sdoc, SEXP fun)
     }
 
     if(fun == R_NilValue)    {
-	action = freeXMLDocument;
+        action = R_xmlFreeDoc;
     } else if(TYPEOF(fun) == EXTPTRSXP)
 	action = (R_CFinalizer_t) R_ExternalPtrAddr(fun);
     
@@ -157,7 +145,7 @@ R_XMLInternalDocument_free(SEXP sdoc)
      ERROR;
   }
 
-  freeXMLDocument(sdoc);
+  R_xmlFreeDoc(sdoc);
   
   return(sdoc);
 }
@@ -211,10 +199,27 @@ RS_XML_createDocFromNode(USER_OBJECT_ s_node)
 
  node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
  doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+ R_numXMLDocs++;
+
  ptr = xmlDocCopyNode(node, doc, 1);
- doc->children = ptr;
+ node = (xmlNodePtr) doc;
+ xmlAddChild(node, ptr);
+/* doc->children = ptr; */
  ans = R_createXMLDocRef(doc);
  return(ans);
+}
+
+USER_OBJECT_
+RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
+{
+ xmlDocPtr doc;
+ xmlNodePtr node, ptr;
+
+ doc = (xmlDocPtr) R_ExternalPtrAddr(s_doc);
+ node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+
+ ptr = xmlDocCopyNode(node, doc, 1);
+ return(R_createXMLNodeRef(ptr));
 }
 
 /*

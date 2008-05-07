@@ -91,7 +91,7 @@ const char *RS_XML(DtdNames)[] = {"elements", "entities"};
  */
 USER_OBJECT_
 RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId, 
-                   USER_OBJECT_ asText, USER_OBJECT_ isURL)
+  	       USER_OBJECT_ asText, USER_OBJECT_ isURL, USER_OBJECT_ errorFun)
 {
  USER_OBJECT_ ans;
  const char * dtdName = strdup(CHAR_DEREF(STRING_ELT(dtdFileName, 0)));
@@ -122,6 +122,10 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
 
   ctxt->validate = 1;
 
+#ifdef RS_XML_SET_STRUCTURED_ERROR  /* Done in R code now. */
+  xmlSetStructuredErrorFunc(errorFun == NULL_USER_OBJECT ? NULL : errorFun, R_xmlStructuredErrorHandler);
+#endif
+
   if(ctxt->myDoc == NULL)
     ctxt->myDoc = xmlNewDoc(BAD_CAST "1.0");
 
@@ -146,7 +150,16 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
     dtd = ctxt->myDoc->extSubset;
   }
 
+#ifdef RS_XML_SET_STRUCTURED_ERROR 
+  xmlSetStructuredErrorFunc(NULL, NULL);
+#endif
+
   if(dtd == NULL) {
+      if(errorFun != NULL_USER_OBJECT) {
+        RSXML_structuredStop(errorFun, NULL);
+      } else
+        return(stop("DTDParseError", "error parsing %s", dtdName));
+
    PROBLEM "error in DTD %s", extId
    ERROR;
   }
@@ -188,7 +201,7 @@ RS_XML(ConstructDTDList)(xmlDocPtr myDoc, int processInternals, xmlParserCtxtPtr
     if(sets[i]) {
       SET_VECTOR_ELT(ans, i, el= RS_XML(createDTDParts)(sets[i], ctxt));
       PROTECT(klass = NEW_CHARACTER(1));
-      SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING(i==0 ? "ExternalDTD" : "InternalDTD"));
+      SET_STRING_ELT(klass, 0, mkChar(i==0 ? "ExternalDTD" : "InternalDTD"));
       SET_CLASS(el, klass);
       UNPROTECT(1);
     }

@@ -88,6 +88,16 @@ saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0
 }
 
 \examples{
+
+ b = newXMLNode("bob")
+ saveXML(b)
+
+ f = tempfile()
+ saveXML(b, f)
+ doc = xmlInternalTreeParse(f)
+ saveXML(doc)
+
+
 con <- xmlOutputDOM()
 con$addTag("author", "Duncan Temple Lang")
 con$addTag("address",  close=FALSE)

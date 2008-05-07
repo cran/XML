@@ -14,7 +14,7 @@ or with via the parser.
 }
 \usage{
 xmlNode(name, ..., attrs=NULL, namespace="", .children = list(...))
-xmlTextNode(value, namespace="", entities = XMLEntities)
+xmlTextNode(value, namespace="", entities = XMLEntities, cdata = FALSE)
 xmlPINode(sys, value, namespace="")
 xmlCDataNode(...)
 xmlCommentNode(text)
@@ -35,6 +35,11 @@ xmlCommentNode(text)
      name, value pairs of attributes for this XML node.}
   \item{value}{This is the text that is to be used when forming
      an \code{XMLTextNode}.}
+    \item{cdata}{a logical value which controls whether the text 
+     being used for the child node is to be first
+      enclosed within a CDATA node to escape special characters such
+      as \code{>} and \code{&}.
+   }
   \item{namespace}{The XML namespace identifier for this node.}
   \item{sys}{the name of the system for which the processing instruction
     is targeted. This is the value that appears in the

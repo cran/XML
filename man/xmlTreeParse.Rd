@@ -1,12 +1,26 @@
 \name{xmlTreeParse}
 \alias{xmlTreeParse}
 \alias{htmlTreeParse}
+\alias{xmlInternalTreeParse}
 \title{XML Parser}
 \description{
- Parses an XML or HTML file or string, and generates an R 
- structure representing the XML/HTML tree.
- Use \code{htmlTreeParse} when the content is known
+ Parses an XML or HTML file or string containing XML/HTML content, and generates an R 
+ structure representing the XML/HTML tree.  Use \code{htmlTreeParse} when the content is known
  to be (potentially malformed) HTML.
+ This function has numerous parameters/options and operates quite differently
+ based on  their values.
+  It can create trees in R or using internal C-level nodes, both of
+  which are useful in different contexts.
+ It can perform conversion of the nodes into R objects using
+ caller-specified  handler functions and this can be used to 
+ map the XML document directly into R data structures,
+ by-passing the conversion to an R-level tree which would then
+ be processed recursively or with multiple descents to extract the
+ information of interest.
+
+ \code{xmlInternalTreeParse} is identical to \code{xmlTreeParse}
+ except it has no \code{useInternalNodes} parameter and 
+  uses \code{TRUE} for its operation, i.e. working with internal nodes.
 }
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
@@ -15,13 +29,23 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              useInternalNodes = FALSE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
              useDotNames = length(grep("^\\.", names(handlers))) > 0,
-             xinclude = TRUE, addFinalizer = TRUE)
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+
+xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
+             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
+             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+             useInternalNodes = TRUE, isSchema = FALSE,
+             fullNamespaceInfo = FALSE, encoding = character(),
+             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
               isURL = FALSE, asTree = FALSE, 
               useInternalNodes = FALSE, encoding = character(),
               useDotNames = length(grep("^\\.", names(handlers))) > 0,
-              xinclude = FALSE, addFinalizer = TRUE) 
+              xinclude = FALSE, addFinalizer = TRUE, 
+              error = xmlErrorCumulator()) 
 }
 
 \arguments{
@@ -159,6 +183,29 @@ return type.
    external pointer object. This is only relevant when
    \code{useInternalNodes} is \code{TRUE}.
  }
+
+  \item{error}{a function that is invoked when the XML parser reports
+    an error.
+    When an error is encountered, this is called with 7 arguments.
+   See \code{\link{xmlStructuredStop}} for information about these
+
+   If parsing completes and no document is generated, this function is
+   called again with only argument which is a character vector of
+   length 0.  This gives the function an opportunity to report all the 
+   errors and raise an exception rather than doing this when it sees
+   th first one.
+
+    This function can do what it likes with the information.
+    It can raise an R error or let parser continue and potentially
+    find further errors.
+
+    The default value of this argument supplies a function that 
+    cumulates the errors
+
+    If this is \code{NULL}, the default error handler function in the
+    package  \code{\link{xmlStructuredStop}} is invoked and this will 
+    raise an error in R at that time in R.
+}
 }
 \details{
  The \code{handlers} argument is used similarly
@@ -210,13 +257,19 @@ contents.
 
 }
 \value{
-By default, an object of class XML doc is returned,
- which contains fields/slots named 
- \code{file}, \code{version} and \code{children}.
-  \item{\code{file}}{The (expanded) name of the file
- containing the XML.}
-  \item{\code{version}}{A string identifying the 
- version of XML used by the document.}
+ By default ( when \code{useInternalNodes} is \code{FALSE}, 
+  \code{getDTD} is \code{TRUE},  and no
+ handler functions are provided), the return value is, an object of
+ (S3) class \code{XMLDocument}.
+ This has two fields named \code{doc} and \code{dtd}
+ and are of class \code{DTDList} and \code{XMLDocumentContent} respectively.
+
+ If \code{getDTD} is \code{FALSE},  only the \code{doc} object is returned.
+ 
+ The \code{doc} object has three fields of its own:
+  \code{file}, \code{version} and \code{children}.
+  \item{\code{file}}{The (expanded) name of the file  containing the XML.}
+  \item{\code{version}}{A string identifying the  version of XML used by the document.}
   \item{\code{children}}{
  A list of the XML nodes at the top of the document.
  Each of these is of class \code{XMLNode}.
@@ -231,17 +284,54 @@ By default, an object of class XML doc is returned,
  \code{XMLComment}, \code{XMLProcessingInstruction},
  \code{XMLEntityRef} are used.
 
-If the value of the argument getDTD is TRUE, the return value is a
-list of length 2.  The first element is as the document as described
-above.  The second element is a list containing the external and
-internal DTDs. Each of these contains 2 lists - one for elements
-and another for entities. See \code{\link{parseDTD}}.
-}
-}
-\references{\url{http://xmlsoft.org}, 
-\url{http://www.w3.org/xml}}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{Make sure that the necessary 3rd party libraries are available.}
+ If the value of the argument getDTD is TRUE and the document refers
+ to a DTD via a top-level DOCTYPE element, the DTD and its information
+ will be available in the \code{dtd} field.  The second element is a
+ list containing the external and internal DTDs. Each of these
+ contains 2 lists - one for element definitions and another for entities. See
+ \code{\link{parseDTD}}. 
+
+
+ If a list of functions is given via \code{handlers}, 
+ this list is returned. Typically, these handler functions
+ share state via a closure and the resulting updated data structures
+ which contain the extracted and processed values from the XML
+ document can be retrieved via a function in this handler list.
+
+ If \code{asTree} is \code{TRUE}, then the converted tree is returned.
+ What form this takes depends on what the handler functions have
+ done to process the XML tree.
+
+ If \code{useInternalNodes} is \code{TRUE} and no handlers are
+ specified, an object of S3 class \code{XMLInternalDocument} is
+ returned. This can be used in much the same ways as an
+ \code{XMLDocument}, e.g. with \code{\link{xmlRoot}},
+ \code{\link{docName}} and so on to traverse the tree.
+  It can also be used with XPath queries via \code{\link{getNodeSet}},
+ \code{\link{xpathApply}} and \code{doc["xpath-expression"]}.
+
+ If internal nodes are used and the internal tree returned directly,
+ all the nodes are returned as-is and no attempt to 
+  trim white space, remove ``empty'' nodes (i.e. containing only white
+ space), etc. is done. This is potentially quite expensive and so is
+ not done generally, but should  be done during the processing
+ of the nodes.  When using XPath queries, such nodes are easily
+ identified and/or ignored and so do not cause any difficulties.
+ They do become an issue when dealing with a node's chidren
+ directly and so one can use simple filtering techniques such as
+ \code{ xmlChildren(node)[ ! xmlSApply(node, inherits,  "XMLInternalTextNode")]}
+ and even check the \code{\link{xmlValue}} to determine if it contains only
+ white space.
+ \code{ xmlChildren(node)[ ! xmlSApply(node, function(x) inherit(x,
+              "XMLInternalTextNode")] && trim(xmlValue(x)) == "")}
+  
+ } }
+
+ \references{\url{http://xmlsoft.org}, \url{http://www.w3.org/xml}}
+
+ \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>} 
+
+\note{Make sure  that the necessary 3rd party libraries are available.}
 
 \seealso{ \link{xmlEventParse},
   \code{\link{free}} for releasing the memory when
@@ -411,7 +501,7 @@ m <- xmlTreeParse(fileName,
 
  sapply(getNodeSet(doc, "//variable"), xmlValue)
          
- free(doc) 
+ #free(doc) 
 
 
   # character set encoding for HTML
@@ -433,6 +523,33 @@ m <- xmlTreeParse(fileName,
 
  f = system.file("exampleData", "nodes2.xml", package = "XML")
  xmlRoot(xmlTreeParse(f, xinclude = TRUE))
+
+  # Errors
+  try(xmlTreeParse("<doc><a> & < <?pi > </doc>"))
+
+    # catch the error by type.
+ tryCatch(xmlTreeParse("<doc><a> & < <?pi > </doc>"),
+                "XMLParserErrorList" = function(e) {
+                                                      cat("Errors in XML document\n", e$message, "\n")
+                                                    })
+
+    #  terminate on first error            
+  try(xmlTreeParse("<doc><a> & < <?pi > </doc>", error = NULL))
+
+    #  see xmlErrorCumulator in the XML package 
+
+
+  f = system.file("exampleData", "book.xml", package = "XML")
+  doc.trim = xmlInternalTreeParse(f, trim = TRUE)
+  doc = xmlInternalTreeParse(f, trim = FALSE)
+  xmlSApply(xmlRoot(doc.trim), class)
+      # note the additional XMLInternalTextNode objects
+  xmlSApply(xmlRoot(doc), class)
+
+
+  top = xmlRoot(doc)
+  textNodes = xmlSApply(top, inherits, "XMLInternalTextNode")
+  sapply(xmlChildren(top)[textNodes], xmlValue)
 }
 
 \keyword{file}

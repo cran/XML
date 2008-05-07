@@ -1,3 +1,104 @@
+Version 1.95-1
+
+  *  Minor bug fixes regarding Encoding issues introduce in 1.95-0.
+
+  *  xmlEventParse() calls R_CheckUserInterrupt() when making callbacks to R functions
+     and so should make the GUI more responsive.
+
+  *  Test for older versions of libxml2 which did not have a context field in the xmlNs
+     data structure.
+
+Version 1.95-0
+
+  *  Use the encoding of the document in creating R character strings to identify 
+     the Encoding() in R. There are probably omissions and potential problems, so 
+     I would be very grateful for examples which fail, along with the file, the locale
+     and the R code used to manipulate these.
+
+
+Version 1.94-0
+
+  *  Fixed a bug in xpathApply()/getNodeSet() applied to an XMLInternalNode
+     which now ensures that the nodes emerge with the original internal document
+     as their top-level document.
+
+  *  Added processXInclude() for processing individual XInclude nodes
+     and determining what nodes they add.
+
+  * If asText is TRUE in xmlTreeParse(), xmlInternalTreeParse(), ...,
+     no call to file.exists() is made. This is both sensible and
+     overcomes a potential file name length limitation (at least on
+     Windows).
+
+  *  The trim parameter for xmlInternalTreeParse() and
+     xmlTreeParse(, useInternal = TRUE) causes simple text nodes
+     containing blank space to be discarded.  saveXML() will, by
+     default, put them back but not if text nodes are explicitly added.
+
+  *  xmlTreeParse(), xmlInternalTreeParse(), htmlTreeParser(),
+     parseDTD(), etc.  take an error handler function which defaults to
+     collecting all the errors and reporting them at the end of the
+     attempt to parse.
+
+  *  getXMLErrors() returns a list of errors from the XML/HTML parser
+     for help in correcting documents.
+
+  *  Added xmlStopParser() which can be used to terminate a parser from
+     R. This is useful in handler functions for SAX-style parsing via
+     xmlEventParse(). 
+
+  *  A handler function passed to xmlEventParse() can indicate that it
+     wants to be passed a reference to the internal xmlParserContext by 
+     having the class XMLParserContextFunction.  Such functions will be
+     called with the context object as the first argument and the usual
+     arguments displaced by 1, e.g. the name and attributes for a
+     startElement handler would then be in positions 2 and 3.
+   
+  *  When parsing with useInternalNodes= TRUE and trim = TRUE in
+     xmlTreeParse() or xmlInternalTreeParse(), blank nodes are discarded
+     so line breaks between nodes are not returned as part of the tree.
+     This makes pretty-printing/indenting work on the resulting
+     document but does not return the exact content of the original
+     XML. Use trim = FALSE to preserve the breaks.
+
+  *  Added xmlInternalTreeParse() which is a simple copy of xmlTreeParse()
+      with useInternalNodes defaulting to TRUE, so we get an internal C-level tree.
+
+  *  Added an xpathSApply() function that simplifies the result to a
+     vector/matrix, if possible.
+
+  *  Added replaceNode() function which allows one to insert an internal node
+     with another one. 
+
+  *  addChildren() has a new at parameter to specify where in the list
+     of children to add the new nodes.
+
+  *  newXMLNode(), etc. can compute the document (doc argument) from
+     the parent.
+
+  *  The subset operator applied to an XMLInternalDocument  and
+     getNodeSubset() and xpathApply() compute the namespaces from the
+     top-level of the document by default, so, e.g., doc[["//r:init"]] work.
+
+  *  section parameter added to xmlSource() to allow easy subsetting to
+     a particular <section> within a document.
+
+  *  added catalogLoad(), catalogAdd(), catalogClearTable() functions.
+
+  *  Added docName() function for querying the file name or URL of a
+     parsed XML document.
+
+  *  RS_XML_createDocFromNode() C routine adds root node
+     correctly via xmlAddChild().
+
+  *  Slightly improved identification of HTML content rather than a file or URL name.
+ 
+  * Added a simplify parameter to the xmlNamespaceDefinition()
+     function which, if TRUE, returns a character vector giving the
+     prefix = URI pairs which can be used directly in xpathApply() and
+     getNodeSet().
+
+
 Version 1.93-1
 
   *  Method for xmlNamespace with a character is now exported!  Needed for cases that arise in

@@ -30,7 +30,7 @@ function(nodes = list(), parents = character(), children = list(),
    # but we need to deal with XMLFlatListTree slightly different.
   f = function(suggestion = "") {
        # the check to see if suggestion is a name in env is very expensive.
-     if(suggestion == "" || exists(suggestion, env)) 
+     if(suggestion == "" || exists(suggestion, env, inherits = FALSE)) 
         as.character(.count + 1)  # can use length(tt)
      else
         suggestion
@@ -77,12 +77,11 @@ function(nodes = list(), parents = character(), children = list(),
       .nodes <<- nodeSet
       idx
   }
-#  environment(env$.tidy) <- env
-  ans = structure(env, class = c("XMLHashTree", "XMLFlatTree"))
-  .this = ans
+  #  environment(env$.tidy) <- env
+  
+  .this = structure(env, class = c("XMLHashTree", "XMLFlatTree"))
 
-
-  ans
+  .this
 }
 
 
@@ -98,7 +97,7 @@ xmlParent.XMLHashTreeNode =
 function(x)
 {
   p = get(".parents", x$env)
-  idx = exists(x$id, p)
+  idx = exists(x$id, p, inherits = FALSE)
   if(!idx)
       return(NULL)
 
@@ -112,7 +111,7 @@ xmlChildren.XMLHashTreeNode =
   # in the .children hash table and then the resulting entry is a character
   # vector giving the ids of the child nodes of obj. So we have to resolve those
   # children id's back in the hash table for the actual nodes.
-function(x)
+function(x, addNames = TRUE)
 {
   e = x$env
   kids = get(".children", e)

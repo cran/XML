@@ -17,9 +17,7 @@ to obtain the list of valid attributes.}
   \item{dtd}{The DTD containing the definition of the elements,
 specifically \code{element}.}
 }
-\details{
-  
-}
+
 \value{
  A logical value indicating if the
 list of attributes suppported by the 

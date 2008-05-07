@@ -9,7 +9,11 @@
  */
 
 #include "EventParse.h"
+
+
+#define R_USE_XML_ENCODING 1
 #include "Utils.h" /* For the findFunction and invokeFunction. */
+#undef R_USE_XML_ENCODING    /*XXX */
 
 #include "RSCommon.h"
 
@@ -47,12 +51,44 @@ IsConnection(USER_OBJECT_ obj)
 }
 
 
+static USER_OBJECT_ 
+RS_XML(createAttributesList)(const char **atts, const xmlChar *encoding) 
+{
+  int n=0, i;
+  const char **ptr = atts;
+  USER_OBJECT_ attr_names;
+  USER_OBJECT_ attr_values;
+
+
+  while(ptr && ptr[0]) {
+    n++;
+    ptr += 2;
+  }
+
+ 
+  if(n < 1)
+    return(NULL_USER_OBJECT);
+
+  PROTECT(attr_values = NEW_CHARACTER(n));
+  PROTECT(attr_names = NEW_CHARACTER(n));
+     ptr = atts;
+     for(i=0; i < n; i++, ptr+=2) {
+      SET_STRING_ELT(attr_values, i, COPY_TO_USER_STRING(ptr[1]));
+      SET_STRING_ELT(attr_names, i,  COPY_TO_USER_STRING(ptr[0]));
+     }
+    SET_NAMES(attr_values, attr_names);
+  UNPROTECT(2);
+
+  return(attr_values);
+}
+
+
 USER_OBJECT_ 
 RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
                   USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion,
-   	           USER_OBJECT_ branches, USER_OBJECT_ useDotNames)
+   	           USER_OBJECT_ branches, USER_OBJECT_ useDotNames, USER_OBJECT_ errorFun)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -62,6 +98,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   RS_XML_ContentSourceType asTextBuffer;
   RS_XMLParserData *parserData;
   USER_OBJECT_ ans;
+  int status;
 
 
   if(IsConnection(fileName) || isFunction(fileName))
@@ -129,15 +166,21 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
       xmlSubstituteEntitiesDefault(1);   
 #endif
 
-  RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0]);
+  status = RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0]);
 
+/* How about using R_alloc() here so that it is freed, i.e. for the fileName and the parserData itself. */
   ans = parserData->stateObject ? parserData->stateObject : handlers;
   free(parserData->fileName);
+
 
   if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
      R_ReleaseObject(parserData->stateObject);
 
-  free(parserData);
+  if(status != 0) {
+    RSXML_structuredStop(errorFun, NULL);
+  }
+
+  /* free(parserData); Now using R_alloc */
 
   return(ans);
 }
@@ -158,6 +201,8 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
  USER_OBJECT_ opArgs;
  int i, num;
   const XML_Char *xml_args[5];
+
+  DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
    num = sizeof(xml_args)/sizeof(xml_args[0]);
 
@@ -182,6 +227,7 @@ RS_XML(startElement)(void *userData, const char *name, const char **atts)
   USER_OBJECT_ opArgs;
   int i;
   RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
+  DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
   if((i = R_isBranch(CHAR_TO_XMLCHAR(name), rinfo)) != -1) {
       R_processBranch(rinfo, i, CHAR_TO_XMLCHAR(name), NULL, NULL, 0, NULL, 0, 0, (const xmlChar ** /*XXX*/) atts);
@@ -193,7 +239,7 @@ RS_XML(startElement)(void *userData, const char *name, const char **atts)
   SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(name)); 
 
   /* Now convert the attributes list. */
-   SET_VECTOR_ELT(opArgs, 1, RS_XML(createAttributesList)(atts));
+   SET_VECTOR_ELT(opArgs, 1, RS_XML(createAttributesList)(atts, encoding));
    RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), name, ((RS_XMLParserData*) userData), opArgs);
    UNPROTECT(1);
 }
@@ -202,7 +248,8 @@ void
 RS_XML(commentHandler)(void *userData, const XML_Char *data)
 {
   USER_OBJECT_ opArgs = NEW_LIST(1);
- RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
+  RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
+  DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
   PROTECT(opArgs);
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
@@ -213,38 +260,14 @@ RS_XML(commentHandler)(void *userData, const XML_Char *data)
 }
 
 
-USER_OBJECT_ 
-RS_XML(createAttributesList)(const char **atts) 
-{
-  int n=0, i;
-  const char **ptr = atts;
-  USER_OBJECT_ attr_names;
-  USER_OBJECT_ attr_values;
-  while(ptr && ptr[0]) {
-    n++;
-    ptr += 2;
-  }
- 
-  if(n < 1)
-    return(NULL_USER_OBJECT);
 
-  PROTECT(attr_values = NEW_CHARACTER(n));
-  PROTECT(attr_names = NEW_CHARACTER(n));
-     ptr = atts;
-     for(i=0; i < n; i++, ptr+=2) {
-      SET_STRING_ELT(attr_values, i, COPY_TO_USER_STRING(ptr[1]));
-      SET_STRING_ELT(attr_names, i,  COPY_TO_USER_STRING(ptr[0]));
-     }
-    SET_NAMES(attr_values, attr_names);
-  UNPROTECT(2);
-
-  return(attr_values);
-}
 
 void RS_XML(endElement)(void *userData, const char *name)
 {
  USER_OBJECT_ opArgs;
  RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
+ DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
+
 
  if(rinfo->current) {
      R_endBranch(rinfo, CHAR_TO_XMLCHAR(name), NULL, NULL);
@@ -273,6 +296,8 @@ RS_XML(processingInstructionHandler)(void *userData, const XML_Char *target, con
 {
  USER_OBJECT_ opArgs;
  RS_XMLParserData *parserData = (RS_XMLParserData *) userData;
+  DECL_ENCODING_FROM_EVENT_PARSER(parserData)
+
 
  PROTECT(opArgs = NEW_LIST(2));
  SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
@@ -302,6 +327,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
  char *tmpString, *tmp;
  USER_OBJECT_ opArgs = NULL;
  RS_XMLParserData *parserData = (RS_XMLParserData*)userData; 
+ DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
   if(parserData->current) {
       xmlChar *tmp = (xmlChar *) S_alloc((len + 1), sizeof(xmlChar));
@@ -316,7 +342,8 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
   if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && s[0] == '\n' && parserData->trim))
     return;
 
-           /* 1 more than length so we can put a \0 on the end. */
+           /*XXX Deal with encoding, memory cleanup, 
+             1 more than length so we can put a \0 on the end. */
     tmp = tmpString = (char*)calloc(len+1, sizeof(char));
     strncpy(tmpString, s, len);
  
@@ -363,8 +390,9 @@ RS_XML(notStandAloneHandler)(void *userData)
 RS_XMLParserData *
 RS_XML(createParserData)(USER_OBJECT_ handlers) 
 {
- RS_XMLParserData *parser = calloc(1, sizeof(RS_XMLParserData));
+ RS_XMLParserData *parser = (RS_XMLParserData *) R_alloc(1, sizeof(RS_XMLParserData));
 
+ memset(parser, '\0', sizeof(RS_XMLParserData));
  parser->methods = handlers;
 
 return(parser);
@@ -384,6 +412,8 @@ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserDa
   USER_OBJECT_ _userObject = parserData->methods;
   int general = 0;
 
+  R_CHECK_INTERRUPTS
+
   if(preferredName && parserData->callByTagName) {
     fun = RS_XML(findFunction)(preferredName, _userObject);
   }
@@ -399,7 +429,7 @@ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserDa
    return(NULL_USER_OBJECT);
   }
 
-  val = RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject);
+  val = RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject, parserData->ctx);
   updateState(val, parserData);
   return(val); 
 }

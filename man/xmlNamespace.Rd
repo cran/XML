@@ -29,7 +29,7 @@ xmlNamespace(x)
  For non-root nodes, this returns a string giving the identifier
  of the name space for this node.
 For the root node,
-this returns a list with $3$ elements:
+this returns a list with 2 elements:
 \item{id}{the identifier by which other nodes refer to this
 namespace.}
 \item{uri}{the URI or location that defines this namespace.}
@@ -44,12 +44,20 @@ namespace.}
  \code{\link{xmlChildren}}
  \code{\link{xmlAttrs}}
  \code{\link{xmlValue}}
+ \code{\link{xmlNamespaceDefinitions}} 
 }
 
 \examples{
   doc <- xmlTreeParse(system.file("exampleData", "job.xml", package="XML"))
   xmlNamespace(xmlRoot(doc))
   xmlNamespace(xmlRoot(doc)[[1]][[1]])
+
+
+  doc <- xmlInternalTreeParse(system.file("exampleData", "job.xml", package="XML"))
+     # Since the first node is a comment, get the sibling.
+  xmlNamespace(getSibling(xmlRoot(doc)))
+  xmlNamespace(getSibling(xmlRoot(doc))[[1]][[1]])
+
 
   node <- xmlNode("arg", xmlNode("name", "foo"), namespace="R")
   xmlNamespace(node)

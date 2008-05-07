@@ -5,7 +5,7 @@
  Represents the contents of a DTD as a user-level object containing the element and entity definitions.
 }
 \usage{
-parseDTD(extId, asText=FALSE, name="", isURL=FALSE)
+parseDTD(extId, asText=FALSE, name="", isURL=FALSE, error = xmlErrorCumulator())
 }
 \arguments{
  \item{extId}{The name of the file containing the DTD to be processed.}
@@ -15,6 +15,9 @@ and handed to the parser as content only.}
  \item{name}{Optional name to provide to the parsing mechanism.}
  \item{isURL}{A logical value indicating whether the input source is to be
   considred a URL or a regular file or string containing the XML.}
+ \item{error}{an R function that is called when an error is
+ encountered. This can report it and continue or terminate by raising
+ an error in R.  See the error parameter for \code{link{xmlTreeParse}}.}
 }
 \details{
  Parses and converts the contents of the DTD in the specified file 

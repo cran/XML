@@ -19,7 +19,7 @@
   \code{\link{getNodeSet}}.
 }
 \usage{
-xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE)
+xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE,  simplify  = FALSE)
 getDefaultNamespace(doc) 
 }
 \arguments{
@@ -39,8 +39,15 @@ getDefaultNamespace(doc)
     collected into a single "flat" list and so there may be duplicate
     names.
   }
-}
-\details{
+ \item{simplify}{a logical value. If this is \code{TRUE}, 
+     a character vector of prefix-URI pairs is returned.
+   This can be used directly in calls to functions such as
+      \code{\link{xpathApply}}  and \code{\link{getNodeSet}}.
+    The default value of \code{FALSE} returns a list
+    of name space definitions which also identify 
+   whether the definition is local to the particular node or inherited
+   from an ancestor.
+  }
 }
 \value{
   A list with as many elements as there are namespace definitions.
@@ -68,8 +75,9 @@ getDefaultNamespace(doc)
   xmlNamespaceDefinitions(n, recursive = TRUE)
 
 
+    # Now using internal nodes.
   f = system.file("exampleData", "namespaces.xml", package = "XML")
-  n = xmlRoot(xmlTreeParse(f, useInternal = TRUE))
+  n = xmlRoot(xmlInternalTreeParse(f))
   xmlNamespaceDefinitions(n)
 
   xmlNamespaceDefinitions(n, recursive = TRUE)

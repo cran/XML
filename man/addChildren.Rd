@@ -2,6 +2,7 @@
 \alias{addChildren}
 \alias{removeChildren}
 \alias{removeNodes}
+\alias{replaceNodes}
 \alias{addAttributes}
 \alias{removeAttributes}
 \alias{addChildren,XMLInternalNode-method}
@@ -13,7 +14,7 @@
 \title{Add child nodes to an XML node}
 \description{
   This collection of functions
-  allow us to add and remove children from an XML node
+  allow us to add, remove and replace children from an XML node
   and also to and and remove attributes on an XML node.
   These are generic functions that work on
   both internal C-level \code{XMLInternalElementNode} objects
@@ -24,10 +25,12 @@
   function and methods in the future.
 }
 \usage{
-addChildren(node, ..., kids = list(...))
+addChildren(node, ..., kids = list(...), at = NA, cdata = FALSE)
 removeChildren(node, ..., kids = list(...), free = FALSE)
 removeNodes(node, free = rep(FALSE, length(node)))
-addAttributes(node, ..., .attrs = NULL)
+replaceNodes(oldNode, newNode, ...)
+addAttributes(node, ..., .attrs = NULL, 
+                suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE))
 removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
                   .all = (length(list(...)) + length(.attrs)) == 0)
 }
@@ -56,6 +59,25 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
       multiple nodes with the same name),
       or the \code{XMLInternalNode} object itself.
     }
+    \item{at}{if specified, an integer identifying
+      the position in the original
+      list of children at which the new children should be added.
+      The children are added after that child.
+      This can also be a vector of indices which is as long
+      as the number of children being added and specifies the position
+      for each child being added. If the vector is shorter than the
+      number of children being added, it is padded with NAs
+      and so the corresponding children are added at the end of the
+      list.
+
+      This parameter is only implemented for internal nodes at present.
+     }
+    \item{cdata}{a logical value which controls whether children that
+     are specified as strings/text are enclosed within a CDATA node
+     when converted to actual nodes.  This value is passed on to the
+     relevant function that creates the text nodes, e.g. 
+     \code{\link{xmlTextNode}} and \code{\link{newXMLTextNode}}.
+   }
     \item{.attrs}{a character vector identifying the names of the
       attributes.  These strings can have name space prefixes,
       e.g. \code{r:length}
@@ -85,7 +107,26 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
       memory managers. 
     }
     \item{.all}{a logical value indicating whether to remove all of the
-      attributes within the XML node without having to specify them by name.}
+      attributes within the XML node without having to specify them by
+     name.}
+   \item{oldNode}{the node which is to be replaced}
+   \item{newNode}{the node which is to take the place of
+     \code{oldNode} in the list of children of the parent of
+     \code{oldNode}}
+   \item{suppressNamespaceWarning}{a logical value or a character string. 
+      This is used to control the situation when an  XML node
+      or attribute is created with a name space prefix that currently has no
+      definition for that node. 
+      This is not necessarily an error but can lead to one.
+      This argument controls whether a warning is issued
+       or if a separate function is called.
+      A value of \code{FALSE} means not to suppress the warning and 
+      so it is issued. A value of \code{TRUE} causes the potential
+      problem to be ignored assuming that the namespace will be added
+      to this node or one of its ancestors at a later point.
+      And if this value is a character string, we search for a
+      function of that name and invoke it. 
+     }
 }
 \details{
 

@@ -6,7 +6,7 @@ xmlTree <-
   # are relatively similar in complexity.
   #
   #
-function(tag = NULL, attrs = NULL, dtd=NULL, namespaces = list(),
+function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
           doc = newXMLDoc(dtd, namespaces))
   # Allows a DOCTYPE, etc. at the beginning by specifying dtd as 
   # a vector of 1, 2, 3 elements passed to newXMLDTDNode() or
@@ -267,9 +267,47 @@ function(x, ...)
 }  
 
 
-xmlRoot.XMLInternalElement =
+ #??? This was XMLInternalElement and not ...Node
+xmlRoot.XMLInternalElement = xmlRoot.XMLInternalNode =
 function(x, ...)
 {
-  xmlRoot(as(x, "XMLInternalDocument"))
+  doc = as(x, "XMLInternalDocument")
+  if(is.null(doc))
+    getRootNode(x)
+  else
+    xmlRoot(doc)
 }
   
+docName =
+  # Get the name of the file/URI for the document.
+function(doc)
+ UseMethod("docName")
+
+docName.XMLInternalDocument =
+function(doc)
+{
+  .Call("RS_XML_getDocumentName", doc)
+}
+
+
+docName.XMLDocument =
+function(doc)
+{
+  doc$doc$file
+}
+
+docName.XMLDocumentContent =
+function(doc)
+{
+  doc$file
+}  
+
+setGeneric("docName<-", function(x, value)
+                         standardGeneric("docName<-"))
+
+setMethod("docName<-", "XMLInternalDocument",
+function(x, value)
+{
+  .Call("RS_XML_setDocumentName", x, value)
+  x
+})

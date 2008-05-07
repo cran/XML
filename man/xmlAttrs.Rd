@@ -16,7 +16,7 @@
 }
 \usage{
  xmlAttrs(node, ...)
- 'xmlAttrs<-'(node, value)
+ 'xmlAttrs<-'(node, suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE), value)
 }
 \arguments{
   \item{node}{The \code{XMLNode} object
@@ -25,6 +25,7 @@
     ignored but present for future extensions.}
   \item{value}{a named character vector giving the new attributes to be
     added to the node.}
+  \item{suppressNamespaceWarning}{see \code{\link{addChildren}}}
 }
 \value{
  A named character vector, where the names
@@ -51,7 +52,7 @@ pairs in the XML tag
  doc <- xmlTreeParse(fileName, useInternalNodes = TRUE)
  d = xmlRoot(doc)
    # skip over the comment
- d = XML:::getNextSibling(d)
+ d = XML:::getSibling(d)
 
  xmlAttrs(d)
  xmlAttrs(d) <- c(name = "Motor Trend fuel consumption data",

@@ -136,39 +136,43 @@ function(x, ignoreComments = FALSE)
  x$value
 }
 
+# "xmlValue.NULL" =
+#  function(x, ignoreComments = FALSE)
+#               character()
 
-getNextSibling =
+
+getSibling =
   # Access the next field in the xmlNodePtr object.
   # not exported.
-function(x)
+function(node, after = TRUE)
 {
-  if(!inherits(x, "XMLInternalNode"))
+  if(!inherits(node, "XMLInternalNode"))
     stop("can only operate on an internal node")
 
-  .Call("RS_XML_getNextSibling", x)
+  .Call("RS_XML_getNextSibling", node, as.logical(after))
 }
 
 xmlNamespaceDefinitions <-
-function(x, addNames = TRUE, recursive = FALSE)
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 {
   UseMethod("xmlNamespaceDefinitions")
 }
 
 xmlNamespaceDefinitions.XMLInternalDocument =
-function(x, addNames = TRUE, recursive = FALSE)
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 {
   r = xmlRoot(x)
   while(!is.null(r) && !inherits(r, "XMLInternalElementNode")) 
-     r = getNextSibling(r)
+     r = getSibling(r)
 
   if(is.null(r))
-    return(NULL)
+    return(if(simplify) character() else NULL)
   
-  xmlNamespaceDefinitions(r)
+  xmlNamespaceDefinitions(r, addNames, recursive, simplify)
 }
 
 xmlNamespaceDefinitions.XMLNode =
-  function(x, addNames = TRUE, recursive = FALSE) {
+  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
     ans = unclass(x)$namespaceDefinitions
 
 
@@ -185,17 +189,52 @@ xmlNamespaceDefinitions.XMLNode =
 
     if(addNames && length(ans) && length(names(ans)) == 0)
         names(ans) = sapply(ans, function(x) x$id)
-    
+
+    if(simplify) {
+      if(length(ans) == 0)
+        return(character())
+      
+      ans = sapply(ans, function(x) x$uri)
+    }
+
     ans
   }
 
 xmlNamespaceDefinitions.XMLInternalNode =
-  function(x, addNames = TRUE, recursive = FALSE) {
+  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
     ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x, as.logical(recursive))
     if(addNames && length(ans) > 0)
       names(ans) = sapply(ans, function(x) x$id)
+
+    if(simplify) {
+      if(length(ans) == 0)
+        return(character(0))
+      ans = sapply(ans, function(x) x$uri)
+      ans = removeDuplicateNamespaces(ans)
+    }
+
     ans
   }
+
+removeDuplicateNamespaces =
+function(ns)
+{
+  dups = duplicated(names(ns))
+  if(!any(dups))
+    return(ns)
+
+  tapply(ns, names(ns),
+           function(els) {
+             if(length(els) == 1)
+               return(TRUE)
+
+             if(length(unique(els)) > 1)
+               stop("different URIs for the same name space prefix ", names(els)[1])
+             TRUE
+           })
+  
+  ns[!dups]
+}  
 
 xmlNamespace <-
 function(x)
@@ -221,13 +260,38 @@ xmlNamespace.character =
           }
 #)
 
+verifyNamespace =
+  # Check that the namespace prefix in tag (if any)
+  # has a definition in def that matches the definition of the same prefix in node.
+function(tag, def, node)
+{
+   # could have prefix: with no name, but that should never be allowed earlier than this.
+  ns = strsplit(tag, ":")[[1]]
+  if(length(ns) == 1)
+    return(TRUE)
+
+  if(! (ns[1] %in% names(def)) )
+     TRUE  #??
+
+  defs = xmlNamespaceDefinitions(node)
+
+  if( defs[[ ns[1] ]]$uri == def[ ns[1] ]) 
+      stop("name space prefix ", ns, " does not match ", namespaceDefinition[ns], " but ", defs[[ ns[1] ]] $uri)
+
+  TRUE
+}  
+
 
 xmlGetAttr <-
-function(node, name, default = NULL, converter = NULL)
+  #Added support for name spaces.
+function(node, name, default = NULL, converter = NULL, namespaceDefinition = character())
 {
   a <- xmlAttrs(node)
   if(is.null(a) || is.na(match(name, names(a)))) 
     return(default)
+
+  if(length(namespaceDefinition))
+     verifyNamespace(name, namespaceDefinition, node)
 
   if(!is.null(converter))
     converter(a[[name]])
@@ -235,3 +299,36 @@ function(node, name, default = NULL, converter = NULL)
     a[[name]]
 }  
 
+
+getXInclude =
+function(node, parse = FALSE, sourceDoc = NULL)
+{
+  href = xmlGetAttr(node, "href")
+  xpointer = xmlGetAttr(node, "xpointer")
+
+  if(parse) {
+     #
+     # Perhaps just relod the original document
+     # and see what the difference is. Not guaranteed
+     # to work since people may have already altered
+     # the source document.
+    
+    if(!is.na(href)) {
+       fileName = paste(dirname(docName(sourceDoc)), href, sep = .Platform$file.sep)
+       doc = xmlInternalTreeParse(fileName)
+    } else
+      doc = sourceDoc
+    
+    if(!is.na(xpointer)) {
+
+    }
+  } else 
+    c(href = href, xpointer = xpointer)
+}  
+
+getInclude =
+function(doc, parse = FALSE)
+{
+  xpathApply(doc, "//xi:include", getXIncludeInfo, parse, docName(doc), doc,
+                 namespaces = c(xi="http://www.w3.org/2001/XInclude"))
+}  

@@ -33,15 +33,15 @@ DefaultXPathNamespaces =
 
 setGeneric("xmlSource",
 function(url, ...,
-          envir =globalenv(),
+          envir = globalenv(),
           xpath = character(),
           ids = character(),
           omit = character(),
           ask = FALSE,
           example = NA,
-          fatal = TRUE, verbose = FALSE,
+          fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),         
-          namespaces = DefaultXPathNamespaces)
+          namespaces = DefaultXPathNamespaces, section = character(), eval = TRUE)
 {
 
   standardGeneric("xmlSource")
@@ -53,23 +53,27 @@ function(url, ...,
 
 
 setMethod("xmlSource", c("character"),
-function(url, ..., envir =globalenv(),
+function(url, ...,
+          envir =globalenv(),
           xpath = character(),         
           ids = character(),
           omit = character(),
           ask = FALSE,
           example = NA,         
-          fatal = TRUE, verbose = FALSE,
+          fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),
-          namespaces = DefaultXPathNamespaces)
+          namespaces = DefaultXPathNamespaces,
+          section = character(), eval = TRUE)
 {
-  library(XML)
   doc = xmlTreeParse(url, ..., useInternal = TRUE)
-#  on.exit(free(doc))
 
   if(is(verbose, "numeric"))
     verbose = verbose - 1
-  
+
+  if(!is.character(section))
+    section = as.integer(section)
+
+  #XXX use section when processing the examples
   if(length(example))  {
     egs = getNodeSet(doc, "//r:example", namespaces)
     if(length(egs)) {
@@ -93,7 +97,7 @@ function(url, ..., envir =globalenv(),
         xmlSource(init, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces)
         cat("Done doc-level init", length(init), "\n")
       }
-      
+
       ans = sapply(i, function(x) {
                         nodes = getNodeSet(egs[[x]], paste(xnodes, collapse = "|"), namespaces)
                         if(verbose) 
@@ -106,10 +110,19 @@ function(url, ..., envir =globalenv(),
       return(ans)
    }
   }
+
+  if(length(section) && is.character(section))
+    section = paste("@id=\"", section, "\"")
   
   if(length(xpath)) {
        # do an XPath query and then look inside the resulting nodes
        # for the xnodes of interest.
+
+    if(length(section)) {
+          # XXX assumes just one section. What about c(1, 2, 4)
+       xpath =paste("//section[", section, "]", xpath, sep = "")
+    }
+    
     nodes = getNodeSet(doc, xpath, namespaces)
     v =
       unlist(lapply(nodes, function(n) {
@@ -119,12 +132,22 @@ function(url, ..., envir =globalenv(),
                              recursive = FALSE)
                   }), recursive = FALSE)
   } else {
-     v = getNodeSet(doc, "//r:function", namespaces)
-     w = getNodeSet(doc, paste(xnodes, collapse = "|"), namespaces)
-     v = c(v, w)
+    functions = 
+    functions = limitXPathToSection(section, "//r:function")
+    xnodes = limitXPathToSection(section, xnodes)
+        # Do we need to ensure the order for the functions first?
+    v = getNodeSet(doc, paste(c(functions, xnodes), collapse = "|"), namespaces)
+#   v = getNodeSet(doc, functions, namespaces)
+#   w = getNodeSet(doc, xnodes, namespaces)
+#   v = c(v, w)    
   }
 
+  if(is.null(v))
+    stop("No matching nodes in the document found")
+  
   class(v) <- "XMLNodeSet"
+
+
 
     # deal with a top-level node r:codeIds which is of the form
     #   abc
@@ -143,8 +166,33 @@ function(url, ..., envir =globalenv(),
      ids = ids[ids != ""]
    }
 
-  xmlSource(v, ids = ids, omit = omit, ask = ask, fatal = fatal, verbose = verbose, envir = envir)
+  xmlSource(v, ids = ids, omit = omit, ask = ask, fatal = fatal, verbose = verbose,  envir = envir,
+            section = if(!is.character(section)) section else character(),
+            eval = eval)
 })
+
+
+limitXPathToSection =
+  #
+  # limitToSection(1:3)
+  # limitToSection(letters[1:3])
+  # limitToSection(letters[1:3], "//r:plot")
+function(section, xpath = c("//r:code", "//r:func", "//r:plot", "//r:expr"))
+{
+  if(length(section) == 0)
+    return(paste(xpath, collapse = "|"))
+  
+  if(is.character(section))
+    section = paste("@id=", sQuote(section), sep = "")
+  
+  paste(outer(section, xpath,
+                         function(sect, xp)
+                           paste("//section[", sect, "]", xp, sep = "")),
+        collapse = "|")
+}  
+
+
+
 
 setMethod("xmlSource", "XMLNodeSet",
 function(url, ..., envir =globalenv(),
@@ -153,9 +201,9 @@ function(url, ..., envir =globalenv(),
           omit = character(),
           ask = FALSE,
           example = NA,         
-          fatal = TRUE, verbose = FALSE,
+          fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("r:function", "r:init[not(@eval='false')]", "r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),         
-          namespaces =  DefaultXPathNamespaces)
+          namespaces =  DefaultXPathNamespaces, section = character(), eval = TRUE)
 {
   if(ask) {
      doc = as(url[[1]], "XMLInternalDocument")     #XXXX  no doc here now.
@@ -166,14 +214,14 @@ function(url, ..., envir =globalenv(),
      }
    }
   
-  ans = sapply(url, evalNode, envir = envir, verbose = verbose, ids = ids, omit = omit)
+  ans = sapply(url, evalNode, envir = envir, verbose = verbose, ids = ids, omit = omit, echo = echo, print = print, ask = ask)
   invisible(ans)
 })
 
 
 evalNode = 
-function(node, envir = globalenv(), ids = character(), verbose = FALSE, omit = character(),
-         namespaces = c(r = "http://www.r-project.org"))
+function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = echo, omit = character(),
+         namespaces = c(r = "http://www.r-project.org"), print = echo, ask = FALSE, eval = TRUE)
 {
             #XXX check all ancestors. Ideally exclude them in the XPath query
    if(xmlName(xmlParent(node)) == "ignore")
@@ -228,7 +276,21 @@ function(node, envir = globalenv(), ids = character(), verbose = FALSE, omit = c
 
 #   txt = xmlValue(node)
    if(verbose)
-     cat("*************\nEvaluating node\n", txt, "\n")
+     cat("*************\nEvaluating node\n")
    cmd = parse(text = txt)
-   eval(cmd, globalenv())
+   if(echo)
+     print(cmd)
+
+   if(eval) {
+     if(ask) {
+       w = menu(c("evaluate", "skip", "terminate"))
+       if(w == 2)
+         return(NULL)
+       else if(w == 3)
+         stop("User terminated the xmlSource")
+     }
+
+     eval(cmd, envir)     
+   } else
+     cmd
 }  

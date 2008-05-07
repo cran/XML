@@ -68,6 +68,7 @@ export(
  xmlTextNode,
  xmlTree,
  xmlTreeParse,
+ xmlInternalTreeParse,       
  xmlValue,
  names.XMLNode,
  parseURI,
@@ -85,7 +86,8 @@ export(
  removeNodes,       
  addAttributes,
  removeAttributes,
- "xmlName<-"      
+ "xmlName<-",
+  addSibling
 # xmlFlatListTree       
 )
 
@@ -113,6 +115,7 @@ S3method(removeChildren, XMLInternalNode)
 
 S3method(xpathApply, XMLInternalNode)
 S3method(xpathApply, XMLInternalDocument)
+export(xpathSApply)
 
 
 S3method(xmlNamespaceDefinitions, XMLNode)
@@ -143,12 +146,18 @@ S3method(xmlSize, XMLHashTreeNode)
 S3method(xmlSize, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
 
+
 S3method(xmlRoot, XMLInternalDOM)
+S3method(xmlRoot, XMLInternalNode)
 
 
 S3method(addChildren, XMLInternalNode)
+S3method(addChildren, XMLInternalDocument)
 S3method(addChildren, XMLNode)
 
+
+export(replaceNodes)
+S3method(replaceNodes, XMLInternalNode)
 
 
 S3method(xmlChildren, XMLNode)
@@ -157,6 +166,9 @@ S3method(xmlSize, XMLInternalNode)
 
 
 S3method(xmlValue, XMLInternalNode)
+
+# exportS3method("xmlValue", "NULL")
+
 
 S3method(xmlName, XMLComment)
 S3method(xmlName, XMLNode)
@@ -216,6 +228,7 @@ S3method(xmlValue, XMLComment)
 S3method(xmlValue, XMLCDataNode)
 S3method(xmlValue, XMLProcessingInstruction)
 
+S3method(addSibling, XMLInternalNode)
 
 S3method(xmlNamespace, XMLNode)
 S3method(xmlNamespace, XMLInternalNode)
@@ -236,6 +249,15 @@ S3method(dtdElementValidEntry, XMLOrContent)
 S3method(dtdElementValidEntry, XMLElementContent)
 S3method(dtdElementValidEntry, character)
 S3method(dtdElementValidEntry, XMLSequenceContent)
+
+export(docName)
+S3method(docName, XMLDocument)
+S3method(docName, XMLDocumentContent)
+S3method(docName, XMLInternalDocument)
+
+export("docName<-")
+exportMethods("docName<-")
+
 
 exportClass("SAXState")
 
@@ -258,4 +280,19 @@ exportMethods("names", "$", "$<-", "coerce")
 }
 
 
+
 #importFrom(utils, normalizePath)
+
+export(getSibling)
+export(catalogLoad, catalogClearTable, catalogAdd)
+
+
+export(xmlStructuredStop, xmlErrorCumulator) # xmlStop
+export(xmlStopParser)
+export(getXMLErrors)
+
+export(processXInclude)
+S3method(processXInclude, list)
+S3method(processXInclude, XMLInternalDocument)
+S3method(processXInclude, XMLInternalElementNode)
+

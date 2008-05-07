@@ -19,10 +19,16 @@
   being present..
 }
 \usage{
-xmlChildren(x)
+xmlChildren(x, addNames= TRUE)
 }
 \arguments{
   \item{x}{an object of class XMLNode.}
+  \item{addNames}{a logical value indicating whether to add the XML
+  names of the nodes as names of the R list.
+  This is only relevant for XMLInternalNode objects as XMLNode objects
+  in R already have R-level names.
+  }
+
 }
 \value{
  A list whose elements are sub-nodes of the user-specified

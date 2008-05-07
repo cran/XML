@@ -8,6 +8,8 @@
  */
 
 #include "DocParse.h"
+
+#define R_USE_XML_ENCODING 1
 #include "Utils.h"  /* For isBlank() */
 
 
@@ -24,6 +26,7 @@
 #include <libxml/xinclude.h>
 
 
+
 int RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans);
 USER_OBJECT_ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ ns, R_XMLSettings *parserSettings);
 
@@ -37,6 +40,9 @@ static void NodeTraverse(xmlNodePtr doc, USER_OBJECT_ converterFunctions, R_XMLS
 
 
 static USER_OBJECT_ makeSchemaReference(xmlSchemaPtr ref);
+
+
+
 
 
 USER_OBJECT_
@@ -60,6 +66,12 @@ RS_XML(getDefaultValiditySetting)(USER_OBJECT_ val)
 #endif
 }
 
+#include <libxml/parser.h>
+void
+R_xmlStructuredErrorHandler(void *data, xmlErrorPtr err)
+{
+	RSXML_structuredStop((SEXP) data, err);
+}
 
 /**
   Entry point for reading, parsing and converting an XML tree
@@ -95,7 +107,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
 		        USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding,
 		        USER_OBJECT_ useDotNames,
-                        USER_OBJECT_ xinclude)
+		        USER_OBJECT_ xinclude, USER_OBJECT_ errorFun)
 {
 
   const char *name;
@@ -158,22 +170,37 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
 /*XXX make certain to cleanup the settings. */
       return(makeSchemaReference(schema));
-
   }
+
+#ifdef RS_XML_SET_STRUCTURED_ERROR 
+  xmlSetStructuredErrorFunc(errorFun == NULL_USER_OBJECT ? NULL : errorFun, R_xmlStructuredErrorHandler);
+#endif
 
   if(asTextBuffer) {
-   doc = useHTML ? htmlParseDoc(CHAR_TO_XMLCHAR(name), encoding) : xmlParseMemory(name, strlen(name));
-   if(doc != NULL) {
-      doc->name = (char *) xmlStrdup(CHAR_TO_XMLCHAR("<buffer>"));
-   }
+      doc = useHTML ? htmlParseDoc(CHAR_TO_XMLCHAR(name), encoding) : xmlParseMemory(name, strlen(name)); 
+
+      if(doc != NULL) 
+         doc->name = (char *) xmlStrdup(CHAR_TO_XMLCHAR("<buffer>"));
+
   } else {
-   doc = useHTML ? htmlParseFile(XMLCHAR_TO_CHAR(name), encoding) : xmlParseFile(name);
+      doc = useHTML ? htmlParseFile(XMLCHAR_TO_CHAR(name), encoding) : xmlParseFile(name);
   }
+
+#ifdef RS_XML_SET_STRUCTURED_ERROR 
+  xmlSetStructuredErrorFunc(NULL, NULL);
+#endif
 
   if(doc == NULL) {
       if(freeName && name) {
+#ifdef EXPERIMENTING
 	  free((char *) name);
+#endif
       }
+      /*XXX Just freed the name ! */
+      if(errorFun != NULL_USER_OBJECT) {
+        RSXML_structuredStop(errorFun, NULL);
+      } else
+        return(stop("XMLParseError", "error in creating parser for %s", name));
 
       PROBLEM "error in creating parser for %s", name
       ERROR;
@@ -230,7 +257,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
         SET_VECTOR_ELT(ans, 1, tmp = RS_XML(ConstructDTDList)(doc, 1, NULL));
 
         PROTECT(klass = NEW_CHARACTER(1));
-        SET_STRING_ELT( klass, 0, COPY_TO_USER_STRING("DTDList"));
+        SET_STRING_ELT( klass, 0, mkChar("DTDList"));
         SET_CLASS(tmp, klass);
 
         RS_XML(SetNames)(sizeof(names)/sizeof(names[0]), names, ans);
@@ -245,12 +272,13 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   xmlFreeDoc(doc);
+  R_numXMLDocsFreed++;
 
   if(!parserSettings.internalNodeReferences) {
      /* Set the class for the document. */
     className = NEW_CHARACTER(1);
     PROTECT(className);
-      SET_STRING_ELT(className, 0, COPY_TO_USER_STRING(useHTML ? "HTMLDocument" : "XMLDocument"));   
+      SET_STRING_ELT(className, 0, mkChar(useHTML ? "HTMLDocument" : "XMLDocument"));   
       SET_CLASS(rdoc, className);
     UNPROTECT(1);
   }
@@ -304,6 +332,8 @@ RS_XML(convertXMLDoc)(const char *fileName, xmlDocPtr doc, USER_OBJECT_ converte
   USER_OBJECT_ rdoc_el_names, klass;
   int n = NUM_DOC_ELEMENTS;
   const char *version = "";
+  DECL_ENCODING_FROM_DOC(doc)
+
 
   PROTECT(rdoc = NEW_LIST(n));
   PROTECT(rdoc_el_names = NEW_CHARACTER(n));
@@ -359,6 +389,7 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
   int n = 0;
   xmlNs *ptr = ns;
   USER_OBJECT_ ans, tmp, names;
+  DECL_ENCODING_FROM_NODE(node)
 
   while(ptr) {
     ptr = ptr->next;
@@ -462,7 +493,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
   USER_OBJECT_ ans_el_names;
   USER_OBJECT_ nsDef = NULL_USER_OBJECT;
   int addValue;
-
+  DECL_ENCODING_FROM_NODE(node)
   char *contentValue = XMLCHAR_TO_CHAR(node->content);
 
 #ifdef ROOT_HAS_DTD_NODE
@@ -522,11 +553,11 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 
 
 
-  SET_STRING_ELT(ans_el_names, NODE_NAME, COPY_TO_USER_STRING("name"));
-  SET_STRING_ELT(ans_el_names, NODE_ATTRIBUTES,  COPY_TO_USER_STRING("attributes"));
-  SET_STRING_ELT(ans_el_names, NODE_CHILDREN, COPY_TO_USER_STRING("children"));
-  SET_STRING_ELT(ans_el_names, NODE_NAMESPACE, COPY_TO_USER_STRING("namespace"));
-  SET_STRING_ELT(ans_el_names, NODE_NAMESPACE_DEFS, COPY_TO_USER_STRING("namespaceDefinitions"));
+  SET_STRING_ELT(ans_el_names, NODE_NAME, mkChar("name"));
+  SET_STRING_ELT(ans_el_names, NODE_ATTRIBUTES,  mkChar("attributes"));
+  SET_STRING_ELT(ans_el_names, NODE_CHILDREN, mkChar("children"));
+  SET_STRING_ELT(ans_el_names, NODE_NAMESPACE, mkChar("namespace"));
+  SET_STRING_ELT(ans_el_names, NODE_NAMESPACE_DEFS, mkChar("namespaceDefinitions"));
 
   if(node->ns) {
     PROTECT(nsDef = NEW_CHARACTER(1));
@@ -539,7 +570,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
 	if(node->ns->href)
 	    SET_STRING_ELT(nsDef, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->ns->href)));
 	if(node->ns->prefix)
-	    SET_NAMES(nsDef, mkString(XMLCHAR_TO_CHAR(node->ns->prefix))); /* XXX change! */
+		SET_NAMES(nsDef, ScalarString(COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->ns->prefix)))); /* XXX change! */
 	SET_CLASS(nsDef, mkString("XMLNamespace"));
     }
     SET_VECTOR_ELT(ans, NODE_NAMESPACE, nsDef);
@@ -554,7 +585,7 @@ RS_XML(createXMLNode)(xmlNodePtr node, int recursive, int direction, R_XMLSettin
     SET_STRING_ELT(VECTOR_ELT(ans, NUM_NODE_ELEMENTS), 0, COPY_TO_USER_STRING(contentValue));
 
     if(node->type == XML_ENTITY_REF_NODE) 
-	SET_NAMES(VECTOR_ELT(ans, NUM_NODE_ELEMENTS), mkString(XMLCHAR_TO_CHAR(node->name)));
+	    SET_NAMES(VECTOR_ELT(ans, NUM_NODE_ELEMENTS), ScalarString(COPY_TO_USER_STRING(node->name)));
   }
 
   SET_NAMES(ans, ans_el_names);
@@ -609,7 +640,7 @@ convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings)
         USER_OBJECT_ opArgs = NEW_LIST(1);
 	 PROTECT(opArgs);
 	 SET_VECTOR_ELT(opArgs, 0, ans);
-	 val = RS_XML(invokeFunction)(fun, opArgs, NULL);
+	 val = RS_XML(invokeFunction)(fun, opArgs, NULL, NULL);
    	 UNPROTECT(1);
       }
   }
@@ -657,9 +688,9 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
      if(appendDefault)
        numEls++;
      PROTECT(Class = NEW_CHARACTER(numEls));
-        SET_STRING_ELT(Class, 0, COPY_TO_USER_STRING(className));
+        SET_STRING_ELT(Class, 0, mkChar(className));
 	if(appendDefault)
-          SET_STRING_ELT(Class, numEls-1, COPY_TO_USER_STRING("XMLNode"));
+          SET_STRING_ELT(Class, numEls-1, mkChar("XMLNode"));
         SET_CLASS(ans, Class);
       UNPROTECT(1);
       className = NULL;
@@ -682,6 +713,7 @@ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node)
 {
 
  USER_OBJECT_ ans;
+ DECL_ENCODING_FROM_NODE(node)
 
  if(node->nsDef) {
    PROTECT(ans = NEW_LIST(3));
@@ -863,6 +895,8 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
                               node->childs;
 #endif
 
+  DECL_ENCODING_FROM_NODE(node)
+
   base = c;
 
   if(IS_FUNCTION(parserSettings->converters)) {
@@ -926,87 +960,6 @@ RS_XML(createNodeChildren)(xmlNodePtr node, int direction, R_XMLSettings *parser
 }
 
 
-/**
-   Create an R named list containing the attributes of the specified node.
- */
-
-/*
-   We could use the CONS mechanism rather than doing a double pass.
-   Not certain what is quicker in this situation. Also, doesn't
-   work that way in S4, so keep it this way.
-*/
-USER_OBJECT_ 
-RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
-{
-  USER_OBJECT_ ans = NULL_USER_OBJECT;
-  USER_OBJECT_ ans_names;
-  xmlAttr * atts;
-
-  int n = 0, i;
-
-      /* Count the number of attributes*/
-    atts = node->properties;
-
-    while(atts) {
-      n++;
-      atts = atts->next;
-    }
-
-  if(n > 0) {
-    SEXP ans_namespaces;
-    int nonTrivialAttrNamespaces = 0;
-
-    PROTECT(ans = NEW_CHARACTER(n));
-    PROTECT(ans_names = NEW_CHARACTER(n));
-    PROTECT(ans_namespaces = NEW_CHARACTER(n));
-
-         /* Loop over the attributes and create the string elements
-            and the elements of the name vector.
-          */
-
-
-      atts = node->properties;
-
-      for(i=0; i < n ; i++) {
-	/* Have to be careful that atts->val and atts->val->context are non-null. Something like
-           <a href=""> kills it otherwise.
-         */
-#ifdef LIBXML2
-         SET_STRING_ELT(ans, i, 
-                         COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(
-                                          ((atts->xmlChildrenNode != (xmlNode*)NULL && atts->xmlChildrenNode->content != (xmlChar*)NULL )
-                                                       ? atts->xmlChildrenNode->content : (xmlChar*)""))));
-#else
-         SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(((atts->val != (xmlNode*)NULL && atts->val->content != (xmlChar*)NULL )
-                                                            ? atts->val->content : (xmlChar*)""))));
-
-#endif
-         if(atts->name) {
-           if(parserSettings->addAttributeNamespaces && atts->ns && atts->ns->prefix) {
-             char buf[400];
-             sprintf(buf, "%s:%s", atts->ns->prefix, atts->name);
-             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(buf));
-	   } else
-             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->name)));
-
-	   if(atts->ns && atts->ns->prefix) {
-	     SET_STRING_ELT(ans_namespaces, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->ns->prefix)));
-	     nonTrivialAttrNamespaces++;
-	   }
-	 }
-
-         atts = atts->next;
-     }
-
-    if(nonTrivialAttrNamespaces)
-        Rf_setAttrib(ans, Rf_install("namespaces"), ans_namespaces);
-    SET_NAMES(ans, ans_names);
-
-    UNPROTECT(nonTrivialAttrNamespaces ? 3 : 3);
-   }
-
-  return(ans);
-}
 
 USER_OBJECT_
 RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSettings)
@@ -1019,7 +972,7 @@ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSetting
         USER_OBJECT_ tmp;
 	 PROTECT(opArgs);
 	 SET_VECTOR_ELT(opArgs, 0, arg);
-	 tmp = RS_XML(invokeFunction)(fun, opArgs, NULL);
+	 tmp = RS_XML(invokeFunction)(fun, opArgs, NULL, NULL);
          ans = tmp;
    	 UNPROTECT(1);
       }
@@ -1127,11 +1080,14 @@ R_createXMLNode(USER_OBJECT_ snode, USER_OBJECT_ handlers, USER_OBJECT_ r_trim, 
 }
 
 
+
 USER_OBJECT_
 RS_XML_xmlNodeName(USER_OBJECT_ snode)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     USER_OBJECT_ ans;
+    DECL_ENCODING_FROM_NODE(node)
+
 
     PROTECT(ans = NEW_CHARACTER(1));
     SET_STRING_ELT(ans, 0, node->name ? COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(node->name)) : R_NaString);
@@ -1146,6 +1102,7 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     USER_OBJECT_ ans;
     xmlNs *ns;
+    DECL_ENCODING_FROM_NODE(node)
 
     ns = node->ns;
     if(!ns)
@@ -1155,7 +1112,7 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     if(ns->href)
         SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
     if(ns->prefix)
-        SET_NAMES(ans, mkString(XMLCHAR_TO_CHAR(ns->prefix))); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
+        SET_NAMES(ans, ScalarString(COPY_TO_USER_STRING(ns->prefix))); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
     UNPROTECT(1);    
     return(ans);
 }
@@ -1195,12 +1152,14 @@ RS_XML_xmlNodeNumChildren(USER_OBJECT_ snode)
 }
 
 USER_OBJECT_
-RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
+RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
-    USER_OBJECT_ ans;
+    USER_OBJECT_ ans, names;
     int count = 0, i;
     xmlNodePtr ptr =  node->children;
+    int addNames = LOGICAL(r_addNames)[0];
+    DECL_ENCODING_FROM_NODE(node)
 
     while(ptr) {
 	count++;
@@ -1210,10 +1169,17 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
     ptr = node->children;
 
     PROTECT(ans = NEW_LIST(count));
+    if(addNames) 
+	PROTECT(names = NEW_CHARACTER(count));
+
     for(i = 0; i < count ; i++, ptr = ptr->next) {
 	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr));
+	if(addNames)
+	    SET_STRING_ELT(names, i, COPY_TO_USER_STRING(ptr->name ? ptr->name : ""));
     }
-    UNPROTECT(1);
+    if(addNames)
+	SET_NAMES(ans, names);
+    UNPROTECT(1 + addNames);
    
     return(ans);
 }
@@ -1239,3 +1205,198 @@ RS_XML_MemoryShow()
 {
     xmlMemDisplay(stderr);
 }
+
+USER_OBJECT_
+RS_XML_setDocumentName(USER_OBJECT_ sdoc, USER_OBJECT_ sname)
+{
+    /* if doc is NULL in C , return NULL in R
+       If doc->name is NULL in C, return NA
+       Otherwise,  return the string.
+       */
+    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+    USER_OBJECT_ ans;
+
+    if(!doc) {
+	PROBLEM "NULL pointer supplied for internal document"
+	    WARN;
+	return(R_NilValue);
+    }
+
+    doc->URL = xmlStrdup(CHAR_DEREF(STRING_ELT(sname, 0)));
+
+    return(ScalarLogical(TRUE));
+}
+
+
+
+USER_OBJECT_
+RS_XML_getDocumentName(USER_OBJECT_ sdoc)
+{
+    /* if doc is NULL in C , return NULL in R
+       If doc->name is NULL in C, return NA
+       Otherwise,  return the string.
+       */
+    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+    USER_OBJECT_ ans;
+    const xmlChar *encoding;
+    if(!doc) {
+	PROBLEM "NULL pointer supplied for internal document"
+	    WARN;
+	return(R_NilValue);
+    }
+    encoding = doc->encoding;
+    PROTECT(ans = NEW_CHARACTER(1));
+    SET_STRING_ELT(ans, 0, doc->URL ? COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(doc->URL)) : R_NaString);
+    UNPROTECT(1);    
+    return(ans);
+}
+
+
+USER_OBJECT_
+RS_XML_setKeepBlanksDefault(USER_OBJECT_ val)
+{
+    int prev;
+    prev = xmlKeepBlanksDefault(INTEGER(val)[0]);
+    return(ScalarInteger(prev));
+}
+
+
+USER_OBJECT_
+RS_XML_xmlXIncludeProcessFlags(USER_OBJECT_ r_doc, USER_OBJECT_ r_flags)
+{
+    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
+    int ans;
+
+    ans = xmlXIncludeProcessFlags(doc, INTEGER(r_flags)[0]);
+    return(ScalarInteger(ans));
+}
+
+USER_OBJECT_
+RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
+{
+    xmlNodePtr node;
+    int flags = INTEGER(r_flags)[0];
+    int n, i;
+    xmlNodePtr prev, parent;
+    SEXP ans = R_NilValue;
+
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+    prev = node->prev;
+    parent = node->parent;
+
+    n = xmlXIncludeProcessTreeFlags(node, flags);
+
+    if(n == 0)
+	return(R_NilValue);
+
+    if(!prev)  {
+	fprintf(stderr, "Adding to children of %s\n", prev->name);
+        prev = parent->children;
+    } else {
+	fprintf(stderr, "Adding after  %s\n", prev->name);
+	prev = prev->next;
+    }
+
+    prev = node->next;
+
+    PROTECT(ans = NEW_LIST(n));
+    for(i = 0; i < n; i++) {
+	SET_VECTOR_ELT(ans, i, prev ? R_createXMLNodeRef(prev) : R_NilValue);
+	prev = prev->next;
+    }
+    UNPROTECT(1);
+
+
+    return(ans);
+}
+
+
+
+/**
+   Create an R named list containing the attributes of the specified node.
+ */
+
+/*
+   We could use the CONS mechanism rather than doing a double pass.
+   Not certain what is quicker in this situation. Also, doesn't
+   work that way in S4, so keep it this way.
+*/
+USER_OBJECT_ 
+RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
+{
+  USER_OBJECT_ ans = NULL_USER_OBJECT;
+  USER_OBJECT_ ans_names;
+  xmlAttr * atts;
+  const xmlChar *encoding = node->doc ? node->doc->encoding : NULL;
+
+  int n = 0, i;
+
+      /* Count the number of attributes*/
+    atts = node->properties;
+
+    while(atts) {
+      n++;
+      atts = atts->next;
+    }
+
+  if(n > 0) {
+    SEXP ans_namespaces;
+    int nonTrivialAttrNamespaces = 0;
+
+    PROTECT(ans = NEW_CHARACTER(n));
+    PROTECT(ans_names = NEW_CHARACTER(n));
+    PROTECT(ans_namespaces = NEW_CHARACTER(n));
+
+         /* Loop over the attributes and create the string elements
+            and the elements of the name vector.
+          */
+
+
+      atts = node->properties;
+
+      for(i=0; i < n ; i++) {
+	/* Have to be careful that atts->val and atts->val->context are non-null. Something like
+           <a href=""> kills it otherwise.
+         */
+#ifdef LIBXML2
+         SET_STRING_ELT(ans, i, 
+                         COPY_TO_USER_STRING(
+                                       XMLCHAR_TO_CHAR(
+                                          ((atts->xmlChildrenNode != (xmlNode*)NULL && atts->xmlChildrenNode->content != (xmlChar*)NULL )
+                                                       ? atts->xmlChildrenNode->content : (xmlChar*)""))));
+#else
+         SET_STRING_ELT(ans, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(((atts->val != (xmlNode*)NULL && atts->val->content != (xmlChar*)NULL )
+                                                            ? atts->val->content : (xmlChar*)""))));
+
+#endif
+         if(atts->name) {
+           if(parserSettings->addAttributeNamespaces && atts->ns && atts->ns->prefix) {
+             char buf[400];
+             sprintf(buf, "%s:%s", atts->ns->prefix, atts->name);
+             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(buf));
+	   } else
+             SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->name)));
+
+	   if(atts->ns && atts->ns->prefix) {
+	     SET_STRING_ELT(ans_namespaces, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->ns->prefix)));
+	     nonTrivialAttrNamespaces++;
+	   }
+	 }
+
+         atts = atts->next;
+     }
+
+    if(nonTrivialAttrNamespaces)
+        Rf_setAttrib(ans, Rf_install("namespaces"), ans_namespaces);
+    SET_NAMES(ans, ans_names);
+
+    UNPROTECT(nonTrivialAttrNamespaces ? 3 : 3);
+   }
+#if 0
+   else
+      ans = NEW_CHARACTER(0);
+#endif
+
+  return(ans);
+}
+

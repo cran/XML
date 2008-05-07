@@ -26,5 +26,4 @@ typedef enum {RS_XML_FILENAME, RS_XML_TEXT, RS_XML_CONNECTION, RS_XML_INVALID_CO
 
 #endif /* end of _R_ */
 
-
 #endif

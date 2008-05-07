@@ -43,9 +43,7 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(), env = 
   \item{n}{for \code{xmlFlatListTree}, this is used as the default size
     to allocate for the list containing the nodes}
 }
-\details{
 
-}
 \value{
   An object of class XMLFlatTree which is specialized
   to \code{XMLFlatListTree} by the \code{xmlFlatListTree}

@@ -12,6 +12,7 @@
 
  */
 
+
 #include "Utils.h"  
 
 #include <ctype.h>  /* For isspace() */
@@ -118,8 +119,13 @@ void xmlParserError(void *ctx, const char *msg, ...)
   char buf[3000], *tmp;
   va_list args;
 
+#if 1
+  va_start(args, msg);
+  stop("XMLParserError", msg, args);
+#else
+
     /* Empty the string buffer. */
-  memset(buf , '\0', sizeof(buf)/sizeof(buf[0]));
+    memset(buf , '\0', sizeof(buf)/sizeof(buf[0]));
 
     /* Insert the file and line number. */
   localXmlParserPrintFileInfo(ctxt->input, buf);
@@ -132,6 +138,7 @@ void xmlParserError(void *ctx, const char *msg, ...)
   va_end(args);
   PROBLEM "XML Parsing Error: %s", buf
   WARN;
+#endif
 }
 
 #ifndef USE_LINKED_ERROR_HANDLER
@@ -188,10 +195,7 @@ RS_XML(SetNames)(int n, const char *cnames[], USER_OBJECT_ ans)
   PROTECT(names = NEW_CHARACTER(n));
   for(i = 0; i < n ; i++) {
     /* could install as a pre-defined string. */
-    /*
-         CHARACTER_DATA(names)[i] = COPY_TO_USER_STRING(cnames[i]);
-    */
-         SET_STRING_ELT(names, i, COPY_TO_USER_STRING(cnames[i]));
+      SET_STRING_ELT(names, i, mkChar(cnames[i]));
   }
 
   SET_NAMES(ans, names);
@@ -210,10 +214,8 @@ RS_XML(SetClassName)(const char *localClassName, USER_OBJECT_ target)
 {
     USER_OBJECT_ className;
      PROTECT(className = NEW_CHARACTER(1)); 
-     /*
-       CHARACTER_DATA(className)[0] = COPY_TO_USER_STRING(localClassName);
-     */
-       SET_STRING_ELT(className, 0, COPY_TO_USER_STRING(localClassName));
+
+       SET_STRING_ELT(className, 0, mkChar(localClassName));
        SET_CLASS(target, className);
      UNPROTECT(1);
  
@@ -318,4 +320,152 @@ R_parseURI(SEXP r_uri)
   
   UNPROTECT(2);
   return(ans);
+}
+
+void R_xmlFreeDoc(SEXP ref)
+{
+  xmlDocPtr doc;
+  doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
+
+  if(doc) {
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *)"?? (internally created)");
+#ifdef R_XML_DEBUG
+      fprintf(stderr, "Cleaning up document %p, %s, has children %d\n", (void *) doc, url, (int) (doc->children != NULL));
+#endif
+      xmlFreeDoc(doc);
+      R_numXMLDocsFreed++;
+  }
+  R_ClearExternalPtr(ref);
+}
+
+
+SEXP
+RS_XML_freeDoc(SEXP ref)
+{
+  xmlDocPtr doc;
+  doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
+
+  if(doc) {
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
+#ifdef R_XML_DEBUG
+      fprintf(stderr, "Freeing the document %p, %s\n", (void *) doc, url);
+#endif
+      xmlFreeDoc(doc);
+      R_numXMLDocsFreed++;
+  }
+  R_ClearExternalPtr(ref);
+  return(R_NilValue);
+}
+
+
+/* This is a finalizer that removes the nodes and disassociates the
+   node and the document and then frees the document structure.
+
+   Does xmlFreeDoc() deal with the URL and name fields in the doc?
+*/
+void R_xmlFreeDocLeaveChildren(SEXP ref)
+{
+ xmlDocPtr doc;
+ doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
+
+  if(doc) {
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
+      xmlNodePtr tmp;
+#ifdef R_XML_DEBUG
+      fprintf(stderr, "Cleaning up document but not children: %p, %s\n", (void *) doc, url);
+#endif
+      tmp = doc->children;
+      xmlUnlinkNode(doc->children);
+      tmp->doc = NULL;
+      xmlFreeDoc(doc);
+      R_numXMLDocsFreed++;
+  }
+  R_ClearExternalPtr(ref);
+}
+
+
+
+
+
+
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+
+SEXP
+RSXML_structuredStop(SEXP errorFun, xmlErrorPtr err)
+{
+    SEXP e, ptr;
+    int n = 8;
+
+    if(!err)
+       n = 2;
+
+    PROTECT(e = allocVector(LANGSXP, 8));
+
+    SETCAR(e, errorFun != NULL && errorFun != R_NilValue ? errorFun :  Rf_install("xmlStructuredStop")); 
+    ptr = CDR(e);
+
+    if(err) {
+       SETCAR(ptr, mkString(err->message)); 
+       ptr= CDR(ptr);
+       SETCAR(ptr, ScalarInteger(err->code));
+       ptr= CDR(ptr);
+       SETCAR(ptr, ScalarInteger(err->domain));
+       ptr= CDR(ptr);
+       SETCAR(ptr, ScalarInteger(err->line));
+       ptr= CDR(ptr);
+       SETCAR(ptr, ScalarInteger(err->int2));
+       ptr= CDR(ptr);
+       SETCAR(ptr, ScalarInteger(err->level));
+       ptr= CDR(ptr);
+       SETCAR(ptr, err->file ? mkString(err->file) : NEW_CHARACTER(0));
+    } else {
+       SETCAR(ptr, NEW_CHARACTER(0));    
+    }
+
+    Rf_eval(e, R_GlobalEnv);
+    UNPROTECT(1);
+}
+
+/*
+ Because we call this function via Rf_eval(), we end up 
+ with an extra call on the stack when we enter recover.
+ */
+SEXP
+stop(const char *className, const char *msg, ...)
+{
+    char buf[10000];
+    SEXP error, tmp, e;
+    const char * classNames[] = {"simpleError", "error", "condition"};
+    int i;
+
+    va_list ap;
+
+    va_start(ap, msg);
+/*    Rvsnprintf(buf, sizeof(buf)/sizeof(buf[0]), msg, ap); */
+    vsnprintf(buf, sizeof(buf)/sizeof(buf[0]), msg, ap);
+    va_end(ap);
+    
+    PROTECT(error = mkString(buf));
+
+/*
+    PROTECT(tmp = allocVector(STRSXP, sizeof(classNames)/sizeof(classNames[0])));
+    for(i = 0; i < sizeof(classNames)/sizeof(classNames[0]); i++)
+	SET_STRING_ELT(tmp, i+1, mkChar(classNames[i]));
+    SET_STRING_ELT(tmp, 0, mkChar(className));
+    SET_CLASS(error, tmp);
+*/
+
+    PROTECT(e = allocVector(LANGSXP, 2));
+    SETCAR(e, Rf_install("xmlStop"));
+    SETCAR(CDR(e), error);
+    Rf_eval(e, R_GlobalEnv);
+    UNPROTECT(2);
+
+/*
+ Rf_PrintValue(error);
+ errorcall(error, "%s", msg);
+    UNPROTECT(1);
+*/
+    return(error);
 }

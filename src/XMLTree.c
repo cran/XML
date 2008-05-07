@@ -36,7 +36,8 @@
 #endif
 
 
-#include "Utils.h"  /* R_createXMLNodeRef() */
+#define R_USE_XML_ENCODING 1
+#include "Utils.h"  /* R_createXMLNodeRef(), Encoding macros. */
 
 
 #ifdef USE_OLD_ROOT_CHILD_NAMES
@@ -138,6 +139,9 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 /*   ns = xmlNewNs(xmlGetRootElement(doc), ); */
    node = xmlNewDocNode(doc, ns, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), NULL);
 
+
+#if 0
+/* trying to do this in R now. */
    if((n = GET_LENGTH(nameSpaceDefinitions)) > 0) {
        /* Need the default namespace and then also any other */
      USER_OBJECT_ prefixes = GET_NAMES(nameSpaceDefinitions);
@@ -145,7 +149,10 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
          xmlNewNs(node, CHAR_DEREF(STRING_ELT(nameSpaceDefinitions, i)), CHAR_DEREF(STRING_ELT(prefixes, i)));
      }
    }
+#endif
 
+#if 0
+/* trying to do this in R now. */
    n = GET_LENGTH(attrs);
    if(n > 0) {
        USER_OBJECT_ attrNames = GET_NAMES(attrs);
@@ -158,7 +165,7 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 			  CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrs, i))));
        }
    }
-
+#endif
 
 
    if(doc && XML_ROOT(doc) == NULL) {
@@ -169,11 +176,13 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
 }
 
 USER_OBJECT_
-RS_XML_getNextSibling(USER_OBJECT_ s_node)
+RS_XML_getNextSibling(USER_OBJECT_ s_node, USER_OBJECT_ s_prev)
 {
-    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node), ptr;
 
-    return(node->next ? R_createXMLNodeRef(node->next) : NULL_USER_OBJECT);
+    ptr = LOGICAL(s_prev)[0] ? node->next : node->prev;
+
+    return(ptr ? R_createXMLNodeRef(ptr) : NULL_USER_OBJECT);
 }
 
 
@@ -240,6 +249,7 @@ RS_XML_removeNodeAttributes(USER_OBJECT_ s_node, USER_OBJECT_ attrs, USER_OBJECT
 
 #define GET_R_XML_NODE_PTR(x)   (xmlNodePtr) R_ExternalPtrAddr(s_node);
 
+
 USER_OBJECT_
 RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
 {
@@ -247,6 +257,7 @@ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef)
     xmlNsPtr *els, el;
     int n = 0, i;
     USER_OBJECT_ ans, names;
+    DECL_ENCODING_FROM_NODE(node)
 
     els = xmlGetNsList(node->doc, node);
     if(!els) 
@@ -311,14 +322,28 @@ R_removeInternalNode(SEXP r_node, SEXP r_free)
     return(NULL_USER_OBJECT);
 }
 
+SEXP
+RS_XML_setRootNode(USER_OBJECT_ r_doc, USER_OBJECT_ r_node)
+{
+    xmlDocPtr doc;
+    xmlNodePtr node;
+
+    doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+
+    if(!node->doc)
+	node->doc = doc;
+    xmlDocSetRootElement(doc, node);
+
+    return(ScalarLogical(TRUE));
+}
 
 /**
- Add the internal XML node represented by the S object @node
- as a child of the XML node represented by the S object @parent.
-
+   Add the internal XML node represented by the S object @node
+   as a child of the XML node represented by the S object @parent.
  */
 USER_OBJECT_
-R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
+R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OBJECT_ shallow)
 {
     xmlNodePtr n, p;
 
@@ -330,7 +355,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
     if(IS_LIST(node))  {
       int i;
       for(i = 0; i < GET_LENGTH(node); i++)
-         R_insertXMLNode(VECTOR_ELT(node, i), parent);
+	  R_insertXMLNode(VECTOR_ELT(node, i), parent, R_NilValue/*XXX*/, shallow);
 
       return(NULL_USER_OBJECT);
     }
@@ -357,7 +382,20 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
 	PROBLEM "either the parent or child node is NULL"
         ERROR;
     }
-	
+
+    if(n->parent == p) {
+	xmlUnlinkNode(n);
+    } 
+
+      /* Make certain the nodes belong to this document if they already belong to another by copying. */
+    if(n->doc && n->doc != p->doc) {
+	n = xmlDocCopyNode(n, p->doc, 1);
+    } else if(!n->doc && LOGICAL(shallow)[0]) {
+	/* XXX This is intended to avoid setting all the nodes to this document and then having to undo that
+                later on.*/
+      n->doc = p->doc;
+    }
+
 
     switch(p->type) {
     case XML_ELEMENT_NODE:
@@ -377,6 +415,49 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent)
     }
     return(NULL_USER_OBJECT);     
 }
+
+USER_OBJECT_
+RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_after)
+{
+    xmlNodePtr p, n, ans;
+    
+    xmlNodePtr (*f)(xmlNodePtr, xmlNodePtr);
+
+    p = (xmlNodePtr) R_ExternalPtrAddr(r_to);
+    n = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+
+    if(!p || !n) {
+	PROBLEM "either the parent or child node is NULL"
+        ERROR;
+    }
+	
+    f = LOGICAL(r_after)[0] ?  xmlAddNextSibling : xmlAddPrevSibling ;
+    ans = f(p, n);
+
+    return(R_createXMLNodeRef(ans));
+}
+
+USER_OBJECT_
+RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new)
+{
+    xmlNodePtr Old, New, ans;
+
+    if(TYPEOF(r_old) != EXTPTRSXP && TYPEOF(r_new) != EXTPTRSXP) {
+       PROBLEM "R_replaceXMLNode expects XMLInternalNode objects"
+       ERROR;
+    }
+    Old = (xmlNodePtr) R_ExternalPtrAddr(r_old);
+    New = (xmlNodePtr) R_ExternalPtrAddr(r_new);
+
+    if(!Old) {
+	PROBLEM "NULL value for XML node to replace"
+	    ERROR;
+    }
+
+    ans = xmlReplaceNode(Old, New);
+    return(R_createXMLNodeRef(ans));  
+}
+
 
 /*
   a = newXMLNode("a", newXMLNode("b", newXMLNode("c", 3)), newXMLNode("d", "text"))
@@ -430,7 +511,7 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
   if(!node) {
       PROBLEM "empty XML document"
 	  WARN;
-      return(NULL);
+      return(NULL_USER_OBJECT);
   }
 
   if(LOGICAL(skipDtd)[0]) {
@@ -452,14 +533,21 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
  XML document object.
 
  */
+
+int R_numXMLDocs = 0;
+int R_numXMLDocsFreed = 0;
+
 USER_OBJECT_
 R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces)
 {
   xmlDocPtr doc;
   doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+  R_numXMLDocs++;
 
   return(R_createXMLDocRef(doc));
 }
+
+
 
 
 USER_OBJECT_
@@ -571,15 +659,23 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive)
     return(NULL_USER_OBJECT); /* never reached */
 }
 
+#ifdef R_XML_DEBUG
+xmlDocPtr currentDoc;
+#endif
 
 USER_OBJECT_
 R_createXMLDocRef(xmlDocPtr doc)
 {
   SEXP ref, tmp;
 
+#ifdef R_XML_DEBUG
+  currentDoc = doc;
+#endif
+
+
   PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
-  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLInternalDocument"));
+  SET_STRING_ELT(tmp, 0, mkChar("XMLInternalDocument"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
@@ -593,7 +689,7 @@ R_createXMLNsRef(xmlNsPtr ns)
 
   PROTECT(ref = R_MakeExternalPtr(ns, Rf_install("XMLNamespaceRef"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
-  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING("XMLNamespaceRef"));
+  SET_STRING_ELT(tmp, 0, mkChar("XMLNamespaceRef"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
@@ -653,10 +749,11 @@ R_createXMLNodeRef(xmlNodePtr node)
   if(!node)
       return(NULL_USER_OBJECT);
 
+
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(2));
-  SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(R_getInternalNodeClass(node->type)));
-  SET_STRING_ELT(tmp, 1, COPY_TO_USER_STRING("XMLInternalNode"));
+  SET_STRING_ELT(tmp, 0, mkChar(R_getInternalNodeClass(node->type)));
+  SET_STRING_ELT(tmp, 1, mkChar("XMLInternalNode"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
@@ -712,6 +809,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	doc->children = (xmlNodePtr) dtd;
     }
 
+
     /* Figure out what the name of the file is, or if it is NULL. */
     if(GET_LENGTH(sfileName))
       fileName = CHAR_DEREF(STRING_ELT(sfileName, 0));
@@ -740,8 +838,10 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
         PROTECT(ans = NEW_CHARACTER(1));
 	if(encoding && encoding[0])
 	    xmlDocDumpFormatMemoryEnc(doc, &mem, &size, encoding, LOGICAL_DATA(sindent)[0]);
-	else
-	    xmlDocDumpMemory(doc, &mem, &size); 
+	else {
+	    xmlDocDumpFormatMemory(doc, &mem, &size, 1); 
+	    /* xmlDocDumpMemory(doc, &mem, &size);  original */
+	}
 
 
 	if(dtd) {
@@ -754,6 +854,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	}
 
 	if(mem) {
+	    DECL_ENCODING_FROM_DOC(doc)
 	    SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(mem))); 
 	    xmlFree(mem);
 	} else { 
@@ -780,19 +881,49 @@ RS_XML_setDoc(USER_OBJECT_ snode, USER_OBJECT_ sdoc)
 
     if(sdoc != NULL_USER_OBJECT) {
        doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-    } else
+    } else {
 	doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+	R_numXMLDocs++;
+    }
  
     xmlDocSetRootElement(doc, node);
     return(R_createXMLDocRef(doc));
 }
 
 USER_OBJECT_
-RS_XML_unsetDoc(USER_OBJECT_ snode)
+RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent)
 {
-    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
-    xmlUnlinkNode(node);
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode), parent;
+    if(!node) {
+	return(NULL_USER_OBJECT);
+    }
+
+    if(node->doc && node->doc->children == node) {
+	xmlDocSetRootElement(node->doc, NULL);
+    }
+
+    if(LOGICAL(unlink)[0]) 
+	xmlUnlinkNode(node);
+
+
+    node->doc = NULL;
+    node->parent = NULL;
+
+    if(r_parent != R_NilValue) {
+        node->parent = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    }
+
     return(ScalarLogical(TRUE));
+}
+
+SEXP
+RS_XML_setDocEl(SEXP r_node, SEXP r_doc)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
+    xmlSetTreeDoc(node, doc);
+/*    node->doc = doc; */
+    return(R_NilValue);
 }
 
 
@@ -848,12 +979,17 @@ USER_OBJECT_
 RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format, USER_OBJECT_ indent, USER_OBJECT_ r_encoding)
 {
     USER_OBJECT_ ans, tmp;
-    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+    xmlNodePtr node;
     const char *encoding = NULL;
     xmlOutputBufferPtr buf;
     xmlBufferPtr xbuf;
 
-    int oldIndent = xmlIndentTreeOutput;
+    int oldIndent;
+
+    oldIndent = xmlIndentTreeOutput;
+
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+
     xmlIndentTreeOutput =  LOGICAL(indent)[0];
 
     xbuf = xmlBufferCreate();
@@ -868,28 +1004,18 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
     xmlOutputBufferFlush(buf);
     xmlIndentTreeOutput = oldIndent;
 
-    PROTECT(ans = NEW_CHARACTER(1));
     if(xbuf->use > 0) {
         /*XXX this const char * in CHARSXP means we have to make multiple copies. */
 #if 0
-	PROTECT(tmp = allocVector(CHARSXP, xbuf->use));
-	memcpy(CHAR_DEREF(tmp), xbuf->content, xbuf->use);
-#else
-	char *rbuf = malloc(sizeof(char) * (xbuf->use + 1));
-	if(!rbuf) {
-	    PROBLEM "cannot allocate memory (%d) for internal buffer in XML package ", (int)xbuf->use
-            ERROR;
-	}
+	char *rbuf = R_alloc(sizeof(char) * (xbuf->use + 1));
 	memcpy(rbuf, xbuf->content, xbuf->use + 1);
 	PROTECT(tmp = mkChar(rbuf));
-	Free(rbuf);
 #endif
-	SET_STRING_ELT(ans, 0, tmp);
-	UNPROTECT(1);
-    }
+	ans = ScalarString(mkChar(xbuf->content));
+    } else
+      ans = NEW_CHARACTER(1);
 
     xmlOutputBufferClose(buf);
-    UNPROTECT(1);
 
     return(ans);
 }
@@ -901,6 +1027,7 @@ R_xmlNodeValue(SEXP node, SEXP raw)
    xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
    xmlChar *tmp;
    SEXP ans;
+   DECL_ENCODING_FROM_NODE(n)
 
    if(!n) {
       PROBLEM  "null value for xml node reference"
@@ -918,9 +1045,11 @@ R_xmlNodeValue(SEXP node, SEXP raw)
 
    }
 */
-   if(tmp)
-       ans = mkString(XMLCHAR_TO_CHAR(tmp));
-   else 
+   if(tmp) {
+     ans = ScalarString(CreateCharSexpWithEncoding(encoding, tmp));
+//     ans = mkString(XMLCHAR_TO_CHAR(tmp));
+     // Just playing:  ans = ScalarString(mkCharCE(tmp, CE_UTF8));
+   } else 
        ans = NEW_CHARACTER(0);
 
    return(ans);
@@ -931,13 +1060,17 @@ R_xmlNsAsCharacter(USER_OBJECT_ s_ns)
 {
   xmlNsPtr ns = NULL;
   USER_OBJECT_ ans, names;
+  const xmlChar *encoding = NULL;
   ns = (xmlNsPtr) R_ExternalPtrAddr(s_ns);  
+#ifdef LIBXML_NAMESPACE_HAS_CONTEXT
+  encoding = ns->context ? ns->context->encoding : NULL;
+#endif
 
   PROTECT(ans = NEW_CHARACTER(2));
   PROTECT(names = NEW_CHARACTER(2));
 
-  SET_STRING_ELT(names, 0, COPY_TO_USER_STRING("prefix"));
-  SET_STRING_ELT(names, 1, COPY_TO_USER_STRING("href"));
+  SET_STRING_ELT(names, 0, mkChar("prefix"));
+  SET_STRING_ELT(names, 1, mkChar("href"));
 
   if(ns->prefix)
       SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix)));
@@ -956,5 +1089,30 @@ R_getXMLNodeDocument(USER_OBJECT_ s_node)
     if(!n->doc)
 	return(NULL_USER_OBJECT);
 
+       /*??? Does this arrange to free it? */
     return(R_createXMLDocRef(n->doc));
+}
+
+
+USER_OBJECT_
+RS_XML_isDescendantOf(USER_OBJECT_ r_node, USER_OBJECT_ r_top, USER_OBJECT_ strict)
+{
+    xmlNodePtr node, ptr, top;
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    top = (xmlNodePtr) R_ExternalPtrAddr(r_top);    
+
+    if(!node || !top) {
+	PROBLEM  "null value passed to RS_XML_isDescendantOf"
+	    ERROR;
+    }
+
+    ptr = node;
+
+    while(ptr && ptr->type != XML_DOCUMENT_NODE) {
+	if(ptr == top)
+	    return(ScalarLogical(ptr == node && LOGICAL(strict)[0] ? FALSE : TRUE));
+	ptr = ptr->parent;
+    }
+    
+    return(ScalarLogical(FALSE));
 }

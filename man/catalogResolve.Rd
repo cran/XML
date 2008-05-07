@@ -12,21 +12,31 @@
    
   This function provides a mechanism to query the catalog to
   resolve a URI, PUBLIC or SYSTEM identifier.
-  
+
+  This is now vectorized, so accepts a character vector of
+  URIs and recycles \code{type} to have the same length.
+
+  If an entry is not resolved via the catalog system,
+  a \code{NA} is returned for that element.
+  To leave the value unaltered in this case, use \code{asIs = TRUE} .
 }
 \usage{
-catalogResolve(id, type = "uri", debug = FALSE)
+catalogResolve(id, type = "uri", asIs = FALSE, debug = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{id}{the name of the (generic) element to be resolved}
   \item{type}{a string, specifying whether the lookup is for a uri,
     system or public element}
+  \item{asIs}{a logical. If \code{TRUE} any element of \code{id} which
+    is not resolved by the catalog system will be left as given in the
+    call. If \code{FALSE}, such unresolved elements are identified
+    by \code{NA}.
+   }
   \item{debug}{logical value indicating whether to turn on debugging
     output written to the console (\code{TRUE}) or not (\code{FALSE}).}
 }
-\details{
-}
+
 \value{
   A character vector. If the element was resolved,
   the single element is the resolved value.
@@ -60,6 +70,12 @@ catalogResolve("http://www.omegahat.org/XSL/math.xsl", "uri")
   # This one does not resolve anything, returning an empty value.
 catalogResolve("http://www.oasis-open.org/docbook/xml/4.1.2/foo.xsl", "uri")
 
+
+   # Vectorized and returns NA for the first and /tmp/html.xsl
+   # for the second.
+
+ catalogAdd("http://made.up.domain", "/tmp")
+ catalogResolve(c("ddas", "http://made.up.domain/html.xsl"), asIs = TRUE)
 }
 \keyword{IO}
 \concept{XML}

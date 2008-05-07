@@ -13,7 +13,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
             isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
             encoding = character(),
             useDotNames = length(grep("^\\.", names(handlers))) > 0,
-            xinclude = FALSE, addFinalizer = TRUE)
+            xinclude = FALSE, addFinalizer = TRUE, error = xmlErrorCumulator())
 {
 
   if(length(file) > 1) {
@@ -24,6 +24,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  }
 
 
+  if(missing(asText) && substring(file, 1, 1) == "<")
+    asText = TRUE
   
   if(missing(isURL)) {
     isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
@@ -32,7 +34,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
     # check whether we are treating the file name as
     # a) the XML text itself, or b) as a URL.
     # Otherwise, check if the file exists and report an error.
- if(asText == FALSE & isURL == FALSE) {
+ if(asText == FALSE && isURL == FALSE) {
   if(file.exists(file) == FALSE)
      stop(paste("File", file, "does not exist "))
  }
@@ -49,6 +51,9 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
    else
      xinclude = as.logical(xinclude)   
  }
+
+ .oldErrorHandler = setXMLErrorHandler(error)
+ on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
          as.logical(ignoreBlanks), as.logical(replaceEntities),
@@ -56,7 +61,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
            as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding),
-           as.logical(useDotNames), xinclude)
+           as.logical(useDotNames), xinclude, error)
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

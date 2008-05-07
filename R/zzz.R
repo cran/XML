@@ -17,7 +17,7 @@ function(libname, pkgname)
   # Added by Uwe Ligges.
  if(.Platform$OS.type == "windows"){
      temp <- Sys.getenv("PATH")
-     Sys.setenv("PATH" = paste(normalizePath(file.path(libname, pkgname, "libs")), 
+     Sys.setenv("PATH" = paste(utils::normalizePath(file.path(libname, pkgname, "libs")), 
                                file.path(Sys.getenv("R_HOME"), "modules", fsep="\\"), temp, sep=";"))
      on.exit(Sys.setenv(PATH = temp))
  }     

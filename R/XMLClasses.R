@@ -21,7 +21,7 @@
 #
 
 xmlChildren <-
-function(x)
+function(x, addNames = TRUE)
 {
  UseMethod("xmlChildren")
 }
@@ -31,7 +31,7 @@ xmlChildren.XMLNode <-
 # Retrieve the list of children (sub-nodes) within
 # an XMLNode object.
 #
-function(x)
+function(x, addNames = TRUE)
 {
   x$children
 }
@@ -209,7 +209,7 @@ print.XMLNode <-
 # 
 function(x, ..., indent = "", tagSeparator = "\n")
 {
- if(! is.null(xmlAttrs(x))) {
+ if(length(xmlAttrs(x))) {
    tmp <- paste(names(xmlAttrs(x)),paste("\"", xmlAttrs(x),"\"", sep=""), sep="=", collapse=" ")
  } else 
    tmp <- ""
@@ -425,12 +425,33 @@ function(doc, namespaces,
 
 
 getNodeSet =
-function(doc, path, namespaces = getDefaultNamespace(doc), fun = NULL, ...)
+function(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), fun = NULL, ...)
 {
   xpathApply(doc, path, fun, ...,  namespaces = namespaces)
 }
 
 
+xpathSApply =
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+          resolveNamespaces = TRUE, simplify = TRUE)
+{
+  answer = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+
+    # Taken from sapply
+    if (simplify && length(answer) && length(common.len <- unique(unlist(lapply(answer, 
+        length)))) == 1) {
+        if (common.len == 1) 
+            unlist(answer, recursive = FALSE)
+        else if (common.len > 1) 
+            array(unlist(answer, recursive = FALSE), dim = c(common.len, 
+                length(X)), dimnames = if (!(is.null(n1 <- names(answer[[1]])) & 
+                is.null(n2 <- names(answer)))) 
+                list(n1, n2))
+        else answer
+    }
+    else answer  
+  
+}
 
 xpathApply =
   #
@@ -440,14 +461,14 @@ xpathApply =
   #   xpathApply(d, "/o:a//c:c", fun = NULL, namespaces = c("o", "c"))
   #
   #
-function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
           resolveNamespaces = TRUE)
 {
   UseMethod("xpathApply")
 }  
 
 xpathApply.XMLInternalDocument =
-function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
           resolveNamespaces = TRUE)
 {
 #  if(!inherits(doc, "XMLInternalDocument"))
@@ -480,31 +501,198 @@ function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
 
 
 xmlDoc =
-function(node)
+function(node, addFinalizer = FALSE)
 {
-  .Call("RS_XML_createDocFromNode", node)
+ doc = .Call("RS_XML_createDocFromNode", node)
+ addDocFinalizer(doc, addFinalizer)
+ doc
 }
 
 
+# Used to use
+#   getDefaultNamespace(doc)
+
+
+if(FALSE)  {
 xpathApply.XMLInternalNode =
-function(doc, path, fun = NULL, ... , namespaces = getDefaultNamespace(doc),
+  #
+  #  There are several situations here.
+  #  We/libxml2 needs a document to search.
+  #  We have a node. If we use its document, all is fine, but the 
+  #  search will be over the entire document.  We may get nodes from other sub-trees
+  #  that do not pertain to our starting point (doc).
+  #  Alternatively, we can create a new doc with this node as the top-level node
+  #  and do the search. But then we end up with new nodes. So if you want to find
+  #  nodes in the original document in order to change them rather than just read information
+  #  from them, then you will be sorely mistaken when you think your changes have been applied
+  #  to the original document.
+
+  #
+  # Regardless of what we do, we still have to figure out the adding of the doc attribute.
+  #
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
           resolveNamespaces = TRUE)
 {
-  if(FALSE) {
-    node = doc
-    doc = as(doc, "XMLInternalDocument")
-    ns = getDefaultNamespace(doc)
-    prefix = ""
-    if(length(ns)) 
-      prefix = if(length(names(ns)))  names(ns)[1] else "ns"
+  addDocAttribute = FALSE
 
-    path = paste(XML:::getXMLPath(node, prefix), path, sep = "/")
-  } else {
-    doc = xmlDoc(doc)
-  }
-
-  xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+    # This is a wholesale copy.
+  addDocAttribute = TRUE
+  doc = xmlDoc(doc, TRUE)
+  
+     #
+     # If the doc is already there, can't we just use that without copying it? Yes.
+     # XXX maybe not. Looks like libxml2 starts at the top of the doc again.
+     # But if there is no doc for this node, then we create a new doc and
+     # put a finalizer on it. But we attach the document as an attribute to each of the
+     # the resulting nodes. Then it will be protected from gc() and so will the nodes
+     # until each of the nodes are released.
+     #XXX???  What if we do a subsequent search on another of these nodes.
+     # Then need to add it to the results.
+if(FALSE) {
+  tmp = as(doc, "XMLInternalDocument")
+  addDocAttribute = is.null(tmp)    
+  if(is.null(tmp)) {
+     if(!is.null(attr(doc, "document")))
+       doc = attr(doc, "document")
+     else
+       doc =  newXMLDoc(node = doc) # if we used  xmlDoc(doc), no finalizer.
+  } else
+     doc = tmp
 }
+
+  ans = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+
+  if(addDocAttribute && length(ans))
+    ans = lapply(ans, function(x) { attr(x, "document") = doc; x})
+  
+  ans
+}
+} # end if if(FALSE)
+
+
+
+getRootNode =
+function(node)
+{
+  p = node
+  while(!is.null(xmlParent(p))) 
+    p = xmlParent(p)
+
+  p
+}
+
+xpathApply.XMLInternalNode =
+  #
+  # This allows us to use XPath to search within a sub-tree of the document, i.e. 
+  # from a particular node.
+  # This is slightly tricky because the libxml2 routines require a document to search.
+  # We could copy the nodes to a new document, e.g.
+  #    xmlDoc(node)
+  # but then the results would be for new nodes, not the original ones.
+  # So we would not be able to find nodes and then modify them as we would be modifying the
+  # copies.
+  #
+  #  If this what is desired, use
+  #      doc = xmlDoc(node)
+  #      xpathApply(doc, xpath, ...)
+  #  and then that is what you will get.
+
+  #
+  #  In the case that you want the original nodes in the result,
+  #  then we have to do a little bit of work. We create a new document
+  #  and set the source node as its root node.  We arrange to
+  #   a) put the node back where it came from and b) free the document.
+  #  So there is no memory leak.
+  #
+  #  The other thing we must do is to find the 
+  #
+  # 
+  # This version avoids doing any copying of nodes when there is a document already
+  # associated with the nodes.
+  #
+function(doc, path, fun = NULL, ...,
+          namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+           resolveNamespaces = TRUE)
+{
+  node = doc
+
+  addDocAttribute = FALSE
+  createdNewDocument = FALSE
+  tmp = as(doc, "XMLInternalDocument")
+
+  putBack =
+    function(node, info)  {
+      if(!is.null(info$left))
+        addSibling(info$left, node)
+      else if(!is.null(info$right))
+        addSibling(info$right, node, after = FALSE)
+      else if(!is.null(info$parent))
+        addChildren(info$parent, node)
+    }
+  info = list(parent = xmlParent(node),
+              left = getSibling(node, after = FALSE),
+              right = getSibling(node, after = TRUE))     
+  
+ 
+       # The approaches here are to create a new empty document and then set the node
+       # to be its root. We don't set the document for each of the sub-nodes but just this
+       # top-level node. Then we arrange that when we end this function, we discard the
+       # newly created document and put the node back into the original tree in its
+       # original position.
+       # This involves knowing the parent and the position at which to put the node back into the tree.
+       # If it is the top most node, i.e. no parent, then it is simple - just set the parent back to NULL.
+       # If it has a parent, but no siblings, just set the parent.
+       # And if it has a sibling, put it back next to that sibling.
+       #     If it is the first child, put to the left of the sibling.
+       #     If it is not, put to the right.
+       # Need to make certain the resulting nodes have the original document
+       # Use xmlSetTreeDoc rather than node->doc = node as this is recursive.
+       # And so this is now all done in the on.exit() via the call to RS_XML_setDocEl()  
+#    doc = newXMLDoc(node = node, addFinalizer = getNativeSymbolInfo("R_xmlFreeDocLeaveChildren")$address)
+
+    doc = newXMLDoc(addFinalizer = FALSE)
+    parent = xmlParent(node)
+    .Call("RS_XML_setRootNode", doc, node)
+    on.exit({ .Call("RS_XML_unsetDoc", node, unlink = TRUE, parent)
+              .Call("RS_XML_freeDoc", doc)
+              if(!is.null(tmp)) {
+                                        # Need to create a new document with the current node as the root.
+                                        # When we are finished, we have to ensure that we put the node back into the original document
+                                        # We can use the same mechanism as when we have to create the document from scratch.
+               .Call("RS_XML_setDocEl", node, tmp) 
+              }
+              putBack(node, info)
+            })
+
+    docName(doc) = paste("created for xpathApply for", path, "in node", xmlName(node))
+   
+
+  ans = xpathApply(doc, path, NULL, namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+
+  if(length(ans) == 0)
+    return(ans)
+  
+    # now check if the result was actually a descendant of our top-level node for this
+    # query. It is possible that it arose from a different sub-tree.
+  w = sapply(ans, function(el) .Call("RS_XML_isDescendantOf", el, node, strict = FALSE))
+
+  ans = ans[w]
+
+#  if(FALSE && addDocAttribute && length(ans))
+#     ans = lapply(ans, function(x) { attr(x, "document") = doc; x})
+
+#  if(createdNewDocument)
+#       # Need to remove the links  from these nodes to the parent.
+#    lapply(ans, function(x) .Call("RS_XML_unsetDoc", x, unlink = FALSE))
+
+  
+  if(!is.null(fun))
+     lapply(ans, fun, ...)
+  else
+     ans
+
+}  
+
 
 
 

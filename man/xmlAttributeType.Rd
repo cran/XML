@@ -32,8 +32,6 @@ if this attribute is defined as being a value from an enumerated set.}
 \code{\link{parseDTD}}
 }
 
-\examples{
 
-}
 \keyword{file}
 

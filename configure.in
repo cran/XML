@@ -599,6 +599,18 @@ AC_TRY_COMPILE([
 
 CFLAGS="${TMP_CFLAGS}"
 
+
+  AC_TRY_COMPILE([
+  #include <libxml/tree.h>
+  ],
+  [
+  xmlNsPtr ns;
+   ns->context;
+ ],
+ [PKG_CPPFLAGS="$PKG_CPPFLAGS -DLIBXML_NAMESPACE_HAS_CONTEXT=1"; echo "xmlNs has a context field"], 
+ [echo "No context field in xmlNs structure."])
+
+
 fi
 
 

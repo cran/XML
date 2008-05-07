@@ -10,7 +10,8 @@
   attribute is not present.
 }
 \usage{
-xmlGetAttr(node, name, default = NULL, converter = NULL)
+xmlGetAttr(node, name, default = NULL, converter = NULL,
+            namespaceDefinition = character())
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -24,6 +25,18 @@ xmlGetAttr(node, name, default = NULL, converter = NULL)
     value which is useful if it is, for example, a number.
     This is only called if the attribute exists within the node.
    In other words, it is not applied to the \code{default} value.}
+  \item{namespaceDefinition}{a named character vector giving
+      name space prefixes and URIs to use when resolving for the
+      the attribute with a namespace.
+       The values are used to compare the name space prefix used in
+       the \code{name} given by the user to the name space 
+       definition in the node to ensure they match.
+     This is important as we might ask for an attribute named
+    \code{r:width} assuming that the prefix \code{r} corresponded to the
+     URI \code{http://www.r-project.org}. However, there may 
+     be a name space prefix \code{r} defined on the node that points
+     to  a different URI and so this would be an erroneous match.
+  }
 }
 \details{
   This just checks that the attribute list is

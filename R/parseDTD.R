@@ -1,5 +1,5 @@
 parseDTD <- 
-function(extId, asText=FALSE, name="", isURL=FALSE)
+function(extId, asText=FALSE, name="", isURL=FALSE, error = xmlErrorCumulator())
 {
   extId <- as.character(extId)
   if(missing(isURL)) {
@@ -7,7 +7,11 @@ function(extId, asText=FALSE, name="", isURL=FALSE)
   }
 
   if(missing(name))
-    name <- extId
+     name <- extId
+
+  .oldErrorHandler = setXMLErrorHandler(error)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
+  
  .Call("RS_XML_getDTD", as.character(name), as.character(extId),  
-                          as.logical(asText), as.logical(isURL))
+                          as.logical(asText), as.logical(isURL), error)
 }

@@ -47,21 +47,26 @@ earlier.
 How do we define a default namespace?
 }
 \usage{
-xmlDoc(node)
-newXMLDoc(dtd, namespaces=NULL, addFinalizer = TRUE)
+xmlDoc(node, addFinalizer = FALSE)
+newXMLDoc(dtd = NA, namespaces=NULL, addFinalizer = TRUE, 
+           name = character(), node = NULL)
 newXMLNode(name, ..., attrs = NULL, namespace="",
             namespaceDefinitions = character(),
-             doc = NULL, .children = list(...), parent = NULL)
-newXMLTextNode(text, parent = NULL, doc = NULL)
-newXMLCDataNode(text, parent = NULL, doc = NULL)
-newXMLCommentNode(text, parent = NULL, doc = NULL)
-newXMLPINode(name, text, parent = NULL, doc = NULL)
+             doc = NULL, .children = list(...), parent = NULL,
+	     at = NA, cdata = FALSE,
+             suppressNamespaceWarning =
+                 getOption("suppressXMLNamespaceWarning", FALSE))
+newXMLTextNode(text, parent = NULL, doc = NULL, cdata = FALSE)
+newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA)
+newXMLCommentNode(text, parent = NULL, doc = NULL, at = NA)
+newXMLPINode(name, text, parent = NULL, doc = NULL, at = NA)
 newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = NULL)  
 }
 \arguments{
   \item{node}{a \code{XMLInternalNode} object that will be copied to
     create a subtree for a new document.}
-  \item{dtd}{the name of the DTD to use for the XML document.}
+  \item{dtd}{the name of the DTD to use for the XML document.
+    Currently ignored!}
   \item{namespaces}{a named character vector
   with each element specifying a name space identifier and the
   corresponding URI for that namespace
@@ -122,6 +127,7 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
 \item{text}{the text content for the new XML node}
 \item{nodeName}{the name of the node to put in the DOCTYPE element
   that will appear as the top-most node in the XML document.}
+
 \item{externalID}{the PUBLIC identifier for the document type.
   This is a string of the form \code{A//B//C//D}.
   A is either + or -; B identifies the person or insitution that defined
@@ -144,7 +150,28 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
 }
 \item{parent}{the node which will act as the parent of this newly
   created node. This need not be specified and one can add the new node
-  to another node in a separate operation via \code{\link{addChildren}}.}
+  to another node in a separate operation via
+  \code{\link{addChildren}}.}
+
+  \item{cdata}{a logical value indicating whether to enclose the text
+  within a CDATA node (\code{TRUE}) or not (\code{FALSE}). This is a
+  convenience mechanism to avoid having to create the text node and
+  then the CDATA node.  If one is not certain what characters are in
+  the text,  it is useful to use \code{TRUE} to ensure that they are
+  \dQuote{escaped}.
+ 
+  It is an argument for \code{newXMLNode} as the child nodes can be
+  given as simple strings and are converted to text nodes. This
+  \code{cdata} value is passed to the calls to create these text nodes
+  and so controls whether they are enclosed within CDATA nodes.
+ 
+
+  }
+  \item{suppressNamespaceWarning}{see \code{\link{addChildren}}}
+
+  \item{at}{this allows one to control the position in the list of children at which the node should be
+  added. The default means at the end and this can be any position
+  from 0 to the current number of children.}
 }
 \details{
 These create internal C level objects/structure instances
@@ -176,6 +203,8 @@ document.}
 
 \examples{
 
+doc = newXMLDoc()
+
  # Simple creation of an XML tree using these functions
 top = newXMLNode("a")
 newXMLNode("b", attrs = c(x = 1, y = 'abc'), parent = top)
@@ -195,6 +224,22 @@ addChildren(o, kids)
 
 cat(saveXML(top))
 
+
+x = newXMLNode("block", "xyz", attrs = c(id = "bob"),
+                      namespace = "fo",
+                      namespaceDefinitions = c("fo" = "http://www.fo.org"))
+
+xmlName(x, TRUE) == "fo"
+
+  # a short cut to define a name space and make it the prefix for the
+  # node, thus avoiding repeating the prefix via the namespace argument.
+x = newXMLNode("block", "xyz", attrs = c(id = "bob"),
+                      namespace = c("fo" = "http://www.fo.org"))
+
+
+ # name space on the attribute
+x = newXMLNode("block", attrs = c("fo:id" = "bob"),
+                      namespaceDefinitions = c("fo" = "http://www.fo.org"))
 
 
 

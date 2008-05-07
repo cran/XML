@@ -79,11 +79,12 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
 
   xmlFreeDoc(doc);
+  R_numXMLDocsFreed++;
 
      /* Set the class for the document. */
   className = NEW_CHARACTER(1);
   PROTECT(className);
-    SET_STRING_ELT(className, 0, COPY_TO_USER_STRING("HTMLDocument"));   
+    SET_STRING_ELT(className, 0, mkChar("HTMLDocument"));   
     SET_CLASS(rdoc, className);
   UNPROTECT(1);
 
