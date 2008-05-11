@@ -125,7 +125,6 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
    xmlDocPtr doc = NULL;
    xmlNsPtr ns = NULL;
    xmlNodePtr node;
-   int n, i;
 
    if(GET_LENGTH(sdoc))
        doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
@@ -893,7 +892,7 @@ RS_XML_setDoc(USER_OBJECT_ snode, USER_OBJECT_ sdoc)
 USER_OBJECT_
 RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent)
 {
-    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode), parent;
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     if(!node) {
 	return(NULL_USER_OBJECT);
     }
@@ -978,7 +977,7 @@ Test:
 USER_OBJECT_
 RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format, USER_OBJECT_ indent, USER_OBJECT_ r_encoding)
 {
-    USER_OBJECT_ ans, tmp;
+    USER_OBJECT_ ans;
     xmlNodePtr node;
     const char *encoding = NULL;
     xmlOutputBufferPtr buf;

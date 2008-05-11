@@ -115,17 +115,17 @@ void S_xmlParserError(void *ctx, const char *msg, ...)
 void xmlParserError(void *ctx, const char *msg, ...)
 #endif
 { 
-  xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
-  char buf[3000], *tmp;
   va_list args;
 
 #if 1
   va_start(args, msg);
   stop("XMLParserError", msg, args);
 #else
+  xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
+  char buf[3000], *tmp;
 
     /* Empty the string buffer. */
-    memset(buf , '\0', sizeof(buf)/sizeof(buf[0]));
+  memset(buf , '\0', sizeof(buf)/sizeof(buf[0]));
 
     /* Insert the file and line number. */
   localXmlParserPrintFileInfo(ctxt->input, buf);
@@ -328,8 +328,8 @@ void R_xmlFreeDoc(SEXP ref)
   doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
 
   if(doc) {
-      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *)"?? (internally created)");
 #ifdef R_XML_DEBUG
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *)"?? (internally created)");
       fprintf(stderr, "Cleaning up document %p, %s, has children %d\n", (void *) doc, url, (int) (doc->children != NULL));
 #endif
       xmlFreeDoc(doc);
@@ -346,8 +346,8 @@ RS_XML_freeDoc(SEXP ref)
   doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
 
   if(doc) {
-      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
 #ifdef R_XML_DEBUG
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
       fprintf(stderr, "Freeing the document %p, %s\n", (void *) doc, url);
 #endif
       xmlFreeDoc(doc);
@@ -369,9 +369,9 @@ void R_xmlFreeDocLeaveChildren(SEXP ref)
  doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
 
   if(doc) {
-      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
       xmlNodePtr tmp;
 #ifdef R_XML_DEBUG
+      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
       fprintf(stderr, "Cleaning up document but not children: %p, %s\n", (void *) doc, url);
 #endif
       tmp = doc->children;
@@ -425,6 +425,8 @@ RSXML_structuredStop(SEXP errorFun, xmlErrorPtr err)
 
     Rf_eval(e, R_GlobalEnv);
     UNPROTECT(1);
+    /* Shouldn't get back to here! Rf_eval() should raise an error.*/
+    return(R_NilValue);
 }
 
 /*
@@ -435,9 +437,7 @@ SEXP
 stop(const char *className, const char *msg, ...)
 {
     char buf[10000];
-    SEXP error, tmp, e;
-    const char * classNames[] = {"simpleError", "error", "condition"};
-    int i;
+    SEXP error, e;
 
     va_list ap;
 
@@ -449,6 +449,7 @@ stop(const char *className, const char *msg, ...)
     PROTECT(error = mkString(buf));
 
 /*
+    const char * classNames[] = {"simpleError", "error", "condition"};
     PROTECT(tmp = allocVector(STRSXP, sizeof(classNames)/sizeof(classNames[0])));
     for(i = 0; i < sizeof(classNames)/sizeof(classNames[0]); i++)
 	SET_STRING_ELT(tmp, i+1, mkChar(classNames[i]));
@@ -463,8 +464,7 @@ stop(const char *className, const char *msg, ...)
     UNPROTECT(2);
 
 /*
- Rf_PrintValue(error);
- errorcall(error, "%s", msg);
+    errorcall(error, "%s", msg);
     UNPROTECT(1);
 */
     return(error);

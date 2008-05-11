@@ -79,7 +79,8 @@ RS_XML_catalogAdd(SEXP orig, SEXP replace, SEXP type)
     n =  LENGTH(orig);
     ans = NEW_LOGICAL(n);
     for(i = 0; i < n ; i++) {
-	LOGICAL(ans)[i] = (xmlCatalogAdd(CHAR(STRING_ELT(type, i)), CHAR(STRING_ELT(orig, i)), CHAR(STRING_ELT(replace, i))) == 0);
+	LOGICAL(ans)[i] = (xmlCatalogAdd(CHAR_TO_XMLCHAR(STRING_ELT(type, i)), CHAR_TO_XMLCHAR(STRING_ELT(orig, i)), 
+					 CHAR_TO_XMLCHAR(STRING_ELT(replace, i))) == 0);
     }
 
     return(ans);

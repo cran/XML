@@ -213,7 +213,7 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
   opArgs = NEW_LIST(num);
   for(i =0;i < num; i++) {
    SET_VECTOR_ELT(opArgs, i,  NEW_CHARACTER(1));
-   SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] : "")); 
+   SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] :  "")); 
   }
 
   RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "entityDeclaration"), 
@@ -339,7 +339,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
      <abc/>
      <next>
      */
-  if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && s[0] == '\n' && parserData->trim))
+ if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && (const char *) s[0] == '\n' && parserData->trim))
     return;
 
            /*XXX Deal with encoding, memory cleanup, 

@@ -1,3 +1,8 @@
+Version 1.95-2
+
+  * Fix for xpathApply()/getNodeSet() on the top-level node of a document
+    which left the original document with no children!  Found by Martin Morgan.
+
 Version 1.95-1
 
   *  Minor bug fixes regarding Encoding issues introduce in 1.95-0.

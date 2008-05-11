@@ -1,7 +1,7 @@
 #include "EventParse.h"
 #include "DocParse.h"
 
-#define USE_XML_ENCODING 1
+#define R_USE_XML_ENCODING 1
 #include "Utils.h"
 
 #ifdef FROM_GNOME_XML_DIR
@@ -401,7 +401,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   PROTECT(tmp = NEW_CHARACTER(1));
   if(URI) {
      SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(URI))); 
-     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding, (void*)prefix ? XMLCHAR_TO_CHAR(prefix) : ""))); 
+     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR ( (void*)prefix ? prefix : "")))); 
   }
   SET_VECTOR_ELT(opArgs, 2, tmp);
   UNPROTECT(1);

@@ -252,7 +252,7 @@ RS_XML_setStructuredErrorHandler(SEXP els)
     fun = VECTOR_ELT(els, 0);
     sym = VECTOR_ELT(els, 1);
 
-    if(sym != R_NilValue & TYPEOF(sym) != EXTPTRSXP) {
+    if(sym != R_NilValue && TYPEOF(sym) != EXTPTRSXP) {
 	PROBLEM "invalid symbol object for XML error handler. Need an external pointer, e.g from getNativeSymbolInfo"
         ERROR;
     }

@@ -164,7 +164,7 @@ SEXP CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str);
 #ifdef R_USE_XML_ENCODING
 #undef COPY_TO_USER_STRING
 #warning "Redefining COPY_TO_USER_STRING to use encoding from XML parser"
-#define COPY_TO_USER_STRING(x)  CreateCharSexpWithEncoding(encoding, (x))
+#define COPY_TO_USER_STRING(x)  CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR (x))
 #endif
 
 

@@ -207,9 +207,9 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(TYPEOF(xinclude) == LGLSXP && LOGICAL_DATA(xinclude)[0]) {
-      int status = xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE);
+      xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE);
   } else if(TYPEOF(xinclude) == INTSXP && GET_LENGTH(xinclude) > 0) {
-      int status = xmlXIncludeProcessFlags(doc, INTEGER(xinclude)[0]);
+      xmlXIncludeProcessFlags(doc, INTEGER(xinclude)[0]);
   }
 
   if(!useHTML && LOGICAL_DATA(validate)[0]) {
@@ -473,7 +473,6 @@ getNamespaceDefs(xmlNodePtr node, int recursive)
 USER_OBJECT_
 RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node, USER_OBJECT_ recursive)
 {
-  USER_OBJECT_ nsDef = NULL_USER_OBJECT;
   xmlNodePtr node;
 
   if(TYPEOF(r_node) != EXTPTRSXP) {
@@ -1214,7 +1213,6 @@ RS_XML_setDocumentName(USER_OBJECT_ sdoc, USER_OBJECT_ sname)
        Otherwise,  return the string.
        */
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
-    USER_OBJECT_ ans;
 
     if(!doc) {
 	PROBLEM "NULL pointer supplied for internal document"

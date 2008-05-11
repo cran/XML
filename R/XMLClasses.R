@@ -628,6 +628,8 @@ function(doc, path, fun = NULL, ...,
         addSibling(info$right, node, after = FALSE)
       else if(!is.null(info$parent))
         addChildren(info$parent, node)
+      else if(!is.null(tmp))
+        addChildren(tmp, node)        
     }
   info = list(parent = xmlParent(node),
               left = getSibling(node, after = FALSE),
