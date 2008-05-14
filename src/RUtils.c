@@ -275,8 +275,10 @@ RS_XML_setStructuredErrorHandler(SEXP els)
 SEXP
 CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
 {
-    cetype_t enc = CE_NATIVE;
     SEXP ans;
+
+#ifdef HAVE_R_CETYPE_T
+    cetype_t enc = CE_NATIVE;
     if(encoding == (const xmlChar *) NULL || encoding == (const xmlChar *) "") {
   	    enc = CE_NATIVE;
     } else if(xmlStrcmp(encoding, "UTF-8") == 0 || xmlStrcmp(encoding, "utf-8") == 0)
@@ -288,5 +290,8 @@ CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
     }
 
     ans = mkCharCE(str, enc);
+#else
+    ans = mkChar(str);
+#endif
     return(ans);
 }

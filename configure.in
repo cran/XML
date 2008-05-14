@@ -614,6 +614,19 @@ CFLAGS="${TMP_CFLAGS}"
 fi
 
 
+CPPFLAGS="$CPPFLAGS -I$R_HOME/include"
+echo "Checking for cetype_t enumeration"
+AC_TRY_COMPILE([
+   #include <Rinternals.h>
+],
+[
+   cetype_t t;
+],
+[DEFINES="$DEFINES -DHAVE_R_CETYPE_T=1"; echo "Using recent version of R with cetype_t enumeration type for encoding"], 
+[echo "No cetype_t enumeration defined in R headers."])
+
+
+
 
 
 AC_SUBST(DUMP_WITH_ENCODING)

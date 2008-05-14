@@ -1,3 +1,8 @@
+Version 1.95-3
+
+  *  configuration change to support older versions of R that do not
+     have the C enumeration type cetype_t defined in Rinternals.h.
+
 Version 1.95-2
 
   * Fix for xpathApply()/getNodeSet() on the top-level node of a document
