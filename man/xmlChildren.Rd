@@ -3,6 +3,7 @@
 \alias{xmlChildren<-}
 \alias{xmlChildren.XMLNode}
 \alias{xmlChildren.XMLInternalNode}
+\alias{xmlChildren.XMLInternalDocument}
 \title{ Gets the sub-nodes within an XMLNode object. }
 \description{
   These functions provide access to the children of the given

@@ -94,7 +94,7 @@ function(url, ...,
        # find any r:init nodes which are not inside an example.
       init = getNodeSet(doc, "//r:init[not(ancestor::r:example)]", namespace = c(r = "http://www.r-project.org"))
       if(length(init)) {
-        xmlSource(init, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces)
+        xmlSource(init, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces, eval = eval)
         cat("Done doc-level init", length(init), "\n")
       }
 
@@ -104,15 +104,15 @@ function(url, ...,
                           cat("Example", ids[x], "\n")
 
                              #XXX put the correct ids in her.
-                        xmlSource(nodes, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces)
+                        xmlSource(nodes, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces, eval = eval)
                         
                       })
       return(ans)
    }
   }
 
-  if(length(section) && is.character(section))
-    section = paste("@id=\"", section, "\"")
+#  if(length(section) && is.character(section))
+#    section = paste("@id", dQuote(section), sep = "=")
   
   if(length(xpath)) {
        # do an XPath query and then look inside the resulting nodes
@@ -253,26 +253,7 @@ function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = e
      # go through the node and see if there are any r:code nodes
      # with a ref attribute
      # and go fetch the corresponding <r:code id='@ref'> node.
-   txt = paste(xmlSApply(node,
-                          function(x) {
-
-                            if(inherits(x, c("XMLInternalCommentNode", "XMLInternalPINode"))) {
-
-                            } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:code") {
-                               ref = xmlGetAttr(x, "ref")
-                               if(!is.na(ref)) {
-                                   v = getNodeSet(as(x, "XMLInternalDocument"),
-                                                  paste(sapply(c("code", "frag"),
-                                                                function(x) paste("//r:", x , "[@id='", ref, "']", sep = "")), collapse = "|"),
-                                                  namespaces)
-                                   xmlValue(v[[1]])
-                               } else
-                                   xmlValue(x)                                 
-                            } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
-                            }  else
-                               xmlValue(x)
-                          }),
-                collapse = "\n")
+   txt = paste(getRCode(node, namespaces),  collapse = "\n")
 
 #   txt = xmlValue(node)
    if(verbose)
@@ -294,3 +275,27 @@ function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = e
    } else
      cmd
 }  
+
+
+getRCode =
+function(node, namespaces = c(r = "http://www.r-project.org"))
+{
+ xmlSApply(node, function(x) {
+  
+  if(inherits(x, c("XMLInternalCommentNode", "XMLInternalPINode"))) {
+
+  } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:code") {
+     ref = xmlGetAttr(x, "ref")
+     if(!is.na(ref)) {
+         v = getNodeSet(as(x, "XMLInternalDocument"),
+                        paste(sapply(c("code", "frag"),
+                                      function(x) paste("//r:", x , "[@id='", ref, "']", sep = "")), collapse = "|"),
+                        namespaces)
+         xmlValue(v[[1]])
+     } else
+         xmlValue(x)                                 
+  } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
+  }  else
+     xmlValue(x)
+ })
+}

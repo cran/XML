@@ -39,7 +39,7 @@ void RS_XML(piHandler)(void *ctx, const xmlChar *target, const xmlChar *data);
 void RS_XML(entityDeclaration)(void *ctx, const xmlChar *name, int type, const xmlChar *publicId, 
                                 const xmlChar *systemId, xmlChar *content);
 xmlEntityPtr RS_XML(getEntityHandler)(void *userData, const xmlChar *name);
-
+xmlEntityPtr RS_XML(getParameterEntityHandler)(void *userData, const xmlChar *name);
 
 int RS_XML(isStandAloneHandler)(void *ctx);
 void RS_XML(warningHandler)(void *ctx, const char *msg, ...);
@@ -304,6 +304,7 @@ R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo)
      
     return(-1);   
 }
+
 void
 R_processBranch(RS_XMLParserData * rinfo, 
                 int branchIndex, 
@@ -346,9 +347,20 @@ R_endBranch(RS_XMLParserData *rinfo,
         tmp = rinfo->current;
         if(tmp->parent == NULL) {
             /* Call the function.*/
-            SEXP e = allocVector(LANGSXP, 2), rnode, fun;
+	    SEXP fun, args;
+	    if(rinfo->dynamicBranchFunction)
+		fun = rinfo->dynamicBranchFunction;
+	    else
+		fun = VECTOR_ELT(rinfo->branches, rinfo->branchIndex);
+#if 1
+	    PROTECT(args = NEW_LIST(1));
+	    SET_VECTOR_ELT(args, 0, R_createXMLNodeRef(tmp));
+	    RS_XML(invokeFunction)(fun, args, NULL, rinfo->ctx);
+	    UNPROTECT(1);
+#else
+            SEXP e = allocVector(LANGSXP, 2), rnode;
             PROTECT(e);
-            fun = VECTOR_ELT(rinfo->branches, rinfo->branchIndex);
+
             SETCAR(e, fun);
             rnode = R_createXMLNodeRef(tmp);
             SETCAR(CDR(e), rnode);
@@ -359,11 +371,32 @@ R_endBranch(RS_XMLParserData *rinfo,
 #endif
             xmlFreeNode(rinfo->top);
             rinfo->top = NULL;
+#endif
         }
 
         rinfo->current = rinfo->current->parent;
     }
 }
+
+
+static int 
+isBranchFunction(SEXP obj)
+{
+    int i, n;
+    SEXP classes;
+
+    if(TYPEOF(obj) != CLOSXP) 
+	return(0);
+
+    classes = GET_CLASS(obj);
+    n = GET_LENGTH(classes);
+    for(i = 0; i < n; i++)
+	if(strcmp(CHAR(STRING_ELT(classes, i)), "SAXBranchFunction") == 0)
+	    return(1);
+    
+    return(0);
+}
+
 
 static void	
 RS_XML(xmlSAX2StartElementNs)(void * userData, 
@@ -378,7 +411,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
 {
   int i, n;
   USER_OBJECT_ tmp, names;
-  USER_OBJECT_ opArgs;
+  USER_OBJECT_ opArgs, ans;
   RS_XMLParserData *rinfo = (RS_XMLParserData*) userData;
   DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
@@ -419,13 +452,14 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   UNPROTECT(2);
 
 
-  RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
+  ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
+  if(isBranchFunction(ans)) {
+      R_PreserveObject(rinfo->dynamicBranchFunction = ans);
+      R_processBranch(rinfo, i, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes);
+  }
 
   UNPROTECT(1);
 }
-
-
-
 
 
 static void
@@ -510,7 +544,7 @@ RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion)
   xmlParserHandler->hasExternalSubset = NULL;
   xmlParserHandler->resolveEntity = NULL;
 
-  xmlParserHandler->getParameterEntity = NULL;
+  xmlParserHandler->getParameterEntity = RS_XML(getParameterEntityHandler);
   xmlParserHandler->attributeDecl = NULL;
   xmlParserHandler->elementDecl = NULL;
   xmlParserHandler->notationDecl = NULL;
@@ -631,10 +665,9 @@ RS_XML(entityDeclaration)(void *ctx,
 }
 
 
-xmlEntityPtr
-RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
+static xmlEntityPtr
+do_getEntityHandler(void *userData, const xmlChar *name, const char * r_funName)
 {
-    
     SEXP opArgs, r_ans;
     xmlEntityPtr ans = NULL;
     RS_XMLParserData *parserData = (RS_XMLParserData*) userData;
@@ -642,7 +675,7 @@ RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
 
     PROTECT(opArgs = NEW_LIST(1)) ;
     SET_VECTOR_ELT(opArgs, 0, ScalarString(COPY_TO_USER_STRING(name))); /*XXX should we encode this? Done now! */
-    r_ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(userData, "getEntity"), NULL, (RS_XMLParserData *) userData, opArgs);
+    r_ans = RS_XML(callUserFunction)(r_funName, NULL, (RS_XMLParserData *) userData, opArgs);
     
     PROTECT(r_ans) ;
     if(r_ans != NULL_USER_OBJECT && GET_LENGTH(r_ans) > 0) {
@@ -666,6 +699,20 @@ RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
 
     return(ans);
 }
+
+xmlEntityPtr
+RS_XML(getEntityHandler)(void *userData, const xmlChar *name)
+{
+    return(do_getEntityHandler(userData, name, HANDLER_FUN_NAME(userData, "getEntity")));
+}
+
+
+xmlEntityPtr
+RS_XML(getParameterEntityHandler)(void *userData, const xmlChar *name)
+{
+    return(do_getEntityHandler(userData, name, HANDLER_FUN_NAME(userData, "getParameterEntity")));
+}
+
 
 
 

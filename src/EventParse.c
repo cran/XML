@@ -141,6 +141,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   parserData->ignoreBlankLines = LOGICAL_DATA(ignoreBlanks)[0]; 
   parserData->stateObject = (stateObject == NULL_USER_OBJECT ? NULL : stateObject);
   parserData->useDotNames = LOGICAL_DATA(useDotNames)[0];
+  parserData->dynamicBranchFunction = NULL;
 
   /*Is this necessary? Shouldn't it already be protected? Or is there a chance that we may 
     be doing this asynchronously in a pull approach. */
@@ -162,8 +163,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
 
 #if 0
     /* If one wants entities expanded directly and to appear as text.  */
-  if(LOGICAL_DATA(replaceEntities)[0]) 
-      xmlSubstituteEntitiesDefault(1);   
+   xmlSubstituteEntitiesDefault(LOGICAL_DATA(replaceEntities)[0]);   
 #endif
 
   status = RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0]);
@@ -406,7 +406,7 @@ return(parser);
    
 */
 USER_OBJECT_
-RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserData *parserData, USER_OBJECT_ opArgs) 
+RS_XML(callUserFunction)(const char *opName, const char *preferredName, RS_XMLParserData *parserData, USER_OBJECT_ opArgs) 
 {
   USER_OBJECT_ fun = NULL, val;
   USER_OBJECT_ _userObject = parserData->methods;

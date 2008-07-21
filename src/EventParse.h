@@ -89,6 +89,13 @@ typedef struct {
 
     /* The XML context */
   xmlParserCtxtPtr ctx;
+
+    /* A function which is used to process a branch "anonymously, i.e
+       not one that is actively identified in the branches = list(....)
+       but a function that is returned from a regular startElement handler
+       that indicates collect up the node and call this.
+     */
+  USER_OBJECT_ dynamicBranchFunction;
 } RS_XMLParserData;
 
 /* The name of the R element to call fo the general case.
@@ -130,7 +137,7 @@ struct NodeList {
 /* Allocate a data structure for use with the parser */
 RS_XMLParserData *createRSXMLParserData(USER_OBJECT_ handlers) ;
 
-USER_OBJECT_ RS_XML(callUserFunction)(char *opName, const char *preferredName, RS_XMLParserData *parser, USER_OBJECT_ opArgs) ;
+USER_OBJECT_ RS_XML(callUserFunction)(const char *opName, const char *preferredName, RS_XMLParserData *parser, USER_OBJECT_ opArgs) ;
 /*Made static now: USER_OBJECT_ RS_XML(createAttributesList)(const char **atts); */
 
 

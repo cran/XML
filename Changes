@@ -1,3 +1,45 @@
+Version 1.97-1
+
+  *  Fix for configuration in detecting existence of encoding
+     enumerations in R.  So now encoding of strings is working again.
+  
+
+Version 1.97-0
+
+  *  Added xmlNativeTreeParse() as an alias for xmlInternalTreeParse()
+     and xmlTreeParse(, useInternalNodes = TRUE).
+
+  *  Assignment to attributes of an R-level XML node works again, e.g.
+          xmlAttrs(doc[[3]][[2]])['foo'] = "bar"
+
+  *  Subsetting ([[) for XMLHashNode behaves correctly.
+
+  *  Added .children parameter to addTag() function in xmlOutputDOM() objects.
+   
+  *  Thanks to Michael Lawrence, a significantly simpler and more
+     general  mechanism is used for getNodeSet()/xpathApply() when
+     applied to a node and not a document.  This allows xpath queries
+     that go back up the ancestor path for the node.
+
+
+Version 1.96-0
+
+  *  Functionality for working with XML Schema now incorporated.
+
+  *  xmlSchemaValidate() function for validating a document against a schema.
+
+  *  xmlSchemaValidate() using structured error handlers to give
+     information about line numbers, columns, domain, etc. as well as
+     the message.
+
+  *  xmlChildren() method for XMLInternalDocument
+
+  *  Recognize additional internal node types,
+     e.g. XMLXIncludeStartNode, ...
+
+  *  foo.dtd example now uses internal and external entities for illustration.
+
+
 Version 1.95-3
 
   *  configuration change to support older versions of R that do not

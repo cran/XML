@@ -3,6 +3,9 @@
 <!ENTITY % img "MyImage.gif">
 <!ENTITY % foobar "xxx">
 
+<!ENTITY foobar "xxx">
+<!ENTITY outside  SYSTEM "entityValue">
+
 <!ELEMENT entry3 ( (variables | (tmp, x)), (record)* , (a*, b,c,d, (e|f)) , (foo)+ ) >
 <!ELEMENT dataset ( variables, ((record)* | tmp) ) >
 

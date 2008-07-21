@@ -70,9 +70,19 @@ function()
 
   }
 
-  list(handler = h, errors = function() errors, reset = function() errors <<- list)
+  structure(list(handler = h, errors = function() structure(errors, class = "XMLStructuredErrorList"), reset = function() errors <<- list),
+              class = "XMLStructuredErrorCumulator")
 }
 
+setOldClass("XMLStructuredErrorList")
+
+print.XMLStructuredErrorList =
+function(x, ...) {
+   if(length(x) == 0)
+     print(NULL)
+   else
+     print(t(sapply(x, function(x) unlist(x[c("line", "msg")]))))
+}
 
 getXMLErrors=
   #

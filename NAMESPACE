@@ -98,7 +98,10 @@ exportMethods("toHTML")
 exportClasses("XMLInternalDocument")
 exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
-              "XMLInternalCommentNode", "XMLDTDNode")
+              "XMLInternalCommentNode", "XMLDTDNode",
+              "XMLXIncludeStartNode", "XMLXIncludeEndNode", "XMLEntityDeclNode",
+              "XMLAttributeDeclNode", "XMLDocumentNode", "XMLDocumentTypeNode",
+              "XMLDocumentFragNode", "XMLNamespaceDeclNode")
 
 exportClasses("XMLNamespace")
 
@@ -129,6 +132,9 @@ S3method(addNode, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
 S3method(print, XMLHashTree)
 
+S3method(print, XMLRDocument)
+S3method(xmlRoot, XMLRDocument)
+
 S3method("names<-", XMLNode)
 S3method("xmlName<-", XMLNode)
 S3method("xmlName<-", XMLInternalElementNode)
@@ -138,6 +144,7 @@ exportMethods("xmlAttrs<-")
 
 S3method(xmlParent, XMLTreeNode)
 S3method(xmlChildren, XMLTreeNode)
+S3method(xmlChildren, XMLInternalDocument)
 S3method(xmlParent, XMLHashTreeNode)
 S3method(xmlParent, XMLInternalNode)
 S3method(xmlChildren, XMLHashTreeNode)
@@ -267,14 +274,15 @@ exportMethods("xmlSource")
 # Not yet exported....
 #xmlValidity
 
-if(FALSE) {
+if(TRUE) {
 exportClasses("ExternalReference", "xmlSchemaRef", "libxmlTypeTable")
 exportClasses("SchemaElementTable", "xmlSchemaElementRef",
               "SchemaTypeTable", "xmlSchemaTypeRef",
 	      "SchemaAttributeTable", "xmlSchemaAttributeRef",
                "SchemaAttributeGroupTable", "xmlSchemaAttributeGroupRef",
-              "SchemaNotationTable", "xmlSchemaNotationRef"
-)
+              "SchemaNotationTable", "xmlSchemaNotationRef")
+
+export(xmlSchemaValidate, schemaValidationErrorHandler, xmlSchemaParse)
 
 exportMethods("names", "$", "$<-", "coerce")
 }
@@ -296,3 +304,10 @@ S3method(processXInclude, list)
 S3method(processXInclude, XMLInternalDocument)
 S3method(processXInclude, XMLInternalElementNode)
 
+exportMethods(show)
+
+export(xmlElementSummary)
+#, xmlElementSummaryHandlers)
+
+#export(xmlNodeMatch)
+#export(getRCode)

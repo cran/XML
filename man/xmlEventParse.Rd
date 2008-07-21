@@ -255,6 +255,25 @@ If this is True, each callback function  should support
   handler will not be called for that nested instance.
   If there is an instance where this is problematic, please
   contact the maintainer of this package.
+
+  One can cause the parser to collect a branch without identifying
+  the  node within the \code{branches} list. Specifically, within
+  a  regular start-element handler, one can return a function 
+  whose class is \code{SAXBranchFunction}.
+  The SAX parser recognizes this and collects up the branch
+  starting at the current node being processed  and when it is
+  complete, invokes this function. 
+  This allows us to dynamically determine which nodes to treat as
+  branches rather than just matching names. This is necessary when
+  a node name has different meanings in different parts of the XML
+  hierarchy, e.g. dict in an iTunes song list.
+
+  See the file \code{itunesSax2.R} inthe examples for an example of this.
+
+  This is a two step process. In the future, we might make it so that
+  the R function handling the start-element event could directly
+  collect  the branch and continue its operations without having
+  to call another function asynchronously.
 }
 \item{useDotNames}{a logical value
   indicating whether to use the

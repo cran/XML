@@ -1286,7 +1286,12 @@ RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
 
     if(n == 0)
 	return(R_NilValue);
+    else if(n == -1) {
+	PROBLEM "failed in XInclude"
+        ERROR;
+    }
 
+#if 0
     if(!prev)  {
 	fprintf(stderr, "Adding to children of %s\n", prev->name);
         prev = parent->children;
@@ -1303,7 +1308,7 @@ RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
 	prev = prev->next;
     }
     UNPROTECT(1);
-
+#endif
 
     return(ans);
 }

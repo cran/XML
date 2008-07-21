@@ -3,7 +3,7 @@ function(extId, asText=FALSE, name="", isURL=FALSE, error = xmlErrorCumulator())
 {
   extId <- as.character(extId)
   if(missing(isURL)) {
-    isURL <- length(grep("http://",extId)) | length(grep("ftp://",extId))
+    isURL <- length(grep("http://",extId))  > 0 ||  length(grep("ftp://",extId)) > 0
   }
 
   if(missing(name))

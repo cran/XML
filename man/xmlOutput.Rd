@@ -8,15 +8,16 @@ These two functions provide different ways to construct XML documents
 incrementally.  They provide a single, common interface for adding and
 closing tags, and inserting nodes.  The buffer version stores the XML
 representation as a string.  The DOM version builds the tree of XML
-node objects.
+node objects entirely within R.
 
 }
 \usage{
 xmlOutputBuffer(dtd=NULL, nameSpace="", buf=NULL,
-                 nsURI=NULL, header="<?xml version=\"1.0\"?>")
+                             nsURI=NULL, header="<?xml version=\"1.0\"?>")
 
 xmlOutputDOM(tag="doc", attrs = NULL, dtd=NULL,
-                 nameSpace=NULL, nsURI=character(0))
+                          nameSpace=NULL, nsURI=character(0),
+                          xmlDeclaration = NULL)
 }
 
 \arguments{
@@ -42,7 +43,17 @@ This provides a convenient way to specify the default name space that appers in 
 }
  \item{header}{if non-NULL, this is immediately written to the output stream allowing
   one to control the initial section of the XML document.}
- \item{tag}{the name of the top-level node/element in the DOM being created.}
+ \item{tag}{the name of the top-level node/element in the DOM being
+  created.}
+ \item{xmlDeclaration}{ a logical value or a string.
+   If this is a logical value and \code{TRUE}, the default <?xml version='1.0'?>
+    processing instruction is emitted at the top of the document.  
+   If it is \code{FALSE}, no xml declaration is emitted at the top of
+   the document.
+    If this is provided as a string, the contents of this is added
+    as the content of the processing instruction.   A version='1.0' is
+    added if there is no  'version=' content within the given string.
+  }
 }
 \details{
 
@@ -77,7 +88,7 @@ The following are specific to \code{xmlOutputDOM}:
 \author{Duncan Temple Lang}
 
 \seealso{
-\code{\link{xmlTree}} for an internal (C-level) representation of the tree,
+\code{\link{xmlTree}} for a native/internal (C-level) representation of the tree,
 \code{\link{xmlNode}},
 \code{\link{xmlTextNode}},
 \code{\link{append.xmlNode}}
@@ -92,18 +103,18 @@ con$addTag("author", "Duncan Temple Lang")
 con$addTag("address",  close=FALSE)
  con$addTag("office", "2C-259")
  con$addTag("street", "Mountain Avenue.")
- con$addTag("phone", close=FALSE)
+ con$addTag("phone", close = FALSE)
    con$addTag("area", "908", attrs=c(state="NJ"))
    con$addTag("number", "582-3217")
  con$closeTag() # phone
 con$closeTag() # address
 
-con$addTag("section", close=FALSE)
+con$addTag("section", close = FALSE)
  con$addNode(xmlTextNode("This is some text "))
  con$addTag("a","and a link", attrs=c(href="http://www.omegahat.org"))
  con$addNode(xmlTextNode("and some follow up text"))
 
- con$addTag("subsection", close=FALSE)
+ con$addTag("subsection", close = FALSE)
    con$addNode(xmlTextNode("some addtional text "))
    con$addTag("a", attrs=c(href="http://www.omegahat.org"), close=FALSE)
      con$addNode(xmlTextNode("the content of the link"))
@@ -118,6 +129,19 @@ con$closeTag() # section
  d$addComment("A comment")
  print(d$value())
  print(d$value(), indent = FALSE, tagSeparator = "")
+
+
+ d = xmlOutputDOM("bob", xmlDeclaration = TRUE)
+ print(d$value())
+
+ d = xmlOutputDOM("bob", xmlDeclaration = "encoding='UTF-8'")
+ print(d$value())
+
+
+ d = xmlOutputBuffer("bob", header = "<?xml version='1.0' encoding='UTF-8'?>", 
+                      dtd = "foo.dtd")
+ d$addTag("bob")
+ cat(d$value())
 }
 \keyword{file}
 \keyword{IO}

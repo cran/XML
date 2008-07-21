@@ -66,12 +66,6 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
      if(is.list(namespace))
        return(NULL)
 
-#debugging
-if(FALSE) {      
-a =    xmlNamespaceDefinitions(node)
-b = namespaceDeclarations(node, TRUE)      
-}
-#end debugging
       
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
        ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace)
@@ -121,8 +115,12 @@ if(FALSE) {
    if(inherits(name, "XMLInternalNode"))
       node = name
    else {
-      node <- newXMLNode(name, attrs = attrs, namespace = namespace, doc = doc,
-                            parent = if(length(currentNodes) > 1) currentNodes[[1]] else xmlRoot(currentNodes[[1]]),
+      parent = if(length(currentNodes) > 1) 
+                    currentNodes[[1]] 
+               else 
+                    xmlRoot(currentNodes[[1]])
+      node <- newXMLNode(name, attrs = attrs, namespace = namespace, 
+                         doc = doc,  parent = parent,
                           namespaceDefinitions = if(addNamespaceDefinitions) namespaces else NULL)
 
       if(addNamespaceDefinitions) {

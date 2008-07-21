@@ -1,12 +1,28 @@
 xmlOutputDOM <-
-function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
+function(tag = "doc", attrs = NULL, dtd = NULL, nameSpace = NULL, nsURI = character(0),
+          xmlDeclaration = NULL)
 {
  buf <- NULL
  current <- NULL
 
+ startingNode = 1
+
+ if(is.logical(xmlDeclaration) && xmlDeclaration)
+    xmlDeclaration = xmlPINode("xml", 'version = "1.0"')
+ else if(is.character(xmlDeclaration)) {
+     if(length(grep('version *=', xmlDeclaration)) == 0)
+       xmlDeclaration = paste(xmlDeclaration, "version='1.0'")
+     xmlDeclaration = xmlPINode("xml", xmlDeclaration)
+ }
+
+ if(length(dtd)) 
+   dtd = paste("<!DOCTYPE", tag, "SYSTEM", dQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", dQuote(dtd[2])), ">")
+
+ 
  reset <-
  function() {
-  buf <<- xmlNode(tag, attrs = attrs, namespace = nameSpace)
+  buf <<- xmlNode(tag, attrs = attrs, namespace = nameSpace)   
+
   if(length(nsURI) > 0) {
    names(nsURI) <- paste("xmlns", names(nsURI), sep=":")
    buf$attributes <<- nsURI
@@ -19,11 +35,11 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
 
 
  addTag <- 
- function(tag, ..., attrs=NULL, close=TRUE, namespace=NULL) {
+ function(tag, ..., attrs=NULL, close=TRUE, namespace=NULL, .children = list(...)) {
    if(missing(namespace))
      namespace <- nameSpace
 
-   addNode(n <- xmlNode(tag, ..., attrs= attrs, namespace=namespace))
+   addNode(n <- xmlNode(tag, attrs= attrs, namespace = namespace, .children = .children))
    if(close == FALSE) {
      current <<- c(current, xmlSize(getCurrent()))
    }
@@ -92,7 +108,16 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
    current <<- current[-length(current)]
  }
 
- con <- list( value=function() {buf},
+ getValue =
+  function() {
+      # Add DOCTYPE if we have a dtd.
+    if(!is.null(xmlDeclaration))
+      structure(list(xmlDeclaration = xmlDeclaration, root = buf, doctype = dtd), class = "XMLRDocument")  
+    else
+       buf
+  }
+ 
+ con <- list( value= getValue,
               addTag = addTag,
               addEndTag = function(name){ closeTag(name)},
               closeTag = closeTag,
@@ -107,4 +132,20 @@ function(tag="doc", attrs = NULL, dtd=NULL, nameSpace=NULL, nsURI=character(0))
   class(con) <- c("XMLOutputDOM", "XMLOutputStream")
 
  return(con)
+}
+
+xmlRoot.XMLRDocument =
+function(x, ...)
+  x$root
+
+print.XMLRDocument =
+function(x, ...)
+{
+  if(!is.null(x$xmlDeclaration))
+    print(x$xmlDeclaration)
+
+  if(!is.null(x$doctype))
+    cat(x$doctype, "\n")
+
+  print(x$root, ...)
 }

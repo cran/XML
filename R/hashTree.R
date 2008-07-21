@@ -40,7 +40,7 @@ function(nodes = list(), parents = character(), children = list(),
 
   addNode =
      # This adds each new node.  
-   function(node, parentId)
+  function(node, parentId)
    {
      node = asXMLTreeNode(node, .this, className = "XMLHashTreeNode")
      id = node$id

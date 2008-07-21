@@ -15,6 +15,15 @@ setOldClass(c("XMLInternalCommentNode", "XMLInternalNode"))
 setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
 setOldClass(c("XMLInternalTextNode", "XMLInternalNode"))
 
+setOldClass(c("XMLXIncludeStartNode", "XMLInternalNode"))
+setOldClass(c("XMLXIncludeEndNode", "XMLInternalNode"))
+setOldClass(c("XMLEntityDeclNode", "XMLInternalNode"))
+setOldClass(c("XMLAttributeDeclNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentTypeNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentFragNode", "XMLInternalNode"))
+setOldClass(c("XMLNamespaceDeclNode", "XMLInternalNode"))
+
 setOldClass(c("XMLDTDNode", "XMLInternalNode"))
 
 setOldClass("XMLNamespace")
@@ -111,6 +120,8 @@ function(x)
   .Call("RS_XML_xmlNodeNamespace", x)
 }
 
+
+
 xmlAttrs.XMLInternalNode = 
 function(node, addNamespace = TRUE, ...)
 {
@@ -122,6 +133,16 @@ function(x, addNames = TRUE)
 {
  .Call("RS_XML_xmlNodeChildrenReferences", x, as.logical(addNames))
 }
+
+xmlChildren.XMLInternalDocument =
+function(x, addNames = TRUE)
+{
+# .Call("RS_XML_xmlDocumentChildren", x, as.logical(addNames))
+ xmlChildren.XMLInternalNode(x, addNames)
+}
+
+
+
 
 xmlSize.XMLInternalNode =
 function(obj)
@@ -612,6 +633,12 @@ function(x, i, j, ..., value)
 }  
 
 
+"xmlAttrs<-.XMLInternalNode" =
+function(x, name, value)
+{
+ 
+}  
+
 addChildren.XMLInternalNode =
 addChildren.XMLInternalDocument =
   #
@@ -1011,7 +1038,6 @@ tmp =
 function(node, suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE), value)
 {
    addAttributes(node, .attrs = value, suppressNamespaceWarning = suppressNamespaceWarning)
-   node
 }
 
 setMethod("xmlAttrs<-", "XMLInternalElementNode", tmp)
@@ -1191,3 +1217,12 @@ function(node, ..., .values = list(...))
   names(ans) = ids
   ans
 }
+
+
+
+
+xmlNodeMatch =
+function(x, table, nomatch = NA_integer_)
+{
+  .Call("R_matchNodesInList", x, table, as.integer(nomatch))
+}  

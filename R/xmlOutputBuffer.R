@@ -28,8 +28,8 @@ xmlOutputBuffer <-
 #
 #
 #
-function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
-         header="<?xml version=\"1.0\"?>")
+function(dtd = NULL, nameSpace = NULL, buf = NULL, nsURI = NULL,
+          header = "<?xml version=\"1.0\"?>")
 {
     # If the user gave as an existing buffer and header is non-NULL,
     # we appendd it to the buffer. This can be used for adding things
@@ -46,10 +46,14 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
        open(buf, rw = "w")
        on.exit(close(buf))
      }
+    cat(header,"\n", sep="", file = buf)     
   } else if(!is.null(header))
-    cat(header,"\n", sep="", file=buf)
+    cat(header,"\n", sep="", file = buf)
 
 
+
+  emittedDocType <- FALSE
+  
   if(missing(nameSpace) && !is.null(nsURI) && !is.null(names(nsURI))) {
     nameSpace <- names(nsURI)[1]
   }
@@ -88,8 +92,8 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
   }
 
 
-  openTag <- function(tag, ..., attrs=NULL, sep="\n",
-                       namespace=NULL, xmlns=NULL) {
+  openTag <- function(tag, ..., attrs = NULL, sep = "\n",
+                       namespace = NULL, xmlns = NULL) {
     addTag(tag, ..., attrs = attrs, sep = sep, namespace = namespace, xmlns, close = FALSE)
   }
 
@@ -102,8 +106,8 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
    #
    # We also need to allow the user specify an empty namespace
    # so that tags 
-  addTag <- function(tag, ..., attrs=NULL, sep="\n", close=TRUE,
-                       namespace=NULL, xmlns=NULL) {
+  addTag <- function(tag, ..., attrs = NULL, sep = "\n", close = TRUE,
+                       namespace = NULL, xmlns = NULL) {
 
     tmp <- ""
 
@@ -175,7 +179,7 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
      # and so no namespaces are defined at this point.
 
 #    !startingTag &&
-    tagName <- ifelse(!is.null(namespace) && namespace != "", paste(namespace,tag,sep=":"), tag)
+    tagName <- if(!is.null(namespace) && namespace != "") paste(namespace,tag,sep=":") else tag
 
 
     if(!is.null(attrs)) {
@@ -185,6 +189,11 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
     }
 
 
+    if(length(dtd) && !emittedDocType)  {
+       add(paste("<!DOCTYPE", tag, "SYSTEM", dQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", dQuote(dtd[2])), ">"))
+       emittedDocType <<- TRUE
+    }
+    
    
     add(paste("<", tagName, tmp, ">", sep=""))
 
@@ -193,14 +202,14 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
     }
 
     if(close) 
-      add(paste(ifelse(sep=="\n","","\n"), "</",tagName, ">", "\n", sep=""), sep="")
+      add(paste(if(sep == "\n")"" else"\n", "</",tagName, ">", "\n", sep=""), sep="")
     else 
       addOpenTag(tag, namespace, xmlns)
 
     NULL
   }
 
-   closeTag <- function(name=NULL, namespace=nameSpace) {
+   closeTag <- function(name = NULL, namespace = nameSpace) {
     if(is.null(name)) {
       tmp <- getOpenTag() 
       name <- tmp[1] 
@@ -271,6 +280,7 @@ function(dtd = NULL, nameSpace= "", buf=NULL, nsURI=NULL,
     }
     return(paste0("<", tag,tmp, ">",...,"</",tag,">"))
   }
+
 
   con <- list( value=function() {buf},
                addTag = addTag,

@@ -1,3 +1,8 @@
+xmlSchemaParse =
+function(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
+{
+  xmlInternalTreeParse(file, asText = asText, isSchema = TRUE, xinclude = xinclude, error = error)
+}
 
  xmlTreeParse <- 
 #
@@ -113,7 +118,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
 
 
-xmlInternalTreeParse = xmlTreeParse
+xmlNativeTreeParse = xmlInternalTreeParse = xmlTreeParse
+formals(xmlNativeTreeParse)[["useInternalNodes"]] = TRUE
 formals(xmlInternalTreeParse)[["useInternalNodes"]] = TRUE
 
 if(FALSE) {

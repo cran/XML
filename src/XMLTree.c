@@ -730,6 +730,28 @@ R_getInternalNodeClass(xmlElementType type)
         case XML_NAMESPACE_DECL:
               p = "XMLNamespaceDeclaration";
               break;
+        case XML_XINCLUDE_START:
+              p = "XMLXIncludeStartNode";
+              break;
+        case XML_XINCLUDE_END:
+              p = "XMLXIncludeEndNode";
+              break;
+        case XML_ENTITY_DECL:
+              p = "XMLInternalEntityRefNode";
+              break;
+        case XML_ATTRIBUTE_DECL:
+              p = "XMLAttributeDeclNode";
+              break;
+        case XML_DOCUMENT_NODE:
+              p = "XMLDocumentNode";
+              break;
+        case XML_DOCUMENT_TYPE_NODE:
+              p = "XMLDocumentTypeNode";
+              break;
+        case XML_DOCUMENT_FRAG_NODE:
+              p = "XMLDocumentFragNode";
+              break;
+
         default:
               p = "XMLUnknownInternalNode";
     }

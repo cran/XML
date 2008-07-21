@@ -7,6 +7,15 @@
 \alias{XMLInternalCommentNode-class}
 \alias{XMLInternalPINode-class}
 \alias{XMLInternalCDataNode-class}
+\alias{XMLAttributeDeclNode-class}
+% Added later. Do they fit here.
+\alias{XMLDocumentFragNode-class}
+\alias{XMLDocumentNode-class}
+\alias{XMLDocumentTypeNode-class}
+\alias{XMLEntityDeclNode-class}
+\alias{XMLNamespaceDeclNode-class}
+\alias{XMLXIncludeStartNode-class}
+\alias{XMLXIncludeEndNode-class}
 \alias{XMLDTDNode-class}
 
 \title{Classes to describe an XML node object.}

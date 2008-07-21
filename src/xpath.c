@@ -25,7 +25,16 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
   }
 
   for(i = 0; i < obj->nodeNr; i++) {
-    ref = R_createXMLNodeRef(obj->nodeTab[i]);
+      xmlNodePtr el;
+      el = obj->nodeTab[i];
+      if(el->type == XML_ATTRIBUTE_NODE) {
+	  PROTECT(ref = mkString((el->children && el->children->content) ? el->children->content : ""));
+	  SET_NAMES(ref, mkString(el->name));
+	  SET_CLASS(ref, mkString("XMLAttributeValue"));
+	  UNPROTECT(1);
+      } else
+	ref = R_createXMLNodeRef(obj->nodeTab[i]);
+
     if(expr) {
       PROTECT(ref);
       SETCAR(arg, ref);
@@ -152,7 +161,7 @@ R_XMLInternalDocument_free(SEXP sdoc)
 
 
 SEXP
-RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
+RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun)
 {
  xmlXPathContextPtr ctxt = NULL;
  xmlXPathObjectPtr result;
@@ -167,6 +176,9 @@ RS_XML_xpathEval(SEXP sdoc, SEXP path, SEXP namespaces, SEXP fun)
 
  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
  ctxt = xmlXPathNewContext(doc);
+
+ if(GET_LENGTH(r_node))
+     ctxt->node = R_ExternalPtrAddr(r_node);
 
  if(GET_LENGTH(namespaces)) {
      ctxt->namespaces =  R_namespaceArray(namespaces, ctxt); /* xmlCopyNamespaceList(doc); */
@@ -282,3 +294,28 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
 }
 #endif
 
+
+SEXP
+R_matchNodesInList(SEXP r_nodes, SEXP r_target, SEXP r_nomatch)
+{
+    xmlNodeSetPtr nodes = NULL, target;
+    xmlNodePtr el;
+    int i, j, n, n2;
+    SEXP ans;
+      
+    n = GET_LENGTH(r_nodes);
+    n2 = GET_LENGTH(r_target);
+    ans = NEW_INTEGER( n );
+    for(i = 0; i < n ; i++) {
+	el = R_ExternalPtrAddr(VECTOR_ELT(r_nodes, i));
+	INTEGER(ans)[i] = INTEGER(r_nomatch);
+	for(j = 0; j < n2; j++) {
+	    if(el == R_ExternalPtrAddr(VECTOR_ELT(r_target, j))) {
+		INTEGER(ans)[i] = j;
+		break; 
+	    }
+	}
+    }
+
+    return(ans);
+}

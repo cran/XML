@@ -8,6 +8,40 @@
 
 <dl>
 
+    <dt>
+    <li>  I have compiled the package from source and everything goes
+    fine, but when I try to load it, I get an error about an
+    "undefined symbol xmlOutputBufferCreateBuffer". What's the problem?
+    <dd>
+	The most obvious explanation is that you are <i>compiling</i> against
+    one version of libxml2 but <i>loading</i> another.
+	Here is the explanation I gave to several people.
+<div style="border: solid 1px; background-color: lightgrey; padding: 2pt">
+That particular routine is either "borrowed"
+from libxml2.so or if not available from that, a compiled
+copy I added to the XML source is used.
+So it looks like the configuration is smart enough not
+to compile the one we provide because xmlOutputBufferCreateBuffer()
+is available  in libxml2-2.6.32, but then it fails to find it
+at load time.
+<p/>
+So the first thing that comes to mind is that there is some inconsistency
+between your compile/link configuration and your run-time load configuration.
+Is it possible that you have an older version of libxml2...so somewhere
+on your system that is being loaded at run time
+Try the shell command
+<pre>
+R CMD ldd <wherever XML is installed>/libs/XML.so
+</pre>
+and see where it thinks libxml2 is. Hopefully it will
+list it and we might see that it is /usr/lib/libxml2.so
+and that you are compiling against a version in
+/usr/local/lib/.
+If that is the case, you would need to change your personal setting for
+<b>LD_LIBRARY_PATH</b>
+or add /usr/local/lib to  /etc/ld.so.conf file at a system level.
+</div>
+
   <dt>
   <li> How do I create my own XML content from within R
       and not just parse other people's XML documents?
@@ -313,6 +347,6 @@ causes an error in the parser something like
 <address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Sat Sep 29 12:07:53 PDT 2007
+Last modified: Fri May 16 07:40:39 NZST 2008
 <!-- hhmts end -->
 </body> </html>

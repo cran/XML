@@ -99,7 +99,7 @@ function(node, ...)
 #
 function(x, ..., all = FALSE)
 {
- obj <- x$children
+ obj <- xmlChildren(x) # x$children
 
  if(all) # "all" %in% names(list(...)) && list(...)[["all"]] == TRUE)
    obj[ names(obj) %in% list(...)[[1]] ]
@@ -121,7 +121,7 @@ function(x, ...)
 #
 function(x, ...)
 {
- x$children[[...]]
+ xmlChildren(x)[[...]]
 }
 
 names.XMLNode <-
@@ -469,7 +469,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE)
+          resolveNamespaces = TRUE, .node = NULL)
 {
 #  if(!inherits(doc, "XMLInternalDocument"))
 #    stop("Need XMLInternalDocument object for XPath query")
@@ -486,7 +486,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
     fun = as.call(c(fun, append(1, args)))
 
 
-  ans = .Call("RS_XML_xpathEval", doc, as.character(path), namespaces, fun)
+  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun)
 
   if(length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]
@@ -692,10 +692,26 @@ function(doc, path, fun = NULL, ...,
      lapply(ans, fun, ...)
   else
      ans
+}
 
-}  
 
 
+xpathApply.XMLInternalNode =
+function(doc, path, fun = NULL, ...,
+          namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+           resolveNamespaces = TRUE)
+{
+  xpathApply.XMLInternalDocument(as(doc, "XMLInternalDocument"), path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = doc)
+}
+
+
+xpathApply.XMLDocument =
+xpathApply.XMLNode =  
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+          resolveNamespaces = TRUE, .node = NULL)
+{
+  stop("XPath expressions cannot be applied to R-level nodes. Use xmlInternalTreeParse() to process the document and then use xpathApply()")
+}
 
 
 # d = xmlTreeParse("data/book.xml", useInternal = TRUE)

@@ -2,6 +2,8 @@
 \alias{xmlTreeParse}
 \alias{htmlTreeParse}
 \alias{xmlInternalTreeParse}
+\alias{xmlNativeTreeParse}
+\alias{xmlSchemaParse}
 \title{XML Parser}
 \description{
  Parses an XML or HTML file or string containing XML/HTML content, and generates an R 
@@ -20,7 +22,10 @@
 
  \code{xmlInternalTreeParse} is identical to \code{xmlTreeParse}
  except it has no \code{useInternalNodes} parameter and 
-  uses \code{TRUE} for its operation, i.e. working with internal nodes.
+  uses \code{TRUE} for its operation, i.e. working with internal
+ nodes.
+
+ \code{xmlSchemaParse} is a convenience function for parsing an XML schema.
 }
 \usage{
 xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
@@ -39,6 +44,14 @@ xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FAL
              useDotNames = length(grep("^\\.", names(handlers))) > 0,
              xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
 
+xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
+             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
+             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+             useInternalNodes = TRUE, isSchema = FALSE,
+             fullNamespaceInfo = FALSE, encoding = character(),
+             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
               isURL = FALSE, asTree = FALSE, 
@@ -46,6 +59,8 @@ htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               useDotNames = length(grep("^\\.", names(handlers))) > 0,
               xinclude = FALSE, addFinalizer = TRUE, 
               error = xmlErrorCumulator()) 
+
+xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
 }
 
 \arguments{
@@ -64,13 +79,16 @@ in the resulting `tree'. }
   objects. Typically, this is a named list of functions,
    and a closure can be used to provide local data.
   This provides a way of filtering the tree as it is being
-  created, adding or removing nodes, and generally processing
+  created in R, adding or removing nodes, and generally processing
   them as they are constructed in the C code.
 
    In a recent addition to the package (version 0.99-8),
    if this is specified as a single function object,
-   we call that function for each node in the underlying DOM tree.
+   we call that function for each node (of any type) in the underlying DOM tree.
    It is invoked with the new node and its parent node.
+   This applies to regular nodes and also comments, processing
+   instructions, CDATA nodes, etc.  So this function must be
+   sufficiently general to handle them all.
   }
   \item{replaceEntities}{
    logical value indicating whether to substitute entity references

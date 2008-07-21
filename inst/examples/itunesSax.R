@@ -20,8 +20,6 @@ function()
 
        if(name == "dict")
          dictLevel <<- dictLevel + 1L
-
-       
     }
 
 

@@ -5534,7 +5534,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  DEFINES="$DEFINES -DHAVE_R_CETYPE_T=1"; echo "Using recent version of R with cetype_t enumeration type for encoding"
+  PKG_CPPFLAGS="${PKG_CPPFLAGS} -DHAVE_R_CETYPE_T=1"; echo "Using recent version of R with cetype_t enumeration type for encoding"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
