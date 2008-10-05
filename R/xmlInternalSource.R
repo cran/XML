@@ -214,7 +214,10 @@ function(url, ..., envir =globalenv(),
      }
    }
   
-  ans = sapply(url, evalNode, envir = envir, verbose = verbose, ids = ids, omit = omit, echo = echo, print = print, ask = ask)
+  ans = sapply(url, evalNode, envir = envir, verbose = verbose, ids = ids,
+                omit = omit, echo = echo, print = print, ask = ask, eval = eval)
+
+  names(ans) = sapply(url, xmlName, full = TRUE)
   invisible(ans)
 })
 

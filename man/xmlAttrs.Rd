@@ -16,11 +16,14 @@
 }
 \usage{
  xmlAttrs(node, ...)
- 'xmlAttrs<-'(node, suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE), value)
+ 'xmlAttrs<-'(node, append = TRUE, suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE), value)
 }
 \arguments{
   \item{node}{The \code{XMLNode} object
     whose attributes are to be extracted. }
+  \item{append}{a logical value indicating whether to add the attributes in \code{value} to the existing attributes 
+   within the XML node, or to replace the set of any existing attributes with this new set, i.e. remove the existing ones and 
+   then set the attributes with the contents of \code{value}.}
   \item{...}{additional arguments for the specific methods, currently
     ignored but present for future extensions.}
   \item{value}{a named character vector giving the new attributes to be
@@ -51,8 +54,6 @@ pairs in the XML tag
 
  doc <- xmlTreeParse(fileName, useInternalNodes = TRUE)
  d = xmlRoot(doc)
-   # skip over the comment
- d = XML:::getSibling(d)
 
  xmlAttrs(d)
  xmlAttrs(d) <- c(name = "Motor Trend fuel consumption data",

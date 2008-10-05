@@ -13,7 +13,7 @@ integrated with other trees generated manually
 or with via the parser.
 }
 \usage{
-xmlNode(name, ..., attrs=NULL, namespace="", .children = list(...))
+xmlNode(name, ..., attrs=NULL, namespace="", namespaceDefinitions = NULL, .children = list(...))
 xmlTextNode(value, namespace="", entities = XMLEntities, cdata = FALSE)
 xmlPINode(sys, value, namespace="")
 xmlCDataNode(...)
@@ -41,6 +41,10 @@ xmlCommentNode(text)
       as \code{>} and \code{&}.
    }
   \item{namespace}{The XML namespace identifier for this node.}
+  \item{namespaceDefinitions}{a collection of name space definitions, containing the prefixes and the corresponding URIs.
+    This is most conveniently specified as a character vector whose names attribute is the vector of prefixes
+   and whose values are the URIs.  Alternatively, one can provide a list of name space definition objects 
+   such as those returned}
   \item{sys}{the name of the system for which the processing instruction
     is targeted. This is the value that appears in the
      \code{<?sys value?>}}
@@ -89,14 +93,29 @@ and
 
  # node named arg with two children: name and defaultValue
  # Both of these have a text node as their child.
-a <- xmlNode("arg", attrs = c(default="TRUE"),
+ n <- xmlNode("arg", attrs = c(default="TRUE"),
                xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
 
 
   # internal C-level node.
- newXMLNode("arg", attrs = c(default = "TRUE"),
-             newXMLNode("name", "foo"),
-             newXMLNode("defaultValue", "1:10"))
+ a = newXMLNode("arg", attrs = c(default = "TRUE"),
+                newXMLNode("name", "foo"),
+                newXMLNode("defaultValue", "1:10"))
 
+ xmlAttrs(a) = c(a = 1, b = "a string")
+
+ xmlAttrs(a) = c(a = 1, b = "a string", append = FALSE)
+
+ newXMLNamespace(a, c("r" = "http://www.r-project.org"))
+ xmlAttrs(a) = c("r:class" = "character") 
+
+
+ xmlAttrs(a[[1]]) = c("r:class" = "character") 
+
+
+  # Using a character vector as a namespace definitions
+ x = xmlNode("bob",
+             namespaceDefinitions = c(r = "http://www.r-project.org",
+                                      omg = "http://www.omegahat.org"))
 }
 \keyword{file}

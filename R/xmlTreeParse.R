@@ -100,18 +100,22 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
               xinclude, error)
 
 
+
 #  if(inherits(ans, "XMLParseError"))
 #    stop(ans)
   
   if(!missing(handlers) & !as.logical(asTree))
     return(handlers)
 
+  if(length(class(ans)))
+    class(ans) = oldClass(class(ans))
+
   if(inherits(ans, "XMLInternalDocument"))
     addDocFinalizer(ans, addFinalizer)
   else if(!getDTD) {
        #??? is this a good idea.
-     class(ans) = "XMLDocumentContent"
-  }
+     class(ans) = oldClass("XMLDocumentContent")
+  } 
 
   ans
 }
@@ -121,6 +125,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 xmlNativeTreeParse = xmlInternalTreeParse = xmlTreeParse
 formals(xmlNativeTreeParse)[["useInternalNodes"]] = TRUE
 formals(xmlInternalTreeParse)[["useInternalNodes"]] = TRUE
+xmlParse = xmlNativeTreeParse
 
 if(FALSE) {
    # Another approach is to just change the call, as below, but this is tricky

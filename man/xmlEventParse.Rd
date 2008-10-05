@@ -41,12 +41,14 @@
  XML element of interest, i.e. \code{"myTag" = function(x, attrs)}.
 }
 \usage{
-xmlEventParse(file, handlers=xmlEventHandler(), ignoreBlanks = FALSE, addContext=TRUE,
-               useTagName=TRUE, asText = FALSE, trim=TRUE, useExpat=FALSE, isURL = FALSE,
-                state = NULL, replaceEntities = TRUE, validate = FALSE,
-                 saxVersion = 1, branches = NULL,
-                 useDotNames = length(grep("^\\.", names(handlers))) > 0,
-                  error = xmlErrorCumulator())
+xmlEventParse(file, handlers = xmlEventHandler(), 
+               ignoreBlanks = FALSE, addContext=TRUE,
+                useTagName = TRUE, asText = FALSE, trim=TRUE, 
+                 useExpat=FALSE, isURL = FALSE,
+                  state = NULL, replaceEntities = TRUE, validate = FALSE,
+                   saxVersion = 1, branches = NULL,
+                    useDotNames = length(grep("^\\.", names(handlers))) > 0,
+                     error = xmlErrorCumulator())
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -211,7 +213,7 @@ If this is True, each callback function  should support
   \item{saxVersion}{an integer value which should be either 1 or 2.
     This specifies which SAX interface to use in the C code.
     The essential difference is the number of arguments passed to the
-    \code{startElement} handler function(s).  In addition to the name of
+    \code{startElement} handler function(s).  Under SAX 2, in addition to the name of
     the element and the named-attributes vector, two additional arguments
     are provided.
     The first identifies the namespace of the element.
@@ -223,7 +225,7 @@ If this is True, each callback function  should support
     If there is no prefix because the namespace is being used as the
     default, the result of calling \code{\link[base]{names}} on
     the string is \code{""}.
-    The fourth argument gives the collection of all the namespaces
+    The second additional argument (the fourth in total) gives the collection of all the namespaces
     defined within this element.
     Again, this is a named character vector.
   }

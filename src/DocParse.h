@@ -48,4 +48,6 @@ USER_OBJECT_ RS_XML(lookupGenericNodeConverter)(xmlNodePtr node, USER_OBJECT_ me
 USER_OBJECT_ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node);
 
 USER_OBJECT_ RS_XML_xmlXIncludeProcessFlags(USER_OBJECT_ r_doc, USER_OBJECT_ r_flags);
+
+USER_OBJECT_ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSettings);
 #endif

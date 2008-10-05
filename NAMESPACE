@@ -19,10 +19,12 @@ export(
  getNodeSet,
  xpathApply,
  htmlTreeParse,
+ htmlParse,       
  libxmlVersion,
  xmlDoc,
  newXMLDoc,
  newXMLNode,
+ newXMLNamespace,
  newXMLPINode,
  newXMLTextNode,
  newXMLCommentNode,
@@ -68,7 +70,9 @@ export(
  xmlTextNode,
  xmlTree,
  xmlTreeParse,
- xmlInternalTreeParse,       
+ xmlInternalTreeParse,
+ xmlNativeTreeParse,
+ xmlParse,              
  xmlValue,
  names.XMLNode,
  parseURI,
@@ -76,9 +80,9 @@ export(
  xmlHashTree,
  addNode,
  xmlNamespaceDefinitions,
+ xmlNamespaces,
  matchNamespaces,
  getDefaultNamespace,
- "xmlChildren<-",
  catalogResolve,
  toHTML,
  addChildren,
@@ -95,8 +99,11 @@ exportMethods("addAttributes", "removeAttributes")
 
 exportMethods("toHTML")
 
+export("xmlChildren<-")
+exportMethods("xmlChildren<-")
+
 exportClasses("XMLInternalDocument")
-exportClasses("XMLNode", "XMLInternalNode", "XMLInternalElementNode",
+exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
               "XMLInternalCommentNode", "XMLDTDNode",
               "XMLXIncludeStartNode", "XMLXIncludeEndNode", "XMLEntityDeclNode",
@@ -124,6 +131,8 @@ export(xpathSApply)
 S3method(xmlNamespaceDefinitions, XMLNode)
 S3method(xmlNamespaceDefinitions, XMLInternalDocument)
 S3method(xmlNamespaceDefinitions, XMLInternalNode)
+S3method(xmlNamespaceDefinitions, XMLAbstractDocument)
+#XXX S3method(xmlNamespaceDefinitions, XMLHashTreeNode)
 
 #S3method(names, XMLFlatTree)
 #S3method("$", XMLFlatListTree)
@@ -132,23 +141,46 @@ S3method(addNode, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
 S3method(print, XMLHashTree)
 
+S3method(print, XMLInternalDocument)
+S3method(print, XMLInternalNode)
+
 S3method(print, XMLRDocument)
 S3method(xmlRoot, XMLRDocument)
 
+
+if(TRUE) {
+S3method(xmlName, XMLComment)
+S3method(xmlName, XMLNode)
+S3method(xmlName, XMLInternalNode)
+} else
+  # S4 version
+exportMethods(xmlName)
+  
 S3method("names<-", XMLNode)
 S3method("xmlName<-", XMLNode)
 S3method("xmlName<-", XMLInternalElementNode)
 
 
+
+
+
 exportMethods("xmlAttrs<-")
 
-S3method(xmlParent, XMLTreeNode)
+
+if(TRUE) {
 S3method(xmlChildren, XMLTreeNode)
 S3method(xmlChildren, XMLInternalDocument)
+S3method(xmlChildren, XMLHashTreeNode)
+S3method(xmlChildren, XMLNode)
+S3method(xmlChildren, XMLInternalNode)
+} else
+  exportMethods("xmlChildren")
+
+S3method(xmlParent, XMLTreeNode)
 S3method(xmlParent, XMLHashTreeNode)
 S3method(xmlParent, XMLInternalNode)
-S3method(xmlChildren, XMLHashTreeNode)
 S3method(xmlSize, XMLHashTreeNode)
+
 
 S3method(xmlSize, XMLHashTree)
 S3method(xmlRoot, XMLHashTree)
@@ -167,8 +199,7 @@ export(replaceNodes)
 S3method(replaceNodes, XMLInternalNode)
 
 
-S3method(xmlChildren, XMLNode)
-S3method(xmlChildren, XMLInternalNode)
+
 S3method(xmlSize, XMLInternalNode)
 
 
@@ -177,9 +208,6 @@ S3method(xmlValue, XMLInternalNode)
 # exportS3method("xmlValue", "NULL")
 
 
-S3method(xmlName, XMLComment)
-S3method(xmlName, XMLNode)
-S3method(xmlName, XMLInternalNode)
 
 S3method("[", XMLNode)
 S3method("[[", XMLNode)
@@ -192,15 +220,24 @@ S3method("[", XMLInternalDocument)
 S3method("[[", XMLInternalDocument)
 S3method("names", XMLInternalNode)
 
+S3method("[[", XMLHashTreeNode)
+
 S3method("[<-", XMLNode)
 S3method("[[<-", XMLNode)
+
+S3method("[[<-", XMLInternalNode)
+
 
 S3method(names, XMLNode)
 S3method(length, XMLNode)
 
-S3method(xmlAttrs, XMLNode)
-S3method(xmlAttrs, XMLInternalNode)
-S3method(xmlAttrs, XMLElementDef)
+if(TRUE) {
+ S3method(xmlAttrs, XMLNode)
+ S3method(xmlAttrs, XMLInternalNode)
+ S3method(xmlAttrs, XMLElementDef)
+} else
+  exportMethods("xmlAttrs")
+
 
 S3method(xmlSize, XMLDocument)
 S3method(xmlSize, default)
@@ -229,11 +266,14 @@ S3method(xmlSApply, XMLDocument)
 S3method(xmlSApply, XMLDocumentContent)
 S3method(xmlSApply, XMLInternalNode)
 
+if(TRUE) {
 S3method(xmlValue, XMLNode)
 S3method(xmlValue, XMLTextNode)
 S3method(xmlValue, XMLComment)
 S3method(xmlValue, XMLCDataNode)
 S3method(xmlValue, XMLProcessingInstruction)
+} else
+ exportMethods("xmlValue")
 
 S3method(addSibling, XMLInternalNode)
 
@@ -261,6 +301,13 @@ export(docName)
 S3method(docName, XMLDocument)
 S3method(docName, XMLDocumentContent)
 S3method(docName, XMLInternalDocument)
+S3method(docName, XMLInternalNode)
+S3method(docName, XMLHashTree)
+
+
+export("xmlNamespaces<-")
+exportMethods("xmlNamespaces<-")
+
 
 export("docName<-")
 exportMethods("docName<-")
@@ -279,7 +326,7 @@ exportClasses("ExternalReference", "xmlSchemaRef", "libxmlTypeTable")
 exportClasses("SchemaElementTable", "xmlSchemaElementRef",
               "SchemaTypeTable", "xmlSchemaTypeRef",
 	      "SchemaAttributeTable", "xmlSchemaAttributeRef",
-               "SchemaAttributeGroupTable", "xmlSchemaAttributeGroupRef",
+              "SchemaAttributeGroupTable", "xmlSchemaAttributeGroupRef",
               "SchemaNotationTable", "xmlSchemaNotationRef")
 
 export(xmlSchemaValidate, schemaValidationErrorHandler, xmlSchemaParse)
@@ -292,6 +339,8 @@ exportMethods("names", "$", "$<-", "coerce")
 #importFrom(utils, normalizePath)
 
 export(getSibling)
+S3method(getSibling, XMLInternalNode)
+S3method(getSibling, XMLHashTreeNode)
 export(catalogLoad, catalogClearTable, catalogAdd)
 
 
@@ -311,3 +360,12 @@ export(xmlElementSummary)
 
 #export(xmlNodeMatch)
 #export(getRCode)
+
+
+export(xmlParserContextFunction)
+
+export(getRelativeURL)
+
+
+
+export(xmlToList)

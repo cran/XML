@@ -72,7 +72,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  ans
 }
 
-
+htmlParse = htmlTreeParse
+formals(htmlParse)$useInternalNodes = TRUE
 
 
 parseURI =

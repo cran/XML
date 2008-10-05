@@ -74,7 +74,23 @@ addSibling(node, ..., kids = list(...), after = NA)
            nodes = getNodeSet(doc, "//key[text() = 'Artist']")
            sapply(nodes, function(x)  xmlValue(getSibling(x)))
 	
-   
+
+      f = system.file("exampleData", "simple.xml", package = "XML")
+      tt = as(xmlParse(f), "XMLHashTree") 
+
+       tt
+
+      e = getSibling(xmlRoot(tt)[[1]])
+        # and back to the first one again by going backwards along the sibling list.
+      getSibling(e, after = FALSE)
+
+
+         # This also works for multiple top-level "root" nodes
+      f = system.file("exampleData", "job.xml", package = "XML")
+      tt = as(xmlParse(f), "XMLHashTree")
+       x = xmlRoot(tt, skip = FALSE)
+       getSibling(x)
+       getSibling(getSibling(x), after = FALSE)
 }
 
 \keyword{IO}

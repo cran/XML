@@ -1,3 +1,54 @@
+Version 1.98-0
+
+  *  The function XML:::xpathSubNodeApply() is the implementation of xpathApply() for an XMLInternalNode
+     from earlier versions of the package and which explicitly moves the node to a new document and performs
+     the XPath query and then re-parents the node.  Instead of using this, users can use xpathApply()/getNodeSet()
+     and simply change the XPath expression to be prefixed with ., e.g. instead of //tr, use .//tr to root the 
+     XPath query at the current node.
+
+  *  Minor patch to configure.in to allow for libxml2-2.7.*.
+ 
+  *  saveXML() for XMLInternalDocument now uses xmlDocFormatDump() ratehr than xmlSaveFile()
+     and so formatting is "better".
+
+  *  The [ and [[ operators for XMLInternalDocument support a 'namespaces' parameter
+     for ease of extracting nodes. This is syntactic sugar for getNodeSet()/xpathApply().
+
+  *  xmlParse() and htmlParse() return internal documents and nodes by default and are easier to type.
+     The results are amenable to XPath queries and so these are the most flexible representations.
+
+  *  xmlRoot() has a skip argument that controls whether to ignore comment and DTD nodes.
+     The default is TRUE.
+
+  *  Additional functionality for XMLHashTree and XMLHashTreeNode, including facilities for creating nodes
+     while adding them to the tree, copying sub-trees/nodes to separate trees.
+
+  *  Functionality to convert from an XMLInternalNode to an XMLHashTree - as(node, "XMLHashTree").
+     This is also an option in xmlTreeParse(, useHashTree = TRUE/FALSE)
+     [or xmlTreeParse(, treeType = "hashTree")]
+
+  *  Branch nodes from xmlEventParse(, branches = list(...)) are now garbage collected appropriately.
+
+  *  xmlAttrs.XMLInternalNode now does not add the namespace prefix to the name of the attribute, 
+     by default. Use xmlAttrs(node, addNamespace = TRUE) to get old behaviour.
+
+  *  xmlGetAttr() has a corresponding new parameter addNamespace that is passed through to the call to 
+     xmlGetAttr().
+
+  *  getRelativeURL() function available for getting URI of a document from a given attribute
+     relative to a base URL, e.g. an HTML <a href=""/> or a <schema:import schemaLocation=""/>.
+
+  *  xmlAttrs<- methods support an append (TRUE by default) to add values to the existing attributes,
+     or to replace the existing ones with the right-hand side of the assignment.
+
+  *  xmlAttrs<- checks for namespaces in all the ancestors for XMLInternalNode and XMLHashTreeNode.
+
+  *  Introduced the class XMLAbstractNode which is the parent for the XMLNode, XMLInternalNode and 
+     XMLHashTreeNode, which allows high-level methods that use the API to access the elements of the nodes
+     to be defined for a single type.
+
+  *  Changed name of XMLNameSpace class to XMLNamespace (lower-case 's').
+
 Version 1.97-1
 
   *  Fix for configuration in detecting existence of encoding

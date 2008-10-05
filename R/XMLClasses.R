@@ -20,11 +20,107 @@
 # In S4/Splus5, we should use the new class mechanism.
 #
 
+setS3Method =
+function(fun, class) {
+  if(!useS4)
+    return()
+  
+  cat("setting method for", fun, class, "\n")
+  setMethod(fun, class, get(paste(fun, class, sep = ".")), where = topenv(parent.frame()))
+}
+
+setOldClass =
+function(classes)
+{
+   classes = c(classes[1], unique(sapply(classes[-1], oldClass)))
+   methods::setOldClass(classes)
+}
+
+oldClass =
+function(class)
+{
+  unique(c(class, extends(class)))
+}
+
+###############################
+# These were in xmlNodes, but need to be defined earlier.
+
+
+setOldClass("XMLAbstractDocument")
+
+setOldClass(c("XMLInternalDocument", "XMLAbstractDocument"))
+setOldClass(c("XMLHashTree", "XMLAbstractDocument"))
+setOldClass(c("XMLDocument", "XMLAbstractDocument"))
+
+setOldClass("XMLAbstractNode")
+
+setOldClass(c("RXMLAbstractNode", "XMLAbstractNode"))
+
+# Why do we have to repeat this class inheritance information?
+# We don't!
+# setOldClass(c("XMLHashTreeNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLTextNode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLPINode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLCommentNode", "XMLNode", "XMLTextNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLProcessingInstruction", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+# setOldClass(c("XMLCDataNode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+
+
+setOldClass(c("XMLHashTreeNode", "RXMLAbstractNode"))
+setOldClass(c("XMLNode", "RXMLAbstractNode"))
+###setOldClass(c("XMLTextNode", "XMLNode"))
+methods::setOldClass(c("XMLTextNode", "XMLTextNode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode" ))
+#setOldClass(c("XMLEntitiesEscapedTextNode", "XMLTextNode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode"))
+#setOldClass(c("XMLEntitiesEscapedTextNode", "XMLTextNode"))
+setOldClass(c("XMLPINode", "XMLNode"))
+setOldClass(c("XMLCommentNode", "XMLNode"))
+setOldClass(c("XMLProcessingInstruction", "XMLNode"))
+setOldClass(c("XMLCDataNode", "XMLNode"))
+
+
+
+
+setOldClass(c("XMLInternalNode", "XMLAbstractNode"))
+
+setOldClass(c("XMLInternalCDataNode", "XMLInternalNode"))
+setOldClass(c("XMLInternalPINode", "XMLInternalNode"))
+setOldClass(c("XMLInternalCommentNode", "XMLInternalNode"))
+
+setOldClass(c("XMLInternalElementNode", "XMLInternalNode"))
+setOldClass(c("XMLInternalTextNode", "XMLInternalNode"))
+
+setOldClass(c("XMLXIncludeStartNode", "XMLInternalNode"))
+setOldClass(c("XMLXIncludeEndNode", "XMLInternalNode"))
+setOldClass(c("XMLEntityDeclNode", "XMLInternalNode"))
+setOldClass(c("XMLAttributeDeclNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentTypeNode", "XMLInternalNode"))
+setOldClass(c("XMLDocumentFragNode", "XMLInternalNode"))
+setOldClass(c("XMLNamespaceDeclNode", "XMLInternalNode"))
+
+setOldClass(c("XMLDTDNode", "XMLInternalNode"))
+
+setOldClass(c("XMLNamespace"))
+setOldClass(c("XMLNamespaceDefinition"))
+
+setOldClass("XMLInternalDOM")
+
+setOldClass("XMLNamespaceDefinitions")
+setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
+setOldClass("XMLNamespace")
+
+
+############
+
+
+
 xmlChildren <-
 function(x, addNames = TRUE)
 {
  UseMethod("xmlChildren")
 }
+
 
 xmlChildren.XMLNode <-
 #
@@ -36,10 +132,39 @@ function(x, addNames = TRUE)
   x$children
 }
 
+
+if(useS4) {
+setGeneric("xmlChildren", function(x, addNames = TRUE) standardGeneric("xmlChildren"))
+setMethod("xmlChildren", "XMLNode", xmlChildren.XMLNode)
+}
+
+if(useS4) {
+setGeneric("xmlName", function(node, full = FALSE) standardGeneric("xmlName"))
+setMethod("xmlName", "XMLCommentNode", function(node, full = FALSE) "comment")
+
+setMethod("xmlName", "XMLNode",
+function(node, full = FALSE)
+{
+  ns  = unclass(node)$namespace
+  if(!full || is.null(ns) || ns == "")
+    return(node$name)
+  
+  # 
+  if(!is.character(ns)) {
+    tmp = ns$id
+  } else if(inherits(ns, "XMLNamespace"))
+    tmp = names(ns)
+  else
+    tmp = ns
+
+  if(length(tmp))
+     paste(tmp, unclass(node)$name, sep=":")
+  else
+     unclass(node)$name
+})
+} else {
+
 xmlName <-
-#
-#
-#
 function(node, full = FALSE)
 {
   UseMethod("xmlName", node)
@@ -56,21 +181,24 @@ xmlName.XMLNode <-
 #
 function(node, full = FALSE)
 {
-  if(!full || is.null(node$namespace) || node$namespace == "")
+  ns  = unclass(node)$namespace
+  if(!full || is.null(ns) || ns == "")
     return(node$name)
   
   # 
-  if(!is.character(node$namespace)) {
-    tmp = node$namespace$id
-  } else if(inherits(node$namespace, "XMLNamespace"))
-    tmp = names(node$namespace)
+  if(!is.character(ns)) {
+    tmp = ns$id
+  } else if(inherits(ns, "XMLNamespace"))
+    tmp = names(ns)
   else
-    tmp = node$namespace
+    tmp = ns
 
   if(length(tmp))
-     paste(tmp, node$name, sep=":")
+     paste(tmp, unclass(node)$name, sep=":")
   else
-     node$name
+     unclass(node)$name
+}
+
 }
 
 xmlAttrs <-
@@ -78,6 +206,7 @@ function(node, ...)
 {
   UseMethod("xmlAttrs", node)
 }
+
 
 xmlAttrs.XMLNode <-
 #
@@ -89,6 +218,8 @@ function(node, ...)
  node$attributes
 }
 
+if(useS4)
+setMethod("xmlAttrs", "XMLNode", xmlAttrs.XMLNode)
 
 
 "[.XMLNode" <-
@@ -127,7 +258,8 @@ function(x, ...)
 names.XMLNode <-
 function(x)
 {
- names(xmlChildren(x))
+# names(xmlChildren(x))
+ xmlSApply(x, xmlName)
 }
 
 "names<-.XMLNode" <-
@@ -200,7 +332,33 @@ function(x, ..., indent = "", tagSeparator = "\n")
     txt = insertEntities( xmlValue(x) )
   
   cat(indent, txt, tagSeparator, sep="")
-}  
+}
+
+setAs("XMLNamespaceDefinitions", "character",
+       function(from) {
+
+         if(length(from) == 0)
+            return(character())
+
+         ans = structure(sapply(from, function(x) x$uri), names = sapply(from, function(x) x$id))
+         if(length(names(ans)) == 0)
+           names(ans) = ""
+         ans
+       })
+
+setAs("character", "XMLNamespaceDefinitions",
+       function(from) {
+
+         ids = names(from)
+         if(is.null(ids))
+           ids = rep("", length(from))
+
+         structure(lapply(seq(along = from),
+                           function(i)
+                              structure(list(id = ids[[i]], uri = from[i], local = TRUE), class = "XMLNamespace")),
+                   class = "XMLNamespaceDefinitions",
+                   names = ids)
+       })
 
 print.XMLNode <-
 #
@@ -214,11 +372,13 @@ function(x, ..., indent = "", tagSeparator = "\n")
  } else 
    tmp <- ""
 
- if(!is.null(x$namespaceDefinitions)) {
-   ns <- paste(sapply(x$namespaceDefinitions, 
-                       function(x) {
-                            paste("xmlns", ifelse(nchar(x$id) > 0, ":", ""), x$id, "=", "\"", x$uri, "\"", sep="")
-                       }), collapse=" ")
+ if(length(x$namespaceDefinitions) > 0) {
+    k = as(x$namespaceDefinitions, "character")
+    ns = paste("xmlns", ifelse(nchar(names(k)), ":", ""), names(k), "=", dQuote(k), sep = "", collapse = " ")
+#   ns <- paste(sapply(x$namespaceDefinitions, 
+#                       function(x) {
+#                            paste("xmlns", if(nchar(x$id) > 0) ":" else "", x$id, "=", "\"", x$uri, "\"", sep="")
+#                       }), collapse=" ")
 
  } else 
    ns <- ""
@@ -334,7 +494,6 @@ function(doc)
 
 matchNamespaces =
   # d = xmlTreeParse("data/namespaces.xml", useInternal = TRUE)
-
   #   "omg"
   #   c("ns", "omegahat", "r")
   #   c("ns", omegahat = "http://www.omegahat.org", "r")  
@@ -349,7 +508,6 @@ function(doc, namespaces,
           defaultNs = getDefaultNamespace(doc)
         )
 {
-
 
     # 3 cases:
     #  i) we are given a single string (e.g. "r") which we use as a prefix for the default namespace
@@ -370,11 +528,11 @@ function(doc, namespaces,
        return(namespaces)       
    }
 
-    # fix the names so that we empty ones.
+    # fix the names so that we have empty ones if we have none at all.
   if(is.null(names(namespaces)))
     names(namespaces) = rep("", length(namespaces))
 
-   # which need to be fixed.
+   # which need to be fixed up.
   i = (names(namespaces) == "")
   
   if(any(i)) {
@@ -394,10 +552,13 @@ function(doc, namespaces,
     }
     
     if(sum(i) > 0) {
+           # So there is at least one namespace without a name.
+
+          # See if there are duplicates
         dups = names(nsDefs)[duplicated(names(nsDefs))]
         tmp = match(namespaces[i], dups)
         if(length(dups) > 0 && any(is.na(tmp)))
-          stop("cannot match namespace prefix(es) ",
+          stop("duplicate namespaces, so cannot match namespace prefix(es) ",
                 paste(namespaces[i][is.na(tmp)], collapse = ", "),
                 " in ", paste(unique(names(nsDefs)), collapse= ", "))
 
@@ -474,7 +635,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 #  if(!inherits(doc, "XMLInternalDocument"))
 #    stop("Need XMLInternalDocument object for XPath query")
 
-  if(resolveNamespaces)
+  if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)
   
   if(!is.null(fun) && !is.call(fun))
@@ -582,6 +743,7 @@ function(node)
 }
 
 xpathApply.XMLInternalNode =
+xpathSubNodeApply =  
   #
   # This allows us to use XPath to search within a sub-tree of the document, i.e. 
   # from a particular node.
@@ -696,12 +858,15 @@ function(doc, path, fun = NULL, ...,
 
 
 
+if(TRUE)
 xpathApply.XMLInternalNode =
 function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
            resolveNamespaces = TRUE)
 {
-  xpathApply.XMLInternalDocument(as(doc, "XMLInternalDocument"), path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = doc)
+  xpathApply.XMLInternalDocument(as(doc, "XMLInternalDocument"), path, fun, ...,
+                                 namespaces = namespaces, resolveNamespaces = resolveNamespaces,
+                                 .node = doc)
 }
 
 

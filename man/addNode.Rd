@@ -16,13 +16,16 @@
   
   }
 \usage{
-addNode(node, parent, to)
+addNode(node, parent, to, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{node}{the node to be added as a child of the parent.}
   \item{parent}{the parent node or identifier}
   \item{to}{the tree object}
+  \item{\dots}{additional arguments that are understood by the different methods for the different types of 
+   trees/nodes. These can include \code{attrs}, \code{namespace}, \code{namespaceDefinitions},
+    \code{.children}.}
 }
 \value{
   The new node object.

@@ -124,6 +124,28 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(), env = 
 
   # Get is parent node.
  xmlParent(tr$A)
+
+
+ f = system.file("exampleData", "allNodeTypes.xml", package = "XML")
+
+   # Convert the document
+ r = xmlInternalTreeParse(f, xinclude = TRUE)
+ ht = as(r, "XMLHashTree")
+ ht
+ 
+  # work on the root node, or any node actually
+ as(xmlRoot(r), "XMLHashTree")
+
+  # Example of making copies of an XMLHashTreeNode object to create a separate tree.
+ f = system.file("exampleData", "simple.xml", package = "XML")
+ tt = as(xmlParse(f), "XMLHashTree")
+
+ xmlRoot(tt)[[1]]
+ xmlRoot(tt)[[1, copy = TRUE]]
+
+ table(unlist(eapply(tt, xmlName)))
+ # if any of the nodes had any attributes
+ # table(unlist(eapply(tt, xmlAttrs)))
 }
 \keyword{IO}
 \concept{XML}

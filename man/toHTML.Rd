@@ -34,7 +34,7 @@ toHTML(x, context = NULL)
 \value{
  an object of class \code{XMLInternalNode}
 }
-\references{  }
+%\references{  }
 \author{Duncan Temple Lang}
 
 \seealso{

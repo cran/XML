@@ -1,14 +1,19 @@
 xmlNode <-
-function(name, ..., attrs = NULL, namespace = "", .children = list(...))
+function(name, ..., attrs = NULL, namespace = "",
+          namespaceDefinitions = NULL, .children = list(...))
 {
   kids <- lapply(.children, asXMLNode)
   kids = addNames(kids)
 
-  node <- list(name = name, attributes = attrs, children = kids, namespace=namespace)
-  class(node) <- c("XMLNode")
+    # Check the names paces
+  node <- list(name = name, attributes = attrs, children = kids, namespace=namespace,
+                namespaceDefinitions = as(namespaceDefinitions, "XMLNamespaceDefinitions"))
+  class(node) <- oldClass("XMLNode") # , "XMLAbstractNode")
 
   node
 }
+
+setAs("NULL", "XMLNamespaceDefinitions", function(from) structure(list(), class = "XMLNamespaceDefinitions"))
 
 addNames =
 function(kids, fromTag = TRUE)
@@ -23,12 +28,25 @@ function(kids, fromTag = TRUE)
   kids
 }
 
-"xmlChildren<-" <-
+setGeneric("xmlChildren<-",
+function(x, value) {
+  standardGeneric("xmlChildren<-")
+})
+
+setMethod("xmlChildren<-", "ANY",
 function(x, value) {
   value = addNames(value)
   x$children <- value
   x
-}
+})
+
+setMethod("xmlChildren<-", "XMLInternalNode",
+function(x, value) {
+  x
+})
+
+
+
 
 addChildren =
 function(node, ..., kids = list(...), at = NA, cdata = FALSE)
@@ -84,10 +102,12 @@ function(value, namespace = "", entities = XMLEntities, cdata = FALSE)
     value = xmlCDataNode(value)
   
   node$value <- value
-  class(node) <- c("XMLTextNode", class(node))
+  if(!cdata)
+     class(node) <- oldClass("XMLTextNode") # , class(node))
   if(length(entities))
-    class(node) <- c(class(node), "EntitiesEscaped")
- node
+    class(node) <- c(class(node), "EntitiesEscaped") #"XMLEntitiesEscapedTextNode"
+  
+  node
 }
 
 
@@ -96,7 +116,7 @@ function(sys, value, namespace="")
 {
   x <- xmlNode(name=sys, namespace=namespace)
   x$value <- value
-  class(x) <- c("XMLProcessingInstruction", class(x))
+  class(x) <- oldClass("XMLProcessingInstruction") # , class(x))
 
  x
 }
@@ -105,7 +125,7 @@ xmlCommentNode <-
 function(text)
 {
   node <- xmlTextNode(text)
-  class(node) <- c("XMLCommentNode", class(node))
+  class(node) <- oldClass("XMLCommentNode") # , class(node))
 
   node
 }
@@ -117,7 +137,7 @@ function(...)
  
   node <- xmlNode("text")
   node$value <- txt
-  class(node) <- c("XMLCDataNode", class(node))
+  class(node) <- oldClass("XMLCDataNode") # , class(node))
 
  node
 }
@@ -125,6 +145,7 @@ function(...)
 asXMLNode <-
 function(x)
 {
+   #XXX
   if(!inherits(x, "XMLNode")) {
     xmlTextNode(x)
   } else {

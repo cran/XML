@@ -330,7 +330,7 @@ So we would use
   getNodeSet(d, "//d:defaultNs", "d")
 
    # And the syntactic sugar is 
-  d["//d:defaultNs", namespaces = "d"]
+  d["//d:defaultNs", namespace = "d"]
 
 
    # this illustrates how we can use the prefixes in the XML document
@@ -420,6 +420,11 @@ So we would use
 
        # And here we use our own binding.
     xpathApply(doc, "//x:a", namespaces = c(x = "http://www.r-project.org"))
+
+
+
+       # Get all the nodes in the entire tree.
+    table(unlist(sapply(doc["//*|//text()|//comment()|//processing-instruction()"], class)))
 }
 \keyword{file}
 \keyword{IO}

@@ -3,32 +3,28 @@ if(!exists("Sys.setenv", baseenv()))
 
 
 xmlRoot <-
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
  UseMethod("xmlRoot")
 }
 
 xmlRoot.XMLDocument <-
-function(x, ...)
+function(x, skip = TRUE,...)
 {
 #  x$children[[1]]
 # x$doc
 
-  xmlRoot(x$doc, ...)
+  xmlRoot(x$doc, skip = skip,...)
 }
 
 xmlRoot.XMLDocumentContent <-
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
   args <- list(...)
-  if("skip" %in% names(args))
-   skip <- args[["skip"]]
-  else
-   skip <- TRUE
 
   a <- x$children[[1]]
-  if(skip & inherits(a, "XMLComment")) {
-     which <- sapply(x$children, function(x) !inherits(x, "XMLComment"))
+  if(skip & inherits(a, "XMLCommentNode")) {
+     which <- sapply(x$children, function(x) !inherits(x, "XMLCommentNode"))
      if(any(which)) {
        which <- (1:length(x$children))[which]
        a <- x$children[[which[1]]]
@@ -40,7 +36,7 @@ function(x, ...)
 
 
 xmlRoot.HTMLDocument <-
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
    x$children[[1]]
 }
@@ -100,14 +96,26 @@ function(x, ignoreComments = FALSE)
  UseMethod("xmlValue")
 }
 
+if(useS4)
+  setGeneric("xmlValue", function(x, ignoreComments = FALSE) standardGeneric("xmlValue"))
+
 xmlValue.XMLNode <- 
 function(x, ignoreComments = FALSE)
 {
- if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
-    return(xmlValue(x[[1]], ignoreComments))
+ if(xmlSize(x) > 0) {
+   kids = xmlChildren(x)
+   if(ignoreComments)
+     kids = kids[ !sapply(kids, "XMLCommentNode") ]
+   return(paste(sapply(kids, xmlValue, ignoreComments), collapse = ""))
+ }
+
+ # if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
+ #    return(xmlValue(x[[1]], ignoreComments))
 
  x$value
 }
+
+setS3Method("xmlValue", "XMLNode")
 
 xmlValue.XMLTextNode <- 
 function(x, ignoreComments = FALSE)
@@ -115,7 +123,9 @@ function(x, ignoreComments = FALSE)
  x$value
 }
 
-xmlValue.XMLComment <- 
+setS3Method("xmlValue", "XMLTextNode")
+
+xmlValue.XMLComment <-  xmlValue.XMLCommentNode <-
 function(x, ignoreComments = FALSE)
 {
  if(ignoreComments)
@@ -124,11 +134,15 @@ function(x, ignoreComments = FALSE)
  x$value
 }
 
+setS3Method("xmlValue", "XMLCommentNode")
+
 xmlValue.XMLCDataNode <- 
 function(x, ignoreComments = FALSE)
 {
  x$value
 }
+
+setS3Method("xmlValue", "XMLCDataNode")
 
 xmlValue.XMLProcessingInstruction <- 
 function(x, ignoreComments = FALSE)
@@ -136,12 +150,14 @@ function(x, ignoreComments = FALSE)
  x$value
 }
 
+setS3Method("xmlValue", "XMLProcessingInstruction")
+
 # "xmlValue.NULL" =
 #  function(x, ignoreComments = FALSE)
 #               character()
 
 
-getSibling =
+getSibling.XMLInternalNode =
   # Access the next field in the xmlNodePtr object.
   # not exported.
 function(node, after = TRUE)
@@ -157,6 +173,8 @@ function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 {
   UseMethod("xmlNamespaceDefinitions")
 }
+
+xmlNamespaces = xmlNamespaceDefinitions
 
 xmlNamespaceDefinitions.XMLInternalDocument =
 function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
@@ -174,7 +192,6 @@ function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 xmlNamespaceDefinitions.XMLNode =
   function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
     ans = unclass(x)$namespaceDefinitions
-
 
     if(recursive == TRUE) {
                    #      warning("recursive facility not yet implemented.")
@@ -194,11 +211,13 @@ xmlNamespaceDefinitions.XMLNode =
       if(length(ans) == 0)
         return(character())
       
-      ans = sapply(ans, function(x) x$uri)
-    }
+      ans = structure(sapply(ans, function(x) x$uri),
+                      class = c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
+    } else if(!is.null(ans))
+      class(ans) = "XMLNamespaceDefinitions"
 
     ans
-  }
+}
 
 xmlNamespaceDefinitions.XMLInternalNode =
   function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
@@ -210,11 +229,41 @@ xmlNamespaceDefinitions.XMLInternalNode =
       if(length(ans) == 0)
         return(character(0))
       ans = sapply(ans, function(x) x$uri)
-      ans = removeDuplicateNamespaces(ans)
-    }
+      ans = structure(removeDuplicateNamespaces(ans), class = c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
+    } else if(!is.null(ans))
+       class(ans) = "XMLNamespaceDefinitions"
 
     ans
   }
+
+setGeneric("getEffectiveNamespaces",
+function(node)
+ standardGeneric("getEffectiveNamespaces"))
+
+tmp =
+function(node)
+{  
+   ans = xmlNamespaceDefinitions(node)
+   merge = function(to, what) {
+      i = !(names(what) %in% names(to))
+      if(any(i))
+        ans[names(what)[i]] <<- what[i] 
+   }
+     
+   tmp = xmlParent(node)
+   while(!is.null(tmp)) {
+      merge(ans, xmlNamespaceDefinitions(tmp))
+      tmp = xmlParent(tmp)
+   }
+   ans
+}
+setMethod("getEffectiveNamespaces", "XMLInternalNode", tmp)
+setMethod("getEffectiveNamespaces", "XMLHashTreeNode", tmp)
+
+setMethod("getEffectiveNamespaces", "XMLNode",
+           function(node)
+               xmlNamespaceDefinitions(node))
+
 
 removeDuplicateNamespaces =
 function(ns)
@@ -251,13 +300,13 @@ function(x)
 
 #setMethod("xmlNamespace", "character",
 xmlNamespace.character = 
-           function(x) {
-             a = strsplit(x, ":")[[1]]
-             if(length(a) == 1)
-               character()
-             else
-               a[1]
-          }
+function(x) {
+    a = strsplit(x, ":")[[1]]
+    if(length(a) == 1)
+      character()
+    else
+      a[1]
+}
 #)
 
 verifyNamespace =
@@ -284,9 +333,10 @@ function(tag, def, node)
 
 xmlGetAttr <-
   #Added support for name spaces.
-function(node, name, default = NULL, converter = NULL, namespaceDefinition = character())
+function(node, name, default = NULL, converter = NULL, namespaceDefinition = character(),
+          addNamespace = length(grep(":", name)) > 0)
 {
-  a <- xmlAttrs(node)
+  a <- xmlAttrs(node, addNamespace)
   if(is.null(a) || is.na(match(name, names(a)))) 
     return(default)
 

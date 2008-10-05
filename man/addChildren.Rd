@@ -30,7 +30,8 @@ removeChildren(node, ..., kids = list(...), free = FALSE)
 removeNodes(node, free = rep(FALSE, length(node)))
 replaceNodes(oldNode, newNode, ...)
 addAttributes(node, ..., .attrs = NULL, 
-                suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE))
+               suppressNamespaceWarning = getOption("suppressXMLNamespaceWarning", FALSE),
+                append = TRUE)
 removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
                   .all = (length(list(...)) + length(.attrs)) == 0)
 }
@@ -127,10 +128,11 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
       And if this value is a character string, we search for a
       function of that name and invoke it. 
      }
+  \item{append}{a logical value that indicates whether (\code{TRUE}) the specified
+   attributes should be added to the existing  attributes on the XML node
+   (if any exist), or, if \code{FALSE} these should replace any existing attributes.}
 }
-\details{
-
-}
+%\details{}
 \value{
  Each of these functions returns the modified node.
  For an internal node, this is the same R object   and
@@ -144,7 +146,7 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
  \url{http://www.xmlsoft.org}{libxml2}
 }
 \author{Duncan Temple Lang}
-\note{}
+%\note{}
 \seealso{
   \code{\link{xmlTree}}
   \code{\link{newXMLNode}}
@@ -221,8 +223,6 @@ o = addChildren(z,
 o
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{IO }
 \keyword{programming}
 \concept{XML}

@@ -120,9 +120,16 @@ function(x, ...)
 }
 
 
+
+
 xmlAttrs.XMLElementDef <-
 function(node, ...)
 {
  node$attributes
 }
 
+
+if(useS4) {
+  setGeneric("xmlAttrs", function(node, ...) standardGeneric("xmlAttrs"))
+  setMethod("xmlAttrs", "XMLElementDef", xmlAttrs.XMLElementDef)
+}

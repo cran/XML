@@ -35,6 +35,7 @@ parseURI(uri)
 }
 
 \seealso{
+ \code{\link{getRelativeURL}}
 }
 \examples{
   parseURI("http://www.omegahat.org:8080/RCurl/index.html")

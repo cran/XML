@@ -97,7 +97,7 @@ R_libxmlTypeTable_names(USER_OBJECT_ table, USER_OBJECT_ s_elType)
    PROTECT(d.names = NEW_CHARACTER(n)); ctr++;
    if(getElements) {
        PROTECT(d.els = NEW_LIST(n)); ctr++;
-       d.elType = CHAR_DEREF(STRING_ELT(s_elType, 0));
+       d.elType = (char *) CHAR_DEREF(STRING_ELT(s_elType, 0));
    }
    xmlHashScan(t, getKeys, &d);
 

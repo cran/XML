@@ -20,7 +20,6 @@
 extern void R_PreserveObject(SEXP);
 extern void R_ReleaseObject(SEXP);
 
-static void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
 
 /*
   Read the specified file as an XML document and invoke functions/methods in
@@ -84,8 +83,9 @@ RS_XML(createAttributesList)(const char **atts, const xmlChar *encoding)
 
 
 USER_OBJECT_ 
-RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addContext, 
-               USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
+RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElementHandlers,
+               USER_OBJECT_ addContext, 
+                USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
                   USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion,
    	           USER_OBJECT_ branches, USER_OBJECT_ useDotNames, USER_OBJECT_ errorFun)
@@ -133,6 +133,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ addCont
   }
 
   parserData = RS_XML(createParserData)(handlers);
+  parserData->endElementHandlers = endElementHandlers;
   parserData->branches         = branches;
   parserData->fileName         = name; 
   parserData->callByTagName    = LOGICAL_DATA(useTagName)[0]; 
@@ -230,7 +231,7 @@ RS_XML(startElement)(void *userData, const char *name, const char **atts)
   DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
   if((i = R_isBranch(CHAR_TO_XMLCHAR(name), rinfo)) != -1) {
-      R_processBranch(rinfo, i, CHAR_TO_XMLCHAR(name), NULL, NULL, 0, NULL, 0, 0, (const xmlChar ** /*XXX*/) atts);
+      R_processBranch(rinfo, i, CHAR_TO_XMLCHAR(name), NULL, NULL, 0, NULL, 0, 0, (const xmlChar ** /*XXX*/) atts, 1);
       return;
   }
 
@@ -260,30 +261,52 @@ RS_XML(commentHandler)(void *userData, const XML_Char *data)
 }
 
 
+USER_OBJECT_
+findEndElementFun(const char *name, RS_XMLParserData *rinfo)
+{
+    int i, n;
+    USER_OBJECT_ names = GET_NAMES(rinfo->endElementHandlers);
+    n = GET_LENGTH(rinfo->endElementHandlers);
+    for(i = 0 ; i < n ; i++) {
+	if(strcmp(CHAR_DEREF(STRING_ELT(names, i)), name) == 0)
+	    return(VECTOR_ELT(rinfo->endElementHandlers, i));
+    }
+    return(NULL);
+}
 
 
 void RS_XML(endElement)(void *userData, const char *name)
 {
- USER_OBJECT_ opArgs;
+ USER_OBJECT_ opArgs, fun;
  RS_XMLParserData *rinfo = (RS_XMLParserData *) userData;
  DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
 
  if(rinfo->current) {
+     /*  Dealing with a branch, so close up. */
      R_endBranch(rinfo, CHAR_TO_XMLCHAR(name), NULL, NULL);
-      return;
+     return;
  }
 
- ((RS_XMLParserData*)userData)->depth++;
+ ((RS_XMLParserData*)userData)->depth++; /* ??? should this be depth-- */
 
   PROTECT(opArgs = NEW_LIST(1));
   SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
      SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, COPY_TO_USER_STRING(name));
 
+  fun = findEndElementFun(name, rinfo);
+  if(fun)  {
+      USER_OBJECT_ val = RS_XML(invokeFunction)(fun, opArgs, rinfo->stateObject, rinfo->ctx);
+      updateState(val, rinfo);
+  }
+  else
      RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "endElement"), NULL, ((RS_XMLParserData*) userData), opArgs);
-  UNPROTECT(1);
 
+  UNPROTECT(1);
 }
+
+
+
 
 /**
  Called for inline expressions of the form
@@ -321,6 +344,38 @@ RS_XML(endCdataSectionHandler)(void *userData)
 
 
 
+char *
+fixedTrim(char *str,  int len, int *start, int *end)
+{
+  char *tmp;
+  *end  = len;
+  *start = 0;
+
+    /* If a degenerate string, just return. */
+  if(len == 0 || str == (char*)NULL || str[0] == '\0')
+    return(str);
+
+   /* Jump to the end */
+  tmp = str + len - 2;
+  while(tmp >= str && isspace(*tmp)) {
+      tmp--;
+      (*end)--;
+  }
+  if(tmp == str) {
+   return(str);
+  }
+
+  tmp = str;
+
+  while(*start <= *end && *tmp && isspace(*tmp)) {
+    tmp++;
+    (*start)++;
+  }
+
+    return(tmp);
+}
+
+
 void 
 RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
 {
@@ -329,9 +384,28 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
  RS_XMLParserData *parserData = (RS_XMLParserData*)userData; 
  DECL_ENCODING_FROM_EVENT_PARSER(parserData)
 
+   /* XXX Here is where we have to ignoreBlankLines and use the trim setting in parserData */
   if(parserData->current) {
-      xmlChar *tmp = (xmlChar *) S_alloc((len + 1), sizeof(xmlChar));
-      memcpy(tmp, s, len); tmp[len] = '\0';
+      xmlChar *tmp;
+      int newLen = len, start = 0, end = len;
+#if 1
+      if(parserData->trim) {
+          tmpString =  fixedTrim(XMLCHAR_TO_CHAR(s), len, &start, &end);
+	  newLen = end - start; 
+      } else 
+          tmpString = s;
+
+      if(newLen < 0 && parserData->ignoreBlankLines)
+	    return;
+#else
+      tmpString = s;
+#endif
+      if(newLen < 0)
+	tmp = strdup("");
+      else {
+         tmp = (xmlChar *) S_alloc(newLen + 2, sizeof(xmlChar));
+         memcpy(tmp, tmpString, newLen); tmp[newLen] = '\0';
+      }
       xmlAddChild(parserData->current, xmlNewText(tmp));
       return;
   }
@@ -360,7 +434,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
 
   free(tmp);
 
-    /* If we are ignoring blanks and the potentiall newly computed length is non-zero, then
+    /* If we are ignoring blanks and the potentially newly computed length is non-zero, then
        call the user function.
      */
 

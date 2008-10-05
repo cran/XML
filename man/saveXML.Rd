@@ -75,7 +75,9 @@ saveXML(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0
  adds nodes.
 }
 \value{
- 
+ If \code{file} is not specified, the result is a character string containing
+ the resulting XML content.
+ If \code{file} is passed in the call, 
 }
 \references{\url{http://www.w3.org/XML}, \url{http://www.omegahat.org/RSXML}}
 \author{Duncan Temple Lang}

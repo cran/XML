@@ -13,6 +13,16 @@
 \alias{xmlSchemaNotationRef-class}
 \alias{xmlSchemaRef-class}
 \alias{xmlSchemaTypeRef-class}
+\alias{names,xmlSchemaRef-method}
+\alias{$,xmlSchemaRef-method}
+
+\alias{names,libxmlTypeTable-method}
+\alias{$,libxmlTypeTable-method}
+\alias{$<-,libxmlTypeTable-method}
+\alias{coerce,libxmlTypeTable,list-method}
+
+\alias{show,XMLSchemaValidationResults-method}
+
 
 \title{Classes for working with XML Schema}
 
@@ -24,8 +34,7 @@ schema for its elements.
 \section{Slots}{
  \describe{}
 }
-\section{Methods}{
-}
+%\section{Methods}{}
 
 \seealso{
 \code{\link{xmlSchemaValidate}}

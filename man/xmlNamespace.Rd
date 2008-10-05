@@ -54,10 +54,9 @@ namespace.}
 
 
   doc <- xmlInternalTreeParse(system.file("exampleData", "job.xml", package="XML"))
-     # Since the first node is a comment, get the sibling.
-  xmlNamespace(getSibling(xmlRoot(doc)))
-  xmlNamespace(getSibling(xmlRoot(doc))[[1]][[1]])
-
+     # Since the first node, xmlRoot() will skip that, by default.
+  xmlNamespace(xmlRoot(doc))
+  xmlNamespace(xmlRoot(doc)[[1]][[1]])
 
   node <- xmlNode("arg", xmlNode("name", "foo"), namespace="R")
   xmlNamespace(node)

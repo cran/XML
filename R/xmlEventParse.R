@@ -7,7 +7,7 @@ GeneralHandlerNames =
        DOM =  c("text", "startElement", "comment", "entity", "cdata",
                  "processingInstruction"))
 
-       checkHandlerNames =
+checkHandlerNames =
 function(handlers, id = "SAX")
 {
   if(is.null(handlers))
@@ -30,8 +30,9 @@ xmlEventParse <-
 #
 # See also xmlParseTree()
 #
-function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE,
-          useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE, isURL=FALSE, state = NULL,
+function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = TRUE,
+          useTagName = TRUE, asText = FALSE, trim=TRUE, useExpat = FALSE,
+          isURL=FALSE, state = NULL,
           replaceEntities = TRUE, validate = FALSE, saxVersion = 1,
           branches = NULL,  useDotNames =  length(grep("^\\.", names(handlers))) > 0,
           error = xmlErrorCumulator()) 
@@ -39,6 +40,16 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
   if(libxmlVersion()$major < 2 && !is.character(file))
     stop("Without libxml2, the source of the XML can only be specified as a URI.")
 
+
+  i = grep("^/", names(handlers))
+  if(length(i)) {
+    endElementHandlers = handlers[i]
+    names(endElementHandlers) = gsub("^/", "", names(endElementHandlers))
+    handlers = handlers[ - i]
+  } else
+    endElementHandlers = list()
+    
+  
   checkHandlerNames(handlers, "SAX")
 
   if(validate)
@@ -96,7 +107,7 @@ function(file, handlers=xmlEventHandler(), ignoreBlanks=FALSE, addContext = TRUE
   .oldErrorHandler = setXMLErrorHandler(error)
   on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
   
- state <- .Call("RS_XML_Parse", file, handlers, 
+ state <- .Call("RS_XML_Parse", file, handlers,  endElementHandlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
                       as.logical(useExpat), state, as.logical(replaceEntities),
@@ -118,3 +129,15 @@ function(parser)
 
   .Call("RS_XML_xmlStopParser", parser)
 }  
+
+
+xmlParserContextFunction =
+function(f, class = "XMLParserContextFunction")
+{
+  class(f) = c(class, class(f))
+
+  f
+}
+
+
+

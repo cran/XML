@@ -135,7 +135,7 @@ function(tag = "doc", attrs = NULL, dtd = NULL, nameSpace = NULL, nsURI = charac
 }
 
 xmlRoot.XMLRDocument =
-function(x, ...)
+function(x, skip = TRUE, ...)
   x$root
 
 print.XMLRDocument =

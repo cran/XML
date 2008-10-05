@@ -32,8 +32,10 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
 	  SET_NAMES(ref, mkString(el->name));
 	  SET_CLASS(ref, mkString("XMLAttributeValue"));
 	  UNPROTECT(1);
-      } else
-	ref = R_createXMLNodeRef(obj->nodeTab[i]);
+      } else if(el->type == XML_NAMESPACE_DECL)
+	  ref = R_createXMLNsRef((xmlNsPtr) el);
+      else
+	ref = R_createXMLNodeRef(el);
 
     if(expr) {
       PROTECT(ref);
@@ -177,8 +179,9 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun)
  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
  ctxt = xmlXPathNewContext(doc);
 
- if(GET_LENGTH(r_node))
-     ctxt->node = R_ExternalPtrAddr(r_node);
+ if(GET_LENGTH(r_node)) {
+     ctxt->node = ctxt->origin = R_ExternalPtrAddr(r_node);
+ }
 
  if(GET_LENGTH(namespaces)) {
      ctxt->namespaces =  R_namespaceArray(namespaces, ctxt); /* xmlCopyNamespaceList(doc); */

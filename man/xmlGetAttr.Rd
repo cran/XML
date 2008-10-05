@@ -11,7 +11,8 @@
 }
 \usage{
 xmlGetAttr(node, name, default = NULL, converter = NULL,
-            namespaceDefinition = character())
+            namespaceDefinition = character(),
+             addNamespace = length(grep(":", name)) > 0)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -36,6 +37,13 @@ xmlGetAttr(node, name, default = NULL, converter = NULL,
      URI \code{http://www.r-project.org}. However, there may 
      be a name space prefix \code{r} defined on the node that points
      to  a different URI and so this would be an erroneous match.
+  }
+  \item{addNamespace}{a logical value that indicates whether we should put the 
+   namespace prefix on the resulting name.
+   This is passed on to \code{\link{xmlAttrs}} and so controls whether the resulting
+   attribute names  have the prefix attached. 
+   So one specifies \code{TRUE} for this argument if the attribute identifier
+   has a namespace prefix.
   }
 }
 \details{

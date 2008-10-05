@@ -1,5 +1,8 @@
 \name{XMLNode-class}
 \docType{class}
+\alias{XMLAbstractNode-class}
+\alias{XMLAbstractNode-class}
+\alias{RXMLNode-class}
 \alias{XMLNode-class}
 \alias{XMLInternalNode-class}
 \alias{XMLInternalTextNode-class}
@@ -44,9 +47,10 @@ No methods defined with class "XMLNode" in the signature.
 }
 \examples{
 
- # An R-level XMLNode object
-a <- xmlNode("arg", attrs = c(default="T"),
-               xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
-  
+           # An R-level XMLNode object
+   a <- xmlNode("arg", attrs = c(default="T"),
+                 xmlNode("name", "foo"), xmlNode("defaultValue","1:10"))
+
+  xmlAttrs(a) = c(a = 1, b = "a string")
 }
 \keyword{classes}

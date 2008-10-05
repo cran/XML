@@ -1,3 +1,25 @@
+getRelativeURL =
+  #
+  #  takes the name of a file/URL and a baseURL and 
+  # figures out the URL for the new file given by u.
+  # This handles the case where the file/URL is relative to the
+  # the baseURL or if it is a fully qualified file or URL.
+
+  #
+  #  getRelativeURL("/foo", "http://www.omegahat.org")
+  #  getRelativeURL("/foo", "http://www.omegahat.org/")
+  #  getRelativeURL("foo", "http://www.omegahat.org/")
+  #  getRelativeURL("http://www.foo.org", "http://www.omegahat.org/")      
+  #
+function(u, baseURL, sep = "/")  
+{
+   pu = parseURI(u)
+   if(pu$scheme == "" && length(grep("^/", pu$path)) == 0)
+      paste(gsub(paste(sep, "$", sep = ""), "", baseURL), u, sep = sep)
+   else
+      u
+}
+
 xmlElementSummaryHandlers =
   #
   #  Functions for the event parser that we can use
@@ -14,9 +36,8 @@ function(file = character(), countAttributes = TRUE)
 
       if(name == "xi:include") {
           # need to handle the xpointer piece
-          # and the relative path names.
-        href = attrs['href']
-        href = paste(dirname(file), href, sep = .Platform$file.sep)
+          # and the relative path names - done with getRelativeURL
+        href = getRelativeURL(attrs['href'], dirname(file), sep = .Platform$file.sep)
         xmlElementSummary(href, funs)
       }
       

@@ -3,7 +3,22 @@
 #  is faster.
 #
 #  Basically, we keep the parents, children and nodes
-#  each as hash tables not a list.
+#  each as hash tables not a list.  Otherwise, this resembles
+#  a flat tree
+#
+#  The notion is that we have a collection of nodes
+#  and a collection of .parents and .children
+#
+#   Each element in .parents is assigned to the name of the node
+#   whose parent is being stored. The value is the identifier for the
+#   parent node. The top node has no entry in this collection.
+#
+#   The .children environment maintains a collection of entries
+#   indexed by the identifier of the relevant node.
+#   The value is a character vector containing the identifiers of the
+#   nodes which  are children of this node.
+#
+#
 #
 xmlHashTree =
   #
@@ -40,24 +55,39 @@ function(nodes = list(), parents = character(), children = list(),
 
   addNode =
      # This adds each new node.  
-  function(node, parentId)
+  function(node, parent = character(), ..., attrs = NULL, namespace = NULL,
+           namespaceDefinitions = character(),
+           .children = list(...),
+           cdata = FALSE,
+           suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE))
    {
+
+    if(is.character(node))
+       node = xmlNode(node, attrs = attrs, namespace = namespace, namespaceDefinitions = namespaceDefinitions)
+
+     .kids = .children
+     .children = .this$.children
+     
      node = asXMLTreeNode(node, .this, className = "XMLHashTreeNode")
      id = node$id
 
      assign(id, node, env)
      .count <<- .count + 1
 
-     if(inherits(parentId, "XMLHashTreeNode"))
-        parentId = parentId$id     
+       # if no parent, 
+     if(!inherits(parent, "XMLNode") && (!is.environment(parent) && length(parent) == 0) || parent == "")
+       return(node)
+    
+     if(inherits(parent, "XMLHashTreeNode"))
+        parent = parent$id     
 
-    if(length(parentId)) {
-        assign(id, parentId, env = .parents)
-        if(exists(parentId, .children, inherits = FALSE))
-           tmp = c(get(parentId, .children), id)
+    if(length(parent)) {
+        assign(id, parent, env = .parents)
+        if(exists(parent, .children, inherits = FALSE))
+           tmp = c(get(parent, .children), id)
         else
            tmp = id
-        assign(parentId, tmp, .children)
+        assign(parent, tmp, .children)
      }    
       
     return(node)
@@ -79,11 +109,102 @@ function(nodes = list(), parents = character(), children = list(),
   }
   #  environment(env$.tidy) <- env
   
-  .this = structure(env, class = c("XMLHashTree", "XMLFlatTree"))
+  .this = structure(env, class = oldClass("XMLHashTree"))
 
   .this
 }
 
+
+# Example of looping over all elements
+# table(unlist(eapply(tree, xmlName)))
+
+getDescendants =
+  #
+  # This is trying to avoid recursion  and use iteration.
+  #
+function(id, tree, kids = tree$.children)
+{
+    # if no kids, then return empty list
+  if(!exists(id, kids))
+     return(character())
+
+  ans = character()
+  tmp = get(id, kids)
+  hasKids = objects(kids)
+  while( length( tmp  ) > 0) {
+    ans = c(ans, tmp)
+    tmp = tmp[ tmp %in% hasKids ]
+    k = get(tmp[1], kids)
+    tmp = c(tmp[-1], k)
+  }
+  ans
+}
+
+
+
+getDescendants =
+  # Simple mechanism, for xmlHashTree trees.
+  # This is recursive.
+function(id, tree, kids = tree$.children)
+{
+   if(is(id, "XMLHashTreeNode")) {
+      if(missing(tree))
+         tree = id$env
+     id = id$id
+   }
+
+  if(!exists(id, kids))
+     return(character())
+
+   ans = get(id, kids)
+   c(ans, unlist(lapply(ans, getDescendants, tree, kids)))
+   #Debugging
+   # names(ans) = sapply(ans, function(i) xmlName(get(i, tree)))
+}
+
+
+subtree = copyXMLHashSubTree =
+function(node)
+{
+    # find all the nodes below this node, i.e. in the subtree
+  tree = node$env  
+  ids = getDescendants(node$id, tree, tree$.children)
+
+  newTree = xmlHashTree()
+
+    # Now copy the parent & children information to the new tree
+    # and also the modified nodes. The only modification necessary
+    # is to set the env field of the original node to the new tree.
+  sapply(c(node$id, ids), function(id) {
+                 n = get(id, tree)
+                 n$env = newTree
+                 assign(id, n, newTree)
+                 if(exists(id, tree$.children))
+                    assign(id, get(id, tree$.children), newTree$.children)
+                 if(exists(id, tree$.parents))                 
+                    assign(id, get(id, tree$.parents), newTree$.parents)
+              })
+  
+  remove(list = node$id, envir = newTree$.parents)
+  newTree
+}
+
+
+
+xmlNamespaceDefinitions.XMLAbstractDocument =
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)  
+{
+   xmlNamespaces(as(x, "XMLAbstractNode"))
+}
+
+setAs("XMLAbstractDocument", "XMLAbstractNode",
+        function(from)
+           xmlRoot(from))
+
+setAs("XMLHashTreeNode", "XMLHashTree",
+       function(from)
+         from$env
+     )
 
 "$.XMLHashTree" =
 function(x, name)
@@ -123,7 +244,10 @@ function(x, addNames = TRUE)
     nodes
   } else
     list()
-}  
+}
+
+if(useS4)
+  setMethod("xmlChildren", "XMLHashTreeNode", xmlChildren.XMLHashTreeNode)
 
 xmlSize.XMLHashTreeNode =
 function(obj)
@@ -142,43 +266,94 @@ function(obj)
   length(obj) - 3  
 }  
 
+# Currently overridden below
 xmlRoot.XMLHashTree =
-function(x, ...)
+function(x, skip = TRUE, ...)
 {  
   id = setdiff(objects(x), objects(x[[".parents"]]))
   get(id, x)
 }
 
 
+"[[.XMLHashTreeNode" =
+function(x, ..., copy = FALSE, exact = TRUE)  
+{
+#   ans = NextMethod("[[")
+   ans = xmlChildren(x)[[...]]  
+   if(copy)
+     xmlRoot(subtree(ans))
+   else
+     ans
+}
+
+
 addNode =
-function(node, parent, to)
+function(node, parent, to, ...)
 {
   UseMethod("addNode", to)
 }
 
 addNode.XMLHashTree =
-function(node, parent, to)
+function(node, parent = character(), to, ...)
 {
-  to[[".addNode"]](node, parent)
+  to[[".addNode"]](node, parent, ...)
 }
 
 xmlRoot.XMLHashTree =
   #
   # This can return multiple roots
   #
-function(x, ...)
+  # Find all the identities of the nodes for which there is no 
+  # corresponding entry n the .parents
+  #
+  #
+  # If skip is TRUE, discard comment nodes. Leave  PI nodes, etc.
+  #
+  # If all is TRUE, return a list() with all the top-level nodes.
+  # 
+function(x, skip = TRUE, all = FALSE, ...)
 {
   parents = get(".parents", x, inherits = FALSE)
   tops = objects(x)[ is.na(match(objects(x), objects(parents)))]
 
   ans = mget(tops, x)
 
-  if(length(ans) == 1)
-    ans[[1]]
-  else
-    ans
+  if(skip)
+    ans = ans[!sapply(ans, inherits, c("XMLCommentNode"))] #XXX names of XML hash tree nodes for comment, processing instruction, text node, etc.
+  
+  if(all)
+    return(ans)
+
+  ans[[1]]
 }
 
+getSibling =
+  # Access the next field in the xmlNodePtr object.
+  # not exported.
+function(node, after = TRUE)
+  UseMethod("getSibling")
+
+getSibling.XMLHashTreeNode =
+function(node, after = TRUE)
+{
+
+  .this = node$env
+  parent = xmlParent(node)
+
+  if(!is.null(parent)) {
+      kids = xmlChildren(parent)
+  } else
+      kids = xmlRoot(.this, skip = FALSE, all = TRUE)
+
+  i = match(node$id, sapply(kids, function(x) x$id))
+  if(is.na(i))
+    stop("shouldn't happen")
+
+  if(after)
+    kids[[i+1]]
+  else
+    kids[[i-1]]
+}
 
 print.XMLHashTree =
 function(x, ...)
@@ -197,3 +372,35 @@ function(el, name, recursive = FALSE)
   if(!recursive) 
     return(kids [ sapply(kids, xmlName) == name ])
 }  
+
+
+convertToHashTree =
+function(from)
+{
+  xx = xmlHashTree()
+  ans = .Call("R_convertDOMToHashTree", from, xx, xx$.children, xx$.parents)
+  xx
+}  
+
+setAs("XMLInternalDocument", "XMLHashTree",
+       function(from) {
+           convertToHashTree(xmlRoot(from, skip = FALSE))
+       })
+
+setAs("XMLInternalNode", "XMLHashTree",
+       function(from) {
+           ans = convertToHashTree(from)
+           docName(ans) <- docName(from)
+           ans           
+       })
+
+docName.XMLHashTree =
+function(doc)
+{
+  doc$.doc
+}
+
+# setMethod("docName", "XMLHashTree", docName.XMLHashTree)
+
+
+

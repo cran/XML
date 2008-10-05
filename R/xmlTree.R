@@ -240,40 +240,28 @@ if(FALSE) {
  return(v)
 }
 
-
-
-
-# Also in xmlNodes.R
-
 setAs("XMLInternalNode", "XMLNode",
         function(from) 
-           asRXMLNode(from)
+           asRXMLNode(from)$top
         )
 
 
-setGeneric("free", function(obj) standardGeneric("free"))
-
-setMethod("free", "XMLInternalDocument",
-           function(obj)  .Call("R_XMLInternalDocument_free", obj))
-
-
-
 xmlRoot.XMLInternalDOM =
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
-  xmlRoot(x$doc())
+  xmlRoot(x$doc(), skip = skip)
 }  
 
 
  #??? This was XMLInternalElement and not ...Node
 xmlRoot.XMLInternalElement = xmlRoot.XMLInternalNode =
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
   doc = as(x, "XMLInternalDocument")
   if(is.null(doc))
-    getRootNode(x)
+    getRootNode(x) # skip = skip - getRootNode doesn't have a skip argument
   else
-    xmlRoot(doc)
+    xmlRoot(doc, skip = skip)
 }
   
 docName =
@@ -287,19 +275,28 @@ function(doc)
   .Call("RS_XML_getDocumentName", doc)
 }
 
+# setMethod("docName", "XMLInternalDocument", docName.XMLInternalDocument)
+
+docName.XMLInternalNode =
+function(doc)
+{
+  docName(as(doc, "XMLInternalDocument"))
+}
+# setMethod("docName", "XMLInternalNode", docName.XMLInternalNode)
 
 docName.XMLDocument =
 function(doc)
 {
   doc$doc$file
 }
+# setMethod("docName", "XMLDocument", docName.XMLDocument)
 
 docName.XMLDocumentContent =
 function(doc)
 {
   doc$file
 }  
-
+# setMethod("docName", "XMLDocumentContent", docName.XMLDocumentContent)
 setGeneric("docName<-", function(x, value)
                          standardGeneric("docName<-"))
 
@@ -309,3 +306,13 @@ function(x, value)
   .Call("RS_XML_setDocumentName", x, value)
   x
 })
+
+
+# See hashTree.R
+setMethod("docName<-", "XMLHashTree",
+function(x, value)
+{
+  assign(".doc", value, x)
+  x
+})
+

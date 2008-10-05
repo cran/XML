@@ -407,6 +407,7 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
   }
 
   SET_NAMES(ans, names);
+  SET_CLASS(ans, mkString("XMLNamespaceDefinitions"));
   UNPROTECT(2);
   return(ans);
 }
@@ -647,12 +648,17 @@ convertNode(USER_OBJECT_ ans, xmlNodePtr node, R_XMLSettings *parserSettings)
 }
 
 
+const char * const XMLNodeClassHierarchy[] = {"XMLNode", "RXMLAbstractNode", "XMLAbstractNode", "oldClass"};        
+
 int
 RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
 {
  char *className = NULL;
  int numEls = 1;
  int appendDefault = 1;
+ int lenHier = sizeof(XMLNodeClassHierarchy)/sizeof(XMLNodeClassHierarchy[0]);
+
+ numEls = lenHier + 1;
 
   switch(node->type) {
     case XML_ENTITY_REF_NODE:
@@ -662,7 +668,7 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
       className = "XMLProcessingInstruction";
       break;
     case XML_COMMENT_NODE:
-      className = "XMLComment";
+      className = "XMLCommentNode";
       break;
     case XML_TEXT_NODE:
       className = "XMLTextNode";
@@ -676,25 +682,22 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
       break;
 #endif
    default:
-     className = "XMLNode";
-     appendDefault = 0;
-     numEls = 1;
+     numEls--;
      break;
   }
 
-  if(className) {
+  if(1) {
      USER_OBJECT_ Class;
-     if(appendDefault)
-       numEls++;
+     int ctr = 0, i;
      PROTECT(Class = NEW_CHARACTER(numEls));
-        SET_STRING_ELT(Class, 0, mkChar(className));
-	if(appendDefault)
-          SET_STRING_ELT(Class, numEls-1, mkChar("XMLNode"));
+        if(className)
+            SET_STRING_ELT(Class, ctr++, mkChar(className));
+
+        for(i = 0; i < lenHier; i++)
+          SET_STRING_ELT(Class, ctr++, mkChar(XMLNodeClassHierarchy[i]));
         SET_CLASS(ans, Class);
       UNPROTECT(1);
-      className = NULL;
   }
-
 
   return(node->type);
 }
@@ -731,7 +734,7 @@ RS_XML(createNameSpaceIdentifier)(xmlNs *space, xmlNodePtr node)
    {
     USER_OBJECT_ klass;
     PROTECT(klass = NEW_CHARACTER(1));
-     SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING("XMLNameSpace"));
+     SET_STRING_ELT(klass, 0, COPY_TO_USER_STRING("XMLNamespaceDefinition"));
      SET_CLASS(ans, klass);
     UNPROTECT(1);
    }
@@ -1111,7 +1114,9 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     if(ns->href)
         SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
     if(ns->prefix)
-        SET_NAMES(ans, ScalarString(COPY_TO_USER_STRING(ns->prefix))); /* SET_STRING_ELT(ans, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix))); */
+        SET_NAMES(ans, ScalarString(COPY_TO_USER_STRING(ns->prefix))); 
+
+    SET_CLASS(ans, mkString("XMLNamespace"));
     UNPROTECT(1);    
     return(ans);
 }

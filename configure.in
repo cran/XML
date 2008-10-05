@@ -196,7 +196,7 @@ dnl extended regular expression usage with this version of sed.
            exit 1
          fi
 
-         if test "$PATCH" -lt 3 ; then
+         if test "$MINOR" -eq 6 -a "$PATCH" -lt 3 ; then
             echo ""
             echo "**** There are problems compiling this package with libxml2-2.6.1 or libmxml2-2.6.2.  ****"
             echo "**** You will probably encounter compilation errors, so we are terminating the build.  ****"

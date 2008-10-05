@@ -26,7 +26,7 @@ fields
 \url{http://www.omegahat.org}  }
 \author{ Duncan Temple Lang }
 
-\seealso{}
+%\seealso{}
 
 \examples{
  ver <- libxmlVersion()

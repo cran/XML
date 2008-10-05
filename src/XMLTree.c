@@ -514,7 +514,7 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
   }
 
   if(LOGICAL(skipDtd)[0]) {
-      while(node && node->type == XML_DTD_NODE) {
+      while(node && (node->type == XML_DTD_NODE || node->type == XML_COMMENT_NODE)) {
 	  node = node->next;
       }
   }
@@ -614,11 +614,15 @@ R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 {
   xmlNodePtr doc = (xmlNodePtr) R_ExternalPtrAddr(sdoc);
   const char *href = CHAR_DEREF(STRING_ELT(shref, 0));
-  const char *prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
+  const char *prefix = NULL;
   xmlNsPtr ns;
 
-  if(!prefix[0])
-      prefix = NULL;
+  if(Rf_length(sprefix)) {
+      prefix = CHAR_DEREF(STRING_ELT(sprefix, 0));
+      if(!prefix[0])
+	  prefix = NULL;
+  }
+
   if(!href[0])
       href = NULL;
 
@@ -772,9 +776,10 @@ R_createXMLNodeRef(xmlNodePtr node)
 
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
-  PROTECT(tmp = NEW_CHARACTER(2));
+  PROTECT(tmp = NEW_CHARACTER(3));
   SET_STRING_ELT(tmp, 0, mkChar(R_getInternalNodeClass(node->type)));
   SET_STRING_ELT(tmp, 1, mkChar("XMLInternalNode"));
+  SET_STRING_ELT(tmp, 2, mkChar("XMLAbstractNode"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
@@ -846,8 +851,17 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	}
 	if(encoding && encoding[0])
 	    xmlSaveFileEnc(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc, encoding);
+#if 0
 	else
 	    xmlSaveFile(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc);
+#else
+	else {
+	  FILE *f;
+	  f = fopen(CHAR_DEREF(STRING_ELT(sfileName, 0)), "w");
+	  xmlDocFormatDump(f, doc, 1);
+	  fclose(f);
+	}
+#endif
         if(compressionLevel != -1) {
 	    xmlSetDocCompressMode(doc, compressionLevel);
 	}

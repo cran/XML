@@ -63,8 +63,6 @@ Instead, we use libxml's SAX parser.}
 \code{\link{xmlEventParse}}
 }
 
-\examples{
-
-}
+%\examples{}
 \keyword{file}
 

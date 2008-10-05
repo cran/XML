@@ -2,6 +2,7 @@
 \alias{docName}
 \alias{docName<-}
 \alias{docName<-,XMLInternalDocument-method}
+\alias{docName<-,XMLHashTree-method}
 \title{Accessors for name of XML document}
 \description{
   These functions and methods allow us to query and set the 

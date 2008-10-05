@@ -125,9 +125,10 @@ function(nodes = list(),
 
 
 xmlRoot.xmlFlatListTree =
-function(x)
+function(x, skip = TRUE, ...)
 {
-  
+  #XXX
+   stop("not implemented")
 }  
 
 

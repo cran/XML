@@ -61,6 +61,8 @@ typedef struct {
    /* The R object in which to search for appropriate methods, usually a closure. */
   USER_OBJECT_ methods;
 
+  USER_OBJECT_ endElementHandlers;
+
    /* 
       The current depth in the XML document tree. 
       Used when constructing
@@ -116,7 +118,8 @@ R_processBranch(RS_XMLParserData * rinfo,
                 const xmlChar ** namespaces, 
                 int nb_attributes, 
                 int nb_defaulted, 
-                const xmlChar ** attributes);
+                const xmlChar ** attributes,
+		Rboolean sax1);
 int
 R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo);
 void
@@ -167,5 +170,9 @@ int RS_XML(notStandAloneHandler)(void *userData);
 int RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
 			      int saxVersion);
 
+
+USER_OBJECT_ findEndElementFun(const char *name, RS_XMLParserData *rinfo);
+
+void updateState(USER_OBJECT_ val, RS_XMLParserData *parserData);
 
 #endif

@@ -1,8 +1,10 @@
 \name{xmlTreeParse}
 \alias{xmlTreeParse}
 \alias{htmlTreeParse}
+\alias{htmlParse}
 \alias{xmlInternalTreeParse}
 \alias{xmlNativeTreeParse}
+\alias{xmlParse}
 \alias{xmlSchemaParse}
 \title{XML Parser}
 \description{
@@ -20,10 +22,13 @@
  be processed recursively or with multiple descents to extract the
  information of interest.
 
- \code{xmlInternalTreeParse} is identical to \code{xmlTreeParse}
- except it has no \code{useInternalNodes} parameter and 
-  uses \code{TRUE} for its operation, i.e. working with internal
- nodes.
+  \code{xmlParse} and \code{htmlParse} are equivalent to the
+  \code{xmlTreeParse} and \code{htmlTreeParse} respectively,
+ except they both use a default value for the \code{useInternalNodes} parameter 
+  of \code{TRUE}, i.e. they working with and return internal
+  nodes/C-level nodes.  These can then be searched using
+  XPath expressions via \code{\link{xpathApply}} and 
+  \code{\link{getNodeSet}}.
 
  \code{xmlSchemaParse} is a convenience function for parsing an XML schema.
 }

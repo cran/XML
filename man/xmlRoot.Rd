@@ -16,10 +16,10 @@ auxillary information such as DTDs, file name and version information
 that is returned as part of the parsing.
 }
 \usage{
-xmlRoot(x, ...)
-\method{xmlRoot}{XMLDocumentContent}(x, ...)
+xmlRoot(x, skip = TRUE, ...)
+\method{xmlRoot}{XMLDocumentContent}(x, skip = TRUE, ...)
 \method{xmlRoot}{XMLInternalDocument}(x, skip = TRUE, ...)
-\method{xmlRoot}{HTMLDocument}(x, ...)
+\method{xmlRoot}{HTMLDocument}(x, skip = TRUE, ...)
 }
 \arguments{
   \item{x}{the object whose root/top-level XML node is to be returned.}
@@ -48,6 +48,15 @@ xmlRoot(x, ...)
 \examples{
   doc <- xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"))
   xmlRoot(doc)
+   # Note that we cannot use getSibling () on a regular R-level XMLNode object
+   # since we cannot go back up or across the tree from that node, but
+   # only down to the children.
+
+    # Using an internal node via xmlParse (== xmlInternalTreeParse())
+  doc <- xmlParse(system.file("exampleData", "mtcars.xml", package="XML"))
+  n = xmlRoot(doc, skip = FALSE)
+     # skip over the DTD and the comment
+  d = getSibling(getSibling(n))
 }
 \keyword{file}
 

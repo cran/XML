@@ -78,7 +78,7 @@ function(x, name) {
 }
 
 xmlRoot.XMLFlatTree =
-function(x, ...)
+function(x, skip = TRUE, ...)
 {
    p = get(".parents", x)
 #XXX   
@@ -108,5 +108,37 @@ function(x, addNames = TRUE)
   else
     list()
 }  
+
+if(useS4)
+  setMethod("xmlChildren", "XMLTreeNode", xmlChildren.XMLTreeNode)
+
+
+
+xmlToList =
+function(node, addAttributes = TRUE)
+{
+  if(is.character(node))
+    node = xmlTreeParse(node)
+
+  if(inherits(node, "XMLAbstractDocument"))
+    node = xmlRoot(node)
+  
+  if(inherits(node, c("XMLTextNode", "XMLInternalTextNode")))
+     xmlValue(node)
+  else if(xmlSize(node) == 0)
+     xmlAttrs(node)
+  else {
+     tmp = vals = xmlApply(node, xmlToList, addAttributes)
+     tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))
+     vals[tt] = lapply(vals[tt], function(x) x[[1]])
+
+     if(addAttributes && length(attrs <- xmlAttrs(node)) > 0)
+        vals[[".attrs"]] = attrs
+     if(any(tt) && length(vals) == 1)
+       vals[[1]]
+     else
+       vals
+  }
+}
 
 

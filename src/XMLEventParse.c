@@ -289,7 +289,7 @@ R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo)
 {
     int n;
     if(rinfo->current)
-        return(-2);
+        return(-2); /* we are processing a branch */
 
     if((n = GET_LENGTH(rinfo->branches)) > 0) {
         int i;
@@ -305,6 +305,23 @@ R_isBranch(const xmlChar *localname, RS_XMLParserData *rinfo)
     return(-1);   
 }
 
+char *
+getPropertyValue(xmlChar **ptr)
+{
+  int len;
+  char *tmp;
+
+      len = (ptr[4] - ptr[3] + 1);
+      tmp = malloc(sizeof(char) * len);
+      if(!tmp) {
+         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
+	 ERROR;
+      }
+      memcpy(tmp, ptr[3], ptr[4] - ptr[3]);
+      tmp[len-1] = '\0'; /*XXX*/
+      return(tmp);
+}
+
 void
 R_processBranch(RS_XMLParserData * rinfo, 
                 int branchIndex, 
@@ -315,7 +332,8 @@ R_processBranch(RS_XMLParserData * rinfo,
                 const xmlChar ** namespaces, 
                 int nb_attributes, 
                 int nb_defaulted, 
-                const xmlChar ** attributes)
+                const xmlChar ** attributes,
+		Rboolean sax1)
 {
     xmlNodePtr node;
 
@@ -323,8 +341,16 @@ R_processBranch(RS_XMLParserData * rinfo,
     if(attributes) {
         const xmlChar **p = attributes;
         int i;
-        for(i = 0; *p ; i += 2, p += 2) 
-            xmlSetProp(node, p[0], p[1]);
+	if(sax1) {
+	  for(i = 0; *p ; i += 2, p += 2) 
+            xmlSetProp(node, p[0], p[1]); /*??? Do we need to xmlStrdup() this. */
+	} else {
+	  xmlChar **ptr = p;
+	  for(i = 0; i < nb_attributes; i++, ptr += 5) {
+	    /*XXX does this get freed later on?*/
+            xmlSetProp(node, xmlStrdup(ptr[0]), getPropertyValue(ptr));
+	  }
+	}
     }
     if(rinfo->current) {
         /* Add to children */
@@ -337,6 +363,19 @@ R_processBranch(RS_XMLParserData * rinfo,
 }
 
 void
+R_xmlFreeNode(SEXP node)
+{
+  xmlNodePtr p;
+
+  p = R_ExternalPtrAddr(node);
+  if(p) {
+      xmlFreeNode(p);
+fprintf(stderr, "Freeing XML node from a branch\n");
+  }
+  R_SetExternalPtrAddr(node, NULL_USER_OBJECT);
+}
+
+void
 R_endBranch(RS_XMLParserData *rinfo,
             const xmlChar * localname, 
             const xmlChar * prefix, 
@@ -346,32 +385,32 @@ R_endBranch(RS_XMLParserData *rinfo,
         xmlNodePtr tmp;
         tmp = rinfo->current;
         if(tmp->parent == NULL) {
-            /* Call the function.*/
+            /* Call the function with the given node.*/
 	    SEXP fun, args;
+	    USER_OBJECT_ rnode;
 	    if(rinfo->dynamicBranchFunction)
 		fun = rinfo->dynamicBranchFunction;
-	    else
+	    else {
 		fun = VECTOR_ELT(rinfo->branches, rinfo->branchIndex);
-#if 1
+ 	    }
+
 	    PROTECT(args = NEW_LIST(1));
-	    SET_VECTOR_ELT(args, 0, R_createXMLNodeRef(tmp));
+	    SET_VECTOR_ELT(args, 0, rnode = R_createXMLNodeRef(tmp));
+	    R_RegisterCFinalizer(rnode, R_xmlFreeNode);
 	    RS_XML(invokeFunction)(fun, args, NULL, rinfo->ctx);
 	    UNPROTECT(1);
-#else
-            SEXP e = allocVector(LANGSXP, 2), rnode;
-            PROTECT(e);
+	    /*
+            xmlFreeNode(rinfo->top);
+            rinfo->top = NULL;
+	    */
 
-            SETCAR(e, fun);
-            rnode = R_createXMLNodeRef(tmp);
-            SETCAR(CDR(e), rnode);
-            (void) Rf_eval(e, R_GlobalEnv);
-            UNPROTECT(1);
 #if 0
             fprintf(stderr, "Finishing branch for %s %s\n", tmp->name, tmp->properties->children->content);
 #endif
-            xmlFreeNode(rinfo->top);
-            rinfo->top = NULL;
-#endif
+
+	    /* if(rinfo->dynamicBranchFunction)
+                 R_ReleaseObject(rinfo->dynamicBranchFunction);
+            */
         }
 
         rinfo->current = rinfo->current->parent;
@@ -418,8 +457,9 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   if(!localname)
       return;
 
-  if((i = R_isBranch(localname, rinfo) != -1)) {
-      R_processBranch(rinfo, i, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes);
+  /* if there is a branch function in the branches argument of xmlEventParse() with this name, call that and return.*/
+  if((i = R_isBranch(localname, rinfo)) != -1) {
+      R_processBranch(rinfo, i, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes, FALSE);
       return;
   }
 
@@ -453,9 +493,14 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
 
 
   ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
+
+  /* If the handler function returned us a SAXBranchFunction function, then we need to build the node's sub-tree and 
+     then invoke the function with that node as the main argument. (It may also get the context/parser.) */
   if(isBranchFunction(ans)) {
+         /* Hold on to the function to avoid it being garbage collected. */
       R_PreserveObject(rinfo->dynamicBranchFunction = ans);
-      R_processBranch(rinfo, i, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes);
+         /* Start the creation of the node's sub-tree. */
+      R_processBranch(rinfo, -1, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes, FALSE);
   }
 
   UNPROTECT(1);
@@ -468,7 +513,7 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
 			    const xmlChar * prefix, 
 			    const xmlChar * URI)
 {
-  USER_OBJECT_ args, tmp;
+  USER_OBJECT_ args, tmp, fun;
   RS_XMLParserData *rinfo = (RS_XMLParserData *) ctx;
   DECL_ENCODING_FROM_EVENT_PARSER(rinfo)
 
@@ -485,7 +530,12 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
       SET_NAMES(tmp, ScalarString(COPY_TO_USER_STRING(prefix)));
   SET_VECTOR_ELT(args, 1, tmp);
 
-  RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endElement"), NULL, (RS_XMLParserData *)ctx, args);
+  fun = findEndElementFun(localname, rinfo);
+  if(fun)  {
+      USER_OBJECT_ val = RS_XML(invokeFunction)(fun, args, rinfo->stateObject, rinfo->ctx);
+      updateState(val, rinfo);
+  } else
+      RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endElement"), NULL, (RS_XMLParserData *)ctx, args);
 
   UNPROTECT(2);
 }

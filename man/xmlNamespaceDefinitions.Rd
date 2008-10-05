@@ -1,6 +1,15 @@
 \name{xmlNamespaceDefinitions}
 \alias{xmlNamespaceDefinitions}
 \alias{getDefaultNamespace}
+\alias{xmlNamespaces}
+\alias{xmlNamespaces<-}
+\alias{xmlNamespaces<-,XMLInternalNode-method}
+\alias{xmlNamespaces<-,XMLNode-method}
+\alias{coerce,NULL,XMLNamespaceDefinitions-method}
+\alias{coerce,XMLNamespace,character-method}
+\alias{coerce,XMLNamespaceDefinition,character-method}
+\alias{coerce,XMLNamespaceDefinitions,character-method}
+\alias{coerce,character,XMLNamespaceDefinitions-method}
 \title{Get definitions of any namespaces defined in this XML node}
 \description{
   If the given node has any namespace definitions declared within it,
@@ -20,6 +29,7 @@
 }
 \usage{
 xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE,  simplify  = FALSE)
+xmlNamespaces(x, addNames = TRUE, recursive = FALSE,  simplify  = FALSE)
 getDefaultNamespace(doc) 
 }
 \arguments{
