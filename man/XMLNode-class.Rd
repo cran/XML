@@ -21,6 +21,8 @@
 \alias{XMLXIncludeEndNode-class}
 \alias{XMLDTDNode-class}
 
+\alias{XMLNamespaceDefinitions-class}
+
 \title{Classes to describe an XML node object.}
 \description{These classes are intended to 
 represent an XML node, either directly in S or a reference to an internal

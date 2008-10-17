@@ -393,7 +393,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
           tmpString =  fixedTrim(XMLCHAR_TO_CHAR(s), len, &start, &end);
 	  newLen = end - start; 
       } else 
-          tmpString = s;
+          tmpString = XMLCHAR_TO_CHAR(s);
 
       if(newLen < 0 && parserData->ignoreBlankLines)
 	    return;
@@ -413,7 +413,8 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
      <abc/>
      <next>
      */
- if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 || (len == 1 && (const char *) s[0] == '\n' && parserData->trim))
+ if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 
+       || (len == 1 && ((const char *) s)[0] == '\n' && parserData->trim))
     return;
 
            /*XXX Deal with encoding, memory cleanup, 

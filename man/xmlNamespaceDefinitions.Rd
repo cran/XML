@@ -87,7 +87,8 @@ getDefaultNamespace(doc)
 
     # Now using internal nodes.
   f = system.file("exampleData", "namespaces.xml", package = "XML")
-  n = xmlRoot(xmlInternalTreeParse(f))
+  doc = xmlInternalTreeParse(f)
+  n = xmlRoot(doc)
   xmlNamespaceDefinitions(n)
 
   xmlNamespaceDefinitions(n, recursive = TRUE)

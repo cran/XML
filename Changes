@@ -1,3 +1,14 @@
+Version 1.98-1
+ 
+  *   Deal with older S3-style classes with inheritance for 2.7.2 differently from the 2.8.0 
+      mechanism.
+
+  *   Changes to catch more cases of xmlChar * being treated as char * which causes the Sun compiler to 
+      fail to compile DocParse.c
+
+  *   Export class XMLNamespaceDefinitions which caused problems in the code in the caMassClass package.
+
+
 Version 1.98-0
 
   *  The function XML:::xpathSubNodeApply() is the implementation of xpathApply() for an XMLInternalNode

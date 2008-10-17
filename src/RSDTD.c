@@ -290,8 +290,8 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
 
    xmlHashScan(table, RS_xmlElementTableConverter, &scanData);
 
-   dtdEls = SET_LENGTH(dtdEls, scanData.counter);
-   dtdNames = SET_LENGTH(dtdNames, scanData.counter);
+   SET_LENGTH(dtdEls, scanData.counter);
+   SET_LENGTH(dtdNames, scanData.counter);
  }
 #else
       for(i = 0; i < n; i++) {
@@ -366,8 +366,8 @@ RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
         See ProcessElements also.
       */
 
-   dtdEls = SET_LENGTH(dtdEls, scanData.counter);
-   dtdNames = SET_LENGTH(dtdNames, scanData.counter);
+   SET_LENGTH(dtdEls, scanData.counter);
+   SET_LENGTH(dtdNames, scanData.counter);
 
  }
 #else

@@ -369,3 +369,4 @@ export(getRelativeURL)
 
 
 export(xmlToList)
+exportClass("XMLNamespaceDefinitions")

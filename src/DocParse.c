@@ -339,8 +339,8 @@ RS_XML(convertXMLDoc)(const char *fileName, xmlDocPtr doc, USER_OBJECT_ converte
   PROTECT(rdoc_el_names = NEW_CHARACTER(n));
  
     /* Insert the name of the file being processed */
-  SET_VECTOR_ELT(rdoc, FILE_ELEMENT_NAME, NEW_CHARACTER(1));
-    SET_STRING_ELT(VECTOR_ELT(rdoc, FILE_ELEMENT_NAME), 0, COPY_TO_USER_STRING(doc->name ? doc->name : fileName));
+    SET_VECTOR_ELT(rdoc, FILE_ELEMENT_NAME, NEW_CHARACTER(1));
+    SET_STRING_ELT(VECTOR_ELT(rdoc, FILE_ELEMENT_NAME), 0, COPY_TO_USER_STRING(doc->name ? XMLCHAR_TO_CHAR(doc->name) : fileName));
     SET_STRING_ELT(rdoc_el_names, FILE_ELEMENT_NAME, COPY_TO_USER_STRING("file"));
 
     /* Insert the XML version information */
@@ -456,7 +456,7 @@ getNamespaceDefs(xmlNodePtr node, int recursive)
 /*	  nsDef = Rf_appendList(nsDef, tmp); */
 	      if(Rf_length(tmp)) {
 		  n = Rf_length(nsDef); 
-		  PROTECT(nsDef = SET_LENGTH(nsDef, Rf_length(nsDef) + Rf_length(tmp)));
+		  PROTECT(SET_LENGTH(nsDef, n + Rf_length(tmp)));
 		  numProtects++;
 		  for(i = 0; i < Rf_length(tmp); i++) 
 		      SET_VECTOR_ELT(nsDef, n + i, VECTOR_ELT(tmp, i));
@@ -655,7 +655,6 @@ RS_XML(setNodeClass)(xmlNodePtr node, USER_OBJECT_ ans)
 {
  char *className = NULL;
  int numEls = 1;
- int appendDefault = 1;
  int lenHier = sizeof(XMLNodeClassHierarchy)/sizeof(XMLNodeClassHierarchy[0]);
 
  numEls = lenHier + 1;
@@ -1159,7 +1158,7 @@ USER_OBJECT_
 RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
-    USER_OBJECT_ ans, names;
+    USER_OBJECT_ ans, names = R_NilValue;
     int count = 0, i;
     xmlNodePtr ptr =  node->children;
     int addNames = LOGICAL(r_addNames)[0];
@@ -1179,7 +1178,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
     for(i = 0; i < count ; i++, ptr = ptr->next) {
 	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr));
 	if(addNames)
-	    SET_STRING_ELT(names, i, COPY_TO_USER_STRING(ptr->name ? ptr->name : ""));
+	    SET_STRING_ELT(names, i, COPY_TO_USER_STRING(ptr->name ? XMLCHAR_TO_CHAR(ptr->name) : ""));
     }
     if(addNames)
 	SET_NAMES(ans, names);
@@ -1225,7 +1224,7 @@ RS_XML_setDocumentName(USER_OBJECT_ sdoc, USER_OBJECT_ sname)
 	return(R_NilValue);
     }
 
-    doc->URL = xmlStrdup(CHAR_DEREF(STRING_ELT(sname, 0)));
+    doc->URL = xmlStrdup(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(sname, 0))));
 
     return(ScalarLogical(TRUE));
 }

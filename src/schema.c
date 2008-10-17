@@ -213,7 +213,8 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
 	R_SchemaValidCallback cbinfo;
 	PROTECT(cbinfo.fun = allocVector(LANGSXP, 2));
 	SETCAR(cbinfo.fun, VECTOR_ELT(r_errorHandlers, 0));
-	xmlSchemaSetValidErrors(ctxt, R_schemaValidityErrorFunc, R_schemaValidityWarningFunc, &cbinfo);
+	xmlSchemaSetValidErrors(ctxt, (xmlSchemaValidityErrorFunc) R_schemaValidityErrorFunc, 
+                                      (xmlSchemaValidityWarningFunc) R_schemaValidityWarningFunc, &cbinfo);
     }
 
     status = xmlSchemaValidateDoc(ctxt, doc);

@@ -28,7 +28,7 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
       xmlNodePtr el;
       el = obj->nodeTab[i];
       if(el->type == XML_ATTRIBUTE_NODE) {
-	  PROTECT(ref = mkString((el->children && el->children->content) ? el->children->content : ""));
+	  PROTECT(ref = mkString((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : ""));
 	  SET_NAMES(ref, mkString(el->name));
 	  SET_CLASS(ref, mkString("XMLAttributeValue"));
 	  UNPROTECT(1);
@@ -311,7 +311,7 @@ R_matchNodesInList(SEXP r_nodes, SEXP r_target, SEXP r_nomatch)
     ans = NEW_INTEGER( n );
     for(i = 0; i < n ; i++) {
 	el = R_ExternalPtrAddr(VECTOR_ELT(r_nodes, i));
-	INTEGER(ans)[i] = INTEGER(r_nomatch);
+	INTEGER(ans)[i] = INTEGER(r_nomatch)[0];
 	for(j = 0; j < n2; j++) {
 	    if(el == R_ExternalPtrAddr(VECTOR_ELT(r_target, j))) {
 		INTEGER(ans)[i] = j;

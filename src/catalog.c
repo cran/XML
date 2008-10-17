@@ -8,7 +8,7 @@ R_xmlCatalogResolve(USER_OBJECT_ r_id, USER_OBJECT_ type, USER_OBJECT_ debug)
 {
     xmlChar *id;
     SEXP r_ans = R_NilValue;
-    xmlChar* ans;
+    xmlChar* ans = NULL;
     int debugLevel = -1;
     int n, i;
 

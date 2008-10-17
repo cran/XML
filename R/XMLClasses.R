@@ -32,14 +32,40 @@ function(fun, class) {
 setOldClass =
 function(classes)
 {
-   classes = c(classes[1], unique(sapply(classes[-1], oldClass)))
+   ancestors = unique(sapply(classes[-1], oldClass))
+   if(length(ancestors)) {
+       classes = c(classes[1], ancestors)
+       oldClassTable[[ classes[1] ]] <<- ancestors
+   }
    methods::setOldClass(classes)
 }
+
+# For R 2.7.2 and older.  In 2.8.0, extends() for setOldClass() works 
+# better.
+
+oldClassTable =  list(
+  "XMLNode" =  c("RXMLAbstractNode", "XMLAbstractNode"),
+  "XMLTextNode" = c("XMLNode", "RXMLAbstractNode", "XMLAbstractNode"),
+  "XMLPINode" = c( "XMLNode", "RXMLAbstractNode", "XMLAbstractNode") ,
+  "XMLProcessingInstruction" = c( "XMLNode", "RXMLAbstractNode", "XMLAbstractNode") ,
+  "XMLCommentNode" = c("XMLNode", "XMLTextNode", "RXMLAbstractNode", "XMLAbstractNode"),
+  "XMLCDataNode" = c("XMLNode", "RXMLAbstractNode", "XMLAbstractNode"),
+  "XMLHashTree" = c("XMLAbstractDocument"),
+  "XMLHashTreeNode" = c("RXMLAbstractNode"),
+  "XMLDocumentContent" = c(),
+  "XMLDocument" = c("XMLAbstractDocument"),
+  "XMLHashTree" = c("XMLAbstractDocument"),
+  "XMLInternalDocument" = c("XMLAbstractDocument"),
+   "XMLInternalDocument" = c("XMLAbstractDocument")
+)
 
 oldClass =
 function(class)
 {
-  unique(c(class, extends(class)))
+  if(version$major == "2" && as.integer(version$minor) >= 8) 
+     return(unique(c(class, extends(class))))
+
+   c(class, oldClassTable[[ class ]])
 }
 
 ###############################

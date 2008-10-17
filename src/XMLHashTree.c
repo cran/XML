@@ -82,7 +82,7 @@ makeHashNode(xmlNodePtr node, char *buf, SEXP env, R_XMLSettings *parserSettings
      numEls++;
 
   PROTECT(ans = NEW_LIST(numEls));
-  PROTECT(tmp = mkString(node->name ? node->name : ""));
+  PROTECT(tmp = mkString(node->name ? XMLCHAR_TO_CHAR(node->name) : ""));
   if(node->ns) 
     SET_NAMES(tmp, mkString(node->ns->prefix));
 
@@ -90,7 +90,7 @@ makeHashNode(xmlNodePtr node, char *buf, SEXP env, R_XMLSettings *parserSettings
   UNPROTECT(1);
 
   SET_VECTOR_ELT(ans, i++, RS_XML(AttributeList)(node, parserSettings));
-  SET_VECTOR_ELT(ans, i++, mkString(node->ns && node->ns->prefix ? node->ns->prefix : ""));
+  SET_VECTOR_ELT(ans, i++, mkString(node->ns && node->ns->prefix ? XMLCHAR_TO_CHAR(node->ns->prefix) : ""));
      /* skip the children */
   i = 4; 
   SET_VECTOR_ELT(ans, i++, mkString(buf));
@@ -226,7 +226,7 @@ processNode(xmlNodePtr root, xmlNodePtr parent, unsigned int *ctr, int parentId,
              included nodes.
          */
       xmlNodePtr parent;
-      parent = root->type == XML_XINCLUDE_START ? parent : root;
+      parent = root->type == XML_XINCLUDE_START ? root->parent : root;
       for(node = root->children; node; node = node->next) 
           processNode(node, parent, ctr, curId, id, env, childrenEnv, parentEnv, parserSettings);
   }

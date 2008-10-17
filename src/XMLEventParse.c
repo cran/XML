@@ -339,7 +339,7 @@ R_processBranch(RS_XMLParserData * rinfo,
 
     node = xmlNewNode(NULL, localname);
     if(attributes) {
-        const xmlChar **p = attributes;
+        xmlChar ** p = attributes;
         int i;
 	if(sax1) {
 	  for(i = 0; *p ; i += 2, p += 2) 
@@ -474,7 +474,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   PROTECT(tmp = NEW_CHARACTER(1));
   if(URI) {
      SET_STRING_ELT(tmp, 0, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(URI))); 
-     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR ( (void*)prefix ? prefix : "")))); 
+     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding,  ( (void*)prefix ? XMLCHAR_TO_CHAR(prefix) : "")))); 
   }
   SET_VECTOR_ELT(opArgs, 2, tmp);
   UNPROTECT(1);
