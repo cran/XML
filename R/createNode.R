@@ -52,12 +52,13 @@ addChildren =
 function(node, ..., kids = list(...), at = NA, cdata = FALSE)
   UseMethod("addChildren")
 
+
 addChildren.XMLNode =  
 function(node, ..., kids = list(...), at = NA, cdata = FALSE)
 {
   kids = lapply(kids,
                 function(i) {
-                  if(!is(i, "XMLNode"))
+                  if(!inherits(i, "XMLNode"))
                     xmlTextNode(as.character(i), cdata = cdata)
                   else
                     i

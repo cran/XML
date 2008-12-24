@@ -425,7 +425,7 @@ function(x, ..., indent = "", tagSeparator = "\n")
           " ", ""), tmp, ifelse(ns != "", " ", ""), ns, "/>", tagSeparator, 
           sep = ""), sep = "")
     } else if (length(xmlChildren(x))==1 &&
-               is(xmlChildren(x)[[1]],"XMLTextNode")) {
+               inherits(xmlChildren(x)[[1]],"XMLTextNode")) {
       ## Sole child is text node, print without extra white space.
       cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
           " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">",
@@ -631,13 +631,12 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
             unlist(answer, recursive = FALSE)
         else if (common.len > 1) 
             array(unlist(answer, recursive = FALSE), dim = c(common.len, 
-                length(X)), dimnames = if (!(is.null(n1 <- names(answer[[1]])) & 
+                length(answer)), dimnames = if (!(is.null(n1 <- names(answer[[1]])) & 
                 is.null(n2 <- names(answer)))) 
                 list(n1, n2))
         else answer
     }
     else answer  
-  
 }
 
 xpathApply =
@@ -673,7 +672,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
     fun = as.call(c(fun, append(1, args)))
 
 
-  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun)
+  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, PACKAGE = "XML")
 
   if(length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]
@@ -690,7 +689,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 xmlDoc =
 function(node, addFinalizer = FALSE)
 {
- doc = .Call("RS_XML_createDocFromNode", node)
+ doc = .Call("RS_XML_createDocFromNode", node, PACKAGE = "XML")
  addDocFinalizer(doc, addFinalizer)
  doc
 }
@@ -842,14 +841,14 @@ function(doc, path, fun = NULL, ...,
 
     doc = newXMLDoc(addFinalizer = FALSE)
     parent = xmlParent(node)
-    .Call("RS_XML_setRootNode", doc, node)
-    on.exit({ .Call("RS_XML_unsetDoc", node, unlink = TRUE, parent)
-              .Call("RS_XML_freeDoc", doc)
+    .Call("RS_XML_setRootNode", doc, node, PACKAGE = "XML")
+    on.exit({ .Call("RS_XML_unsetDoc", node, unlink = TRUE, parent, PACKAGE = "XML")
+              .Call("RS_XML_freeDoc", doc, PACKAGE = "XML")
               if(!is.null(tmp)) {
                                         # Need to create a new document with the current node as the root.
                                         # When we are finished, we have to ensure that we put the node back into the original document
                                         # We can use the same mechanism as when we have to create the document from scratch.
-               .Call("RS_XML_setDocEl", node, tmp) 
+               .Call("RS_XML_setDocEl", node, tmp, PACKAGE = "XML") 
               }
               putBack(node, info)
             })
@@ -864,7 +863,7 @@ function(doc, path, fun = NULL, ...,
   
     # now check if the result was actually a descendant of our top-level node for this
     # query. It is possible that it arose from a different sub-tree.
-  w = sapply(ans, function(el) .Call("RS_XML_isDescendantOf", el, node, strict = FALSE))
+  w = sapply(ans, function(el) .Call("RS_XML_isDescendantOf", el, node, strict = FALSE, PACKAGE = "XML"))
 
   ans = ans[w]
 
@@ -933,3 +932,7 @@ function(x, fun = NULL, ...)
   }
   ans
 }  
+
+
+
+

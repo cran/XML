@@ -107,11 +107,11 @@ function(filename, parse = xmlInternalTreeParse, ...)
 setXMLErrorHandler =
 function(fun)
 {
-  prev = .Call("RS_XML_getStructuredErrorHandler")
+  prev = .Call("RS_XML_getStructuredErrorHandler", PACKAGE = "XML")
 
   sym = getNativeSymbolInfo("R_xmlStructuredErrorHandler", "XML")$address
 
-  .Call("RS_XML_setStructuredErrorHandler", list(fun, sym))
+  .Call("RS_XML_setStructuredErrorHandler", list(fun, sym), PACKAGE = "XML")
   
   prev
 }

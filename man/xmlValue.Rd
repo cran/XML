@@ -5,7 +5,11 @@
 \alias{xmlValue.XMLProcessingInstruction}
 \alias{xmlValue.XMLTextNode}
 \alias{xmlValue.XMLComment}
-\title{Extract the contents of a leaf XML node}
+\alias{xmlValue<-}
+\alias{xmlValue<-,XMLAbstractNode-method}
+\alias{xmlValue<-,XMLInternalTextNode-method}
+\alias{xmlValue<-,XMLTextNode-method}
+\title{Extract or set the contents of a leaf XML node}
 \description{
   Some types of XML nodes have no children nodes, but are leaf nodes and
   simply contain text. Examples are \code{XMLTextMode}, \code{XMLProcessingInstruction}.
@@ -14,7 +18,7 @@
   that contain a single text node.
 }
 \usage{
-xmlValue(x, ignoreComments = FALSE)
+xmlValue(x, ignoreComments = FALSE, recursive = TRUE)
 }
 \arguments{
   \item{x}{the \code{XMLNode} object whose
@@ -23,6 +27,9 @@ xmlValue(x, ignoreComments = FALSE)
     does not include the text in XML comment nodes.
     If this is \code{FALSE}, the text in the comments is part
     of the return value.
+  }
+  \item{recursive}{a logical value indicating whether to process all
+    sub-nodes (\code{TRUE}) or only the text nodes within the node \code{x}.
   }
 }
 \value{
@@ -46,5 +53,21 @@ xmlValue(x, ignoreComments = FALSE)
  xmlValue(node)
 
  xmlValue(xmlTextNode("some more raw text"))
+
+  # Setting the xmlValue().
+ a = newXMLNode("a")
+ xmlValue(a) = "the text"
+ xmlValue(a) = "different text"
+
+ a = newXMLNode("x", "bob")
+ xmlValue(a) = "joe"
+
+ b = xmlNode("bob")
+ xmlValue(b) = "Foo"
+ xmlValue(b) = "again"
+
+ b = newXMLNode("bob", "some text")
+ xmlValue(b[[1]]) = "change"
+ b
 }
 \keyword{file}

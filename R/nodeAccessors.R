@@ -91,53 +91,68 @@ function(X, FUN, ...)
 
 
 xmlValue <- 
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
  UseMethod("xmlValue")
 }
 
 if(useS4)
-  setGeneric("xmlValue", function(x, ignoreComments = FALSE) standardGeneric("xmlValue"))
+  setGeneric("xmlValue", function(x, ignoreComments = FALSE, recursive = TRUE) standardGeneric("xmlValue"))
+
 
 xmlValue.XMLNode <- 
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
- if(xmlSize(x) > 0) {
+ if(recursive && xmlSize(x) > 0) {
    kids = xmlChildren(x)
    if(ignoreComments)
      kids = kids[ !sapply(kids, "XMLCommentNode") ]
-   return(paste(sapply(kids, xmlValue, ignoreComments), collapse = ""))
+   return(paste(unlist(lapply(kids, xmlValue, ignoreComments)), collapse = ""))
+ } else if(!recursive && xmlSize(x) > 0) {
+        #XXX If !recursive but have text nodes e.g. in the second child.
+    i = sapply(xmlChildren(x), inherits, "XMLTextNode")
+    if(any(i))
+      return(paste(unlist(lapply(xmlChildren(x)[i], xmlValue, ignoreComments)), collapse = ""))
  }
-
+ 
  # if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
  #    return(xmlValue(x[[1]], ignoreComments))
 
- x$value
+ if(is.null(x$value))
+   character()
+ else
+   x$value
 }
 
 setS3Method("xmlValue", "XMLNode")
 
 xmlValue.XMLTextNode <- 
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
- x$value
+  if(!is.null(x$value))
+     x$value
+  else
+     character(0)
 }
 
 setS3Method("xmlValue", "XMLTextNode")
 
 xmlValue.XMLComment <-  xmlValue.XMLCommentNode <-
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
  if(ignoreComments)
    return("")
 
- x$value
+  if(!is.null(x$value))
+     x$value
+  else
+     character(0)
 }
 
 setS3Method("xmlValue", "XMLCommentNode")
 
 xmlValue.XMLCDataNode <- 
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
  x$value
 }
@@ -145,7 +160,7 @@ function(x, ignoreComments = FALSE)
 setS3Method("xmlValue", "XMLCDataNode")
 
 xmlValue.XMLProcessingInstruction <- 
-function(x, ignoreComments = FALSE)
+function(x, ignoreComments = FALSE, recursive = TRUE)
 {
  x$value
 }
@@ -165,7 +180,7 @@ function(node, after = TRUE)
   if(!inherits(node, "XMLInternalNode"))
     stop("can only operate on an internal node")
 
-  .Call("RS_XML_getNextSibling", node, as.logical(after))
+  .Call("RS_XML_getNextSibling", node, as.logical(after), PACKAGE = "XML")
 }
 
 xmlNamespaceDefinitions <-
@@ -221,7 +236,7 @@ xmlNamespaceDefinitions.XMLNode =
 
 xmlNamespaceDefinitions.XMLInternalNode =
   function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
-    ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x, as.logical(recursive))
+    ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x, as.logical(recursive), PACKAGE = "XML")
     if(addNames && length(ans) > 0)
       names(ans) = sapply(ans, function(x) x$id)
 

@@ -8,7 +8,7 @@ function(id, type = "uri", asIs = FALSE, debug = FALSE)
    if(any(is.na(i)))
      stop("don't recognize type. Must be one of ", paste(types, collapse = ", "))
 
-   ans = .Call("R_xmlCatalogResolve", as.character(id), i, as.logical(debug))
+   ans = .Call("R_xmlCatalogResolve", as.character(id), i, as.logical(debug), PACKAGE = "XML")
 
    if(asIs)
      ans[is.na(ans)] = id[is.na(ans)]
@@ -20,13 +20,13 @@ function(id, type = "uri", asIs = FALSE, debug = FALSE)
 catalogLoad =
 function(fileNames)
 {
-  .Call("RS_XML_loadCatalog", path.expand(fileNames))
+  .Call("RS_XML_loadCatalog", path.expand(fileNames), PACKAGE = "XML")
 }  
 
 catalogClearTable =
 function()
 {
-  .Call("RS_XML_clearCatalog")
+  .Call("RS_XML_clearCatalog", PACKAGE = "XML")
 }
 
 
@@ -51,7 +51,7 @@ function(orig, replace, type = "rewriteURI")
   type = XMLCatalogTypes[idx]
   type = rep(as.character(type), length = length(orig))
 
-  .Call("RS_XML_catalogAdd", as.character(orig), as.character(replace), as.character(type))
+  .Call("RS_XML_catalogAdd", as.character(orig), as.character(replace), as.character(type), PACKAGE = "XML")
 }  
 
 catalogDump =
@@ -63,7 +63,7 @@ catalogDump =
   
 function(fileName = tempfile(), asText = TRUE)
 {
-  ans = .Call("RS_XML_catalogDump", as.character(fileName))
+  ans = .Call("RS_XML_catalogDump", as.character(fileName), PACKAGE = "XML")
   if(missing(fileName)) {
     ans = xmlTreeParse(fileName, useInternal = TRUE)
     if(asText)

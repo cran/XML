@@ -147,7 +147,7 @@ getDescendants =
   # This is recursive.
 function(id, tree, kids = tree$.children)
 {
-   if(is(id, "XMLHashTreeNode")) {
+   if(inherits(id, "XMLHashTreeNode")) {
       if(missing(tree))
          tree = id$env
      id = id$id
@@ -266,7 +266,7 @@ function(obj)
   length(obj) - 3  
 }  
 
-# Currently overridden below
+#??? Currently overridden below
 xmlRoot.XMLHashTree =
 function(x, skip = TRUE, ...)
 {  
@@ -316,6 +316,9 @@ function(x, skip = TRUE, all = FALSE, ...)
   parents = get(".parents", x, inherits = FALSE)
   tops = objects(x)[ is.na(match(objects(x), objects(parents)))]
 
+  if(length(tops) == 0)
+    return(NULL)
+  
   ans = mget(tops, x)
 
   if(skip)
@@ -378,7 +381,7 @@ convertToHashTree =
 function(from)
 {
   xx = xmlHashTree()
-  ans = .Call("R_convertDOMToHashTree", from, xx, xx$.children, xx$.parents)
+  ans = .Call("R_convertDOMToHashTree", from, xx, xx$.children, xx$.parents, PACKAGE = "XML")
   xx
 }  
 

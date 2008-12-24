@@ -8,7 +8,7 @@ function(libname, pkgname)
  }
 
    # Set the error handlers to our local ones.
- .C("RSXML_setErrorHandlers")
+ .C("RSXML_setErrorHandlers", PACKAGE = "XML")
 }
 
 .onLoad =
@@ -28,7 +28,7 @@ function(libname, pkgname)
 #   .InitSAXMethods()
  }
    # Set the error handlers to our local ones.
- .C("RSXML_setErrorHandlers")
+ .C("RSXML_setErrorHandlers", PACKAGE = "XML")
 }
 
 .onUnload <- function (libpath)
@@ -38,18 +38,20 @@ function(libname, pkgname)
 
 
 
+if(FALSE) {
 .Call =
 function(name, ...)
 {
   base::.Call(name, ..., PACKAGE = "XML")
 }
 
+
 .C =
 function(name, ...)
 {
   base::.C(name, ..., PACKAGE = "XML")
 }
-
+}
 
 #
 #  Copyright (c) 1998, 1999 The Omega Project for Statistical Computing.

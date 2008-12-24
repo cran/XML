@@ -81,10 +81,10 @@ objects.
  dtdFile <- system.file("exampleData", "foo.dtd",package="XML")
  parseDTD(dtdFile)
 
-    # Read from text
- txt <- readLines(dtdFile)
- txt <- paste(txt, "\n", collapse="")
- d <- parseDTD(txt, asText=TRUE)
+txt <- readLines(dtdFile)
+txt <- paste(txt, "\n", collapse="")
+d <- parseDTD(txt, asText=TRUE)
+
 
 \dontrun{
  url <- "http://www.omegahat.org/XML/DTDs/DatasetByRecord.dtd"

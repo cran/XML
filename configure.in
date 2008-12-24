@@ -57,6 +57,16 @@ AC_ARG_WITH(expat,
     fi],
   USE_EXPAT= )
 
+dnl Here we add a flag which we will use below in the case that 
+dnl the user declaratively adds this option in. 
+AC_ARG_WITH(xml_output_buffer,
+	[ --with-xml-output-buffer	use ADD_XML_OUTPUT_BUFFER_CODE (conditionally on)],
+	[ if test "${withval}" = yes; then
+	     ADD_XML_OUTPUT_BUFFER=yes;
+	  else
+	     ADD_XML_OUTPUT_BUFFER=no;
+	  fi],
+	  ADD_XML_OUTPUT_BUFFER=no)
 
 dnl
 dnl End of command line argument declarations.
@@ -460,9 +470,9 @@ if test "${USE_LIBXML}" ; then
 
 fi
 
-
-AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlOutputBufferCreateBuffer, [echo "have xmlOutputBufferCreateBuffer()"], [ echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"])
-
+dnl Here we added the check of the flag to determine if the user wants to force
+dnl the XML_OUTPUT_BUFFER code in XMLTree.c
+AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlOutputBufferCreateBuffer, [echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; fi;], [ echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"])
 
 AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlDocDumpFormatMemoryEnc, PKG_CPPFLAGS="${PKG_CPPFLAGS} -DDUMP_WITH_ENCODING=1")
 

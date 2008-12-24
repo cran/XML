@@ -146,6 +146,7 @@ S3method(print, XMLInternalNode)
 
 S3method(print, XMLRDocument)
 S3method(xmlRoot, XMLRDocument)
+S3method(xmlRoot, HTMLDocument)
 
 
 if(TRUE) {
@@ -370,3 +371,7 @@ export(getRelativeURL)
 
 export(xmlToList)
 exportClass("XMLNamespaceDefinitions")
+
+export('xmlValue<-')
+exportMethods('xmlValue<-')
+

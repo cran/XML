@@ -67,7 +67,7 @@ function(url, ...,
 {
   doc = xmlTreeParse(url, ..., useInternal = TRUE)
 
-  if(is(verbose, "numeric"))
+  if(inherits(verbose, "numeric"))
     verbose = verbose - 1
 
   if(!is.character(section))
@@ -83,7 +83,7 @@ function(url, ...,
         example = ids[w <- menu(ids)]
       } 
 
-      if(is(example, "numeric")) {
+      if(inherits(example, "numeric")) {
         i = example
       } else {
         i = pmatch(example, ids)
@@ -287,7 +287,7 @@ function(node, namespaces = c(r = "http://www.r-project.org"))
   
   if(inherits(x, c("XMLInternalCommentNode", "XMLInternalPINode"))) {
 
-  } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:code") {
+  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:code") {
      ref = xmlGetAttr(x, "ref")
      if(!is.na(ref)) {
          v = getNodeSet(as(x, "XMLInternalDocument"),
@@ -297,8 +297,9 @@ function(node, namespaces = c(r = "http://www.r-project.org"))
          xmlValue(v[[1]])
      } else
          xmlValue(x)                                 
-  } else if(is(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
+  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
   }  else
      xmlValue(x)
  })
 }
+

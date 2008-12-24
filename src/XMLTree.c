@@ -218,7 +218,9 @@ RS_XML_setNodeName(USER_OBJECT_ s_node, USER_OBJECT_ s_name)
 }
 
 
-
+/*
+    attrs is a vector whose names identify
+ */
 USER_OBJECT_
 RS_XML_removeNodeAttributes(USER_OBJECT_ s_node, USER_OBJECT_ attrs, USER_OBJECT_ asNamespace)
 {
@@ -227,10 +229,26 @@ RS_XML_removeNodeAttributes(USER_OBJECT_ s_node, USER_OBJECT_ attrs, USER_OBJECT
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
 
     n = GET_LENGTH(attrs);
-    attr_names = GET_NAMES(attrs);
     PROTECT(ans = NEW_LOGICAL(n));
+    
+    attr_names = GET_NAMES(attrs);
     for(i = 0; i < n; i++) {
-	if(LOGICAL(asNamespace)[0]) {
+	if(TYPEOF(attrs) == INTSXP) {
+	    int which = INTEGER(attrs)[i] - i - 1;
+	    xmlAttrPtr p;
+	    int j = 0; 
+	    
+		p = node->properties;
+		while(j < which && p) {
+		    p = p->next;
+                    j++;
+		}
+		xmlUnsetNsProp(node, p->ns, p->name);
+/*
+            if(p)
+		xmlFree(p);
+*/
+	} else if(LOGICAL(asNamespace)[0]) {
 	    xmlNsPtr ns = NULL;
 	    xmlChar *id;
 	    id = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attr_names, i)));
@@ -337,6 +355,27 @@ RS_XML_setRootNode(USER_OBJECT_ r_doc, USER_OBJECT_ r_node)
     return(ScalarLogical(TRUE));
 }
 
+SEXP
+R_isNodeChildOfAt(SEXP rkid, SEXP rnode, SEXP rat)
+{
+    int i, at;
+    xmlNodePtr kid, node, ptr;
+    node = (xmlNodePtr) R_ExternalPtrAddr(rnode);	
+    kid = (xmlNodePtr) R_ExternalPtrAddr(rkid);	
+
+    if(!node || !kid || !kid->parent)
+	return(ScalarLogical(FALSE));
+
+    at = INTEGER(rat)[0] - 1;
+    ptr = node->children;
+    while(i < at && ptr)  {
+	ptr = ptr->next;
+	i++;
+    }
+    return(ScalarLogical(ptr == kid));
+}
+
+
 /**
    Add the internal XML node represented by the S object @node
    as a child of the XML node represented by the S object @parent.
@@ -345,7 +384,7 @@ USER_OBJECT_
 R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OBJECT_ shallow)
 {
     xmlNodePtr n, p;
-
+    
     if(TYPEOF(parent) != EXTPTRSXP) {
        PROBLEM "R_insertXMLNode expects XMLInternalNode objects for the parent node"
        ERROR;
@@ -1055,6 +1094,29 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
     return(ans);
 }
 
+SEXP
+R_setXMLInternalTextNode_value(SEXP node, SEXP value)
+{
+   xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
+   xmlChar *tmp;
+   const char *str;
+
+   DECL_ENCODING_FROM_NODE(n)
+
+   if(n->type != XML_TEXT_NODE) {
+       PROBLEM  "Can only set value on an text node"
+	   ERROR;
+   }
+    
+   if(n->content)
+       xmlFree(n->content);
+
+   str = CHAR(STRING_ELT(value, 0));
+   n->content = xmlCharStrndup(str, strlen(str));
+/*xmlStrdup(CHAR_TO_XMLCHAR(CHAR(STRING_ELT(value, 0))));*/
+    
+   return(node);
+}
 
 SEXP
 R_xmlNodeValue(SEXP node, SEXP raw)

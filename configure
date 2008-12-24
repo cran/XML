@@ -846,6 +846,7 @@ Optional Packages:
   --with-xml-config    the name of the xml-config program to use.
   --with-libxml           use the libxml library (default)
   --with-expat            use expat library (off by default)
+ --with-xml-output-buffer	use ADD_XML_OUTPUT_BUFFER_CODE (conditionally on)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1361,6 +1362,18 @@ else
   USE_EXPAT=
 fi;
 
+
+# Check whether --with-xml_output_buffer or --without-xml_output_buffer was given.
+if test "${with_xml_output_buffer+set}" = set; then
+  withval="$with_xml_output_buffer"
+   if test "${withval}" = yes; then
+	     ADD_XML_OUTPUT_BUFFER=yes;
+	  else
+	     ADD_XML_OUTPUT_BUFFER=no;
+	  fi
+else
+  ADD_XML_OUTPUT_BUFFER=no
+fi;
 
 
 
@@ -4335,7 +4348,6 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 
 fi
 
-
 as_ac_Lib=`echo "ac_cv_lib_${USE_XMLLIB_NAME}''_xmlOutputBufferCreateBuffer" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for xmlOutputBufferCreateBuffer in -l${USE_XMLLIB_NAME}" >&5
 echo $ECHO_N "checking for xmlOutputBufferCreateBuffer in -l${USE_XMLLIB_NAME}... $ECHO_C" >&6
@@ -4402,11 +4414,10 @@ fi
 echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  echo "have xmlOutputBufferCreateBuffer()"
+  echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; fi;
 else
    echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"
 fi
-
 
 
 as_ac_Lib=`echo "ac_cv_lib_${USE_XMLLIB_NAME}''_xmlDocDumpFormatMemoryEnc" | $as_tr_sh`

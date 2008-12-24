@@ -36,7 +36,6 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
   checkHandlerNames(handlers, "DOM")
 
-
   if(missing(fullNamespaceInfo) && inherits(handlers, "RequiresNamespaceInfo"))
     fullNamespaceInfo = TRUE
   
@@ -84,12 +83,12 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
    file = path.expand(as.character(file))
 
   if(useInternalNodes && trim) {
-    prevBlanks = .Call("RS_XML_setKeepBlanksDefault", 0L)
-    on.exit(.Call("RS_XML_setKeepBlanksDefault", prevBlanks), add = TRUE)
+    prevBlanks = .Call("RS_XML_setKeepBlanksDefault", 0L, PACKAGE = "XML")
+    on.exit(.Call("RS_XML_setKeepBlanksDefault", prevBlanks, PACKAGE = "XML"), add = TRUE)
   }
 
   .oldErrorHandler = setXMLErrorHandler(error)
-  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
@@ -97,7 +96,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
               as.logical(isURL), as.logical(addAttributeNamespaces),
               as.logical(useInternalNodes), FALSE, as.logical(isSchema),
               as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames),
-              xinclude, error)
+              xinclude, error, PACKAGE = "XML")
 
 
 
@@ -158,7 +157,7 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
 xmlValidity =
 function(val = integer(0))
 {
-  .Call("RS_XML_getDefaultValiditySetting", as.integer(val))
+  .Call("RS_XML_getDefaultValiditySetting", as.integer(val), PACKAGE = "XML")
 }
 
 
@@ -178,7 +177,7 @@ processXInclude.XMLInternalDocument =
 function(node, flags = 0L)
 
 {
-  .Call("RS_XML_xmlXIncludeProcessFlags", node, as.integer(flags))
+  .Call("RS_XML_xmlXIncludeProcessFlags", node, as.integer(flags), PACKAGE = "XML")
 }  
 
 processXInclude.XMLInternalElementNode =
@@ -187,5 +186,5 @@ function(node, flags = 0L)
 #  if(xmlName(node) != "include")  # Should check name space also
 #    stop("can only process XInclude on include nodes")
 
-  .Call("RS_XML_xmlXIncludeProcessTreeFlags", node, as.integer(flags))
+  .Call("RS_XML_xmlXIncludeProcessTreeFlags", node, as.integer(flags), PACKAGE = "XML")
 } 

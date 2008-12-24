@@ -515,7 +515,7 @@ m <- xmlTreeParse(fileName,
   # Using flat trees
  tt = xmlHashTree()
  f = system.file("exampleData", "mtcars.xml", package="XML")
- xmlTreeParse(f, handlers = tt[[".addNode"]])
+ xmlTreeParse(f, handlers = list(.startElement = tt[[".addNode"]]))
  xmlRoot(tt)
 
 

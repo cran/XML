@@ -138,10 +138,10 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
     }
     dtd = ctxt->myDoc->intSubset;
   }  else {
-     /* Read the file. */
-    /* Added for 2.2.12. May need to be conditional for 1.8.9 */
+       /* Read the file. */
+       /* Added for 2.2.12. May need to be conditional for 1.8.9 */
     ctxt->sax->internalSubset(ctxt->userData, CHAR_TO_XMLCHAR(dtdName), CHAR_TO_XMLCHAR(extId), CHAR_TO_XMLCHAR(extId));
-    /* Warnings will ensue about not being in internal subset if we don't go to level 2. */
+       /* Warnings will ensue about not being in internal subset if we don't go to level 2. */
 #ifdef USE_EXTERNAL_SUBSET
     ctxt->inSubset = 2;
     ctxt->sax->externalSubset(ctxt->userData, CHAR_TO_XMLCHAR(dtdName), CHAR_TO_XMLCHAR(extId), CHAR_TO_XMLCHAR(extId));

@@ -1,3 +1,23 @@
+Version 1.99-0
+
+  *   Added recursive parameter to xmlValue() function to control whether to work on just the 
+      immediate nodes or also children.
+ 
+  *   Correction for xpathSApply() when returning an array/matrix which referred to a non-existent variable.
+
+  *   Faster creation of internal nodes via newXMLNode().
+
+  *   xmlRoot() for XMLHashTree works for empty trees.
+
+  *   Added xmlValue<-() function.
+
+  *   Fix for removeAttributes() with namespaces.
+
+  *   Addition to configure script of the argument --with-xml-output-buffer to force 
+      whether to compile and use our own "local" version of xmlOutputBufferCreateBuffer()
+      which is needed on unusual systems.  Supplied by Jim Bullard (UC Berkeley).
+
+
 Version 1.98-1
  
   *   Deal with older S3-style classes with inheritance for 2.7.2 differently from the 2.8.0 

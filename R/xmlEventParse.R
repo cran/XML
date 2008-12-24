@@ -20,6 +20,9 @@ function(handlers, id = "SAX")
     warning("future versions of the XML package will require names of general handler functions to be prefixed by a . to distinguish them from handlers for nodes with those names.  This _may_ affect the ", paste(names(handlers)[!is.na(i)], collapse = ", "))
   }
 
+  if(any(w <- !sapply(handlers, is.function)))
+     warning("some handlers are not functions: ", paste(names(handlers[w]), collapse = ", "))  
+
   !prob
 }
 
@@ -105,13 +108,13 @@ function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = 
     stop("error must be a function")
   
   .oldErrorHandler = setXMLErrorHandler(error)
-  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
   
  state <- .Call("RS_XML_Parse", file, handlers,  endElementHandlers, 
                     as.logical(addContext), as.logical(ignoreBlanks),  
                      as.logical(useTagName), as.logical(asText), as.logical(trim), 
                       as.logical(useExpat), state, as.logical(replaceEntities),
-                       as.logical(validate), as.integer(saxVersion), branches, as.logical(useDotNames), error)
+                       as.logical(validate), as.integer(saxVersion), branches, as.logical(useDotNames), error, PACKAGE = "XML")
 
   if(!is.null(state))
      return(state)
@@ -127,7 +130,7 @@ function(parser)
   if(!inherits(parser, "XMLParserContext"))
     stop("Need an XMLParserContext object for xmlStopParser")
 
-  .Call("RS_XML_xmlStopParser", parser)
+  .Call("RS_XML_xmlStopParser", parser, PACKAGE = "XML")
 }  
 
 

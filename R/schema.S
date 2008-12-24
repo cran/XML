@@ -25,19 +25,19 @@ setMethod("$<-", "libxmlTypeTable",
 
 setMethod("names", "libxmlTypeTable",
             function(x) {
-               .Call("R_libxmlTypeTable_names", x, character(0))
+               .Call("R_libxmlTypeTable_names", x, character(0), PACKAGE = "XML")
             })
 
 
 setAs("libxmlTypeTable", "list",
             function(from) {
-               .Call("R_libxmlTypeTable_names", from, getTableElementType(from))
+               .Call("R_libxmlTypeTable_names", from, getTableElementType(from), PACKAGE = "XML")
             })
 
 
 setMethod("$", "libxmlTypeTable",
            function(x, name) {
-               .Call("R_libxmlTypeTable_lookup", x, name, getTableElementType(x))
+               .Call("R_libxmlTypeTable_lookup", x, name, getTableElementType(x), PACKAGE = "XML")
            })
 
 
@@ -57,7 +57,7 @@ setMethod("$", "xmlSchemaRef",
             if(is.na(idx))
               stop("No field ", name, " in ", paste(SchemaRefFields, collapse = ", "))
 
-            .Call(paste("R_libxmlTypeTable", SchemaRefFields[idx], sep = "_"),  x)
+            .Call(paste("R_libxmlTypeTable", SchemaRefFields[idx], sep = "_"),  x, PACKAGE = "XML")
            })
 
 setMethod("names", "xmlSchemaRef", function(x) SchemaRefFields)
@@ -107,9 +107,9 @@ function(schema, doc, errorHandler = xmlErrorFun(), options = 0L)
     schema = xmlSchemaParse(schema)
 
   .oldErrorHandler = XML:::setXMLErrorHandler(if(is.list(errorHandler)) errorHandler[[1]] else errorHandler)
-  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
+  on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
   
-  status = .Call("RS_XML_xmlSchemaValidateDoc", schema@ref, doc, as.integer(options), NULL) # errorHandler)
+  status = .Call("RS_XML_xmlSchemaValidateDoc", schema@ref, doc, as.integer(options), NULL, PACKAGE = "XML") # errorHandler)
 
   if(inherits(errorHandler, "XMLStructuredErrorCumulator"))
     structure(list(status = status, errors = errorHandler[[2]]()), class = "XMLSchemaValidationResults")

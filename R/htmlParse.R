@@ -28,7 +28,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
     asText = TRUE
   
   if(missing(isURL)) {
-    isURL <- length(grep("http://",file)) | length(grep("ftp://",file))
+    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file))
   }
 
     # check whether we are treating the file name as
@@ -46,14 +46,14 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  on.exit(setEntitySubstitution(old))
 
  if(!is.logical(xinclude)) {
-   if(is(xinclude, "numeric"))
+   if(inherits(xinclude, "numeric"))
     xinclude = bitlist(xinclude)
    else
      xinclude = as.logical(xinclude)   
  }
 
  .oldErrorHandler = setXMLErrorHandler(error)
- on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler), add = TRUE)
+ on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
          as.logical(ignoreBlanks), as.logical(replaceEntities),
@@ -61,7 +61,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
            as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding),
-           as.logical(useDotNames), xinclude, error)
+           as.logical(useDotNames), xinclude, error, PACKAGE = "XML")
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)
@@ -79,7 +79,7 @@ formals(htmlParse)$useInternalNodes = TRUE
 parseURI =
 function(uri)
 {
-  u = .Call("R_parseURI", as.character(uri))
+  u = .Call("R_parseURI", as.character(uri), PACKAGE = "XML")
   if(u$port == 0)
     u$port = as.integer(NA)
 

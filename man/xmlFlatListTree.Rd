@@ -96,7 +96,7 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(), env = 
 \examples{
  f = system.file("exampleData", "dataframe.xml", package = "XML")
  tr  = xmlHashTree()
- xmlTreeParse(f, handlers = tr[[".addNode"]])
+ xmlTreeParse(f, handlers = list(.startElement = tr[[".addNode"]]))
 
  tr # print the tree on the screen
 

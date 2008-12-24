@@ -22,7 +22,7 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
  if(!is.null(dtd)) {
    if(isXML2) {
      node = NULL
-     if(is(dtd, "XMLDTDNode"))
+     if(inherits(dtd, "XMLDTDNode"))
        node = dtd
      else if(is.character(dtd) && dtd[1] != "")
        node = newXMLDTDNode(dtd, doc = doc)
@@ -44,7 +44,7 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
                       }
  
  asXMLNode <- function(x) {
-        if(is(x, "XMLInternalNode"))
+        if(inherits(x, "XMLInternalNode"))
           return(x)
         
         v = if(is.list(x)) 
@@ -68,7 +68,7 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
 
       
      if(!is.na(match(namespace, names(namespaces))) && is.na(match(namespace, names(definedNamespaces)))) {
-       ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace)
+       ns <- .Call("R_xmlNewNs", node, namespaces[[namespace]], namespace, PACKAGE = "XML")
        definedNamespaces[[namespace]] <<- ns
      }
 
@@ -169,7 +169,7 @@ if(FALSE) {
         ids = ids[-(1:i)]
      }
      
-   } else if(is(name, "numeric")) {
+   } else if(inherits(name, "numeric")) {
        num = name
        if(is.na(num) || num == -1) 
               # close all of the nodes, except the document node.
@@ -214,7 +214,7 @@ if(FALSE) {
  if(!is.null(tag)) {
    if(is.character(tag)) {
      node = addTag(tag, attrs = attrs, namespace = namespaces, close = FALSE)
-   } else if(is(tag, "XMLInternalNode")) {
+   } else if(inherits(tag, "XMLInternalNode")) {
      if(is.null(xmlParent(node))) # if we have a DTD node, need to add it to that or parallel to that?
        addChildren(doc, node)
    }
@@ -272,7 +272,7 @@ function(doc)
 docName.XMLInternalDocument =
 function(doc)
 {
-  .Call("RS_XML_getDocumentName", doc)
+  .Call("RS_XML_getDocumentName", doc, PACKAGE = "XML")
 }
 
 # setMethod("docName", "XMLInternalDocument", docName.XMLInternalDocument)
@@ -303,7 +303,7 @@ setGeneric("docName<-", function(x, value)
 setMethod("docName<-", "XMLInternalDocument",
 function(x, value)
 {
-  .Call("RS_XML_setDocumentName", x, value)
+  .Call("RS_XML_setDocumentName", x, value, PACKAGE = "XML")
   x
 })
 

@@ -1226,7 +1226,7 @@ RS_XML_setDocumentName(USER_OBJECT_ sdoc, USER_OBJECT_ sname)
 
     doc->URL = xmlStrdup(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(sname, 0))));
 
-    return(ScalarLogical(TRUE));
+    return(sdoc);
 }
 
 

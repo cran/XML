@@ -437,7 +437,7 @@ SEXP
 stop(const char *className, const char *msg, ...)
 {
     char buf[10000];
-    SEXP error, e;
+    SEXP error, e, ns_env, ns_name;
 
     va_list ap;
 
@@ -458,7 +458,9 @@ stop(const char *className, const char *msg, ...)
 */
 
     PROTECT(e = allocVector(LANGSXP, 2));
-    SETCAR(e, Rf_install("xmlStop"));
+    PROTECT(ns_name = mkString("XML"));
+    ns_env = R_FindNamespace(ns_name);
+    SETCAR(e, findVarInFrame(ns_env, Rf_install("xmlStop")));
     SETCAR(CDR(e), error);
     Rf_eval(e, R_GlobalEnv);
     UNPROTECT(2);
