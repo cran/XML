@@ -108,7 +108,7 @@ USER_OBJECT_ RS_XML_printXMLNode(USER_OBJECT_ node, USER_OBJECT_ level, USER_OBJ
 
 USER_OBJECT_ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeNode);
 
-USER_OBJECT_ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive);
+USER_OBJECT_ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer);
 
 
 
@@ -152,6 +152,9 @@ SEXP stop(const char *className, const char *msg, ...);
 SEXP RSXML_structuredStop(SEXP errorFun, xmlErrorPtr err);
 
 void R_xmlStructuredErrorHandler(void *data, xmlErrorPtr err);
+
+
+SEXP R_getDocEncoding(SEXP r_doc);
 
 extern int R_numXMLDocs, R_numXMLDocsFreed;
 

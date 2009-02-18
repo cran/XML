@@ -32,15 +32,18 @@ Each is an object of class \code{XMLEntity}
 or alternatively \code{XMLExternalEntity} if the entity refers
 to an external definition.
 The fields of these types of objects are 
+\itemize{
  \item{name}{the name of the entity by which users refer to it.}
  \item{content}{the expanded value or definition of the entity}
  \item{original}{the value of the entity, but with references to other entities not expanded, but
     maintained in symbolic form.}
+ }
 }
 \item{elements}{a named list of the elements defined in the DTD, with the name of each element being
 the identifier of the element being defined.
 Each entry is an object of class \code{XMLElementDef}
 which has 4 fields.
+\itemize{
  \item{name}{the name of the element.}
  \item{type}{a named integer indicating the type of entry in the DTD, usually
 either \code{element} or \code{mixed}.
@@ -65,6 +68,7 @@ objects.
   \item{type}{the type of the value, e.g. an CDATA, Id, Idref(s), Entity(s), NMToken(s),  Enumeration, Notation}
   \item{defaultType}{the defined type, one of  None, Implied, Fixed or Required.}
   \item{defaultValue}{the default value if it is specified, or the enumerated values as a character vector, if the type is Enumeration.}
+}
 }
 }
 }

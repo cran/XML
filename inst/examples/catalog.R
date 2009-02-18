@@ -5,7 +5,7 @@
 # Get this from catalog.xml
 catalogResolve("http://www.omegahat.org/XSL/")
 
-loadCatalogs("~/Classes/StatComputing/IDynDocs/inst/XML/catalog.xml")
+loadCatalogs("~/Classes/StatComputing/XDynDocs/inst/XML/catalog.xml")
 
 # Found in the first/original catalog, not IDynDocs.
 catalogResolve("http://docbook.sourceforge.net/release/xsl/current/foo")

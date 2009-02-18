@@ -29,7 +29,7 @@ fields of an \code{XMLNode} object.
 Since these are intended to be invisible and
 queried via the accessor methods (\code{\link{xmlName}},
 \code{\link{xmlAttrs}}, etc.), this should not
-be a problem. If you \textit{really} need the names
+be a problem. If you really need the names
 of the fields, use \code{names(unclass(x))}.
 }
 

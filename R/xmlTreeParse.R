@@ -106,12 +106,12 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
   if(!missing(handlers) & !as.logical(asTree))
     return(handlers)
 
-  if(length(class(ans)))
+  if(!isSchema && length(class(ans)))
     class(ans) = oldClass(class(ans))
 
   if(inherits(ans, "XMLInternalDocument"))
     addDocFinalizer(ans, addFinalizer)
-  else if(!getDTD) {
+  else if(!getDTD && !isSchema) {
        #??? is this a good idea.
      class(ans) = oldClass("XMLDocumentContent")
   } 
@@ -150,6 +150,24 @@ function(file, ignoreBlanks = TRUE, handlers=NULL,
 #  if(missing(useInternalNodes) && as.character(sys.call()[[1]]) == "xmlInternalTreeParse")
 #     useInternalNodes = FALSE
 }
+
+
+setGeneric("getEncoding",
+function(obj, ...)
+{
+  standardGeneric("getEncoding")
+})
+
+setMethod("getEncoding", "XMLInternalDocument",
+            function(obj, ...) {
+              .Call("R_getDocEncoding", obj, PACKAGE = "XML")
+            })
+
+setMethod("getEncoding", "XMLInternalNode",
+            function(obj, ...) {
+              .Call("R_getDocEncoding", obj, PACKAGE = "XML")
+            })
+
 
 
 

@@ -47,7 +47,7 @@ xmlEventParse(file, handlers = xmlEventHandler(),
                  useExpat=FALSE, isURL = FALSE,
                   state = NULL, replaceEntities = TRUE, validate = FALSE,
                    saxVersion = 1, branches = NULL,
-                    useDotNames = length(grep("^\\.", names(handlers))) > 0,
+                    useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
                      error = xmlErrorCumulator())
 }
 \arguments{
@@ -312,7 +312,7 @@ local to it and that the caller knows how to extract this.
 \author{Duncan Temple Lang}
 \note{
  The libxml parser can read URLs via http or ftp.
- It does not require the support of \textbf{wget} as used
+ It does not require the support of \code{wget} as used
  in other parts of \R, but uses its own facilities
  to connect to remote servers.
 

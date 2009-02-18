@@ -492,7 +492,7 @@ function(name, ..., attrs = NULL,
             ns = NULL
           }
           if(!inherits(ns, "XMLNamespaceRef"))
-          ns <- newNamespace(node, ns, "")
+             ns <- newNamespace(node, ns, "")
       } else
          ns <- nsDefs[[i]]
     } else  {
@@ -682,6 +682,9 @@ newXMLNamespace = newNamespace =
   # Create a new namespace reference object.
 function(node, namespace, prefix = names(namespace), set = FALSE)
 {
+   if(is.null(namespace))
+      return(NULL) # XXX
+   
    ns <- .Call("R_xmlNewNs", node, namespace, as.character(prefix), PACKAGE = "XML")
    if(set)
       setXMLNamespace(node, ns)
@@ -965,8 +968,8 @@ function(node, ..., kids = list(...), free = FALSE)
                 i
               })
 
-  x$children = unclass(x)$children[ - w ]
-  x
+  node$children = unclass(node)$children[ - w ]
+  node
 }  
 
 removeChildren.XMLInternalNode =
@@ -1024,7 +1027,7 @@ setMethod('toHTML', 'matrix',
                                row = newXMLNode("tr")
                                if(length(rownames(x)) > 0)
                                  addChildren(row, newXMLNode("th", rownames(x)[i]))
-                               addChildren(row,  .children = sapply(r, function(x) newXMLNode("th", format(x))))
+                               addChildren(row,  .children = sapply(x[i,], function(x) newXMLNode("th", format(x))))
                                row
                              })
               addChildren(tb, rows)
@@ -1060,14 +1063,14 @@ setAs("vector", "XMLInternalNode",
 
 saveXML <-
 function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
+         doctype = NULL, encoding = "", ...)
 {
  UseMethod("saveXML")
 }
 
 saveXML.XMLInternalNode <-
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")  
+         doctype = NULL, encoding = "", ...)  
 {
   if(encoding == "")
     encoding = character()
@@ -1099,7 +1102,7 @@ setAs("XMLInternalNode", "character",
 
 saveXML.XMLInternalDocument <-
 function(doc, file = NULL, compression = 0, indent = TRUE,
-          prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "")
+          prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "", ...)
 {
   if(is(doctype, "Doctype")) {
        # Check that the value in the DOCTYPE for the top-level name is the same as that of the
@@ -1129,7 +1132,7 @@ function(doc, file = NULL, compression = 0, indent = TRUE,
 
 saveXML.XMLInternalDOM <-
 function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
+         doctype = NULL, encoding = "", ...)
 {
   saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)
 }
@@ -1137,7 +1140,7 @@ function(doc, file=NULL, compression=0, indent=TRUE, prefix = '<?xml version="1.
 
 saveXML.XMLOutputStream =
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
+         doctype = NULL, encoding = "", ...)
 {
   saveXML(doc$value(), file, compression, indent, prefix, doctype, encoding)  
 }
@@ -1148,7 +1151,7 @@ saveXML.sink =
 # Need to handle a DTD here as the prefix argument..
 #
 function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml version="1.0"?>\n',
-         doctype = NULL, encoding = "")
+         doctype = NULL, encoding = "", ...)
 {
   if(inherits(file, c("character", "connection"))) {
     sink(file)
@@ -1218,7 +1221,7 @@ function(node, ..., .attrs = NULL, suppressNamespaceWarning = getOption('suppres
    node
 })
 
-if(!isGeneric("xmlAttrs<-"))
+#if(!isGeneric("xmlAttrs<-"))
  setGeneric("xmlAttrs<-", function(node, append = TRUE, suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE), value)
                           standardGeneric("xmlAttrs<-"))
 
@@ -1351,7 +1354,7 @@ function(node, ..., .attrs = NULL, .namespace = FALSE,
 
   i = match(.attrs, names(a))
   if(any(is.na(i)) ) 
-     warning("Can't locate attributes ", paste(.attrs[is.na(i)], collapse = ", "), "in XML node ", x$name)
+     warning("Can't locate attributes ", paste(.attrs[is.na(i)], collapse = ", "), "in XML node ", node$name)
 
   a = a[is.na(i)]
   
@@ -1425,3 +1428,22 @@ function(x, table, nomatch = NA_integer_)
 {
   .Call("R_matchNodesInList", x, table, as.integer(nomatch), PACKAGE = "XML")
 }  
+
+
+setGeneric("xmlClone",
+function(node, recursive = TRUE, addFinalizer = FALSE, ...)
+           standardGeneric("xmlClone"))
+
+setMethod("xmlClone", "XMLInternalDocument",           
+function(node, recursive = TRUE, addFinalizer = TRUE, ...)
+{  
+  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
+  addDocFinalizer(ans, addFinalizer)
+  ans
+})
+
+setMethod("xmlClone", "XMLInternalNode",           
+function(node, recursive = TRUE, addFinalizer = FALSE, ...)
+{  
+  .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
+})

@@ -26,7 +26,7 @@
    and so avoid potentially slow network retrieval. 
    Catalog files are written in XML 
    We might have a catalog file that contains the XML
-   In the IDynDocs package, we  refer to OmegahatXSL files and 
+   In the XDynDocs package, we  refer to OmegahatXSL files and 
     DocBook XSL files have a catalog file of the form 
 
    

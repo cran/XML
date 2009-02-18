@@ -25,7 +25,7 @@ xmlName(node, full = FALSE)
 }
 
 \value{
- A character vector of length \textit{1}
+ A character vector of length 1
  which is the \code{node$name} entry.
 }
 \references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},

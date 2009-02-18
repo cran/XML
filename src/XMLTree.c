@@ -421,7 +421,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
         ERROR;
     }
 
-    if(n->parent == p) {
+    if(n->parent == p || n->parent) {
 	xmlUnlinkNode(n);
     } 
 
@@ -434,7 +434,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
       n->doc = p->doc;
     }
 
-
+    
     switch(p->type) {
     case XML_ELEMENT_NODE:
     case XML_DOCUMENT_NODE:	
@@ -672,7 +672,7 @@ R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 
 
 USER_OBJECT_
-RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive)
+RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer)
 {
     if(TYPEOF(obj) != EXTPTRSXP) {
 	PROBLEM  "clone can only be applied to an internal, C-level libxml2 object"

@@ -143,7 +143,7 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
  seen in that wider context. 
 }
 \references{
- \url{http://www.xmlsoft.org}{libxml2}
+libxml2 \url{http://www.xmlsoft.org}
 }
 \author{Duncan Temple Lang}
 %\note{}

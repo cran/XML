@@ -174,7 +174,7 @@ static R_CallMethodDef callMethods[] = {
         ENTRY(RS_XML_setDoc, 2),
         ENTRY(RS_XML_printXMLNode, 5),
         ENTRY(RS_XML_removeChildren, 3),
-        ENTRY(RS_XML_clone, 2),
+        ENTRY(RS_XML_clone, 3),
         ENTRY(RS_XML_addNodeAttributes, 2),
         ENTRY(RS_XML_removeNodeAttributes, 3),
         ENTRY(RS_XML_getNsList, 2),
@@ -193,6 +193,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_catalogDump, 1),
 	ENTRY(RS_XML_setDocumentName, 2),
 	ENTRY(RS_XML_setKeepBlanksDefault, 1),
+	ENTRY(R_getDocEncoding, 1),
 	{NULL, NULL, 0}
 };
 

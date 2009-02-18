@@ -14,7 +14,7 @@ if(FALSE) {
 if(FALSE) {
    # Process the XSL files in IDynDocs, OmegahatXSL and docbook-xsl
  h = xmlElementSummaryHandlers()
- dir = "~/Classes/StatComputing/IDynDocs/inst/XSL"
+ dir = "~/Classes/StatComputing/XDynDocs/inst/XSL"
  invisible(
   lapply(c("", "OmegahatXSL", "docbook-xsl-1.73.2/html", "docbook-xsl-1.73.2/fo"),
         function(sub) {

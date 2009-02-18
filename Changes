@@ -1,3 +1,9 @@
+Version 1.99-1
+  
+  *   addChildren() unconditionally unlinks nodes that already have a parent.
+
+  *   Typo bug in removeChildren.XMLNode code found and fixed by Kate Mullen.
+
 Version 1.99-0
 
   *   Added recursive parameter to xmlValue() function to control whether to work on just the 

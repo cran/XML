@@ -111,7 +111,7 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
     \code{ftp:/},
     then we take this single element to be a namespace definition and
     the since it has no name b), this is the definition for the default namespace for this
-    new node, i.e. corresponding to \code{xmlns='http:/...}.
+    new node, i.e. corresponding to \code{xmlns='http:/...'}.
     It is cumbersome to specify \code{""} as a  name for an element in a
     character vector (as \code{c('' = 'value') gives an unnecessary
       error!}.

@@ -227,7 +227,9 @@ function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = e
          namespaces = c(r = "http://www.r-project.org"), print = echo, ask = FALSE, eval = TRUE)
 {
             #XXX check all ancestors. Ideally exclude them in the XPath query
-   if(xmlName(xmlParent(node)) == "ignore")
+   if(xmlName(xmlParent(node)) == "ignore" ||
+          length(getNodeSet(node, "./ancestor::section[@r:eval='false']|./ancestor::para[@r:eval='false']",
+                              c(r = "http://www.r-project.org"))) > 0)
      return(FALSE)
 
    tmp = xmlGetAttr(node, "id", NA)
@@ -303,3 +305,91 @@ function(node, namespaces = c(r = "http://www.r-project.org"))
  })
 }
 
+
+
+setClass("XMLCodeFile", contains = "character")
+setClass("XMLCodeDoc", contains = "XMLInternalDocument")
+setAs("XMLCodeFile", "XMLCodeDoc",
+        function(from) {
+           new("XMLCodeDoc", xmlParse(from))
+        })
+
+setAs("character", "XMLCodeFile",
+        function(from) {
+           xmlCodeFile(from)
+        })
+
+setAs("character", "XMLCodeDoc",
+        function(from) {
+           xmlCodeFile(from, TRUE)
+        })
+
+xmlCodeFile =
+function(f, parse = FALSE)
+{
+  if(parse)
+     new("XMLCodeDoc", xmlParse(f))
+  else
+     new("XMLCodeFile", f)
+}
+
+setMethod("source", "XMLCodeFile",
+function (file, local = FALSE, echo = verbose, print.eval = echo, 
+    verbose = getOption("verbose"), prompt.echo = getOption("prompt"), 
+    max.deparse.length = 150, chdir = FALSE, encoding = getOption("encoding"), 
+    continue.echo = getOption("continue"), skip.echo = 0, keep.source = getOption("keep.source"))
+   {
+      if(length(verbose) == 0)
+        verbose = FALSE
+      
+      if(chdir) {
+        cwd = getwd()
+        on.exit(setwd(cwd))
+        setwd(dirname(file))
+      }
+
+      xmlSource(file, verbose = verbose)
+   })
+
+setMethod("[[", "XMLCodeFile",
+          function(x, i, j, ...,  env = globalenv()) {
+            doc = as(x, "XMLCodeDoc")
+            n = getNodeSet(doc, paste("//*[@id=", sQuote(i), "]"))
+            if(length(n) == 0) {
+              # This needs code from ptoc to determine the name of an "element"
+             doc = updateIds(doc, save = x)
+            }
+
+            eval(parse(text = xmlValue(n[[1]])), env = env)
+          })
+
+
+updateIds =
+function(doc)
+{
+   nodes = getNodeSet(doc,
+                      "//r:function[not(@id) and not(@eval = 'false')]|//r:code[not(@id) and not(@eval = 'false')]",
+                        c("r" = "http://www.r-project.org"))
+   sapply(nodes, getCodeVar)
+}
+
+getCodeVar =
+function(node)
+{
+     e = parse(text = XML:::getRCode(node))
+     e = e[[length(e)]]
+     # This should use the code in ptoc in RTools.
+     id = if(class(e) %in% c("=", "<-"))
+             as.character(e[[2]])
+          else
+             NA
+
+     if(!is.na(id))
+        addAttributes(node, id = id)
+     id
+}
+
+#
+# f = xmlCodeFile("~/Classes/stat242-08/Code/FormulaWeights/rpartScope.xml")
+# source(f)
+# f[["rpart.model"]]

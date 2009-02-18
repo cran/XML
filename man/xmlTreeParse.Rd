@@ -38,7 +38,7 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
              useInternalNodes = FALSE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
              xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
 
 xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
@@ -46,7 +46,7 @@ xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FAL
              isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
              useInternalNodes = TRUE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
              xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
 
 xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
@@ -54,14 +54,14 @@ xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE
              isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
              useInternalNodes = TRUE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) > 0,
+             useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
              xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
 
 htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               replaceEntities = FALSE, asText = FALSE, trim = TRUE,
               isURL = FALSE, asTree = FALSE, 
               useInternalNodes = FALSE, encoding = character(),
-              useDotNames = length(grep("^\\.", names(handlers))) > 0,
+              useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
               xinclude = FALSE, addFinalizer = TRUE, 
               error = xmlErrorCumulator()) 
 
@@ -255,15 +255,15 @@ so should have a default value (\code{NULL}).
 
 The \code{namespace} function is called with a single argument which
 is an object of class \code{XMLNameSpace}.  This contains
-\begin{description} 
-\item[id] the namespace identifier as used to
-qualify tag names; 
-\item[uri] the value of the namespace identifier,
+\describe{ 
+\item{id}{the namespace identifier as used to
+qualify tag names;} 
+\item{uri}{the value of the namespace identifier,
 i.e. the URI
- identifying the namespace.
-\item[local] a logical value indicating whether the definition
-is local to the document being parsed.
-\end{description}
+ identifying the namespace.}
+\item{local}{a logical value indicating whether the definition
+is local to the document being parsed.}
+}
 
 One should note that the \code{namespace} handler is called before the
 node in which the namespace definition occurs and its children are
@@ -297,12 +297,14 @@ contents.
  A list of the XML nodes at the top of the document.
  Each of these is of class \code{XMLNode}.
  These are made up of 4 fields.
+  \itemize{
    \item{\code{name}}{The name of the element.}
    \item{\code{attributes}}{For regular elements, a named list
      of XML attributes converted from the 
        <tag x="1" y="abc">}
    \item{\code{children}}{List of sub-nodes.}
    \item{\code{value}}{Used only for text entries.}
+  }
  Some nodes specializations of \code{XMLNode}, such as 
  \code{XMLComment}, \code{XMLProcessingInstruction},
  \code{XMLEntityRef} are used.

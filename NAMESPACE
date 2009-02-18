@@ -375,3 +375,15 @@ exportClass("XMLNamespaceDefinitions")
 export('xmlValue<-')
 exportMethods('xmlValue<-')
 
+
+export(getEncoding)
+exportMethods(getEncoding)
+
+exportClass("XMLCodeFile")
+exportClass("XMLCodeDoc")
+exportMethods("[[")
+export(xmlCodeFile)
+exportMethods(source)
+
+
+export(xmlClone)

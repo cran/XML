@@ -1407,3 +1407,25 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
   return(ans);
 }
 
+
+
+SEXP
+R_getDocEncoding(SEXP r_doc)
+{
+    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
+    xmlNodePtr node;
+    const xmlChar *encoding;
+    SEXP ans;
+
+    if(doc->type != XML_DOCUMENT_NODE)
+	doc = ((xmlNodePtr) doc)->doc;
+    if(!doc)
+	return(NEW_CHARACTER(0));
+
+    encoding = doc->encoding;
+    PROTECT(ans = NEW_CHARACTER(1));
+    SET_STRING_ELT(ans, 0, CreateCharSexpWithEncoding(doc->encoding, doc->encoding));
+    UNPROTECT(1);
+
+    return(ans);
+}

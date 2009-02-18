@@ -39,7 +39,7 @@ Class \code{\linkS4class{oldClass}}, directly.
   an XPath expression.
 }
 \references{
- \url{http://www.w3.org/TR/xpath}{XPath}
+ XPath  \url{http://www.w3.org/TR/xpath}
 }
 \seealso{
 
