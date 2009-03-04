@@ -120,17 +120,22 @@ function(node, addNamespace = FALSE, ...)
 
 
 xmlChildren.XMLInternalNode =
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"), ...)
 {
- .Call("RS_XML_xmlNodeChildrenReferences", x, as.logical(addNames), PACKAGE = "XML")
+  kids = .Call("RS_XML_xmlNodeChildrenReferences", x, as.logical(addNames), PACKAGE = "XML")
+  
+if(length(omitNodeTypes))
+    kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]   
+
+  kids
 }
 
 
 xmlChildren.XMLInternalDocument =
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, ...)
 {
 # .Call("RS_XML_xmlDocumentChildren", x, as.logical(addNames), PACKAGE = "XML")
- xmlChildren.XMLInternalNode(x, addNames)
+ xmlChildren.XMLInternalNode(x, addNames, ...)
 }
 
 
@@ -148,6 +153,10 @@ function(obj)
 "[[.XMLInternalNode" <-
 function(x, i, j, ...)
 {
+  if(inherits(i, "formula")) {
+    return(getNodeSet(x, i, if(missing(j)) character() else j)[[1]])
+  }
+  
   kids = xmlChildren(x)
   if(length(kids) == 0)
     return(NULL)
@@ -235,16 +244,20 @@ function(x)
   xmlSApply(x, xmlName)
 
 xmlApply.XMLInternalNode =
-function(X, FUN, ...)
+function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"))
 {
    kids = xmlChildren(X)
+   if(length(omitNodeTypes))
+     kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]   
    lapply(kids, FUN, ...)
 }  
 
 xmlSApply.XMLInternalNode =
-function(X, FUN, ...)
+function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"))
 {
    kids = xmlChildren(X)
+   if(length(omitNodeTypes))
+     kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]
    sapply(kids, FUN, ...)
 }  
 
@@ -1100,6 +1113,9 @@ function(x, ...)
 setAs("XMLInternalNode", "character",
           function(from) saveXML.XMLInternalNode(from))
 
+setAs("XMLInternalTextNode", "character",
+          function(from) xmlValue(from))
+
 saveXML.XMLInternalDocument <-
 function(doc, file = NULL, compression = 0, indent = TRUE,
           prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "", ...)
@@ -1447,3 +1463,79 @@ function(node, recursive = TRUE, addFinalizer = FALSE, ...)
 {  
   .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
 })
+
+
+
+
+findXInclude =
+function(x, asNode = FALSE)
+{
+  while(!is.null(x)) {
+    tmp = getSiblingXIncludeStart(x, asNode)
+    if(!is.null(tmp))
+      return(tmp)
+
+     sib = x
+     if(is(sib, "XMLXIncludeStartNode"))
+        return(if(asNode) sib else xmlAttrs(sib))
+
+     x = xmlParent(x)
+  }
+
+  NULL
+}
+
+getSiblingXIncludeStart =
+function(x, asNode = FALSE)
+{
+     sib = x
+     while(!is.null(sib)) {
+       if(inherits(sib, "XMLXIncludeStartNode"))
+         return(if(asNode) sib else xmlAttrs(sib))         
+       sib <- getSibling(sib, FALSE)
+     }
+
+     NULL
+}
+
+
+getLineNumber =
+function(node, ...)
+{
+  if(!is(node, "XMLInternalNode"))
+      stop("This must be an C-level/native/internal XML node, i.e. of class 'XMLInternalNode'. Got ", paste(class(node), collapse = ", "))
+
+  .Call("R_getLineNumber", node, PACKAGE = "XML")
+}
+  
+
+
+
+
+ensureNamespace =
+  #
+  # Idea is to make certain that the root node has definitions for the specified
+  # namespaces.  The caller specifies the named vector of interest.
+  # If the URL already exists, we return the corresponding prefix.
+  # 
+  #
+  #  Returns the prefixes in the documents that correspond to the
+  #  namespace definitions
+  #
+function(doc, what)
+{
+  if(is(doc, "XMLInternalDocument"))
+     node = xmlRoot(doc)
+  else
+     node = doc
+  
+  defs = xmlNamespaceDefinitions(xmlRoot(doc), simplify = TRUE)
+  i = match(what, defs)
+  w = is.na(i)
+
+  if(any(w)) {
+     sapply(names(what)[w], function(id) newXMLNamespace(node, what[id], id))
+     names(what)[w]
+  } else
+     names(defs)[i]
+}

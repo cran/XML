@@ -86,7 +86,7 @@ objects.
  parseDTD(dtdFile)
 
 txt <- readLines(dtdFile)
-txt <- paste(txt, "\n", collapse="")
+txt <- paste(txt,  collapse="\n")
 d <- parseDTD(txt, asText=TRUE)
 
 

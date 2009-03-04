@@ -13,6 +13,9 @@ getRelativeURL =
   #
 function(u, baseURL, sep = "/")  
 {
+   if(length(u) > 1)
+     return(sapply(u, getRelativeURL, baseURL, sep))
+   
    pu = parseURI(u)
    if(pu$scheme == "" && length(grep("^/", pu$path)) == 0)
       paste(gsub(paste(sep, "$", sep = ""), "", baseURL), u, sep = sep)

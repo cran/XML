@@ -232,7 +232,7 @@ xmlChildren.XMLHashTreeNode =
   # in the .children hash table and then the resulting entry is a character
   # vector giving the ids of the child nodes of obj. So we have to resolve those
   # children id's back in the hash table for the actual nodes.
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, ...)
 {
   e = x$env
   kids = get(".children", e)

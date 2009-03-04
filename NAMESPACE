@@ -387,3 +387,9 @@ exportMethods(source)
 
 
 export(xmlClone)
+export(findXInclude)
+
+export(getLineNumber)
+
+export(ensureNamespace)
+

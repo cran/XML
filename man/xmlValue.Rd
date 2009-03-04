@@ -9,6 +9,7 @@
 \alias{xmlValue<-,XMLAbstractNode-method}
 \alias{xmlValue<-,XMLInternalTextNode-method}
 \alias{xmlValue<-,XMLTextNode-method}
+\alias{coerce,XMLInternalTextNode,character-method}
 \title{Extract or set the contents of a leaf XML node}
 \description{
   Some types of XML nodes have no children nodes, but are leaf nodes and

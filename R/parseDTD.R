@@ -13,7 +13,7 @@ function(extId, asText = FALSE, name = "", isURL = FALSE, error = xmlErrorCumula
   on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
 
   if(asText) {
-    f = tempfile()
+    f <- gsub("\\", "/", tempfile(), fixed=TRUE)    
     cat(extId, "\n", file = f)
     extId = f
     asText = FALSE

@@ -218,7 +218,8 @@ RS_XML_xmlCreateConnectionParserCtxt(USER_OBJECT_ con)
 #ifdef LIBXML2
       ctx = xmlNewParserCtxt();
       ctx->_private = (USER_OBJECT_) con;
-      buf = (xmlParserInputBufferPtr) R_chk_calloc(1, sizeof(xmlParserInputBuffer));
+                                      /* R_chk_calloc */
+      buf = (xmlParserInputBufferPtr) calloc(1, sizeof(xmlParserInputBuffer));
       buf->readcallback = RS_XML_readConnectionInput;
       buf->context = (void*) ctx;
       buf->buffer = xmlBufferCreate();

@@ -1429,3 +1429,17 @@ R_getDocEncoding(SEXP r_doc)
 
     return(ans);
 }
+
+
+
+SEXP
+R_getLineNumber(SEXP r_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+
+    if(!node) {
+	return(NEW_INTEGER(0));
+    }
+
+    return(ScalarInteger(node->line));
+}

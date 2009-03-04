@@ -333,11 +333,13 @@ function(f, parse = FALSE)
      new("XMLCodeFile", f)
 }
 
-setMethod("source", "XMLCodeFile",
+
+tmp.source =
 function (file, local = FALSE, echo = verbose, print.eval = echo, 
     verbose = getOption("verbose"), prompt.echo = getOption("prompt"), 
     max.deparse.length = 150, chdir = FALSE, encoding = getOption("encoding"), 
-    continue.echo = getOption("continue"), skip.echo = 0, keep.source = getOption("keep.source"))
+    continue.echo = getOption("continue"), skip.echo = 0, 
+    keep.source = getOption("keep.source"))
    {
       if(length(verbose) == 0)
         verbose = FALSE
@@ -349,7 +351,15 @@ function (file, local = FALSE, echo = verbose, print.eval = echo,
       }
 
       xmlSource(file, verbose = verbose)
-   })
+   }
+
+if(compareVersion(as.character(getRversion()), "2.8.0") < 0) {
+ cat("Fixing source definition\n")
+ formals(tmp.source) =  formals(tmp.source)[ - length(formals(tmp.source)) ]
+}
+
+setMethod("source", "XMLCodeFile", tmp.source)
+
 
 setMethod("[[", "XMLCodeFile",
           function(x, i, j, ...,  env = globalenv()) {
@@ -362,7 +372,6 @@ setMethod("[[", "XMLCodeFile",
 
             eval(parse(text = xmlValue(n[[1]])), env = env)
           })
-
 
 updateIds =
 function(doc)

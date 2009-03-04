@@ -22,7 +22,7 @@
   being present..
 }
 \usage{
-xmlChildren(x, addNames= TRUE)
+xmlChildren(x, addNames= TRUE, ...)
 }
 \arguments{
   \item{x}{an object of class XMLNode.}
@@ -30,15 +30,16 @@ xmlChildren(x, addNames= TRUE)
   names of the nodes as names of the R list.
   This is only relevant for XMLInternalNode objects as XMLNode objects
   in R already have R-level names.
-  }
-
+}
+  \item{\dots}{additional arguments for the particular methods,
+                e.g. \code{omitTypes} for an XMLInternalNode.}
 }
 \value{
  A list whose elements are sub-nodes of the user-specified
 XMLNode. These are also of class XMLNode.
 }
 \references{\url{http://www.w3.org/XML}}
-\author{ Duncan Temple Lang }
+\author{Duncan Temple Lang}
 
 \seealso{
 \code{\link{xmlChildren}},\code{\link{xmlSize}},

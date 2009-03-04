@@ -142,7 +142,7 @@ setOldClass("XMLNamespace")
 
 
 xmlChildren <-
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, ...)
 {
  UseMethod("xmlChildren")
 }
@@ -153,14 +153,14 @@ xmlChildren.XMLNode <-
 # Retrieve the list of children (sub-nodes) within
 # an XMLNode object.
 #
-function(x, addNames = TRUE)
+function(x, addNames = TRUE, ...)
 {
   x$children
 }
 
 
 if(useS4) {
-setGeneric("xmlChildren", function(x, addNames = TRUE) standardGeneric("xmlChildren"))
+setGeneric("xmlChildren", function(x, addNames = TRUE, ...) standardGeneric("xmlChildren"))
 setMethod("xmlChildren", "XMLNode", xmlChildren.XMLNode)
 }
 
@@ -684,7 +684,6 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 
   ans
 }
-
 
 xmlDoc =
 function(node, addFinalizer = FALSE)

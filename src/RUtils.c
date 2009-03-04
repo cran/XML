@@ -194,6 +194,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_setDocumentName, 2),
 	ENTRY(RS_XML_setKeepBlanksDefault, 1),
 	ENTRY(R_getDocEncoding, 1),
+	ENTRY(R_getLineNumber, 1),
 	{NULL, NULL, 0}
 };
 
@@ -262,8 +263,13 @@ RS_XML_setStructuredErrorHandler(SEXP els)
 	ctx = NULL;
     else if(TYPEOF(fun) == EXTPTRSXP)
         ctx = R_ExternalPtrAddr(fun);
-    else
-	ctx = fun;
+    else {
+	ctx = fun = Rf_duplicate(fun); /* Should R_PreserveObject and
+				  * ReleaseObject() but then we have
+                                    to be able "remember" if it is an
+				    R function or not.*/
+	R_PreserveObject(fun);
+     }
 
 
     handler = (sym == R_NilValue) ? NULL : (xmlStructuredErrorFunc) R_ExternalPtrAddr(sym);

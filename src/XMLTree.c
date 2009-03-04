@@ -461,6 +461,16 @@ RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_af
     
     xmlNodePtr (*f)(xmlNodePtr, xmlNodePtr);
 
+    if(TYPEOF(r_to) != EXTPTRSXP) {
+       PROBLEM "RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the parent node"
+       ERROR;
+    }
+
+    if(TYPEOF(r_node) != EXTPTRSXP) {
+       PROBLEM "RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the node to add"
+       ERROR;
+    }
+
     p = (xmlNodePtr) R_ExternalPtrAddr(r_to);
     n = (xmlNodePtr) R_ExternalPtrAddr(r_node);
 

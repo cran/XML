@@ -17,8 +17,10 @@ if test -z "$LIB_ICONV" ; then
   exit 1
 fi
 
-mkdir $DPKG/libs
+mkdir $R_PACKAGE_DIR/libs
 # These were in $LIB_ZLIB/lib/ and $LIB_XML/lib
-cp $LIB_ZLIB/bin/zlib1.dll $DPKG/libs
-cp $LIB_XML/bin/libxml2.dll $DPKG/libs
+cp $LIB_ZLIB/bin/zlib1.dll $R_PACKAGE_DIR/libs
+cp $LIB_XML/bin/libxml2.dll $R_PACKAGE_DIR/libs
+
+echo "supportsExpat <- function() FALSE\n\nsupportsLibxml() <- TRUE" > R/supports.R
 

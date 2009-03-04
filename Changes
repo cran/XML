@@ -1,3 +1,26 @@
+Version 2.3-0
+
+  *   Added getLineNumber() to be able to determine the line number of an XML node within 
+      its original document.
+
+  *   xmlApply() and xmlSApply() have a parameter to ignore the XInclude start and end nodes.
+
+  *   xmlChildren() also have an omitNodeTypes parameter and by default exclude XInclude nodes.
+
+  *   Added ensureNamespace() to add a namespace definition(s) if necessary.
+
+Version 2.2-1
+
+  *   source() method equivalent to xmlSource() and appropriate installation 
+      changes for older versions of R ( < 2.8.0).
+
+Version 2.2-0
+  *   Added xmlClone() and findXInclude() functions.
+
+  *   [Important] Bug fix regarding the error handling function for XML and HTML parsing.
+      Uncovered by Roger Koenker.   This manifested itself in R errors of the form
+      "attempt to apply non-function".
+
 Version 1.99-1
   
   *   addChildren() unconditionally unlinks nodes that already have a parent.

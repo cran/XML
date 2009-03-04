@@ -155,6 +155,8 @@ void R_xmlStructuredErrorHandler(void *data, xmlErrorPtr err);
 
 
 SEXP R_getDocEncoding(SEXP r_doc);
+SEXP R_getLineNumber(SEXP r_node);
+
 
 extern int R_numXMLDocs, R_numXMLDocsFreed;
 
