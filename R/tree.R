@@ -103,10 +103,12 @@ function(x, addNames = TRUE, ...)
   kids = get(".children", e)
   nodes = get(".nodes", e)
 
-  if(x$id %in% names(kids))
-    nodes[ kids[[ x$id ]] ]
-  else
-    list()
+  ans = if(x$id %in% names(kids))
+            nodes[ kids[[ x$id ]] ]
+        else
+            list()
+
+  structure(ans, class = "XMLNodeList")
 }  
 
 if(useS4)
@@ -142,3 +144,12 @@ function(node, addAttributes = TRUE)
 }
 
 
+indexOfNode =
+  #XXX Do this for hash trees.
+function(x)
+{
+  if(!inherits(x, "XMLInternalNode"))
+    stop("must be an internal node")
+  
+  .Call("R_XML_indexOfChild", x, PACKAGE = "XML")
+}

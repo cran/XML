@@ -35,10 +35,10 @@ R_xmlCatalogResolve(USER_OBJECT_ r_id, USER_OBJECT_ type, USER_OBJECT_ debug)
        }
 
        if(ans) {
-        SET_STRING_ELT(r_ans, i, mkChar(XMLCHAR_TO_CHAR(ans)));
-	xmlFree(ans);
+          SET_STRING_ELT(r_ans, i, mkChar(XMLCHAR_TO_CHAR(ans)));
+   	  xmlFree(ans);
        } else {
-	 SET_STRING_ELT(r_ans, i, NA_STRING);
+ 	 SET_STRING_ELT(r_ans, i, NA_STRING);
        }
     }
 

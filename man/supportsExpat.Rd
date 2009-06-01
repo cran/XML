@@ -38,6 +38,6 @@ has been linked into the package.
 \examples{
      # use Expat if possible, otherwise libxml
   fileName <- system.file("exampleData", "mtcars.xml", package="XML")
-  xmlEventParse(fileName, useExpat = supportsLibxml())
+  xmlEventParse(fileName, useExpat = supportsExpat())
 }
 \keyword{file}

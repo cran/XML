@@ -46,6 +46,9 @@
 # define XML_ROOT(n) (n)->xmlRootNode
 #endif
 
+void incrementDocRef(xmlDocPtr doc);
+
+
 /**
  Create a libxml comment node and return it as an S object
  referencing this value.
@@ -109,9 +112,6 @@ R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
 {
   xmlDocPtr  doc = NULL;
   xmlNodePtr node;
-
-  if(GET_LENGTH(sdoc))
-    doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
 
   node = xmlNewPI(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(content, 0))));
   return(R_createXMLNodeRef(node));
@@ -215,6 +215,106 @@ RS_XML_setNodeName(USER_OBJECT_ s_node, USER_OBJECT_ s_name)
     xmlNodeSetName(node, name);
 
     return(NULL_USER_OBJECT);
+}
+
+#if 0
+int
+removeNodeNamespace(xmlNodePtr node, xmlNsPtr p)
+{
+    if(!p) 
+	return(0);
+
+    if(!node->prev)
+	node->ns = p->next;
+    else
+	p->v->next = p->next;
+
+    return(1);
+}
+#endif
+
+int
+removeNodeNamespaceByName(xmlNodePtr node, const char * const id)
+{
+    xmlNsPtr p, prev;
+
+    if(!node->nsDef)
+	return(0);
+    prev = node->nsDef;
+    p = node->nsDef;
+    if(!(id[0] && !p->prefix) || (p->prefix && strcmp(p->prefix, id) ==  0)) {
+                /*XXX Free or not */
+        if(node->ns == p)
+	    node->ns = NULL;
+	node->nsDef = p->next;
+	return(1);
+    }
+
+    while(1) {
+	if((!id[0] && !p->prefix) || (p->prefix && strcmp(p->prefix, id) == 0)) {
+	    prev->next = p->next;
+	    if(node->ns == p)
+		node->ns = NULL;
+	    return(1);
+	}
+	prev = p;
+	p = p->next;
+    }
+
+    return(0);
+}
+
+SEXP 
+RS_XML_removeAllNodeNamespaces(SEXP s_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    xmlNsPtr p, tmp;
+    int n = 0;
+
+    if(!node)
+	return(ScalarLogical(FALSE));	
+
+    p = node->nsDef;
+    while(p) {
+	if(node->ns == p) {
+	    node->ns = NULL;
+	}
+	tmp = p;
+	p = p->next;
+	if(0 && tmp->type)
+	   xmlFreeNs(tmp); 
+	n++;
+    }
+    node->nsDef = NULL;
+
+    return(ScalarInteger(n));
+}
+
+SEXP 
+RS_XML_removeNodeNamespaces(SEXP s_node, SEXP r_ns)
+{
+    int i, n;
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    xmlNsPtr p;
+    SEXP el, ans;
+    const char *prefix;
+    int t = TYPEOF(r_ns);
+    n = Rf_length(r_ns);
+    PROTECT(ans = allocVector(LGLSXP, n));
+
+    for(i = 0; i < n; i++) {
+	el = VECTOR_ELT(r_ns, i);
+	if(TYPEOF(el) == STRSXP) {
+	   prefix = CHAR(STRING_ELT(el, 0));
+	    LOGICAL(ans)[i] = removeNodeNamespaceByName(node, prefix);
+	} else if(TYPEOF(el) == EXTPTRSXP) {
+	    xmlNsPtr p = (xmlNsPtr) R_ExternalPtrAddr(el);
+	    LOGICAL(ans)[i] = removeNodeNamespaceByName(node, p->prefix);
+	}
+    }
+
+    UNPROTECT(1);
+    return(ans);
 }
 
 
@@ -383,7 +483,7 @@ R_isNodeChildOfAt(SEXP rkid, SEXP rnode, SEXP rat)
 USER_OBJECT_
 R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OBJECT_ shallow)
 {
-    xmlNodePtr n, p;
+    xmlNodePtr n, p, check, tmp = NULL;
     
     if(TYPEOF(parent) != EXTPTRSXP) {
        PROBLEM "R_insertXMLNode expects XMLInternalNode objects for the parent node"
@@ -406,6 +506,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
   	    n = xmlNewText(CHAR(STRING_ELT(node, i)));
    	    xmlAddChild(p, n);
 	}
+	return(NULL_USER_OBJECT);
     }
 
     if(TYPEOF(node) != EXTPTRSXP) {
@@ -435,10 +536,27 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
     }
 
     
+    
     switch(p->type) {
     case XML_ELEMENT_NODE:
+	/* Need to be careful that if n is a text node, it could be
+	 * absorbed into its nearest sibling and then freed. So we
+           take a copy of the text node*/
+	if(n->type == XML_TEXT_NODE) {
+	    tmp = xmlNewText(n->content);
+	    /* tmp = xmlCopyNode(n, 1); */
+	} else 
+	    tmp = n;
+	check = xmlAddChild(p, tmp);
+#if 0
+/* XXXX */
+	if(n->type == XML_TEXT_NODE && check != tmp)
+	    xmlFreeNode(tmp);
+#endif
+	break;
     case XML_DOCUMENT_NODE:	
-	xmlAddChild(p, n);
+	check = xmlAddChild(p, n);
+	incrementDocRef((xmlDocPtr) p);
 	break;
     case XML_PI_NODE:
 	xmlAddSibling(p, n);
@@ -451,6 +569,19 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
        }
 	break;
     }
+
+#if 0
+    /* This is where we handle the case where n being a text node may
+     * have been freed by xmlAddChild. */
+    if(check != n) {
+	fprintf(stderr, "xmlAddChild() may have freed the node\n");fflush(stderr);
+	R_ClearExternalPtr(node);
+    }
+#endif
+
+
+    /* ??? internal_incrementNodeRefCount(n); */
+
     return(NULL_USER_OBJECT);     
 }
 
@@ -699,7 +830,7 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 	node = (xmlNodePtr) R_ExternalPtrAddr(obj);
 	node_ans = xmlCopyNode(node, INTEGER(recursive)[0]);
 	return(R_createXMLNodeRef(node_ans));
-    } else if(R_isInstanceOf(obj, "XMLInternalDOM")) {
+    } else if(R_isInstanceOf(obj, "XMLInternalDocument") || R_isInstanceOf(obj, "XMLInternalDOM")) {
 	xmlDocPtr doc;
 	doc = (xmlDocPtr) R_ExternalPtrAddr(obj);
 	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0])));
@@ -715,6 +846,21 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 xmlDocPtr currentDoc;
 #endif
 
+void
+incrementDocRef(xmlDocPtr doc)
+{
+    int *val;
+    if(!doc)
+	return;
+
+    if(!doc->_private)
+	doc->_private = calloc(1, sizeof(int));
+
+    val = (int *) doc->_private;
+
+    (*val)++;
+}
+
 USER_OBJECT_
 R_createXMLDocRef(xmlDocPtr doc)
 {
@@ -724,6 +870,11 @@ R_createXMLDocRef(xmlDocPtr doc)
   currentDoc = doc;
 #endif
 
+  incrementDocRef(doc);
+
+#ifdef R_XML_DEBUG
+  fprintf(stderr, "creating document reference %s %p\n", doc->name ? doc->name : "internally created", doc);
+#endif
 
   PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
@@ -733,6 +884,14 @@ R_createXMLDocRef(xmlDocPtr doc)
   return(ref);
 }
 
+USER_OBJECT_
+R_removeXMLNsRef(xmlNsPtr ns)
+{
+/*XXX    xmlNsPtr p = (xmlNsPtr) R_ExternalPtrAddr(); */
+    PROBLEM "C routine R_removeXMLNsRef() not implemented yet" 
+    ERROR;
+    return(R_NilValue);
+}
 
 USER_OBJECT_
 R_createXMLNsRef(xmlNsPtr ns)
@@ -746,6 +905,29 @@ R_createXMLNsRef(xmlNsPtr ns)
   UNPROTECT(2);
   return(ref);
 }
+
+USER_OBJECT_
+R_convertXMLNsRef(SEXP r_ns)
+{
+  SEXP ref, ans;
+  xmlNsPtr ns;
+
+  if(TYPEOF(r_ns) != EXTPTRSXP) {
+      PROBLEM "wrong type for namespace reference"
+	  ERROR;
+  }
+
+  ns = (xmlNsPtr) R_ExternalPtrAddr(r_ns);
+
+  PROTECT(ans =  mkString(ns->href));
+  SET_NAMES(ans, mkString(ns->prefix ? ns->prefix : ""));
+
+  UNPROTECT(1);
+
+  return(ans);
+}
+
+
 
 
 const char * 
@@ -812,6 +994,134 @@ R_getInternalNodeClass(xmlElementType type)
     return(p);
 }
 
+void
+internal_incrementNodeRefCount(xmlNodePtr node)
+{
+    int *val;
+    if(!node || !node->_private)
+	return;
+    val = (int *) node->_private;
+    (*val)++;
+}
+
+SEXP
+R_getXMLRefCount(SEXP rnode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(rnode);
+    if(!node || !node->_private)
+	return(R_NilValue);
+    return(ScalarInteger(*((int *) node->_private)));
+}
+
+int
+checkDescendantsInR(xmlNodePtr node)
+{
+    xmlNodePtr p;
+    if(!node)
+	return(0);
+
+    if(node->_private)
+	return(1);
+
+    p = node->children;
+    while(p) {
+	if(checkDescendantsInR(p))
+	    return(1);
+	p = p->next;
+    }
+    return(0);
+}
+
+void
+internal_decrementNodeRefCount(xmlNodePtr node)
+{
+    int *val;
+       /* */    
+    if(!node || !node->_private) /* if node->_private == NULL, should
+				  * we free this node?, i.e. if it is
+				  * not in a parent or a document.
+                                  No! Basically we shouldn't get here
+                                  if we have not set the _private. We
+                                  set the finalizer having set the _private */
+	return;
+
+
+    /*  Get the value of the reference count and decrement it by 1.
+        If we are now at 0, then we can potentially free this node.
+        Certainly, if we are at 0, we should remove the reference
+        count memory altogether.
+        Now that _we_ no longer need the node, perhaps we can free it.
+        But we have to make certain that we don't free it if
+         a) it is a child of another node or 
+         b) if it is within a document and that document is still "in  play".
+              To determine if the document is "in play" we look at it's
+              reference count. 
+              We decrement it by one since we added one to it for this
+              node.
+              If that makes the document's reference count 0, then we
+              free it.
+      
+     */
+    val = (int *) node->_private;
+    (*val)--;
+#ifdef R_XML_DEBUG
+    fprintf(stderr, "decremented node (%s, %d) to %d  (%p)\n", node->name, node->type, *val, node);fflush(stderr);
+#endif
+    if(*val == 0) {
+	free(node->_private);
+        node->_private = NULL;
+	if(node->doc) {
+	    val = node->doc->_private;
+	    if(val) (*val)--;
+	    if(!val || *val == 0) {
+		/* Consolidate with R_xmlFreeDoc */
+#ifdef R_XML_DEBUG
+		fprintf(stderr, "releasing document %p\n", node->doc);fflush(stderr);
+#endif
+		if(val) free(node->doc->_private);
+		node->doc->_private = NULL;
+		xmlFreeDoc(node->doc);
+		R_numXMLDocsFreed++;
+	    }
+	} else if(!node->parent) {
+            int hold;
+	    hold = checkDescendantsInR(node);
+            if(!hold)
+   	       xmlFreeNode(node);
+	} else {
+            /* So we have a parent.  But what if that parent is not
+               being held as an R variable. We need to free the node.
+               We need to make this smarter to see what parts of the 
+               tree we can remove.  For instance, we might be holding
+               onto this one, but not the parent, but that parent has
+               a second child which is being held onto.
+
+               So we go to the top of the node tree and check for its descendants
+            */
+	    int hold;
+            xmlNodePtr p = node->parent;
+	    while(p->parent)  p = p->parent;
+
+	    hold = checkDescendantsInR(p);
+	    if(!hold)
+		xmlFree(p);
+        
+	}
+    }
+}
+
+
+
+void
+decrementNodeRefCount(SEXP rnode)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(rnode);
+    internal_decrementNodeRefCount(node);
+}
+
+
+
+
 /**
 
  */
@@ -819,12 +1129,26 @@ USER_OBJECT_
 R_createXMLNodeRef(xmlNodePtr node)
 {
   SEXP ref, tmp;
+  int *val;
 
   if(!node)
       return(NULL_USER_OBJECT);
 
 
+  if(node->_private == NULL) 
+      node->_private = calloc(1, sizeof(int));
+  val = (int *) node->_private;
+  (*val)++;
+  if(*val == 1)
+     incrementDocRef(node->doc);
+#ifdef R_XML_DEBUG
+  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p)\n", node->name, node->type, (int) *val, node);
+#endif
+
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
+#ifdef XML_REF_COUNT_NODES
+  R_RegisterCFinalizer(ref, decrementNodeRefCount);
+#endif
   PROTECT(tmp = NEW_CHARACTER(3));
   SET_STRING_ELT(tmp, 0, mkChar(R_getInternalNodeClass(node->type)));
   SET_STRING_ELT(tmp, 1, mkChar("XMLInternalNode"));
@@ -835,6 +1159,20 @@ R_createXMLNodeRef(xmlNodePtr node)
 }
 
 
+/*
+ May not be used. Not yet.
+ The idea is to allow the R user to explicitly add a finalizer, like
+ we do for a document.
+ */
+SEXP
+R_addXMLNodeFinalizer(SEXP r_node)
+{
+   xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+#ifdef XML_REF_COUNT_NODES
+  R_RegisterCFinalizer(r_node, decrementNodeRefCount);
+#endif
+  return(r_node);
+}
 
 
 #define ValOrNULL(x) CHAR_TO_XMLCHAR ((x && x[0] ? x : NULL))
@@ -860,13 +1198,20 @@ USER_OBJECT_
 R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression, USER_OBJECT_ sindent,
 	     USER_OBJECT_ prefix, USER_OBJECT_ r_encoding)
 {
-    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+    xmlDocPtr doc;
     const char *fileName = NULL;
     USER_OBJECT_ ans = NULL_USER_OBJECT;
     xmlDtdPtr dtd = NULL;
 
     int oldIndent = xmlIndentTreeOutput;
     const char *encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
+    
+    if(TYPEOF(sdoc) != EXTPTRSXP) {
+       PROBLEM "document passed to R_saveXMLDOM is not an external pointer"
+	   ERROR;
+    }
+
+    doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
 
     xmlIndentTreeOutput = LOGICAL_DATA(sindent)[0];
 
@@ -1222,4 +1567,24 @@ RS_XML_isDescendantOf(USER_OBJECT_ r_node, USER_OBJECT_ r_top, USER_OBJECT_ stri
     }
     
     return(ScalarLogical(FALSE));
+}
+
+
+SEXP
+R_XML_indexOfChild(SEXP r_node)
+{
+    xmlNodePtr node, parent, ptr;
+    int i = 0;
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    ptr = node->parent->children;
+
+    while(ptr) {
+	if(ptr == node)
+	    return(ScalarInteger(i + 1));
+
+	i++;
+	ptr = ptr->next;
+    }
+
+    return(R_NilValue);
 }

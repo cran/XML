@@ -66,7 +66,26 @@ function(url, ...,
           section = character(), eval = TRUE)
 {
   doc = xmlTreeParse(url, ..., useInternal = TRUE)
+  xmlSource(doc, ..., envir = envir, xpath = xpath, ids = ids, omit = omit,
+             ask = ask, example = example, fatal = fatal, verbose = verbose,
+              print = print, xnodes = xnodes, namespaces = namespaces, section = section, eval = eval)
+})
 
+
+setMethod("xmlSource", c("XMLInternalDocument"),
+function(url, ...,
+          envir =globalenv(),
+          xpath = character(),         
+          ids = character(),
+          omit = character(),
+          ask = FALSE,
+          example = NA,         
+          fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
+          xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),
+          namespaces = DefaultXPathNamespaces,
+          section = character(), eval = TRUE)
+{
+  doc = url
   if(inherits(verbose, "numeric"))
     verbose = verbose - 1
 

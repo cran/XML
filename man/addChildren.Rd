@@ -146,7 +146,6 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
 libxml2 \url{http://www.xmlsoft.org}
 }
 \author{Duncan Temple Lang}
-%\note{}
 \seealso{
   \code{\link{xmlTree}}
   \code{\link{newXMLNode}}

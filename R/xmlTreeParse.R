@@ -1,19 +1,19 @@
 xmlSchemaParse =
 function(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
 {
-  xmlInternalTreeParse(file, asText = asText, isSchema = TRUE, xinclude = xinclude, error = error)
+  xmlParse(file, asText = asText, isSchema = TRUE, xinclude = xinclude, error = error)
 }
 
- xmlTreeParse <- 
-#
-# XML parser that reads the entire `document' tree into memory
-# and then converts it to an R/S object. 
-# Uses the libxml from Daniel Veillard at W3.org. 
-#
-# asText  treat the value of file as XML text, not the name of a file containing
-#       the XML text, and parse that.
-#
-#
+xmlTreeParse <- 
+   #
+   # XML parser that reads the entire `document' tree into memory
+   # and then converts it to an R/S object. 
+   # Uses the libxml from Daniel Veillard at W3.org. 
+   #
+   # asText  treat the value of file as XML text, not the name of a file containing
+   #       the XML text, and parse that.
+   #
+   #
 function(file, ignoreBlanks = TRUE, handlers = NULL,
            replaceEntities = FALSE, asText = FALSE, trim = TRUE, validate = FALSE, getDTD = TRUE,
            isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
@@ -31,7 +31,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
   }
   
   if(missing(isURL) && !asText) 
-    isURL <- length(grep("^http://", file)) | length(grep("^ftp://",file)) | length(grep("^file://", file))
+    isURL <- length(grep("^(http|ftp|file)://", file, useBytes = TRUE, perl = TRUE))
 
 
   checkHandlerNames(handlers, "DOM")
@@ -65,7 +65,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  on.exit(setEntitySubstitution(old), add = TRUE)
 
      # Look for a < in the string.
-  if(asText && length(grep("^\\s*<", file, perl = TRUE)) == 0) {
+  if(asText && length(grep("^\\s*<", file, perl = TRUE, useBytes = TRUE)) == 0) {  # !isXMLString(file) ?
     e = simpleError(paste(file, " does not seem to be XML, nor to identify a file name"))
     class(e) = c("XMLInputError", class(e))
     stop(e)
@@ -206,3 +206,6 @@ function(node, flags = 0L)
 
   .Call("RS_XML_xmlXIncludeProcessTreeFlags", node, as.integer(flags), PACKAGE = "XML")
 } 
+
+
+

@@ -2,6 +2,7 @@
 \alias{xmlSource}
 \alias{xmlSource,character-method}
 \alias{xmlSource,XMLNodeSet-method}
+\alias{xmlSource,XMLInternalDocument-method}
 \title{Source the R code, examples, etc. from an XML document}
 \description{
   This is the equivalent of a smart \code{\link[base]{source}}

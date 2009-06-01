@@ -101,7 +101,7 @@ xmlSchemaValidate =
 function(schema, doc, errorHandler = xmlErrorFun(), options = 0L)
 {
   if(is.character(doc))
-    doc = xmlInternalTreeParse(doc)
+    doc = xmlParse(doc)
 
   if(is.character(schema))
     schema = xmlSchemaParse(schema)

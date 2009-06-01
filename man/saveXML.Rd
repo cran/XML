@@ -8,6 +8,12 @@
 \alias{coerce,XMLInternalDocument,character-method}
 \alias{coerce,XMLInternalDOM,character-method}
 \alias{coerce,XMLInternalNode,character-method}
+\alias{saveXML,XMLFlatTree-method}
+\alias{saveXML,XMLInternalDocument-method}
+\alias{saveXML,XMLInternalDOM-method}
+\alias{saveXML,XMLInternalNode-method}
+\alias{saveXML,XMLNode-method}
+\alias{saveXML,XMLOutputStream-method}
 \title{Output internal XML Tree}
 \description{
   Methods for writing the representation of an XML tree to a string or

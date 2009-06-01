@@ -32,7 +32,7 @@ export(
  newXMLDTDNode,       
  parseDTD,
  processingInstruction.SAX,
- saveXML,
+ saveXML,       
  startElement.SAX,
  supportsExpat,
  supportsLibxml,
@@ -102,7 +102,7 @@ exportMethods("toHTML")
 export("xmlChildren<-")
 exportMethods("xmlChildren<-")
 
-exportClasses("XMLInternalDocument")
+exportClasses("XMLInternalDocument", "HTMLInternalDocument")
 exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
               "XMLInternalCommentNode", "XMLDTDNode",
@@ -125,6 +125,7 @@ S3method(removeChildren, XMLInternalNode)
 
 S3method(xpathApply, XMLInternalNode)
 S3method(xpathApply, XMLInternalDocument)
+S3method(xpathApply, XMLNode)
 export(xpathSApply)
 
 
@@ -285,12 +286,13 @@ S3method(xmlNamespace, character)
 # No effect if append is not generic.
 S3method(append, XMLNode)
 
-S3method(saveXML, XMLInternalDocument)
-S3method(saveXML, XMLInternalDOM)
-S3method(saveXML, XMLInternalNode)
-S3method(saveXML, XMLOutputStream)
-S3method(saveXML, XMLNode)
-S3method(saveXML, XMLFlatTree)
+exportMethods(saveXML)
+# S3method(saveXML, XMLInternalDocument)
+# S3method(saveXML, XMLInternalDOM)
+# S3method(saveXML, XMLInternalNode)
+# S3method(saveXML, XMLOutputStream)
+# S3method(saveXML, XMLNode)
+# S3method(saveXML, XMLFlatTree)
 
 S3method(dtdElementValidEntry, XMLElementDef)
 S3method(dtdElementValidEntry, XMLOrContent)
@@ -392,4 +394,40 @@ export(findXInclude)
 export(getLineNumber)
 
 export(ensureNamespace)
+
+export(removeXMLNamespaces)
+exportMethods(removeXMLNamespaces)
+
+
+export(xmlParseDoc)
+
+export(RECOVER,
+      NOENT,
+      DTDLOAD,
+      DTDATTR,
+      DTDVALID,
+      NOERROR,
+      NOWARNING,
+      PEDANTIC,
+      NOBLANKS,
+      SAX1,
+      XINCLUDE,
+      NONET,
+      NODICT,
+      NSCLEAN,
+      NOCDATA,
+      NOXINCNODE,
+      COMPACT,
+      OLD10,
+      NOBASEFIX,
+      HUGE,
+      OLDSAX)
+
+export(libxmlFeatures)
+
+
+exportClass("XMLString")
+export(xml, xmlParseString, isXMLString)
+
+export(readHTMLTable)
 

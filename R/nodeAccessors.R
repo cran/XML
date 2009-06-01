@@ -380,7 +380,7 @@ function(node, parse = FALSE, sourceDoc = NULL)
     
     if(!is.na(href)) {
        fileName = paste(dirname(docName(sourceDoc)), href, sep = .Platform$file.sep)
-       doc = xmlInternalTreeParse(fileName)
+       doc = xmlParse(fileName)
     } else
       doc = sourceDoc
     

@@ -141,7 +141,6 @@ R_addXMLInternalDocument_finalizer(SEXP sdoc, SEXP fun)
         action = R_xmlFreeDoc;
     } else if(TYPEOF(fun) == EXTPTRSXP)
 	action = (R_CFinalizer_t) R_ExternalPtrAddr(fun);
-    
 
     R_RegisterCFinalizer(sdoc, action);
     return(sdoc);
@@ -219,7 +218,7 @@ RS_XML_createDocFromNode(USER_OBJECT_ s_node)
  ptr = xmlDocCopyNode(node, doc, 1);
  node = (xmlNodePtr) doc;
  xmlAddChild(node, ptr);
-/* doc->children = ptr; */
+
  ans = R_createXMLDocRef(doc);
  return(ans);
 }
@@ -229,12 +228,26 @@ RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
 {
  xmlDocPtr doc;
  xmlNodePtr node, ptr;
+ int len, i;
+ SEXP ans;
 
  doc = (xmlDocPtr) R_ExternalPtrAddr(s_doc);
- node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
 
- ptr = xmlDocCopyNode(node, doc, 1);
- return(R_createXMLNodeRef(ptr));
+ if(TYPEOF(s_node) == EXTPTRSXP) {
+     node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+     ptr = xmlDocCopyNode(node, doc, 1);
+     return(R_createXMLNodeRef(ptr));
+ }
+
+ len = Rf_length(s_node);
+ PROTECT(ans = NEW_LIST(ans));
+ for(i = 0; i < len; i++) {
+     node = (xmlNodePtr) R_ExternalPtrAddr(VECTOR_ELT(s_node, i));
+     ptr = xmlDocCopyNode(node, doc, 1);
+     SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr)); 
+ }
+ UNPROTECT(1);
+ return(ans);
 }
 
 /*
@@ -301,7 +314,6 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
 SEXP
 R_matchNodesInList(SEXP r_nodes, SEXP r_target, SEXP r_nomatch)
 {
-    xmlNodeSetPtr nodes = NULL, target;
     xmlNodePtr el;
     int i, j, n, n2;
     SEXP ans;

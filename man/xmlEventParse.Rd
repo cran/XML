@@ -39,6 +39,25 @@
  also provide handler functions for specific tags/elements such
  as \code{<myTag>} with handler elements  with the same name as the
  XML element of interest, i.e. \code{"myTag" = function(x, attrs)}.
+
+ When the event parser is reading text nodes,
+ it may call the text handler function with different
+ sub-strings  of the text within the node.
+ Essentially, the parser collects up n characters into a buffer and
+ passes this as a single string the text handler and then continues
+ collecting more text until the buffer is full or there is no more text.
+ It passes each sub-string to the text handler.
+ If \code{trim} is \code{TRUE}, it removes leading and trailing white
+ space from the substring before calling the text handler. If the
+ resulting text is empty and \code{ignoreBlanks} is \code{TRUE},
+ then we don't bother calling the text handler function.
+
+ So the key thing to remember about dealing with text is that the
+ entire text of a node may come in multiple separate calls
+ to the text handler. A common idiom is to have the text handler
+ concatenate the values it is passed in separate calls and
+ to have the end element handler process the entire text and reset
+ the text variable to be empty.
 }
 \usage{
 xmlEventParse(file, handlers = xmlEventHandler(), 

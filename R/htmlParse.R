@@ -27,8 +27,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
   if(missing(asText) && substring(file, 1, 1) == "<")
     asText = TRUE
   
-  if(missing(isURL)) {
-    isURL <- length(grep("^http://",file)) | length(grep("^ftp://",file))
+  if(!asText && missing(isURL)) {
+     isURL <- length(grep("^(http|ftp)://", file, useBytes = TRUE, perl = TRUE)) 
   }
 
     # check whether we are treating the file name as
@@ -66,8 +66,10 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)
 
-  if(inherits(ans, "XMLInternalDocument"))
-    addDocFinalizer(ans, addFinalizer)  
+  if(inherits(ans, "XMLInternalDocument")) {
+    addDocFinalizer(ans, addFinalizer)
+    class(ans) = c("HTMLInternalDocument", class(ans))
+  }
 
  ans
 }

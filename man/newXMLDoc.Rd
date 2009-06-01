@@ -50,14 +50,15 @@ How do we define a default namespace?
 xmlDoc(node, addFinalizer = FALSE)
 newXMLDoc(dtd = NA, namespaces=NULL, addFinalizer = TRUE, 
            name = character(), node = NULL)
-newXMLNode(name, ..., attrs = NULL, namespace="",
+newXMLNode(name, ..., attrs = NULL, namespace = character(),
             namespaceDefinitions = character(),
              doc = NULL, .children = list(...), parent = NULL,
 	     at = NA, cdata = FALSE,
              suppressNamespaceWarning =
-                 getOption("suppressXMLNamespaceWarning", FALSE))
+                 getOption("suppressXMLNamespaceWarning", FALSE),
+             sibling = NULL)
 newXMLTextNode(text, parent = NULL, doc = NULL, cdata = FALSE)
-newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA)
+newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA, sep = "\n")
 newXMLCommentNode(text, parent = NULL, doc = NULL, at = NA)
 newXMLPINode(name, text, parent = NULL, doc = NULL, at = NA)
 newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = NULL)  
@@ -152,6 +153,10 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   created node. This need not be specified and one can add the new node
   to another node in a separate operation via
   \code{\link{addChildren}}.}
+\item{sibling}{if this is specified (rather than \code{parent})
+this should be an \code{XMLInternalNode} and the new node is added as
+a sibling of this node, after this node, i.e. to the right.
+This is just a convenient form of \code{parent = xmlParent(node)}.}
 
   \item{cdata}{a logical value indicating whether to enclose the text
   within a CDATA node (\code{TRUE}) or not (\code{FALSE}). This is a
@@ -164,14 +169,13 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   given as simple strings and are converted to text nodes. This
   \code{cdata} value is passed to the calls to create these text nodes
   and so controls whether they are enclosed within CDATA nodes.
- 
-
   }
   \item{suppressNamespaceWarning}{see \code{\link{addChildren}}}
 
   \item{at}{this allows one to control the position in the list of children at which the node should be
   added. The default means at the end and this can be any position
   from 0 to the current number of children.}
+  \item{sep}{when adding text nodes, this is used as an additional separator text to insert between the specified strings.}
 }
 \details{
 These create internal C level objects/structure instances

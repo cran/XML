@@ -78,8 +78,10 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
       free((char *) name);
 
 
+#if 0
   xmlFreeDoc(doc);
   R_numXMLDocsFreed++;
+#endif
 
      /* Set the class for the document. */
   className = NEW_CHARACTER(1);

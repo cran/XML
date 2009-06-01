@@ -91,7 +91,7 @@ getXMLErrors=
   # This a somewhat convenient mechanism for fixing up, e.g., malformed HTML 
   # pages or other XML documents.
   
-function(filename, parse = xmlInternalTreeParse, ...)
+function(filename, parse = xmlParse, ...)
 {
   f = xmlErrorFun()
   opts = options()

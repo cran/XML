@@ -1,6 +1,7 @@
 \name{XMLInternalDocument-class}
 \docType{class}
 \alias{XMLInternalDocument-class}
+\alias{HTMLInternalDocument-class}
 \alias{coerce,XMLInternalNode,XMLInternalDocument-method}
 \alias{coerce,XMLInternalDocument,XMLInternalNode-method}
 

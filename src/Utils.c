@@ -328,10 +328,27 @@ void R_xmlFreeDoc(SEXP ref)
   doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
 
   if(doc) {
+      int *val;
+      val = doc->_private;
+      if(val) {
+	  (*val)--;
+	  if(*val) {
+#ifdef R_XML_DEBUG
+	      fprintf(stderr, "Not freeing XML document; still has %d references in the wild\n", *val);
+#endif
+	      R_ClearExternalPtr(ref);
+	      return;
+	  }
+      }
+      
 #ifdef R_XML_DEBUG
       const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *)"?? (internally created)");
       fprintf(stderr, "Cleaning up document %p, %s, has children %d\n", (void *) doc, url, (int) (doc->children != NULL));
 #endif
+      if(val) {
+	  free(val);
+	  doc->_private = NULL;
+      }
       xmlFreeDoc(doc);
       R_numXMLDocsFreed++;
   }
@@ -342,19 +359,8 @@ void R_xmlFreeDoc(SEXP ref)
 SEXP
 RS_XML_freeDoc(SEXP ref)
 {
-  xmlDocPtr doc;
-  doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
-
-  if(doc) {
-#ifdef R_XML_DEBUG
-      const xmlChar *url = doc->URL ? doc->URL : (doc->name ? doc->name : (const xmlChar *) "?? (internally created)");
-      fprintf(stderr, "Freeing the document %p, %s\n", (void *) doc, url);
-#endif
-      xmlFreeDoc(doc);
-      R_numXMLDocsFreed++;
-  }
-  R_ClearExternalPtr(ref);
-  return(R_NilValue);
+    R_xmlFreeDoc(ref); 
+    return(R_NilValue);
 }
 
 
@@ -362,6 +368,9 @@ RS_XML_freeDoc(SEXP ref)
    node and the document and then frees the document structure.
 
    Does xmlFreeDoc() deal with the URL and name fields in the doc?
+
+XXX With the nodes and document under garbage collection, do we really
+need this?
 */
 void R_xmlFreeDocLeaveChildren(SEXP ref)
 {

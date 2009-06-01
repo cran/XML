@@ -43,6 +43,11 @@ static USER_OBJECT_ makeSchemaReference(xmlSchemaPtr ref);
 
 
 
+USER_OBJECT_
+RS_XML(libxmlVersionRuntime)()
+{
+    return(mkString(*__xmlParserVersion()));
+}
 
 
 USER_OBJECT_
@@ -112,7 +117,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
   const char *name;
   xmlDocPtr doc;
-  USER_OBJECT_ rdoc;
+  USER_OBJECT_ rdoc, rdocObj; /* rdocObj is used to put the doc object
+			       * under R's garbage collection.*/
   USER_OBJECT_ className;
   R_XMLSettings parserSettings;
 
@@ -167,8 +173,12 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
       ctxt = xmlSchemaNewParserCtxt(name);
       schema = xmlSchemaParse(ctxt);
+      xmlSchemaFreeParserCtxt(ctxt);
 
-/*XXX make certain to cleanup the settings. */
+/*XXX make certain to cleanup the settings. 
+  Put a finalizer on this in makeSchemaReference.
+*/
+
       return(makeSchemaReference(schema));
   }
 
@@ -229,17 +239,21 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 
   if(parserSettings.internalNodeReferences) {
       /* Use a different approach - pass internal nodes to the converter functions*/
-      xmlNodePtr root;
+      if(GET_LENGTH(converterFunctions) > 0) {
+	  xmlNodePtr root;
 #ifdef USE_OLD_ROOT_CHILD_NAMES
-      root = doc->root;
+	  root = doc->root;
 #else
-      root = doc->xmlRootNode;
+	  root = doc->xmlRootNode;
 #ifdef ROOT_HAS_DTD_NODE
-    if(root->next && root->children == NULL)
-       root = root->next;
+	  if(root->next && root->children == NULL)
+	      root = root->next;
 #endif
 #endif   
-      NodeTraverse(root, converterFunctions, &parserSettings);
+          PROTECT(rdocObj = R_createXMLDocRef(doc));
+	  NodeTraverse(root, converterFunctions, &parserSettings);
+	  UNPROTECT(1);
+      }
       PROTECT(rdoc = NULL_USER_OBJECT);
   } else {
       PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));
@@ -271,8 +285,10 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
      return(R_createXMLDocRef(doc));
   }
 
+#if 0   /* Now garbage collected by R.*/
   xmlFreeDoc(doc);
   R_numXMLDocsFreed++;
+#endif
 
   if(!parserSettings.internalNodeReferences) {
      /* Set the class for the document. */
@@ -1443,3 +1459,120 @@ R_getLineNumber(SEXP r_node)
 
     return(ScalarInteger(node->line));
 }
+
+
+SEXP
+R_xmlReadFile(SEXP r_filename, SEXP r_encoding, SEXP r_options)
+{
+    const char *filename;
+    const char *encoding = NULL;
+    int options;
+    xmlDocPtr doc;
+
+    filename = CHAR_DEREF(STRING_ELT(r_filename, 0));
+    if(Rf_length(r_encoding))
+       encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
+    options = INTEGER(r_options)[0];
+
+    doc = xmlReadFile(filename, encoding, options);
+    return(R_createXMLDocRef(doc));
+}
+
+SEXP
+R_xmlReadMemory(SEXP r_txt, SEXP len, SEXP r_encoding, SEXP r_options, SEXP r_base)
+{
+    const char *txt;
+    const char *encoding = NULL;
+    const char *baseURL = NULL;
+    int options;
+    xmlDocPtr doc;
+
+    txt = CHAR_DEREF(STRING_ELT(r_txt, 0));
+    if(Rf_length(r_encoding))
+       encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
+    options = INTEGER(r_options)[0];
+
+    if(Rf_length(r_base))
+	baseURL = CHAR_DEREF(STRING_ELT(r_base, 0));
+
+    doc = xmlReadMemory(txt, INTEGER(len)[0], baseURL, encoding, options);
+    return(R_createXMLDocRef(doc));
+}
+
+
+
+#if 1
+
+int 
+addXInclude(xmlNodePtr ptr, SEXP *ans, int level)
+{
+	if(ptr->type == XML_XINCLUDE_START) {
+            int len = Rf_length(*ans) + 1;
+	    PROTECT(*ans = SET_LENGTH(*ans, len));
+	    SET_VECTOR_ELT(*ans, len - 1, R_createXMLNodeRef(ptr));
+	    return(1);
+	} else
+	    return(0);
+
+}
+
+int
+processKids(xmlNodePtr ptr, SEXP *ans, int  level)
+{
+        xmlNodePtr kids;
+	int count = 0;
+	kids = ptr->children;
+        while(kids) {
+	    count += addXInclude(kids, ans, level);
+            count += processKids(kids, ans, level + 1);
+            kids = kids->next;
+      	}
+	return(count);
+}
+
+#if 0
+int
+findXIncludeStartNodes(xmlNodePtr node, SEXP *ans, int level)
+{
+    const char * prefix[] = {"", "     ", "           ", "                " };
+    xmlNodePtr ptr = node;
+    int count = 0;
+
+    addXInclude(node, ans, level);
+    ptr = node;
+    while(ptr) {
+	count += addXInclude(ptr, ans, level);
+	count += processKids(ptr, ans, level);
+	ptr = ptr->next;
+    }
+
+//fprintf(stderr, "%s level = %d, %s: %p, type = %d\n", prefix[level], level, ptr->name, node, ptr->type);
+
+//fprintf(stderr, "%p, %s, level = %d, type = %d\n", ptr, ptr->name, level, ptr->type);
+
+    return(count);
+}
+#endif
+
+/*
+ This is a recursive version. We want an iterative version.
+ */
+SEXP
+R_findXIncludeStartNodes(SEXP r_root)
+{
+    xmlNodePtr root;
+    SEXP ans;
+    int count;
+
+    root = (xmlNodePtr) R_ExternalPtrAddr(r_root);
+    if(!root)
+	return(R_NilValue);
+
+    PROTECT(ans = allocVector(VECSXP, 0));
+//    count = findXIncludeStartNodes(root, &ans, 0);
+    count = addXInclude(root, ans, 0) + processKids(root, &ans, 0);
+    UNPROTECT(count + 1);
+    return(ans);
+}
+
+#endif

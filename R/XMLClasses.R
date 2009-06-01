@@ -56,7 +56,7 @@ oldClassTable =  list(
   "XMLDocument" = c("XMLAbstractDocument"),
   "XMLHashTree" = c("XMLAbstractDocument"),
   "XMLInternalDocument" = c("XMLAbstractDocument"),
-   "XMLInternalDocument" = c("XMLAbstractDocument")
+  "HTMLInternalDocument" = c("XMLInternalDocument", "XMLAbstractDocument")
 )
 
 oldClass =
@@ -71,12 +71,13 @@ function(class)
 ###############################
 # These were in xmlNodes, but need to be defined earlier.
 
-
 setOldClass("XMLAbstractDocument")
 
 setOldClass(c("XMLInternalDocument", "XMLAbstractDocument"))
 setOldClass(c("XMLHashTree", "XMLAbstractDocument"))
 setOldClass(c("XMLDocument", "XMLAbstractDocument"))
+
+setOldClass(c("HTMLInternalDocument", "XMLInternalDocument")) # , "XMLAbstractDocument"))
 
 setOldClass("XMLAbstractNode")
 
@@ -155,7 +156,7 @@ xmlChildren.XMLNode <-
 #
 function(x, addNames = TRUE, ...)
 {
-  x$children
+  structure(x$children, class = "XMLNodeList")
 }
 
 
@@ -259,9 +260,9 @@ function(x, ..., all = FALSE)
  obj <- xmlChildren(x) # x$children
 
  if(all) # "all" %in% names(list(...)) && list(...)[["all"]] == TRUE)
-   obj[ names(obj) %in% list(...)[[1]] ]
+   structure(obj[ names(obj) %in% list(...)[[1]] ], class = "XMLNodeList")
  else
-   obj[...] # NextMethod("[") 
+   structure(obj[...], class = "XMLNodeList") # NextMethod("[") 
 }
 
 
@@ -653,9 +654,34 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
   UseMethod("xpathApply")
 }  
 
+toXMLNode =
+  #
+  # For taking an internal node and converting it to an R-level node
+  #
+function(x, ...)
+{
+  txt = saveXML(x)
+  xmlRoot(xmlTreeParse(txt, asText = TRUE))
+}
+
+xpathApply.XMLNode =
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE)
+{
+  idoc = xmlParse(saveXML(doc), asText = TRUE)
+  ans = xpathApply(idoc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces,
+                        .node = .node, noMatchOkay = noMatchOkay)
+
+  # Now convert the results
+  if(length(ans)) 
+     ans = lapply(ans, toXMLNode)
+
+  ans
+}
+
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL)
+          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE)
 {
 #  if(!inherits(doc, "XMLInternalDocument"))
 #    stop("Need XMLInternalDocument object for XPath query")
@@ -674,7 +700,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 
   ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, PACKAGE = "XML")
 
-  if(length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
+  if(!noMatchOkay && length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]
        # if they have a function call, ignore.
     tmp = tmp[ - grep("\\(", path) ]
@@ -895,11 +921,19 @@ function(doc, path, fun = NULL, ...,
 
 
 xpathApply.XMLDocument =
-xpathApply.XMLNode =  
+#xpathApply.XMLNode =  
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
           resolveNamespaces = TRUE, .node = NULL)
 {
-  stop("XPath expressions cannot be applied to R-level nodes. Use xmlInternalTreeParse() to process the document and then use xpathApply()")
+  txt = saveXML(doc)
+  doc = xmlParse(txt, asText = TRUE)
+  ans = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = .node)
+
+  if(length(ans)) 
+     ans = lapply(ans, toXMLNode)
+
+  ans  
+ # stop("XPath expressions cannot be applied to R-level nodes. Use xmlParse() to process the document and then use xpathApply()")
 }
 
 

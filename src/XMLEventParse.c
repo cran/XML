@@ -397,7 +397,7 @@ R_endBranch(RS_XMLParserData *rinfo,
 
 	    PROTECT(args = NEW_LIST(1));
 	    SET_VECTOR_ELT(args, 0, rnode = R_createXMLNodeRef(tmp));
-	    R_RegisterCFinalizer(rnode, R_xmlFreeNode);
+	    /* Done in createXMLNodeRef() R_RegisterCFinalizer(rnode, R_xmlFreeNode); */
 	    RS_XML(invokeFunction)(fun, args, NULL, rinfo->ctx);
 	    UNPROTECT(1);
 	    /*

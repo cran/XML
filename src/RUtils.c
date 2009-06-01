@@ -1,5 +1,6 @@
 #include "Utils.h"
 
+#include <libxml/catalog.h>
 /*
   Utilities used in the R XML parsing facilities for invoking user-level functions from C.
 
@@ -195,11 +196,13 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_setKeepBlanksDefault, 1),
 	ENTRY(R_getDocEncoding, 1),
 	ENTRY(R_getLineNumber, 1),
+	ENTRY(R_addXMLNodeFinalizer, 1),
 	{NULL, NULL, 0}
 };
 
 static R_CMethodDef cmethods[] = {
     ENTRY(RSXML_setErrorHandlers, 0),
+    ENTRY(xmlInitializeCatalog, 0),
     {NULL, NULL, 0}
 };
 
@@ -301,4 +304,13 @@ CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
     ans = mkChar(str);
 #endif
     return(ans);
+}
+
+
+SEXP
+R_lookString(SEXP rstr)
+{
+    const char *str;
+    str = CHAR(STRING_ELT(rstr, 0));
+    return(ScalarInteger(strlen(str)));
 }

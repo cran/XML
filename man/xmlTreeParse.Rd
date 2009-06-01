@@ -575,6 +575,15 @@ m <- xmlTreeParse(fileName,
   top = xmlRoot(doc)
   textNodes = xmlSApply(top, inherits, "XMLInternalTextNode")
   sapply(xmlChildren(top)[textNodes], xmlValue)
+
+
+     # Storing nodes
+   f = system.file("exampleData", "book.xml", package = "XML")
+   titles = list()
+   xmlTreeParse(f, handlers = list(title = function(x)
+                                  titles[[length(titles) + 1]] <<- x))
+   sapply(titles, xmlValue)
+   rm(titles)
 }
 
 \keyword{file}

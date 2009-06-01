@@ -2,8 +2,8 @@ parseDTD <-
 function(extId, asText = FALSE, name = "", isURL = FALSE, error = xmlErrorCumulator())
 {
   extId <- as.character(extId)
-  if(missing(isURL)) {
-    isURL <- length(grep("http://",extId))  > 0 ||  length(grep("ftp://",extId)) > 0
+  if(!asText && missing(isURL)) {
+    isURL <- length(grep("(http|ftp)://", extId, useBytes = TRUE))  > 0 
   }
 
   if(missing(name))

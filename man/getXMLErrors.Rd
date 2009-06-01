@@ -11,7 +11,7 @@ nodes, missing entities, etc.
  along with information about the file, line and column number.
 }
 \usage{
-getXMLErrors(filename, parse = xmlInternalTreeParse, ...)
+getXMLErrors(filename, parse = xmlParse, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

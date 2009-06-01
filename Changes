@@ -1,3 +1,32 @@
+Version 2.5-0
+
+  *   Added xmlParseDoc() and parser option constants. These allow one to parse a document
+      from a file, URL or string and specify any combination of 20 different options controlling
+      the parser, e.g. whether to replace entities, perform XInclude, add start and end XInclude nodes,
+      expand entities, load external DTDs, recover when there are errors.
+
+  *   Added libxmlFeatures() to dynamically determine which features were compiled into the version
+      of libxml2.
+
+  *   newXMLNode() has a new argument sibling which is used to add the new node as the sibling of this
+      node.  The parametr 'at' is used as the value for the 'after' parameter in addSibling().
+
+  *   saveXML() is now an S4 generic. (Changes in other packages, e.g. Sxslt, RXMLHelp.)
+
+  *   Added readHTMLTable() which is a reasonably robust and flexible way to read HTML tables.
+
+  *   Added runTime parameter for libxmlVersion() so we can get compile and run time version information.
+
+
+Version 2.4-0
+
+  *   Significant change to garbage collection facilities for internal/C-level nodes.
+      This works hard to ensure that XMLInternalDocument objects and XMLInternalNode objects
+      in R remain valid even when their "parent" container is released in R. See memory.pdf.
+      This can be disabled with configuration argument --enable-nodegc=no.
+
+  *   Configuration option to compile with xmlsec1 (or xmlsec1-openssl).  More to come on support for this.
+
 Version 2.3-0
 
   *   Added getLineNumber() to be able to determine the line number of an XML node within 
