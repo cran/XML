@@ -236,8 +236,11 @@ if(FALSE) {
          add = function(...){}
        )
 
- class(v) <- c("XMLInternalDOM", "XMLOutputStream")
- return(v)
+ #class(v) <- c("XMLInternalDOM", "XMLOutputStream")
+ # v
+ ans = new("XMLInternalDOM", v)
+ names(ans) = names(v)
+ ans
 }
 
 setAs("XMLInternalNode", "XMLNode",

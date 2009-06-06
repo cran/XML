@@ -1,6 +1,8 @@
 # Avoided if we are using Windows so that we can specify the directory to find the libxml DLL.
 # useDynLib(XML)
 
+import(methods)
+
 #exportPattern(".*")
 export(
  append.xmlNode,
@@ -102,6 +104,7 @@ exportMethods("toHTML")
 export("xmlChildren<-")
 exportMethods("xmlChildren<-")
 
+if(TRUE) {
 exportClasses("XMLInternalDocument", "HTMLInternalDocument")
 exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
@@ -111,9 +114,9 @@ exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalEleme
               "XMLDocumentFragNode", "XMLNamespaceDeclNode")
 
 exportClasses("XMLNamespace")
-
 exportClass("URI")
-
+exportClass(XMLNamespaceDefinitions)
+}
 
 exportMethods("coerce")
 
@@ -372,7 +375,6 @@ export(getRelativeURL)
 
 
 export(xmlToList)
-exportClass("XMLNamespaceDefinitions")
 
 export('xmlValue<-')
 exportMethods('xmlValue<-')
@@ -430,4 +432,7 @@ exportClass("XMLString")
 export(xml, xmlParseString, isXMLString)
 
 export(readHTMLTable)
+
+
+
 

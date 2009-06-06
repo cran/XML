@@ -131,7 +131,7 @@ setOldClass(c("XMLDTDNode", "XMLInternalNode"))
 setOldClass(c("XMLNamespace"))
 setOldClass(c("XMLNamespaceDefinition"))
 
-setOldClass("XMLInternalDOM")
+#setOldClass("XMLInternalDOM")
 
 setOldClass("XMLNamespaceDefinitions")
 setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))

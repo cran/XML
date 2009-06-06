@@ -297,9 +297,11 @@ function(dtd = NULL, nameSpace = NULL, buf = NULL, nsURI = NULL,
                addOpenTag=addOpenTag
               ) 
 
-  class(con) <- c("XMLOutputBuffer", "XMLOutputStream")
-
-  con 
+  # class(con) <- c("XMLOutputBuffer", "XMLOutputStream")
+  # con 
+  ans = new("XMLOutputBuffer", con)
+  names(ans) = names(con)
+  ans
 }
 
 

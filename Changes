@@ -1,3 +1,10 @@
+Version 2.5-1
+
+  *   Added a configuration check and compile time condition for the presence of XML_WITH_ZLIB.  This
+      allows installation with older versions of libxml2 such as 2.6.26.
+
+  *   Moved some old S3 classes to S4 class definitions to deal with recent changes to the methods package.
+
 Version 2.5-0
 
   *   Added xmlParseDoc() and parser option constants. These allow one to parse a document

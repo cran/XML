@@ -698,6 +698,29 @@ AC_ARG_ENABLE(nodegc, [  --enable-nodegc  enable node garbage collection],
 
 dnl  ---------------------------------------------------
 
+AC_DEFUN([CHECK_ENUM], [
+
+AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif
+],
+[
+  int val;
+  val = $1;
+],
+[PKG_CPPFLAGS="$PKG_CPPFLAGS -DHAVE_$1=1"; echo "Version has $1"], 
+[echo "No $1 enumeration value."])
+])
+
+CHECK_ENUM(XML_WITH_ZLIB)
+
+
+dnl   ---------------------------------------------
+
+
 AC_SUBST(XMLSEC_DEFS)
 
 AC_SUBST(LIBXML2)

@@ -1,3 +1,9 @@
+setClass("XMLOutputStream", "list")
+
+setClass("XMLOutputDOM", contains = "XMLOutputStream")
+setClass("XMLOutputBuffer", contains = "XMLOutputStream")
+setClass("XMLInternalDOM", contains = "XMLOutputStream")
+
 xmlOutputDOM <-
 function(tag = "doc", attrs = NULL, dtd = NULL, nameSpace = NULL, nsURI = character(0),
           xmlDeclaration = NULL)
@@ -129,9 +135,11 @@ function(tag = "doc", attrs = NULL, dtd = NULL, nameSpace = NULL, nsURI = charac
               addCData = addCData,             
               current = function(){current}
             ) 
-  class(con) <- c("XMLOutputDOM", "XMLOutputStream")
-
- return(con)
+  #class(con) <- c("XMLOutputDOM", "XMLOutputStream")
+  # con
+  ans = new("XMLOutputDOM", con)
+  names(ans) = names(con)
+  ans
 }
 
 xmlRoot.XMLRDocument =

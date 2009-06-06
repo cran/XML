@@ -41,7 +41,12 @@ R_getXMLFeatures()
            XML_WITH_DEBUG,
            XML_WITH_DEBUG_MEM,
            XML_WITH_DEBUG_RUN,
-           XML_WITH_ZLIB};
+#ifdef HAVE_XML_WITH_ZLIB
+           XML_WITH_ZLIB
+#else
+           -1
+#endif
+   };
 
     const char * const names[] = {
            "THREAD",   
@@ -83,7 +88,10 @@ R_getXMLFeatures()
     PROTECT(ans = allocVector(LGLSXP, n));
     PROTECT(rnames = allocVector(STRSXP, n));
     for(i = 0; i < n; i++)  {
-	LOGICAL(ans)[i] = xmlHasFeature(features[i]);
+        if(features[i] > -1)
+	   LOGICAL(ans)[i] = xmlHasFeature(features[i]);
+        else
+ 	   LOGICAL(ans)[i] = NA_LOGICAL;
 	SET_STRING_ELT(rnames, i, mkChar(names[i]));
     }
     SET_NAMES(ans, rnames);

@@ -137,6 +137,8 @@ function(doc, header = xmlName(node) == "table" && ("thead" %in% names(node) || 
     els = els[ - skip.rows ]
   }
 
+  if(length(els) == 0)
+    return(NULL)
   
    numEls = sapply(els, length)
    if(is.logical(header) && !is.na(header) && header) {
