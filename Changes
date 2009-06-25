@@ -1,3 +1,13 @@
+Version 2.5-3
+
+  *   Trivial change to an Rd file to add an omitted \
+
+Version 2.5-2
+ 
+  *   Configuration enhanced to handle very old (but standard on OS X) versions of libxml which do not have 
+      the xmlHasFeature() routine.
+      People with such an old version of libxml (i.e. 2.6.16) should consider upgrading. That is 5 years old.
+
 Version 2.5-1
 
   *   Added a configuration check and compile time condition for the presence of XML_WITH_ZLIB.  This

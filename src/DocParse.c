@@ -175,6 +175,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
       schema = xmlSchemaParse(ctxt);
       xmlSchemaFreeParserCtxt(ctxt);
 
+
 /*XXX make certain to cleanup the settings. 
   Put a finalizer on this in makeSchemaReference.
 */

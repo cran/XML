@@ -715,7 +715,26 @@ AC_TRY_COMPILE([
 [echo "No $1 enumeration value."])
 ])
 
+
 CHECK_ENUM(XML_WITH_ZLIB)
+
+
+
+AC_TRY_COMPILE([
+#ifdef FROM_GNOME_XML_DIR
+#include <gnome-xml/parser.h>
+#else
+#include <libxml/parser.h>
+#endif
+],
+[
+   xmlFeature f;
+   xmlHasFeature(f);
+],
+[PKG_CPPFLAGS="$PKG_CPPFLAGS -DHAVE_XML_HAS_FEATURE=1"; echo "Version has xmlHasFeature()"], 
+[echo "No xmlHasFeature."])
+
+
 
 
 dnl   ---------------------------------------------

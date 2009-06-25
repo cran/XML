@@ -23,7 +23,7 @@ getRelativeURL(u, baseURL, sep = "/")
     accessed via HTTP, HTTPS, FTP), / should be used. For local files on Windows machines 
      one might use \code{.Platform$file.sep}, but this is incorrect unless one knows that the
      resulting file is to be accessed using Windows file system notation, i.e. 
-      \code{C:\\\\my\\\folder\\\\file}.
+      \code{C:\\\\my\\\\folder\\\\file}.
    .}
 }
 \details{

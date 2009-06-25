@@ -334,7 +334,7 @@ void R_xmlFreeDoc(SEXP ref)
 	  (*val)--;
 	  if(*val) {
 #ifdef R_XML_DEBUG
-	      fprintf(stderr, "Not freeing XML document; still has %d references in the wild\n", *val);
+	      fprintf(stderr, "Not freeing XML document %p (%s); still has %d references in the wild\n", doc, doc->URL ? doc->URL : "?", *val);
 #endif
 	      R_ClearExternalPtr(ref);
 	      return;
@@ -348,9 +348,10 @@ void R_xmlFreeDoc(SEXP ref)
       if(val) {
 	  free(val);
 	  doc->_private = NULL;
-      }
+
       xmlFreeDoc(doc);
       R_numXMLDocsFreed++;
+      } /* was before the xmlFreeDoc so that that was unconditional.*/
   }
   R_ClearExternalPtr(ref);
 }

@@ -37,6 +37,9 @@ fields
 [26] "SCHEMATRON" "MODULES"    "DEBUG"      "DEBUG_MEM"  "DEBUG_RUN" 
 [31] "ZLIB"      
 }
+Elements are either \code{TRUE} or \code{FALSE} indicating whether support
+was activatd for that feature, or \code{NA} if that feature is not
+part of the particular version of libcurl.
 }
 
 \references{\url{http://www.w3.org/XML}, \url{http://www.xmlsoft.org},

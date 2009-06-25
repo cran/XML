@@ -371,7 +371,9 @@ R_xmlFreeNode(SEXP node)
   p = R_ExternalPtrAddr(node);
   if(p) {
       xmlFreeNode(p);
+#ifdef R_XML_DEBUG
 fprintf(stderr, "Freeing XML node from a branch\n");
+#endif
   }
   R_SetExternalPtrAddr(node, NULL_USER_OBJECT);
 }

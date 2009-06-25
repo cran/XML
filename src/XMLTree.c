@@ -47,7 +47,8 @@
 #endif
 
 void incrementDocRef(xmlDocPtr doc);
-
+int getNodeCount(xmlNodePtr node);
+void incrementDocRefBy(xmlDocPtr doc, int num);
 
 /**
  Create a libxml comment node and return it as an S object
@@ -523,6 +524,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
     }
 
     if(n->parent == p || n->parent) {
+      /*XX Need to decrement the reference count if there is a document. */
 	xmlUnlinkNode(n);
     } 
 
@@ -545,9 +547,16 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 	if(n->type == XML_TEXT_NODE) {
 	    tmp = xmlNewText(n->content);
 	    /* tmp = xmlCopyNode(n, 1); */
-	} else 
+	} else {
 	    tmp = n;
+#ifdef R_XML_DEBUG
+            if(n->_private)
+  	       fprintf(stderr, "insertXMLNode: %p incrementing document (%p)  %d\n", n, p->doc, *(int *) n->_private);
+#endif
+	    incrementDocRefBy(p->doc, getNodeCount(n));
+	}
 	check = xmlAddChild(p, tmp);
+
 #if 0
 /* XXXX */
 	if(n->type == XML_TEXT_NODE && check != tmp)
@@ -612,7 +621,7 @@ RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_af
 	
     f = LOGICAL(r_after)[0] ?  xmlAddNextSibling : xmlAddPrevSibling ;
     ans = f(p, n);
-
+    incrementDocRefBy(p->doc, getNodeCount(n));
     return(R_createXMLNodeRef(ans));
 }
 
@@ -846,8 +855,7 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 xmlDocPtr currentDoc;
 #endif
 
-void
-incrementDocRef(xmlDocPtr doc)
+void incrementDocRefBy(xmlDocPtr doc, int num)
 {
     int *val;
     if(!doc)
@@ -858,8 +866,35 @@ incrementDocRef(xmlDocPtr doc)
 
     val = (int *) doc->_private;
 
-    (*val)++;
+    (*val) += num;
 }
+
+void
+incrementDocRef(xmlDocPtr doc)
+{ 
+  incrementDocRefBy(doc, 1);
+}
+
+#define GET_NODE_COUNT(n) \
+   n->_private ? *((int*) (n)->_private) : 0
+
+
+
+int getNodeCount(xmlNodePtr node)
+{
+  int val = 0;
+  xmlNodePtr p = node->children;
+  if(!node)
+    return(0);
+
+  val = GET_NODE_COUNT(node);
+  while(p) {
+    val += getNodeCount(p);
+    p = p->next;
+  }
+  return(val);
+}
+
 
 USER_OBJECT_
 R_createXMLDocRef(xmlDocPtr doc)
@@ -873,7 +908,9 @@ R_createXMLDocRef(xmlDocPtr doc)
   incrementDocRef(doc);
 
 #ifdef R_XML_DEBUG
-  fprintf(stderr, "creating document reference %s %p\n", doc->name ? doc->name : "internally created", doc);
+  fprintf(stderr, "creating document reference %s %p, count = %d\n", 
+              doc->URL ? doc->URL : "internally created", doc,
+              * ((int*) doc->_private));
 #endif
 
   PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), R_NilValue));
@@ -1071,12 +1108,12 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 	free(node->_private);
         node->_private = NULL;
 	if(node->doc) {
-	    val = node->doc->_private;
+	    val = (int *) node->doc->_private;
 	    if(val) (*val)--;
 	    if(!val || *val == 0) {
 		/* Consolidate with R_xmlFreeDoc */
 #ifdef R_XML_DEBUG
-		fprintf(stderr, "releasing document %p\n", node->doc);fflush(stderr);
+		fprintf(stderr, "releasing document (for node) %p %s (%s)\n", node->doc, node->doc->URL ? node->doc->URL : "?", val ? "has zero count" : "no count");fflush(stderr);
 #endif
 		if(val) free(node->doc->_private);
 		node->doc->_private = NULL;
@@ -1142,7 +1179,7 @@ R_createXMLNodeRef(xmlNodePtr node)
   if(*val == 1)
      incrementDocRef(node->doc);
 #ifdef R_XML_DEBUG
-  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p)\n", node->name, node->type, (int) *val, node);
+  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p) (doc = %p)\n", node->name, node->type, (int) *val, node, node->doc);
 #endif
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));

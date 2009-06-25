@@ -10,6 +10,9 @@
 SEXP
 R_getXMLFeatures()
 {
+
+#ifdef HAVE_XML_HAS_FEATURE
+
     int features[] = {
            XML_WITH_THREAD,
            XML_WITH_TREE,
@@ -98,4 +101,7 @@ R_getXMLFeatures()
     UNPROTECT(2);
 
     return(ans);
+#else
+    return(allocVector(STRSXP, 0));
+#endif
 }
