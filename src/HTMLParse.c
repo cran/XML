@@ -94,3 +94,53 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
  UNPROTECT(1); 
  return(rdoc);
 }
+
+
+
+
+/*
+  Copied from  RS_XML_printXMLNode (XMLTree.c)  with minor changes.
+ */
+USER_OBJECT_
+RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent)
+{
+    USER_OBJECT_ ans;
+    xmlDocPtr node;
+    const char *encoding = NULL;
+    xmlOutputBufferPtr buf;
+    xmlBufferPtr xbuf;
+
+    int oldIndent;
+
+    oldIndent = xmlIndentTreeOutput;
+
+    node = (xmlDocPtr) R_ExternalPtrAddr(r_node);
+
+    xmlIndentTreeOutput =  LOGICAL(indent)[0];
+
+    xbuf = xmlBufferCreate();
+   
+    if(GET_LENGTH(r_encoding))
+	encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
+
+    buf = xmlOutputBufferCreateBuffer(xbuf, NULL);
+
+    htmlDocContentDumpFormatOutput(buf, node, encoding, INTEGER(format)[0]);
+    xmlOutputBufferFlush(buf);
+    xmlIndentTreeOutput = oldIndent;
+
+    if(xbuf->use > 0) {
+        /*XXX this const char * in CHARSXP means we have to make multiple copies. */
+#if 0
+	char *rbuf = R_alloc(sizeof(char) * (xbuf->use + 1));
+	memcpy(rbuf, xbuf->content, xbuf->use + 1);
+	PROTECT(tmp = mkChar(rbuf));
+#endif
+	ans = ScalarString(mkChar(xbuf->content));
+    } else
+      ans = NEW_CHARACTER(1);
+
+    xmlOutputBufferClose(buf);
+
+    return(ans);
+}

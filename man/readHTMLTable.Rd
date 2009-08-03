@@ -15,8 +15,9 @@
  The methods attempt to do some heuristic computations to determine
  the header labels for the columns, the name of the table, etc.
 }
+% xmlName(node) == "table" && ("thead" \%in\% names(node) || length(getNodeSet(node, "./tr[1]/th")) > 0)
 \usage{
-readHTMLTable(doc, header = xmlName(node) == "table" && ("thead" \%in\% names(node) || length(getNodeSet(node, "./tr[1]/th")) > 0),
+readHTMLTable(doc, header = NA,
               colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue, as.data.frame = TRUE, ...)
 }
 \arguments{

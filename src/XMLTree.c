@@ -523,10 +523,12 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
         ERROR;
     }
 
-    if(n->parent == p || n->parent) {
+#if 0
+    if(0 && n->parent == p || n->parent) {
       /*XX Need to decrement the reference count if there is a document. */
 	xmlUnlinkNode(n);
-    } 
+    }
+#endif 
 
       /* Make certain the nodes belong to this document if they already belong to another by copying. */
     if(n->doc && n->doc != p->doc) {
@@ -957,7 +959,7 @@ R_convertXMLNsRef(SEXP r_ns)
   ns = (xmlNsPtr) R_ExternalPtrAddr(r_ns);
 
   PROTECT(ans =  mkString(ns->href));
-  SET_NAMES(ans, mkString(ns->prefix ? ns->prefix : ""));
+  SET_NAMES(ans, mkString(ns->prefix ? XMLCHAR_TO_CHAR(ns->prefix) : ""));
 
   UNPROTECT(1);
 
@@ -1213,6 +1215,7 @@ R_addXMLNodeFinalizer(SEXP r_node)
 
 
 #define ValOrNULL(x) CHAR_TO_XMLCHAR ((x && x[0] ? x : NULL))
+
 
 
 /**

@@ -14,6 +14,7 @@ function(libname, pkgname)
 .onLoad =
 function(libname, pkgname)
 {
+
   # Added by Uwe Ligges.
  if(.Platform$OS.type == "windows"){
      temp <- Sys.getenv("PATH")

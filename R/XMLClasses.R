@@ -29,6 +29,7 @@ function(fun, class) {
   setMethod(fun, class, get(paste(fun, class, sep = ".")), where = topenv(parent.frame()))
 }
 
+if(FALSE)
 setOldClass =
 function(classes)
 {
@@ -59,6 +60,8 @@ oldClassTable =  list(
   "HTMLInternalDocument" = c("XMLInternalDocument", "XMLAbstractDocument")
 )
 
+
+
 oldClass =
 function(class)
 {
@@ -72,16 +75,16 @@ function(class)
 # These were in xmlNodes, but need to be defined earlier.
 
 setOldClass("XMLAbstractDocument")
-
 setOldClass(c("XMLInternalDocument", "XMLAbstractDocument"))
 setOldClass(c("XMLHashTree", "XMLAbstractDocument"))
 setOldClass(c("XMLDocument", "XMLAbstractDocument"))
 
-setOldClass(c("HTMLInternalDocument", "XMLInternalDocument")) # , "XMLAbstractDocument"))
+#XXXsetOldClass(c("HTMLInternalDocument", "XMLInternalDocument")) # , "XMLAbstractDocument"))
+setOldClass(c("HTMLInternalDocument", "XMLInternalDocument", "XMLAbstractDocument"))
 
 setOldClass("XMLAbstractNode")
-
 setOldClass(c("RXMLAbstractNode", "XMLAbstractNode"))
+
 
 # Why do we have to repeat this class inheritance information?
 # We don't!

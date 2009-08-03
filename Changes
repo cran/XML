@@ -1,6 +1,24 @@
+Version 2.6-0
+
+  *   When copying a node from one document to another, the node is explicitly
+      copied and not removed from the original document. This also fixes a problem
+      with the name space not being on the resulting node.
+
+  *   New functions for converting simple, shallow XML structure to an R data frame.
+      xmlToDataFrame() & xmlToList()
+
+  *   addChildren() can handle _copying_ a node from a different document.
+
+  *   as()/coerce() method for URI to character.
+
+  *   New functions to convert an XML tree to an S4 object and also to infer
+      S4 class definitions from XML. (makeClassTemplate(), xmlToS4())
+
+  *   Minor change to C code for compilation on Solaris and Sun Studio
+
 Version 2.5-3
 
-  *   Trivial change to an Rd file to add an omitted \
+  *   Trivial change to an Rd file to add an omitted 
 
 Version 2.5-2
  

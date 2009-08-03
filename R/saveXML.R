@@ -121,5 +121,20 @@ setMethod("saveXML", "XMLInternalDocument", saveXML.XMLInternalDocument)
 setMethod("saveXML", "XMLInternalDOM", saveXML.XMLInternalDOM)
 setMethod("saveXML", "XMLOutputStream", saveXML.XMLOutputStream)
 setMethod("saveXML", "XMLNode", saveXML.sink)
+setOldClass("XMLFlatTree")
+setOldClass(c("XMLFlatListTree", "XMLFlatTree"))
 setMethod("saveXML", "XMLFlatTree", saveXML.sink)
+
+
+setMethod("saveXML", "HTMLInternalDocument",
+          function(doc, file = NULL, compression = 0, indent = TRUE,
+             prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "", ...) {
+               ans = .Call("RS_XML_dumpHTMLDoc", doc, as.integer(indent), as.character(encoding), as.logical(indent), PACKAGE = "XML")
+
+               if(length(file)) {
+                 cat(ans, file = file)
+                 file
+               } else
+                 ans
+          })
 

@@ -335,12 +335,12 @@ function(tag, def, node)
     return(TRUE)
 
   if(! (ns[1] %in% names(def)) )
-     TRUE  #??
+     return(FALSE)
 
   defs = xmlNamespaceDefinitions(node)
 
-  if( defs[[ ns[1] ]]$uri == def[ ns[1] ]) 
-      stop("name space prefix ", ns, " does not match ", namespaceDefinition[ns], " but ", defs[[ ns[1] ]] $uri)
+  if( defs[[ ns[1] ]]$uri != def[ ns[1] ]) 
+      stop("name space prefix ", ns, " does not match ", def[ ns[1] ], " but ", defs[[ ns[1] ]] $uri)
 
   TRUE
 }  
@@ -373,7 +373,7 @@ function(node, parse = FALSE, sourceDoc = NULL)
 
   if(parse) {
      #
-     # Perhaps just relod the original document
+     # Perhaps just reload the original document
      # and see what the difference is. Not guaranteed
      # to work since people may have already altered
      # the source document.
@@ -392,8 +392,17 @@ function(node, parse = FALSE, sourceDoc = NULL)
 }  
 
 getInclude =
+  #
+  #XXX  getXIncludeInfo is not defined!
+  #
 function(doc, parse = FALSE)
 {
   xpathApply(doc, "//xi:include", getXIncludeInfo, parse, docName(doc), doc,
                  namespaces = c(xi="http://www.w3.org/2001/XInclude"))
 }  
+
+getXIncludeInfo =
+function(node, parse = FALSE, baseURL = character())
+{
+
+}

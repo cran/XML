@@ -1,6 +1,7 @@
 \name{parseURI}
 \alias{parseURI}
 \alias{URI-class}
+\alias{coerce,URI,character-method}
 \title{Parse a URI string into its elements}
 \description{
   This breaks a URI given as a string into its different elements such as
@@ -39,7 +40,13 @@ parseURI(uri)
 }
 \examples{
   parseURI("http://www.omegahat.org:8080/RCurl/index.html")
-  parseURI("ftp://duncan@www.omegahat.org:8080/RCurl/index.html") 
+  parseURI("ftp://duncan@www.omegahat.org:8080/RCurl/index.html")
+
+  parseURI("ftp://duncan@www.omegahat.org:8080/RCurl/index.html#my_anchor")
+
+  as(parseURI("http://duncan@www.omegahat.org:8080/RCurl/index.html#my_anchor"), "character")
+
+  as(parseURI("ftp://duncan@www.omegahat.org:8080/RCurl/index.html?foo=1&bar=axd"), "character")
 }
 \keyword{IO}
 \concept{URI}

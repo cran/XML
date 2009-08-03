@@ -30,7 +30,7 @@ if(FALSE) {
 }
 
 setGeneric("readHTMLTable",
-          function(doc, header = xmlName(node) == "table" && ("thead" %in% names(node) || length(getNodeSet(node, "./tr[1]/th")) > 0),
+          function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
                      as.data.frame = TRUE, ...)           
              standardGeneric("readHTMLTable"))
@@ -91,13 +91,16 @@ setMethod("readHTMLTable", "XMLInternalElementNode",
   #  as.data.frame
   #
 
-function(doc, header = xmlName(node) == "table" && ("thead" %in% names(node) || length(getNodeSet(node, "./tr[1]/th")) > 0) ,
+function(doc, header = NA ,
           colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
             as.data.frame = TRUE, ...)
 {
   node = doc
   headerFromTable = FALSE
   dropFirstRow = FALSE
+
+  if(is.na(header))
+      header = (xmlName(doc) == "table" && ("thead" %in% names(doc) || length(getNodeSet(doc, "./tr[1]/th")) > 0))
 
   if(is.logical(header) && (is.na(header) || header) &&  xmlName(node) == "table") {
     if("thead" %in% names(node))

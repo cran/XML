@@ -104,9 +104,12 @@ exportMethods("toHTML")
 export("xmlChildren<-")
 exportMethods("xmlChildren<-")
 
+exportClasses("XMLInternalDocument")
+exportClass("URI")
 if(TRUE) {
-exportClasses("XMLInternalDocument", "HTMLInternalDocument")
-exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalElementNode",
+exportClasses("XMLAbstractNode", "XMLNode")
+exportClasses("HTMLInternalDocument")
+exportClasses("XMLInternalNode", "XMLInternalElementNode",
               "XMLInternalTextNode", "XMLInternalPINode", "XMLInternalCDataNode",
               "XMLInternalCommentNode", "XMLDTDNode",
               "XMLXIncludeStartNode", "XMLXIncludeEndNode", "XMLEntityDeclNode",
@@ -114,7 +117,7 @@ exportClasses("XMLAbstractNode", "XMLNode", "XMLInternalNode", "XMLInternalEleme
               "XMLDocumentFragNode", "XMLNamespaceDeclNode")
 
 exportClasses("XMLNamespace")
-exportClass("URI")
+
 exportClass(XMLNamespaceDefinitions)
 }
 
@@ -436,3 +439,7 @@ export(readHTMLTable)
 
 
 
+export(xmlToS4, makeClassTemplate) # xmlToS4List
+exportMethods("xmlToS4")
+export(xmlToDataFrame)
+exportMethods(xmlToDataFrame)

@@ -713,7 +713,7 @@ checkNodeNamespace =
   # can only be checked after we know the parent node, 
   # i.e. after it has been inserted.
   #
-function(node, prefix = xmlNamespace(ns))
+function(node, prefix = xmlNamespace(node))
 {
   if(length(prefix) == 0 || prefix == "")
     return(TRUE)
@@ -724,13 +724,13 @@ function(node, prefix = xmlNamespace(ns))
   okay = FALSE
   p = xmlParent(node)
   while(!is.null(p)) {
-    okay = ns %in% names(xmlNamespaceDefinitions(p))
+    okay = prefix %in% names(xmlNamespaceDefinitions(p))
     if(okay)
       break
   }
   
   if(!okay)
-    stop("using an XML namespace prefix '", ns, "' for a node that is not defined for this node or its node's ancestors")
+    stop("using an XML namespace prefix '", prefix, "' for a node that is not defined for this node or its node's ancestors")
 
   TRUE
 }  

@@ -14,6 +14,7 @@
 \alias{saveXML,XMLInternalNode-method}
 \alias{saveXML,XMLNode-method}
 \alias{saveXML,XMLOutputStream-method}
+\alias{saveXML,HTMLInternalDocument-method}
 \title{Output internal XML Tree}
 \description{
   Methods for writing the representation of an XML tree to a string or

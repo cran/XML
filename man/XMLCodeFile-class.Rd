@@ -5,7 +5,8 @@
 \alias{XMLCodeDoc-class}
 \alias{xmlCodeFile}
 \alias{[[,XMLCodeFile-method}
-\alias{[[,XMLCodeFile,ANY,ANY-method}
+%\alias{[[,XMLCodeFile,ANY,ANY-method}
+\alias{[[,XMLCodeFile,ANY-method}
 \alias{coerce,XMLCodeFile,XMLCodeDoc-method}
 \alias{coerce,character,XMLCodeDoc-method}
 \alias{coerce,character,XMLCodeFile-method}

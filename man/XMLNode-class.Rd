@@ -21,6 +21,15 @@
 \alias{XMLXIncludeEndNode-class}
 \alias{XMLDTDNode-class}
 
+
+\alias{coerce,XMLAbstractNode,Date-method}
+\alias{coerce,XMLAbstractNode,POSIXct-method}
+\alias{coerce,XMLAbstractNode,URL-method}
+\alias{coerce,XMLAbstractNode,character-method}
+\alias{coerce,XMLAbstractNode,integer-method}
+\alias{coerce,XMLAbstractNode,logical-method}
+\alias{coerce,XMLAbstractNode,numeric-method}
+
 \alias{XMLNamespaceDefinitions-class}
 
 \title{Classes to describe an XML node object.}

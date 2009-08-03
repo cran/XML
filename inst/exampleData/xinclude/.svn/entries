@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="6016"
+   name=""
+   committed-date="2009-06-01T21:06:43.168049Z"
+   url="svn+ssh://eeyore.ucdavis.edu/home/omega/SVNRepos/trunk/XML/RS/data/xinclude"
+   last-author="duncan"
+   kind="dir"
+   uuid="97ddf686-9c4d-11db-88ae-b37afa3ab33b"
+   revision="6107"/>
+<entry
+   committed-rev="5887"
+   name="a.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T23:10:34.232178Z"
+   checksum="b5e2c9cb6f41ddae5481f168761cdecb"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="5881"
+   name="b.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T13:19:56.380243Z"
+   checksum="a2dbd9063592a474076a4fa13f33b966"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="5881"
+   name="c.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T13:19:56.380243Z"
+   checksum="7e9d4b62b63326ad2b043393c4fc0b4b"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="5885"
+   name="top.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T22:06:40.347067Z"
+   checksum="3710d0c649035714b6e89873326951b7"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="5888"
+   name="d.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T23:11:51.328298Z"
+   checksum="ee12821458852845d84ba37f3f8012d7"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="5888"
+   name="e.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-04-27T23:11:51.328298Z"
+   checksum="5ecd9593d72f87c8648e2ab7be5814cc"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+<entry
+   committed-rev="6016"
+   name="simple.xml"
+   text-time="2009-06-06T14:44:07.000000Z"
+   committed-date="2009-06-01T21:06:43.168049Z"
+   checksum="30b3e0c2056e41e7ea8bc2e14b5b361e"
+   last-author="duncan"
+   kind="file"
+   prop-time="2009-06-06T14:44:07.000000Z"/>
+</wc-entries>

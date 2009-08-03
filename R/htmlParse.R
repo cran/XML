@@ -91,3 +91,19 @@ function(uri)
 }  
 
 setOldClass("URI")
+setOldClass("URL")
+
+setAs("URI", "character",
+      function(from) {
+           sprintf("%s://%s%s%s%s%s%s%s",
+                                    from[["scheme"]],
+                                    from[["user"]],
+                                    if(from[["user"]] != "") "@" else "",
+                                    from[["server"]],
+                                    if(!is.na(from[["port"]])) sprintf(":%d", as.integer(from[["port"]])) else "",
+                                    from["path"],
+                                    if(from[["query"]] != "") sprintf("?%s", from[["query"]]) else "",
+                                    if(from[["fragment"]] != "") sprintf("#%s", from[["fragment"]]) else ""                   
+                   )
+      })
+
