@@ -79,8 +79,9 @@ RS_XML_catalogAdd(SEXP orig, SEXP replace, SEXP type)
     n =  LENGTH(orig);
     ans = NEW_LOGICAL(n);
     for(i = 0; i < n ; i++) {
-	LOGICAL(ans)[i] = (xmlCatalogAdd(CHAR_TO_XMLCHAR(STRING_ELT(type, i)), CHAR_TO_XMLCHAR(STRING_ELT(orig, i)), 
-					 CHAR_TO_XMLCHAR(STRING_ELT(replace, i))) == 0);
+	LOGICAL(ans)[i] = (xmlCatalogAdd(CHAR_TO_XMLCHAR(CHAR(STRING_ELT(type, i))), 
+                                         CHAR_TO_XMLCHAR(CHAR(STRING_ELT(orig, i))), 
+					 CHAR_TO_XMLCHAR(CHAR(STRING_ELT(replace, i)))) == 0);
     }
 
     return(ans);
@@ -98,4 +99,10 @@ RS_XML_catalogDump(SEXP fileName)
 
     xmlCatalogDump(out);
     return(ScalarLogical(TRUE));
+}
+
+void
+R_xmlInitializeCatalog()
+{
+    xmlInitializeCatalog();
 }

@@ -6,8 +6,9 @@
 \title{Find matching nodes in an internal XML tree/DOM}
 \description{
   These functions provide a way to find XML nodes that match a particular
-  criterion. It uses the XPath syntax and allows quite powerful
-  expressions for identifying nodes of interest.  The XPath language requires some
+  criterion. It uses the XPath syntax and allows very powerful
+  expressions to identify nodes of interest within a document both
+  clearly and efficiently.  The XPath language requires some
   knowledge, but tutorials are available on the Web and in books.
   XPath queries can result in different types of values such as numbers,
   strings, and node sets. It allows simple identification of nodes
@@ -24,6 +25,13 @@
   XPath offers an alternative way to find nodes of interest 
   than recursively or iteratively navigating the entire tree in R
   and performing the navigation explicitly.
+
+  One can search an entire document or start the search from a
+  particular node.  Such node-based searches can even search up the tree
+  as well as within the sub-tree that the node parents.  Node specific
+  XPath expressions are typically started with a "." to indicate the
+  search is relative to that node.
+  
 
   The set of matching nodes corresponding to an XPath expression
   are returned in R as a list.  One can then  iterate over these elements to process the 
@@ -88,7 +96,7 @@
 }
 \usage{
 getNodeSet(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), 
-                    fun = NULL, ...)
+                    fun = NULL, sessionEncoding = CE_NATIVE, ...)
 xpathApply(doc, path, fun, ... , namespaces =  xmlNamespaceDefinitions(doc, simplify = TRUE),
                     resolveNamespaces = TRUE)
 xpathSApply(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
@@ -145,6 +153,8 @@ matchNamespaces(doc, namespaces,
    This is the same as \code{\link[base]{sapply}} does
    in comparison to \code{\link[base]{lapply}}.
  }
+%XXX
+\item{sessionEncoding}{experimental functionality and parameter related to encoding.}
 }
 \details{
   When a namespace is defined on a node in the XML document,
@@ -424,7 +434,12 @@ So we would use
 
 
        # Get all the nodes in the entire tree.
-    table(unlist(sapply(doc["//*|//text()|//comment()|//processing-instruction()"], class)))
+    table(unlist(sapply(doc["//*|//text()|//comment()|//processing-instruction()"],
+    class)))
+
+
+
+
 }
 \keyword{file}
 \keyword{IO}

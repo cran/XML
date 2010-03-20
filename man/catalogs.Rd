@@ -3,6 +3,7 @@
 \alias{catalogLoad}
 \alias{catalogClearTable}
 \alias{catalogAdd}
+\alias{catalogDump}
 
 \title{Manipulate XML catalog contents}
 
@@ -45,7 +46,10 @@
 
    In addition to controlling the catalogs via these functions, we can 
    use \code{\link{catalogResolve}} to use the catalog
-   to resolve the name of a resource and map it to 
+   to resolve the name of a resource and map it to a local resource.
+
+   \code{catalogDump} allows us to retrieve an XML document representing the current
+  contents of the in-memory catalog .
   
    More information can be found at
    \url{http://xmlsoft.org/catalog.html}
@@ -58,6 +62,7 @@
 catalogLoad(fileNames)
 catalogClearTable()
 catalogAdd(orig, replace, type = "rewriteURI")
+catalogDump(fileName = tempfile(), asText = TRUE)
 }
 
 \arguments{
@@ -76,7 +81,11 @@ catalogAdd(orig, replace, type = "rewriteURI")
         Valid values are rewriteURI, rewriteSystem, system, public.
     }
    \item{fileNames}{a character vector giving the names of the 
-       catalog files to load.}}
+       catalog files to load.}
+  \item{fileName}{the name of the file in which to place the contents of the current catalog}
+  \item{asText}{a logical value which indicates whether to write the catalog
+   as a character string if \code{filename} is not specified.}
+}
 
 \value{
     These functions are used for their side effects on the global

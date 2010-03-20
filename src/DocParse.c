@@ -1047,8 +1047,11 @@ notifyError(const char *msg, va_list ap, Rboolean isError)
     memset(buf, '\0', BUFSIZE);
     vsnprintf(buf, BUFSIZE, msg, ap);
 
+    Rf_warning(buf);
+#if 0
     PROBLEM buf
         WARN;
+#endif
 
 #endif
 }
@@ -1295,7 +1298,7 @@ RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
 {
     xmlNodePtr node;
     int flags = INTEGER(r_flags)[0];
-    int n, i;
+    int n;
     xmlNodePtr prev, parent;
     SEXP ans = R_NilValue;
 
@@ -1430,7 +1433,7 @@ SEXP
 R_getDocEncoding(SEXP r_doc)
 {
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
-    xmlNodePtr node;
+
     const xmlChar *encoding;
     SEXP ans;
 

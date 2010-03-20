@@ -1,6 +1,12 @@
+xmlInitializeCatalog = 
+function()
+   .C("R_xmlInitializeCatalog", PACKAGE = "XML")
+
+
 catalogResolve =
 function(id, type = "uri", asIs = FALSE, debug = FALSE)
 {
+   xmlInitializeCatalog()
    type = rep(type, length = length(id))
   
    types = c("uri", "public", "system")
@@ -30,7 +36,7 @@ function()
 }
 
 
-XMLCatalogTypes = c("public", "system", "rewriteSystem", "rewriteURI")
+XMLCatalogTypes = c("public", "system", "rewriteSystem", "rewriteURI", "uri", "delegateSystem", "delegatePublic", "delegateURI", "nextCatalog", "catalog")
 
 
 catalogAdd =
@@ -51,8 +57,10 @@ function(orig, replace, type = "rewriteURI")
   type = XMLCatalogTypes[idx]
   type = rep(as.character(type), length = length(orig))
 
+  xmlInitializeCatalog()
   .Call("RS_XML_catalogAdd", as.character(orig), as.character(replace), as.character(type), PACKAGE = "XML")
 }  
+
 
 catalogDump =
   #
@@ -63,6 +71,7 @@ catalogDump =
   
 function(fileName = tempfile(), asText = TRUE)
 {
+  xmlInitializeCatalog()
   ans = .Call("RS_XML_catalogDump", as.character(fileName), PACKAGE = "XML")
   if(missing(fileName)) {
     ans = xmlTreeParse(fileName, useInternal = TRUE)

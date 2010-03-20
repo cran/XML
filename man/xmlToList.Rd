@@ -61,6 +61,7 @@ tt =
   doc = xmlParse(tt)
   xmlToList(doc)
 
+   # use an R-level node representation
   doc = xmlTreeParse(tt)
   xmlToList(doc)
 }

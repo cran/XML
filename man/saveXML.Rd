@@ -145,6 +145,20 @@ saveXML(con$value(), file="out.xml")
  cat(saveXML(x), "\n")
 
  cat(as(x, "character"), "\n")
+
+
+     # Showing the prefix parameter
+  doc = newXMLDoc()
+  n = newXMLNode("top", doc = doc)
+  b = newXMLNode("bar", parent = n)
+
+     # suppress the <?xml ...?>
+  saveXML(doc, prefix = character())
+
+     # put our own comment in
+  saveXML(doc, prefix = "<!-- This is an alternative prefix -->")
+     # or use a comment node.
+  saveXML(doc, prefix = newXMLCommentNode("This is an alternative prefix"))
 }
 \keyword{IO}
 \keyword{file}

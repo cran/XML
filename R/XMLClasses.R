@@ -129,14 +129,16 @@ setOldClass(c("XMLDocumentTypeNode", "XMLInternalNode"))
 setOldClass(c("XMLDocumentFragNode", "XMLInternalNode"))
 setOldClass(c("XMLNamespaceDeclNode", "XMLInternalNode"))
 
+setOldClass(c("XMLAttributeNode", "XMLInternalNode"))
+
+
 setOldClass(c("XMLDTDNode", "XMLInternalNode"))
 
-setOldClass(c("XMLNamespace"))
-setOldClass(c("XMLNamespaceDefinition"))
+setOldClass("XMLNamespace")
+setOldClass("XMLNamespaceDefinition")
+setOldClass("XMLNamespaceDefinitions")
 
 #setOldClass("XMLInternalDOM")
-
-setOldClass("XMLNamespaceDefinitions")
 setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
 setOldClass("XMLNamespace")
 
@@ -404,7 +406,7 @@ function(x, ..., indent = "", tagSeparator = "\n")
 
  if(length(x$namespaceDefinitions) > 0) {
     k = as(x$namespaceDefinitions, "character")
-    ns = paste("xmlns", ifelse(nchar(names(k)), ":", ""), names(k), "=", dQuote(k), sep = "", collapse = " ")
+    ns = paste("xmlns", ifelse(nchar(names(k)), ":", ""), names(k), "=", ddQuote(k), sep = "", collapse = " ")
 #   ns <- paste(sapply(x$namespaceDefinitions, 
 #                       function(x) {
 #                            paste("xmlns", if(nchar(x$id) > 0) ":" else "", x$id, "=", "\"", x$uri, "\"", sep="")
@@ -571,7 +573,7 @@ function(doc, namespaces,
 
       # deal with the first one as a special case. If this has no match,
       # we will map it to the default namespace's URI.
-    if(i[1] && is.na(match(namespaces[1], names(nsDefs)))) {
+    if(i[1] && length(defaultNs) && is.na(match(namespaces[1], names(nsDefs)))) {
       names(namespaces)[1] = namespaces[1]
       namespaces[1] = defaultNs
       msg = paste("using", names(namespaces)[1], "as prefix for default namespace", defaultNs)
@@ -616,9 +618,9 @@ function(doc, namespaces,
 
 
 getNodeSet =
-function(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), fun = NULL, ...)
+function(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), fun = NULL, sessionEncoding = CE_NATIVE, ...)
 {
-  xpathApply(doc, path, fun, ...,  namespaces = namespaces)
+  xpathApply(doc, path, fun, ...,  namespaces = namespaces, sessionEncoding = sessionEncoding)
 }
 
 
@@ -682,9 +684,11 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
   ans
 }
 
+
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE)
+          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE, 
+           sessionEncoding = CE_NATIVE) # native
 {
 #  if(!inherits(doc, "XMLInternalDocument"))
 #    stop("Need XMLInternalDocument object for XPath query")
@@ -701,7 +705,13 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
     fun = as.call(c(fun, append(1, args)))
 
 
-  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, PACKAGE = "XML")
+      #XXX Match the session encoding c("native" = 0, utf8 = 1, latin1 = 2)
+  encoding = if(is.integer(sessionEncoding))
+                sessionEncoding
+             else
+                getEncodingREnum(sessionEncoding)
+
+  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, encoding, PACKAGE = "XML")
 
   if(!noMatchOkay && length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]

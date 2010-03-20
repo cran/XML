@@ -18,7 +18,9 @@
 % xmlName(node) == "table" && ("thead" \%in\% names(node) || length(getNodeSet(node, "./tr[1]/th")) > 0)
 \usage{
 readHTMLTable(doc, header = NA,
-              colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue, as.data.frame = TRUE, ...)
+              colClasses = NULL, skip.rows = integer(), trim = TRUE,
+              elFun = xmlValue, as.data.frame = TRUE, which = integer(),
+               ...)
 }
 \arguments{
   \item{doc}{the HTML document which can be a file name or a URL
@@ -27,8 +29,20 @@ readHTMLTable(doc, header = NA,
   \item{header}{either a logical value indicating whether the table has
     column labels, e.g. the first row or a \code{thead}, or alternatively
    a character vector giving the names to use for the resulting columns.}
-  \item{colClasses}{}
-  \item{skip.rows}{}
+  \item{colClasses}{either a list or a vector that gives the names of
+    the data types for the different columns in the table, or
+    alternatively a function used to convert the string values to the
+    appropriate type.  A value of \code{NULL} means that we should drop
+    that column from the result.
+    Note that currently the conversion occurs before the
+    vectors are converted to a data frame (if \code{as.data.frame} is
+    \code{TRUE}).
+    As a result, to ensure that character vectors remain as characters
+    and not factors, use \code{stringsAsFactors = TRUE}.
+    This typically applies only to an individual table and so for the
+    method applied to a \code{XMLInternalElementNode} object.
+   }
+  \item{skip.rows}{an integer vector indicating which rows to ignore.}
   \item{trim}{a logical value indicating whether to remove leading and
  trailing white space from the content cells.}
   \item{elFun}{a function which, if specified, is called when converting
@@ -39,7 +53,10 @@ readHTMLTable(doc, header = NA,
   }
   \item{as.data.frame}{a logical value indicating whether to turn the
     resluting table(s) into data frames or leave them as matrices.
-   }
+  }
+  \item{which}{an integer vector identifying which tables to return from
+    within the document. This applies to the method for the document, not
+     individual tables.}
    \item{\dots}{currently additional parameters that are passed on to
      \code{\link{as.data.frame}} if \code{as.data.frame} is \code{TRUE}.
     We may change this to use these as additional arguments for calls to
@@ -97,6 +114,25 @@ HTML4.0 specification
 
  tb = readHTMLTable(tableNodes[[2]], elFun = tryAsInteger,
                        colClasses = c("character", rep("integer", 9)))
+
+
+  zz = readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
+  zz = zz[[4]]  # 4th table
+  zz[-1] = lapply(zz[-1], function(x) as.numeric(gsub(".* ", "", as.character(x))))
+  matplot(1:12, t(zz[-c(1, 14)]), type = "l")
+
+
+# From Marsh Feldman on R-help
+doc <- "http://www.nber.org/cycles/cyclesmain.html"
+     # The  main table is the second one because it's embedded in the page table.
+table <- getNodeSet(htmlParse(doc),"//table") [[2]]   
+xt <- readHTMLTable(table,
+                    header = c("peak","trough","contraction",
+                               "expansion","trough2trough","peak2peak"),
+                    colClasses = c("character","character","character",
+                                   "character","character","character"),
+                    trim = TRUE, stringsAsFactors = FALSE
+                   )
 }
 \keyword{IO}
 \keyword{data}

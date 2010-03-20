@@ -49,6 +49,7 @@
 void incrementDocRef(xmlDocPtr doc);
 int getNodeCount(xmlNodePtr node);
 void incrementDocRefBy(xmlDocPtr doc, int num);
+SEXP R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer);
 
 /**
  Create a libxml comment node and return it as an S object
@@ -121,7 +122,7 @@ R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
 
 USER_OBJECT_
 R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc,
-              USER_OBJECT_ nameSpaceDefinitions)
+              USER_OBJECT_ nameSpaceDefinitions, USER_OBJECT_ manageMemory)
 {
    xmlDocPtr doc = NULL;
    xmlNsPtr ns = NULL;
@@ -172,7 +173,7 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
        XML_ROOT(doc) = node;
    }
 
-   return(R_createXMLNodeRef(node));
+   return(INTEGER(manageMemory)[0] > 0 ? R_createXMLNodeRef(node) : R_createXMLNodeRefDirect(node, 0));
 }
 
 USER_OBJECT_
@@ -623,6 +624,12 @@ RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_af
 	
     f = LOGICAL(r_after)[0] ?  xmlAddNextSibling : xmlAddPrevSibling ;
     ans = f(p, n);
+
+    /* If adding to the root node and inserting a node before the
+     * current first child, update the document.*/
+    if(p->doc && p->doc->children == p && n->next == p)
+	p->doc->children = n;
+
     incrementDocRefBy(p->doc, getNodeCount(n));
     return(R_createXMLNodeRef(ans));
 }
@@ -705,7 +712,7 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
   }
 
   if(LOGICAL(skipDtd)[0]) {
-      while(node && (node->type == XML_DTD_NODE || node->type == XML_COMMENT_NODE)) {
+      while(node && node->type != XML_ELEMENT_NODE /* (node->type == XML_DTD_NODE || node->type == XML_COMMENT_NODE) */) {
 	  node = node->next;
       }
   }
@@ -857,14 +864,29 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 xmlDocPtr currentDoc;
 #endif
 
-void incrementDocRefBy(xmlDocPtr doc, int num)
+int R_XML_MemoryMgrMarker = 10101010011;
+
+void
+initDocRefCounter(xmlDocPtr doc)
 {
     int *val;
-    if(!doc)
+    if(doc->_private)
+	return;
+    doc->_private = calloc(2, sizeof(int));
+    val = (int *) doc->_private;
+    val[1] = R_MEMORY_MANAGER_MARKER;
+}
+
+void 
+incrementDocRefBy(xmlDocPtr doc, int num)
+{
+    int *val;
+    if(!doc || IS_NOT_OUR_DOC_TO_TOUCH(doc))
 	return;
 
-    if(!doc->_private)
-	doc->_private = calloc(1, sizeof(int));
+    if(!doc->_private) {
+	initDocRefCounter(doc);
+    }
 
     val = (int *) doc->_private;
 
@@ -886,7 +908,8 @@ int getNodeCount(xmlNodePtr node)
 {
   int val = 0;
   xmlNodePtr p = node->children;
-  if(!node)
+
+  if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node))
     return(0);
 
   val = GET_NODE_COUNT(node);
@@ -907,6 +930,10 @@ R_createXMLDocRef(xmlDocPtr doc)
   currentDoc = doc;
 #endif
 
+  if(!doc)
+     return(R_NilValue);
+
+  initDocRefCounter(doc);
   incrementDocRef(doc);
 
 #ifdef R_XML_DEBUG
@@ -1025,7 +1052,9 @@ R_getInternalNodeClass(xmlElementType type)
         case XML_DOCUMENT_FRAG_NODE:
               p = "XMLDocumentFragNode";
               break;
-
+        case XML_ATTRIBUTE_NODE:
+              p = "XMLAttributeNode";
+              break;
         default:
               p = "XMLUnknownInternalNode";
     }
@@ -1037,7 +1066,7 @@ void
 internal_incrementNodeRefCount(xmlNodePtr node)
 {
     int *val;
-    if(!node || !node->_private)
+    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node) || !node->_private)
 	return;
     val = (int *) node->_private;
     (*val)++;
@@ -1047,7 +1076,7 @@ SEXP
 R_getXMLRefCount(SEXP rnode)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(rnode);
-    if(!node || !node->_private)
+    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node) || !node->_private)
 	return(R_NilValue);
     return(ScalarInteger(*((int *) node->_private)));
 }
@@ -1056,7 +1085,7 @@ int
 checkDescendantsInR(xmlNodePtr node)
 {
     xmlNodePtr p;
-    if(!node)
+    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node))
 	return(0);
 
     if(node->_private)
@@ -1076,7 +1105,8 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 {
     int *val;
        /* */    
-    if(!node || !node->_private) /* if node->_private == NULL, should
+    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node) || !node->_private) 
+                                 /* if node->_private == NULL, should
 				  * we free this node?, i.e. if it is
 				  * not in a parent or a document.
                                   No! Basically we shouldn't get here
@@ -1159,34 +1189,15 @@ decrementNodeRefCount(SEXP rnode)
 }
 
 
-
-
-/**
-
- */
-USER_OBJECT_
-R_createXMLNodeRef(xmlNodePtr node)
+SEXP
+R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer)
 {
   SEXP ref, tmp;
-  int *val;
-
-  if(!node)
-      return(NULL_USER_OBJECT);
-
-
-  if(node->_private == NULL) 
-      node->_private = calloc(1, sizeof(int));
-  val = (int *) node->_private;
-  (*val)++;
-  if(*val == 1)
-     incrementDocRef(node->doc);
-#ifdef R_XML_DEBUG
-  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p) (doc = %p)\n", node->name, node->type, (int) *val, node, node->doc);
-#endif
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
 #ifdef XML_REF_COUNT_NODES
-  R_RegisterCFinalizer(ref, decrementNodeRefCount);
+  if(addFinalizer > 0 || (addFinalizer < 0 && !IS_NOT_OUR_NODE_TO_TOUCH(node)))
+     R_RegisterCFinalizer(ref, decrementNodeRefCount);
 #endif
   PROTECT(tmp = NEW_CHARACTER(3));
   SET_STRING_ELT(tmp, 0, mkChar(R_getInternalNodeClass(node->type)));
@@ -1195,6 +1206,73 @@ R_createXMLNodeRef(xmlNodePtr node)
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
+}
+
+int
+clearNodeMemoryManagement(xmlNodePtr node)
+{
+    xmlNodePtr tmp;
+    int ctr = 0;
+    if(node->_private) {
+	free(node->_private);
+	node->_private = NULL;
+	ctr++;
+    }
+
+    tmp = node->children;
+    while(tmp) {
+	tmp = tmp->next;
+	ctr += clearNodeMemoryManagement(tmp);
+    }
+    return(ctr);
+}
+
+SEXP
+R_clearNodeMemoryManagement(SEXP r_node)
+{
+   xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+   int val;
+
+   if(!node) 
+       return(ScalarInteger(-1));
+
+   val = clearNodeMemoryManagement(node);
+
+   return(ScalarInteger(val));
+}
+
+
+
+/**
+
+ */
+USER_OBJECT_
+R_createXMLNodeRef(xmlNodePtr node)
+{
+  int *val;
+
+  if(!node)
+      return(NULL_USER_OBJECT);
+
+/*  !IS_NOT_OUR_NODE_TO_TOUCH(node) */
+  if((node->_private && ((int*)node->_private)[1] == (int) R_MEMORY_MANAGER_MARKER)
+     || !node->doc || (!(IS_NOT_OUR_DOC_TO_TOUCH(node->doc)))) {
+      if(node->_private == NULL) {
+        node->_private = calloc(2, sizeof(int));
+	val = (int *) node->_private;
+	val[1] = R_MEMORY_MANAGER_MARKER;
+      }
+
+      val = (int *) node->_private;
+      (*val)++;
+      if(*val == 1)
+	  incrementDocRef(node->doc);
+#ifdef R_XML_DEBUG
+  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p) (doc = %p count = %d)\n", node->name, node->type, (int) *val, node, node->doc,  ((int *)node->doc->_private)[0]);
+#endif
+  }
+
+  return(R_createXMLNodeRefDirect(node, !IS_NOT_OUR_NODE_TO_TOUCH(node)));
 }
 
 
@@ -1252,6 +1330,9 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     }
 
     doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
+
+    if(doc == NULL)
+	return(NEW_CHARACTER(0));
 
     xmlIndentTreeOutput = LOGICAL_DATA(sindent)[0];
 
@@ -1490,6 +1571,19 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 }
 
 SEXP
+R_setXMLInternalTextNode_noenc(SEXP node)
+{
+     xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
+     if(!n) {
+	 PROBLEM "null value passed for XMLInternalTextNode"
+	     ERROR;
+     }
+     n->name = (const xmlChar *) (&xmlStringTextNoenc);
+     return(ScalarLogical(TRUE));
+}
+
+SEXP
+/*R_setXMLInternalTextNode_value(SEXP node, SEXP value, SEXP r_encoding)*/
 R_setXMLInternalTextNode_value(SEXP node, SEXP value)
 {
    xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
@@ -1514,7 +1608,7 @@ R_setXMLInternalTextNode_value(SEXP node, SEXP value)
 }
 
 SEXP
-R_xmlNodeValue(SEXP node, SEXP raw)
+R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
 {
    xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
    xmlChar *tmp;
@@ -1538,7 +1632,12 @@ R_xmlNodeValue(SEXP node, SEXP raw)
    }
 */
    if(tmp) {
+#if 0
      ans = ScalarString(CreateCharSexpWithEncoding(encoding, tmp));
+#else
+     ans = ScalarString(mkCharCE(tmp, INTEGER(r_encoding)[0]));
+#endif
+
 //     ans = mkString(XMLCHAR_TO_CHAR(tmp));
      // Just playing:  ans = ScalarString(mkCharCE(tmp, CE_UTF8));
    } else 

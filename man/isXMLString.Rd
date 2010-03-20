@@ -25,9 +25,13 @@ xml(x)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{str,x,content}{the string containing the XML material.}
-  \item{doc}{}
-  \item{namespaces}{}
-  \item{clean}{}
+  \item{doc}{if specified, an \code{XMLInternalDocument} object which is
+   used to "house" the new nodes. Specifically, when the nodes are
+   created, they are made as part of this document. This may not be as
+   relevant now with the garbage collection being done at a node and
+   document level. But it still potentially of some value.}
+  \item{namespaces}{a character vector giving the URIs for the XML namespaces which are to be removed if \code{clean} is \code{TRUE}.}
+  \item{clean}{a logical value that controls whether namespaces are removed after the document is parsed..}
 }
 \details{
 }

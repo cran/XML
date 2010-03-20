@@ -327,7 +327,7 @@ void R_xmlFreeDoc(SEXP ref)
   xmlDocPtr doc;
   doc = (xmlDocPtr) R_ExternalPtrAddr(ref);
 
-  if(doc) {
+  if(doc && !IS_NOT_OUR_DOC_TO_TOUCH(doc)) {
       int *val;
       val = doc->_private;
       if(val) {
@@ -351,7 +351,7 @@ void R_xmlFreeDoc(SEXP ref)
 
       xmlFreeDoc(doc);
       R_numXMLDocsFreed++;
-      } /* was before the xmlFreeDoc so that that was unconditional.*/
+     } /* was before the xmlFreeDoc so that that was unconditional.*/
   }
   R_ClearExternalPtr(ref);
 }

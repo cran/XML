@@ -22,7 +22,7 @@ function(tag = "doc", attrs = NULL, dtd = NULL, nameSpace = NULL, nsURI = charac
  }
 
  if(length(dtd)) 
-   dtd = paste("<!DOCTYPE", tag, "SYSTEM", dQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", dQuote(dtd[2])), ">")
+   dtd = paste("<!DOCTYPE", tag, "SYSTEM", ddQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", ddQuote(dtd[2])), ">")
 
  
  reset <-

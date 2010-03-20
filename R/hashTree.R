@@ -403,7 +403,7 @@ function(doc)
   doc$.doc
 }
 
-# setMethod("docName", "XMLHashTree", docName.XMLHashTree)
+setMethod("docName", "XMLHashTree", docName.XMLHashTree)
 
 
 

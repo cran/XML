@@ -63,7 +63,7 @@ htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
               useInternalNodes = FALSE, encoding = character(),
               useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
               xinclude = FALSE, addFinalizer = TRUE, 
-              error = xmlErrorCumulator()) 
+              error = function(...){}) 
 
 xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
 }
@@ -172,7 +172,11 @@ return type.
 \item{encoding}{ a character string (scalar) giving the encoding for the
   document.  This is optional as the document should contain its own
   encoding information. However, if it doesn't, the caller can specify
-  this for the parser.
+  this for the parser.  If the XML/HTML document does specify its own
+  encoding that value is used regardless of any value specified by the
+  caller. (That's just the way it goes!) So this is to be used
+  as a safety net in case the document does not have an encoding and
+  the caller happens to know theactual encoding.
 }
 
 \item{useDotNames}{a logical value

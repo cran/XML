@@ -32,28 +32,38 @@ if(FALSE) {
 setGeneric("readHTMLTable",
           function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-                     as.data.frame = TRUE, ...)           
+                     as.data.frame = TRUE, which = integer(), ...)           
              standardGeneric("readHTMLTable"))
 
 setMethod("readHTMLTable", "character",
           function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-                     as.data.frame = TRUE, ...) {
+                     as.data.frame = TRUE, which = integer(), ...) {
               pdoc = htmlParse(doc)
-              readHTMLTable(pdoc, header, colClasses, skip.rows, trim, elFun, as.data.frame, ...)
+              readHTMLTable(pdoc, header, colClasses, skip.rows, trim, elFun, as.data.frame, which, ...)
           })
 
+
+ # XXX Should vectorize in header, colClasses, i.e. allow different values for different tables.
 setMethod("readHTMLTable", "HTMLInternalDocument",
           function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-                     as.data.frame = TRUE, ...)           
+                     as.data.frame = TRUE, which = integer(), ...)           
 {
      #  tbls = getNodeSet(doc, "//table[not(./tbody)]|//table/tbody")
-   tbls = getNodeSet(doc, "//table")
+   tbls = getNodeSet(doc, "//table")  # XXX probably want something related to nested tables
+                                      # "//table[not(ancestor::table)]" -> outer ones
       # if header is missing, compute it each time.
+   if(length(which))
+       tbls = tbls[which]
+
    ans = lapply(tbls, readHTMLTable,  header, colClasses, skip.rows, trim, elFun, as.data.frame, ...)
    names(ans) = sapply(tbls, getHTMLTableName)
-   ans
+
+   if(length(which) && length(tbls) == 1)
+     ans[[1]]
+   else
+     ans
 })
 
 getHTMLTableName =
@@ -99,8 +109,13 @@ function(doc, header = NA ,
   headerFromTable = FALSE
   dropFirstRow = FALSE
 
-  if(is.na(header))
-      header = (xmlName(doc) == "table" && ("thead" %in% names(doc) || length(getNodeSet(doc, "./tr[1]/th")) > 0))
+  tbody = getNodeSet(node, "./tbody")
+  if(length(tbody))
+     node = tbody[[1]]
+  
+     # check if we have a header
+  if(length(header) ==1 && is.na(header))                                                                   # this node was doc
+      header = (xmlName(doc) %in% c("table", "tbody") && ("thead" %in% names(doc) || length(getNodeSet(node, "./tr[1]/th")) > 0))
 
   if(is.logical(header) && (is.na(header) || header) &&  xmlName(node) == "table") {
     if("thead" %in% names(node))
@@ -112,7 +127,7 @@ function(doc, header = NA ,
   }
 
   if(is(header, "XMLInternalElementNode"))   {
-     header = as.character(xpathSApply(header, ".//th|.//td", elFun))
+     header = as.character(xpathSApply(header, "./*/th|./*/td", elFun))
      headerFromTable = TRUE
 
      if(xmlName(node) == "table" && "tbody" %in% names(node))
@@ -175,12 +190,15 @@ function(doc, header = NA ,
                          else
                             as(ans[[i]], colClasses[[i]])
                    )
+
    }
 
    if(as.data.frame)  {
      ans = as.data.frame(ans, ...)
      if(is.character(header))
         names(ans) = header
+     else
+       names(ans) = paste("V", seq(along = ans), sep = "")
    }
     
   ans

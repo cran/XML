@@ -41,7 +41,7 @@ function(url, ...,
           example = NA,
           fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),         
-          namespaces = DefaultXPathNamespaces, section = character(), eval = TRUE)
+          namespaces = DefaultXPathNamespaces, section = character(), eval = TRUE, init = TRUE)
 {
 
   standardGeneric("xmlSource")
@@ -63,12 +63,13 @@ function(url, ...,
           fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),
           namespaces = DefaultXPathNamespaces,
-          section = character(), eval = TRUE)
+          section = character(), eval = TRUE, init = TRUE)
 {
   doc = xmlTreeParse(url, ..., useInternal = TRUE)
   xmlSource(doc, ..., envir = envir, xpath = xpath, ids = ids, omit = omit,
              ask = ask, example = example, fatal = fatal, verbose = verbose,
-              print = print, xnodes = xnodes, namespaces = namespaces, section = section, eval = eval)
+              print = print, xnodes = xnodes, namespaces = namespaces,
+               section = section, eval = eval, init = init)
 })
 
 
@@ -83,7 +84,7 @@ function(url, ...,
           fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("//r:function", "//r:init[not(@eval='false')]", "//r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),
           namespaces = DefaultXPathNamespaces,
-          section = character(), eval = TRUE)
+          section = character(), eval = TRUE, init = TRUE)
 {
   doc = url
   if(inherits(verbose, "numeric"))
@@ -93,7 +94,7 @@ function(url, ...,
     section = as.integer(section)
 
   #XXX use section when processing the examples
-  if(length(example))  {
+  if(length(example) && !all(is.na(example)))  {
     egs = getNodeSet(doc, "//r:example", namespaces)
     if(length(egs)) {
       ids = sapply(egs, xmlGetAttr, "id")
@@ -131,7 +132,7 @@ function(url, ...,
   }
 
 #  if(length(section) && is.character(section))
-#    section = paste("@id", dQuote(section), sep = "=")
+#    section = paste("@id", ddQuote(section), sep = "=")
   
   if(length(xpath)) {
        # do an XPath query and then look inside the resulting nodes
@@ -222,7 +223,7 @@ function(url, ..., envir =globalenv(),
           example = NA,         
           fatal = TRUE, verbose = FALSE, echo = verbose, print = echo,
           xnodes = c("r:function", "r:init[not(@eval='false')]", "r:code[not(@eval='false')]", "//r:plot[not(@eval='false')]"),         
-          namespaces =  DefaultXPathNamespaces, section = character(), eval = TRUE)
+          namespaces =  DefaultXPathNamespaces, section = character(), eval = TRUE, init = TRUE)
 {
   if(ask) {
      doc = as(url[[1]], "XMLInternalDocument")     #XXXX  no doc here now.
@@ -242,7 +243,7 @@ function(url, ..., envir =globalenv(),
 
 
 evalNode = 
-function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = echo, omit = character(),
+function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = verbose, omit = character(),
          namespaces = c(r = "http://www.r-project.org"), print = echo, ask = FALSE, eval = TRUE)
 {
             #XXX check all ancestors. Ideally exclude them in the XPath query
@@ -302,26 +303,39 @@ function(node, envir = globalenv(), ids = character(), verbose = FALSE, echo = e
 
 
 getRCode =
-function(node, namespaces = c(r = "http://www.r-project.org"))
+function(node, namespaces = c(r = "http://www.r-project.org"), recursive = TRUE)
 {
- xmlSApply(node, function(x) {
-  
+ tmp = xmlSApply(node, function(x) {
+
   if(inherits(x, c("XMLInternalCommentNode", "XMLInternalPINode"))) {
 
-  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:code") {
+  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) %in% c("r:code", "r:frag")) {
      ref = xmlGetAttr(x, "ref")
      if(!is.na(ref)) {
          v = getNodeSet(as(x, "XMLInternalDocument"),
                         paste(sapply(c("code", "frag"),
                                       function(x) paste("//r:", x , "[@id='", ref, "']", sep = "")), collapse = "|"),
                         namespaces)
-         xmlValue(v[[1]])
-     } else
-         xmlValue(x)                                 
+         if(length(v) == 0)
+           stop("No code block/fragment named ", ref)
+         else if(length(v) > 1)
+           stop("More than 1 code block/fragment named ", ref)         
+         else
+            if(recursive)
+              getRCode(v[[1]], namespaces, recursive = TRUE)
+            else
+              xmlValue(v[[1]])
+     } else {
+         if(recursive)
+              getRCode(x, namespaces, recursive = TRUE)
+            else
+              xmlValue(x)
+     }
   } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
   }  else
      xmlValue(x)
  })
+ paste(tmp, collapse = "\n")
 }
 
 
@@ -421,3 +435,165 @@ function(node)
 # f = xmlCodeFile("~/Classes/stat242-08/Code/FormulaWeights/rpartScope.xml")
 # source(f)
 # f[["rpart.model"]]
+
+
+setGeneric("xmlSourceFunctions",
+            function(doc, ids = character(), ...) {
+                  standardGeneric("xmlSourceFunctions")
+            })
+
+
+setMethod("xmlSourceFunctions", "character",
+  #
+  # evaluate the r:function nodes, or restricted to @id from ids.
+  #
+function(doc, ids = character(), ...)
+{
+  xmlSourceFunctions(xmlParse(doc), ids, ...)
+})
+
+
+sQuote =
+function(x)
+  sprintf("'%s'", as.character(x))
+
+setMethod("xmlSourceFunctions", "XMLInternalDocument",
+  #
+  # evaluate the r:function nodes, or restricted to @id from ids.
+  #
+function(doc, ids = character(), ...)
+{
+
+  if(length(ids))
+     nodes = getNodeSet(doc, paste("//r:function[", paste("@id", sQuote(ids), sep = "=", collapse = " or " ), "]"), c(r = "http://www.r-project.org"))
+  else
+     nodes = getNodeSet(doc, "//r:function", c(r = "http://www.r-project.org"))
+
+  xmlSource(nodes, ...)
+})
+
+
+################
+
+
+setGeneric("xmlSourceSection",
+           function(doc, ids = character(),
+                      xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", ".//r:code[not(@eval='false')]", ".//r:plot[not(@eval='false')]"), namespaces = DefaultXPathNamespaces, ...)
+              standardGeneric("xmlSourceSection"))
+
+setMethod("xmlSourceSection", "character",
+           function(doc, ids = character(), xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", ".//r:code[not(@eval='false')]", ".//r:plot[not(@eval='false')]"), namespaces = DefaultXPathNamespaces, ...)
+              xmlSourceSection(xmlParse(doc), ids, xnodes, namespaces, ...))
+
+setMethod("xmlSourceSection", "XMLInternalDocument",
+           function(doc, ids = character(),
+                      xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", ".//r:code[not(@eval='false')]", ".//r:plot[not(@eval='false')]"),
+                      namespaces = DefaultXPathNamespaces, ...) {
+              nodes = getNodeSet(doc, "//section")
+              
+              aids = sapply(nodes, xmlGetAttr, "id", NA)
+              m = pmatch(ids, aids)
+              if(any(is.na(m))) {
+                       # for those ids the caller gave us that didn't match
+                       # compare these to the titles.
+                 i = which(is.na(m))
+                 tmp = ids[i]
+                 j = pmatch(ids[i], sapply(nodes, function(x) {
+                                                   tmp = getNodeSet(x, "./title")
+                                                   if(length(tmp))
+                                                     xmlValue(tmp[[1]])
+                                                   else
+                                                     ""
+                                                  }))
+                 m[i [!is.na(j)]] = j[!is.na(j)]
+              }
+
+              if(any(is.na(m)))
+                stop("cannot match section id or title for ", paste(m[is.na(m)], collapse = ", "))
+
+              lapply(nodes[m], evalSection, xnodes, namespaces, ...)
+           })
+
+evalSection =
+function(node, xnodes, namespaces = DefaultXPathNamespaces, envir = globalenv(), ...)
+{
+    # Or use xnodes by stripping away any [] and .//
+  if(xmlName(node, TRUE) %in% c("r:function", "r:plot", "r:code", "r:graphics"))
+    return(evalNode(node, envir, ...))
+  
+  xpath = paste(xnodes, collapse = "|")
+  nodes = getNodeSet(node, xpath, namespaces)
+  sapply(nodes, evalNode, envir, ...)
+}
+
+
+
+#############################################
+
+# r:code[@thread='name']|r:code[ancestor::*[@thread='name']]
+
+setGeneric("xmlSourceThread",
+           function(doc, id, envir = globalenv(), ...,
+                    xnodes = c("r:function", "r:init", "r:code", "r:plot"))
+              standardGeneric("xmlSourceThread"))
+
+setMethod("xmlSourceThread", "character",
+           function(doc, id, envir = globalenv(), ...,
+                    xnodes = c("r:function", "r:init", "r:code", "r:plot"))                    
+              xmlSourceThread(xmlParse(doc), id, envir, ..., xnodes = xnodes)
+          )
+
+setMethod("xmlSourceThread", "list",
+           function(doc, id, envir = globalenv(), ...,
+                    xnodes = c("r:function", "r:init", "r:code", "r:plot"))                                        
+             sapply(doc, evalNode, envir = envir, ..., xnodes = xnodes))
+
+if(FALSE)
+setMethod("xmlSourceThread", "XMLNodeList",
+           function(doc, id, envir = globalenv(), ...,
+                    xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", ".//r:code[not(@eval='false')]", ".//r:plot[not(@eval='false')]"))
+             sapply(doc, evalNode, envir = envir, ...))
+
+
+setMethod("xmlSourceThread", "XMLInternalDocument",
+           function(doc, id, envir = globalenv(), ...,
+                    xnodes = c("r:function", "r:init", "r:code", "r:plot"))  {
+
+                 # all the nodes that are "under" this thread.
+              xp = sprintf("//*[@thread='%s']", id)
+              anc = sprintf("//%s[not(ancestor::*[@thread]) and not(ancestor::altApproach)]", xnodes)
+              xp = paste(c(xp, anc), collapse = " | ")
+
+              nodes = getNodeSet(doc, xp)
+
+              sapply(nodes, evalSection, envir = envir, ..., xnodes = xnodes)
+           })
+
+setGeneric("xmlSourceTask",
+            function(doc, id, envir = globalenv(), ...) {
+              standardGeneric("xmlSourceTask")
+            }
+           )
+
+#                nodes = c("r:code", "r:plot", "r:expr")
+#                fmt = paste(nodes, "[@thread='%s']", sep = "")
+#                xp = paste(sprintf(fmt, id), collapse = " | ")
+#                paste(nodes[]
+#                getNodeSet
+#                "r:code[@thread='%s']|r:plot[@thread='%s']|r:expr['
+#                paste(getNode
+#           })
+
+
+# See tangle.R and xmlTangle.
+# Fix this up. Just thrown down one morning.
+xmlToCode = tangle =
+function(doc, file = stdout())
+{
+  e = xmlSourceFunctions(doc, eval = FALSE) # want to avoid parsing.
+  if(!is(file, "connection"))
+    con = file(file, "w")
+  sapply(e, function(x) cat(x, "\n", file = file))
+  file
+}
+

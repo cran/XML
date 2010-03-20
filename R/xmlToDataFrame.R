@@ -43,7 +43,7 @@ function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = 
 tmp = 
 function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list())
 {
-browser()
+
   if(length(nodes) == 0)
     return(data.frame())
   

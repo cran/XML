@@ -7,7 +7,7 @@
 
 #define RS_XML(a) RS_XML_##a
 
-/* #define R_XML_DEBUG 1   */
+/* #define R_XML_DEBUG 1 */
 
 /* #define XML_REF_COUNT_NODES 1 */
 

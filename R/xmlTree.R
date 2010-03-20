@@ -50,7 +50,7 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
         v = if(is.list(x)) 
                lapply(x, asXMLNode)
             else 
-               newXMLTextNode(as.character(x), doc = doc)
+               newXMLTextNode(as.character(x), doc = doc, escapeEntities = is(x, "AsIs"))
 
         v 
       }
@@ -83,13 +83,12 @@ function(tag = NULL, attrs = NULL, dtd = NULL, namespaces = list(),
  addTag <- function(name, ..., attrs = NULL,
                     close = TRUE, namespace = defaultNamespace, .children = list(...) )
  {
-
    if(inherits(name, "XMLInternalNode")) {
      addChildren(currentNodes[[1]], name)
      currentNodes <<- c(node, currentNodes)
      addChildren(node, kids = .children)
      if(close)
-       currentNodes <<- currentNodes[-1]
+        currentNodes <<- currentNodes[-1]
      return(name)
    }
    
@@ -266,40 +265,44 @@ function(x, skip = TRUE, ...)
   else
     xmlRoot(doc, skip = skip)
 }
-  
-docName =
-  # Get the name of the file/URI for the document.
-function(doc)
- UseMethod("docName")
+
+if(FALSE)  {
+ my.docName =
+     # Get the name of the file/URI for the document.
+ function(doc)
+   UseMethod("docName")
+} else
+ setGeneric("docName", function(doc, ...) standardGeneric("docName"))
 
 docName.XMLInternalDocument =
-function(doc)
+function(doc, ...)
 {
   .Call("RS_XML_getDocumentName", doc, PACKAGE = "XML")
 }
 
-# setMethod("docName", "XMLInternalDocument", docName.XMLInternalDocument)
+setMethod("docName", "XMLInternalDocument", docName.XMLInternalDocument)
 
 docName.XMLInternalNode =
-function(doc)
+function(doc, ...)
 {
   docName(as(doc, "XMLInternalDocument"))
 }
-# setMethod("docName", "XMLInternalNode", docName.XMLInternalNode)
+setMethod("docName", "XMLInternalNode", docName.XMLInternalNode)
 
 docName.XMLDocument =
-function(doc)
+function(doc, ...)
 {
   doc$doc$file
 }
-# setMethod("docName", "XMLDocument", docName.XMLDocument)
+setMethod("docName", "XMLDocument", docName.XMLDocument)
 
 docName.XMLDocumentContent =
-function(doc)
+function(doc, ...)
 {
   doc$file
 }  
-# setMethod("docName", "XMLDocumentContent", docName.XMLDocumentContent)
+setMethod("docName", "XMLDocumentContent", docName.XMLDocumentContent)
+
 setGeneric("docName<-", function(x, value)
                          standardGeneric("docName<-"))
 

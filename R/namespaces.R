@@ -10,7 +10,7 @@ setMethod("simplifyNamespaces", "character",
 
 setMethod("simplifyNamespaces", "XMLInternalDocument",
             function(doc, alreadyCleaned = FALSE, ...) {           
-browser()
+
                  # find all the nodes, but discard the root node.
                allNodes = getNodeSet(doc, "//node()") # [-1]
                root = xmlRoot(doc)

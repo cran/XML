@@ -125,13 +125,18 @@ function(node, addAttributes = TRUE)
   if(inherits(node, "XMLAbstractDocument"))
     node = xmlRoot(node)
   
-  if(inherits(node, c("XMLTextNode", "XMLInternalTextNode")))
+  if(any(inherits(node, c("XMLTextNode", "XMLInternalTextNode"))))
      xmlValue(node)
   else if(xmlSize(node) == 0)
      xmlAttrs(node)
   else {
-     tmp = vals = xmlApply(node, xmlToList, addAttributes)
-     tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))
+     if(is.list(node)) {  # inherits(node, "XMLAbstractNode"))
+       tmp = vals = xmlSApply(node, xmlToList, addAttributes)
+       tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))       
+     } else {
+        tmp = vals = xmlApply(node, xmlToList, addAttributes)
+        tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))
+     }
      vals[tt] = lapply(vals[tt], function(x) x[[1]])
 
      if(addAttributes && length(attrs <- xmlAttrs(node)) > 0)

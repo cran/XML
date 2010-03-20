@@ -160,7 +160,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_ParseTree, 18),
 	ENTRY(R_newXMLDtd, 4),
 	ENTRY(R_newXMLDoc, 2),
-	ENTRY(R_newXMLNode, 5),
+	ENTRY(R_newXMLNode, 6),
 	ENTRY(R_newXMLTextNode, 2),
 	ENTRY(R_xmlNewComment, 2),
 	ENTRY(R_newXMLCDataNode, 2),
@@ -290,6 +290,7 @@ CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
 
 #ifdef HAVE_R_CETYPE_T
     cetype_t enc = CE_NATIVE;
+
     if(encoding == (const xmlChar *) NULL || encoding == (const xmlChar *) "") {
   	    enc = CE_NATIVE;
     } else if(xmlStrcmp(encoding, "UTF-8") == 0 || xmlStrcmp(encoding, "utf-8") == 0)

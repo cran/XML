@@ -18,3 +18,4 @@ PKG_CPPFLAGS= -Wall ${XML_INC_DIR:%=-I%} -I${LIB_ICONV}/include -I${LIB_ICONV} -
 PKG_LIBS= -L${XML_LIB_DIR} -L${XML_LIB_DIR}/../lib -lxml2 
 
 
+

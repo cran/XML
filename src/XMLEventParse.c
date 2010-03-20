@@ -340,7 +340,7 @@ R_processBranch(RS_XMLParserData * rinfo,
 
     node = xmlNewNode(NULL, localname);
     if(attributes) {
-        xmlChar ** p = attributes;
+        const xmlChar ** p = attributes;
         int i;
 	if(sax1) {
 	  for(i = 0; *p ; i += 2, p += 2) 

@@ -5,7 +5,7 @@
 
 
 SEXP
-convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
+convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding)
 {
   SEXP ans, expr = NULL, arg = NULL, ref;
   int i;
@@ -28,8 +28,13 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
       xmlNodePtr el;
       el = obj->nodeTab[i];
       if(el->type == XML_ATTRIBUTE_NODE) {
+#if 0
 	  PROTECT(ref = mkString((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : ""));
 	  SET_NAMES(ref, mkString(el->name));
+#else
+	  PROTECT(ref = ScalarString(mkCharCE((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : "", encoding)));
+	  SET_NAMES(ref, ScalarString(mkCharCE(el->name, encoding)));
+#endif
 	  SET_CLASS(ref, mkString("XMLAttributeValue"));
 	  UNPROTECT(1);
       } else if(el->type == XML_NAMESPACE_DECL)
@@ -59,14 +64,14 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun)
 }
 
 SEXP
-convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun)
+convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun, int encoding)
 {
   SEXP ans = NULL_USER_OBJECT;
 
   switch(obj->type) {
 
     case XPATH_NODESET:
-        ans = convertNodeSetToR(obj->nodesetval, fun);
+        ans = convertNodeSetToR(obj->nodesetval, fun, encoding);
 	break;
     case XPATH_BOOLEAN:
 	ans = ScalarLogical(obj->boolval);
@@ -162,7 +167,7 @@ R_XMLInternalDocument_free(SEXP sdoc)
 
 
 SEXP
-RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun)
+RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, SEXP charEncoding)
 {
  xmlXPathContextPtr ctxt = NULL;
  xmlXPathObjectPtr result;
@@ -191,7 +196,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun)
  result = xmlXPathEvalExpression(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(path, 0))), ctxt);
 
  if(result)
-     ans = convertXPathObjectToR(result, fun);
+     ans = convertXPathObjectToR(result, fun, INTEGER(charEncoding)[0]);
  
  xmlXPathFreeObject(result);
  xmlXPathFreeContext(ctxt);
@@ -240,7 +245,7 @@ RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
  }
 
  len = Rf_length(s_node);
- PROTECT(ans = NEW_LIST(ans));
+ PROTECT(ans = NEW_LIST(len));
  for(i = 0; i < len; i++) {
      node = (xmlNodePtr) R_ExternalPtrAddr(VECTOR_ELT(s_node, i));
      ptr = xmlDocCopyNode(node, doc, 1);

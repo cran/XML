@@ -91,17 +91,18 @@ function(X, FUN, ...)
 
 
 xmlValue <- 
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
  UseMethod("xmlValue")
 }
 
 if(useS4)
-  setGeneric("xmlValue", function(x, ignoreComments = FALSE, recursive = TRUE) standardGeneric("xmlValue"))
+  setGeneric("xmlValue", function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE) 
+        standardGeneric("xmlValue"))
 
 
 xmlValue.XMLNode <- 
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
  if(recursive && xmlSize(x) > 0) {
    kids = xmlChildren(x)
@@ -127,7 +128,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE)
 setS3Method("xmlValue", "XMLNode")
 
 xmlValue.XMLTextNode <- 
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
   if(!is.null(x$value))
      x$value
@@ -138,7 +139,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE)
 setS3Method("xmlValue", "XMLTextNode")
 
 xmlValue.XMLComment <-  xmlValue.XMLCommentNode <-
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
  if(ignoreComments)
    return("")
@@ -152,7 +153,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE)
 setS3Method("xmlValue", "XMLCommentNode")
 
 xmlValue.XMLCDataNode <- 
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
  x$value
 }
@@ -160,17 +161,18 @@ function(x, ignoreComments = FALSE, recursive = TRUE)
 setS3Method("xmlValue", "XMLCDataNode")
 
 xmlValue.XMLProcessingInstruction <- 
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
  x$value
 }
 
 setS3Method("xmlValue", "XMLProcessingInstruction")
 
-# "xmlValue.NULL" =
-#  function(x, ignoreComments = FALSE)
-#               character()
+"xmlValue.NULL" =
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
+          as.character(NA)
 
+#setS3Method("xmlValue", "NULL")
 
 getSibling.XMLInternalNode =
   # Access the next field in the xmlNodePtr object.

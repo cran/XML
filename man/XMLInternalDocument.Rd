@@ -1,5 +1,6 @@
 \name{XMLInternalDocument-class}
 \docType{class}
+\alias{XMLAbstractDocument-class} %XXX put somewhere else.
 \alias{XMLInternalDocument-class}
 \alias{HTMLInternalDocument-class}
 \alias{coerce,XMLInternalNode,XMLInternalDocument-method}

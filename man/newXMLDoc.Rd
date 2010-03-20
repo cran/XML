@@ -56,8 +56,9 @@ newXMLNode(name, ..., attrs = NULL, namespace = character(),
 	     at = NA, cdata = FALSE,
              suppressNamespaceWarning =
                  getOption("suppressXMLNamespaceWarning", FALSE),
-             sibling = NULL)
-newXMLTextNode(text, parent = NULL, doc = NULL, cdata = FALSE)
+             sibling = NULL, manageMemory = TRUE)
+newXMLTextNode(text, parent = NULL, doc = NULL, cdata = FALSE, 
+                escapeEntities = is(text, "AsIs"))
 newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA, sep = "\n")
 newXMLCommentNode(text, parent = NULL, doc = NULL, at = NA)
 newXMLPINode(name, text, parent = NULL, doc = NULL, at = NA)
@@ -176,6 +177,12 @@ This is just a convenient form of \code{parent = xmlParent(node)}.}
   added. The default means at the end and this can be any position
   from 0 to the current number of children.}
   \item{sep}{when adding text nodes, this is used as an additional separator text to insert between the specified strings.}
+  \item{manageMemory}{a logical value that controls whether we register finalizers on the intenal node.}
+
+
+  \item{escapeEntities}{a logical value indicating whether to mark the 
+  internal text node in such a way that protects characters in its contents from
+  being escaped as entities when being serialized via \code{\link{saveXML}}}
 }
 \details{
 These create internal C level objects/structure instances
@@ -299,5 +306,23 @@ z$addNode("topic", "Parallel Computing")
 z$addNode("topic", "Data Visualization")
 z$closeTag()
 z$addNode("address", "4210 Mathematical Sciences Building, UC Davis")
+
+
+
+   # 
+txt = newXMLTextNode("x &lt; 1")
+txt # okay
+saveXML(txt) # x &amp;lt; 1
+
+   # By escaping the text, we ensure the entities don't
+   # get expanded, i.e. &lt; doesn't become &amp;lt;
+txt = newXMLTextNode(I("x &lt; 1"))
+txt # okay
+saveXML(txt) # x &amp;lt; 1
+
+
+newXMLNode("r:expr", newXMLTextNode(I("x < 1")),
+            namespaceDefinitions = c(r = "http://www.r-project.org"))
+
 }
 \keyword{IO}

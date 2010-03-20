@@ -23,6 +23,8 @@ this, I have followed the links from www.xmlsloft.org to
 
    http://www.zlatkovic.com/libxml.en.html 
 
+(The libraries are available directly at http://www.zlatkovic.com/pub/libxml/ )
+
 From the "Getting the Binaries" section, download the zlib, iconv,
 libxml2 (and openssl) zip files.
 

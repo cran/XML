@@ -1,9 +1,7 @@
 # Avoided if we are using Windows so that we can specify the directory to find the libxml DLL.
 # useDynLib(XML)
 
-import(methods)
 
-#exportPattern(".*")
 export(
  append.xmlNode,
  append.XMLNode,
@@ -104,7 +102,7 @@ exportMethods("toHTML")
 export("xmlChildren<-")
 exportMethods("xmlChildren<-")
 
-exportClasses("XMLInternalDocument")
+exportClasses("XMLInternalDocument", "XMLAbstractDocument")
 exportClass("URI")
 if(TRUE) {
 exportClasses("XMLAbstractNode", "XMLNode")
@@ -116,7 +114,7 @@ exportClasses("XMLInternalNode", "XMLInternalElementNode",
               "XMLAttributeDeclNode", "XMLDocumentNode", "XMLDocumentTypeNode",
               "XMLDocumentFragNode", "XMLNamespaceDeclNode")
 
-exportClasses("XMLNamespace")
+exportClass(XMLNamespace)
 
 exportClass(XMLNamespaceDefinitions)
 }
@@ -213,7 +211,8 @@ S3method(xmlSize, XMLInternalNode)
 
 S3method(xmlValue, XMLInternalNode)
 
-# exportS3method("xmlValue", "NULL")
+#exportS3method("xmlValue", "NULL")
+S3method("xmlValue", "NULL")
 
 
 
@@ -307,11 +306,14 @@ S3method(dtdElementValidEntry, character)
 S3method(dtdElementValidEntry, XMLSequenceContent)
 
 export(docName)
+if(FALSE) {
 S3method(docName, XMLDocument)
 S3method(docName, XMLDocumentContent)
 S3method(docName, XMLInternalDocument)
 S3method(docName, XMLInternalNode)
 S3method(docName, XMLHashTree)
+} else
+  exportMethods(docName)
 
 
 export("xmlNamespaces<-")
@@ -326,6 +328,11 @@ exportClass("SAXState")
 
 export(xmlSource)
 exportMethods("xmlSource")
+export(xmlSourceFunctions)
+exportMethods("xmlSourceFunctions")
+export(xmlSourceSection)
+exportMethods("xmlSourceSection")
+
 
 # Not yet exported....
 #xmlValidity
@@ -350,7 +357,7 @@ exportMethods("names", "$", "$<-", "coerce")
 export(getSibling)
 S3method(getSibling, XMLInternalNode)
 S3method(getSibling, XMLHashTreeNode)
-export(catalogLoad, catalogClearTable, catalogAdd)
+export(catalogLoad, catalogClearTable, catalogAdd, catalogDump)
 
 
 export(xmlStructuredStop, xmlErrorCumulator) # xmlStop
@@ -443,3 +450,6 @@ export(xmlToS4, makeClassTemplate) # xmlToS4List
 exportMethods("xmlToS4")
 export(xmlToDataFrame)
 exportMethods(xmlToDataFrame)
+
+export(compareXMLDocs)
+S3method(summary, XMLInternalDocument)

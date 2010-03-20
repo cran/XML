@@ -190,7 +190,7 @@ function(dtd = NULL, nameSpace = NULL, buf = NULL, nsURI = NULL,
 
 
     if(length(dtd) && !emittedDocType)  {
-       add(paste("<!DOCTYPE", tag, "SYSTEM", dQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", dQuote(dtd[2])), ">"))
+       add(paste("<!DOCTYPE", tag, "SYSTEM", ddQuote(dtd[1]), if(length(dtd) > 1) paste("PUBLIC", ddQuote(dtd[2])), ">"))
        emittedDocType <<- TRUE
     }
     

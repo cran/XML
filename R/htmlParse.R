@@ -13,7 +13,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
             isURL = FALSE, asTree = FALSE, useInternalNodes = FALSE,
             encoding = character(),
             useDotNames = length(grep("^\\.", names(handlers))) > 0,
-            xinclude = FALSE, addFinalizer = TRUE, error = xmlErrorCumulator())
+            xinclude = FALSE, addFinalizer = TRUE, error = function(...){})
 {
 
   if(length(file) > 1) {
@@ -81,6 +81,9 @@ formals(htmlParse)$useInternalNodes = TRUE
 parseURI =
 function(uri)
 {
+  if(is.na(uri))
+    return(structure(as.character(uri), class = "URI"))
+  
   u = .Call("R_parseURI", as.character(uri), PACKAGE = "XML")
   if(u$port == 0)
     u$port = as.integer(NA)

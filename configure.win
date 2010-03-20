@@ -25,6 +25,7 @@ mkdir $R_PACKAGE_DIR/libs
 # These were in $LIB_ZLIB/lib/ and $LIB_XML/lib
 cp $LIB_ZLIB/bin/zlib1.dll $R_PACKAGE_DIR/libs
 cp $LIB_XML/bin/libxml2.dll $R_PACKAGE_DIR/libs
+cp $LIB_ICONV/bin/iconv.dll $R_PACKAGE_DIR/libs
 
 echo "supportsExpat <- function() FALSE" > R/supports.R
 echo "supportsLibxml <- function() TRUE" >> R/supports.R

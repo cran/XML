@@ -190,20 +190,26 @@ function(x, i, j, ...)
 
 
 xmlValue.XMLInternalNode =
-function(x, ignoreComments = FALSE, recursive = TRUE)
+function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 {
+
+  encoding = if(is.integer(encoding)) 
+               encoding 
+             else
+               getEncodingREnum(encoding)
+
   if(!recursive) {
      if(xmlSize(x) == 0)
        return(character())
 
     i = sapply(xmlChildren(x), inherits, "XMLInternalTextNode")
     if(any(i))
-      return(paste(unlist(lapply(xmlChildren(x)[i], xmlValue, ignoreComments)), collapse = ""))
+      return(paste(unlist(lapply(xmlChildren(x)[i], xmlValue, ignoreComments, recursive = TRUE, encoding = encoding)), collapse = ""))
     else
       return(character())
    }
   
-  .Call("R_xmlNodeValue", x, PACKAGE = "XML")
+  .Call("R_xmlNodeValue", x, NULL, encoding, PACKAGE = "XML") # 2nd argument ignored.
 }
 
 setS3Method("xmlValue", "XMLInternalNode")
@@ -385,7 +391,7 @@ function(name, ..., attrs = NULL,
          at = NA,
          cdata = FALSE,
          suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE), #  i.e. warn.
-         sibling = NULL
+         sibling = NULL, manageMemory = TRUE
          )
 {
     # make certain we have a character vector for the attributes.
@@ -430,7 +436,8 @@ function(name, ..., attrs = NULL,
      # create the node. Let's leave the namespace definitions and prefix till later.
 
      # xmlSetProp() routine in R_newXMLNode() handles namespaces on the attribute names, even checking them.
-  node <- .Call("R_newXMLNode", as.character(name), character(), character(), doc, namespaceDefinitions, PACKAGE = "XML")
+  node <- .Call("R_newXMLNode", as.character(name), character(), character(), doc, namespaceDefinitions, 
+                   as.integer(manageMemory), PACKAGE = "XML")
 
  if(!is.null(sibling))
     addSibling(sibling, node, after = as.logical(at))
@@ -547,7 +554,7 @@ function(name, ..., attrs = NULL,
          suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE) #  i.e. warn.
         )
 {
-  node = .Call("R_newXMLNode", name, as.character(attrs), character(), doc, character(), PACKAGE = "XML")
+  node = .Call("R_newXMLNode", name, as.character(attrs), character(), doc, character(), TRUE, PACKAGE = "XML")
   if(!is.null(parent))
      addChildren(parent, node, at = at)
   node
@@ -744,12 +751,14 @@ newXMLTextNode =
   #
   #  cdata allows the caller to specify that the text be 
   #  wrapped in a newXMLCDataNode
-function(text,  parent = NULL, doc = NULL, cdata = FALSE)
+function(text,  parent = NULL, doc = NULL, cdata = FALSE, escapeEntities = is(text, "AsIs"))
 {
   if(cdata) 
     return(newXMLCDataNode(text, parent, doc))
 
   a = .Call("R_newXMLTextNode", as.character(text), doc, PACKAGE = "XML")
+  if(escapeEntities)
+    setNoEnc(a)
   
   if(!is.null(parent))
      addChildren(parent, a)
@@ -813,6 +822,16 @@ function(x, i, j, ..., value)
 }  
 
 
+setNoEnc =
+function(node)
+{
+  if(!is(node, "XMLInternalTextNode"))
+    stop("setNoEnc can only be applied to an native/internal text node, not ", paste(class(node), collapse = ", "))
+
+  .Call("R_setXMLInternalTextNode_noenc", node, PACKAGE = "XML")
+}
+
+
 addChildren.XMLInternalNode =
 addChildren.XMLInternalDocument =
   #
@@ -857,7 +876,7 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
             function(j) {
                i = kids[[j]]
 
-               if(is.character(i))
+               if(is.character(i)) 
                  i = newXMLTextNode(i, cdata = cdata)
 
                if(!inherits(i, "XMLInternalNode")) #XX is(i, "XMLInternalNode")
@@ -892,8 +911,9 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
         if(is.null(i))
            next
      
-        if(is.character(i))
+        if(is.character(i)) 
            i = newXMLTextNode(i, cdata = cdata)
+
 
         if(!inherits(i, "XMLInternalNode")) {
            i = as(i, "XMLInternalNode")
@@ -1404,11 +1424,17 @@ function(x, table, nomatch = NA_integer_)
 
 setGeneric("xmlClone",
 function(node, recursive = TRUE, addFinalizer = FALSE, ...)
-           standardGeneric("xmlClone"))
+           {
+              oclass = class(node)
+              ans = standardGeneric("xmlClone")
+              if(!isS4(node))
+                class(ans) = oclass
+              ans
+           })
 
 setMethod("xmlClone", "XMLInternalDocument",           
 function(node, recursive = TRUE, addFinalizer = TRUE, ...)
-{  
+{
   ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
   addDocFinalizer(ans, addFinalizer)
   ans
@@ -1417,7 +1443,7 @@ function(node, recursive = TRUE, addFinalizer = TRUE, ...)
 setMethod("xmlClone", "XMLInternalNode",           
 function(node, recursive = TRUE, addFinalizer = FALSE, ...)
 {  
-  .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
+  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
 })
 
 

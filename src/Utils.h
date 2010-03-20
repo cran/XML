@@ -82,7 +82,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 USER_OBJECT_ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sname, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID);
 USER_OBJECT_ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces);
 
-USER_OBJECT_ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc, USER_OBJECT_ namespaceDefinitions);
+USER_OBJECT_ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER_OBJECT_ sdoc, USER_OBJECT_ namespaceDefinitions, USER_OBJECT_ manageMemory);
 USER_OBJECT_ R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc);
 USER_OBJECT_ R_xmlNewComment(USER_OBJECT_ str, USER_OBJECT_ sdoc);
 USER_OBJECT_ R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value);
@@ -173,12 +173,33 @@ SEXP CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str);
 #ifdef R_USE_XML_ENCODING
 #undef COPY_TO_USER_STRING
 #warning "Redefining COPY_TO_USER_STRING to use encoding from XML parser"
+/*
 #define COPY_TO_USER_STRING(x)  CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR (x))
+*/
+#define COPY_TO_USER_STRING(x)  mkChar(CHAR_TO_XMLCHAR (x))
 #endif
 
 
 #include <R_ext/Utils.h>
 #define R_CHECK_INTERRUPTS R_CheckUserInterrupt();
+
+
+#if 1
+/*
+ We use the address of a global variable as a marker/signature that
+ indicates we created the value of _private.
+*/
+extern int R_XML_MemoryMgrMarker;
+#define R_MEMORY_MANAGER_MARKER &R_XML_MemoryMgrMarker
+
+#define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc->_private == NULL ||  ((int*)doc->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
+#define IS_NOT_OUR_NODE_TO_TOUCH(node) ((node->_private == NULL) || ((int*)node->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
+#else
+#define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc && doc->name && strcmp((doc)->name, " fake node libxslt") == 0)
+#define IS_NOT_OUR_NODE_TO_TOUCH(node) (node && (node)->doc && IS_NOT_OUR_DOC_TO_TOUCH((node)->doc))
+#endif
+
+
 
 #endif
 

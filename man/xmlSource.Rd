@@ -3,6 +3,20 @@
 \alias{xmlSource,character-method}
 \alias{xmlSource,XMLNodeSet-method}
 \alias{xmlSource,XMLInternalDocument-method}
+
+\alias{xmlSourceFunctions}
+\alias{xmlSourceFunctions,character-method}
+\alias{xmlSourceFunctions,XMLInternalDocument-method}
+\alias{xmlSourceSection}
+\alias{xmlSourceSection,character-method}
+\alias{xmlSourceSection,XMLInternalDocument-method}
+
+
+\alias{xmlSourceThread}
+\alias{xmlSourceThread,XMLInternalDocument-method}
+\alias{xmlSourceThread,character-method}
+\alias{xmlSourceThread,list-method}
+
 \title{Source the R code, examples, etc. from an XML document}
 \description{
   This is the equivalent of a smart \code{\link[base]{source}}
@@ -22,7 +36,14 @@
   This is a convenient way to annotate code in a rich way
   and work with source files in a new and potentially more effective
   manner.
+  
+  \code{xmlSourceFunctions} provides a convenient way to read only
+  the function definitions, i.e. the \code{<r:function>} nodes.
+  We can restrict to a subset by specifying the node ids of interest.
 
+  \code{xmlSourceSection} allows us to evaluate the code in one or more
+  specific sections.
+  
   This style of authoring code supports mixed language support
   in which we put, for example, C and R code together in the same
   document.
@@ -60,7 +81,13 @@ xmlSource(url, ...,
                      "//r:code[not(@eval='false')]",
                      "//r:plot[not(@eval='false')]"),
           namespaces = DefaultXPathNamespaces, section = character(),
-          eval = TRUE)
+          eval = TRUE, init = TRUE)
+xmlSourceFunctions(doc, ids = character(), ...)
+xmlSourceSection(doc, ids = character(),
+                 xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", 
+                            ".//r:code[not(@eval='false')]",
+                            ".//r:plot[not(@eval='false')]"),
+                 namespaces = DefaultXPathNamespaces, ...)
 }
 \arguments{
   \item{url}{the name of the file, URL  containing the XML document, or
@@ -154,6 +181,9 @@ xmlSource(url, ...,
   \item{eval}{a logical value indicating whether to evaluate the code in
   the specified nodes or to just return the result of parsing the text
   in each node.}
+ \item{init}{a logical controlling whether to run the R code in any
+    r:init nodes.}
+ \item{doc}{the XML document, either a file name, the content of the document or the parsed document.}
 }
 \details{
   This evaluates the \code{code}, \code{function} and \code{example}

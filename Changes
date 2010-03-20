@@ -1,3 +1,38 @@
+Version 2.8-1
+
+  *   Filled in missing documentation
+
+  *   Added missing init = TRUE for the parameters in one of the methods for xmlSource().
+
+Version 2.8-0
+
+  *   xmlClone() puts the original S3 classes on the new object.
+
+  *   Trivial fix to readHTMLTable() to get the header when the table header is inside
+      a tbody.
+
+  *   Garbage collection/Memory management re-enabled.
+ 
+Version 2.7-0
+ 
+  *   compareXMLDocs() function
+
+  *   Added xmlSourceFunctions() and xmlSourceSection()
+  
+  *   Support in saveXML() for XMLInternalDocument for the prefix parameter.
+
+  *   saveXML() and related methods can deal with NULL pointers in 
+      XMLInternalDocument objects.
+
+  *   fixed bug in catalogAdd().
+
+  *   docName() made an S4 generic with S4 methods (rather than S3 methods).
+
+  *   added catalogDump()
+
+  *   readHTMLTable() puts sensible names on the data frames if there is no header for the table.
+
+
 Version 2.6-0
 
   *   When copying a node from one document to another, the node is explicitly

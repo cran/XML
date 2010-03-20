@@ -19,7 +19,7 @@
   that contain a single text node.
 }
 \usage{
-xmlValue(x, ignoreComments = FALSE, recursive = TRUE)
+xmlValue(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 }
 \arguments{
   \item{x}{the \code{XMLNode} object whose
@@ -32,6 +32,8 @@ xmlValue(x, ignoreComments = FALSE, recursive = TRUE)
   \item{recursive}{a logical value indicating whether to process all
     sub-nodes (\code{TRUE}) or only the text nodes within the node \code{x}.
   }
+%XXX
+ \item{encoding}{experimental functionality and parameter related to encoding.}
 }
 \value{
  The object stored in the 

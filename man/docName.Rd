@@ -1,5 +1,10 @@
 \name{docName}
 \alias{docName}
+\alias{docName,XMLDocument-method}
+\alias{docName,XMLDocumentContent-method}
+\alias{docName,XMLHashTree-method}
+\alias{docName,XMLInternalDocument-method}
+\alias{docName,XMLInternalNode-method}
 \alias{docName<-}
 \alias{docName<-,XMLInternalDocument-method}
 \alias{docName<-,XMLHashTree-method}
@@ -11,12 +16,13 @@
   raw XML content provided as a string.
 }
 \usage{
-docName(doc)
+docName(doc, ...)
 }
 \arguments{
   \item{doc}{the XML document object, of class
      \code{XMLInternalDocument} or \code{XMLDocument}.
   }
+  \item{\dots}{additional methods for methods}
 }
 \value{
   A character string giving the name.

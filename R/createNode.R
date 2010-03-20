@@ -96,7 +96,7 @@ function(value, namespace = "", entities = XMLEntities, cdata = FALSE)
 {
   node <- xmlNode("text", namespace = namespace)
 
-  if(length(entities)) 
+  if(length(entities) && !inherits(value, "AsIs")) 
    value = insertEntities(value, XMLEntities)
 
   if(cdata)

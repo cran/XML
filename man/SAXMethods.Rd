@@ -36,7 +36,7 @@ entityDeclaration.SAX(name, base, sysId, publicId, notationName,  .state = NULL)
 %- maybe also `usage' for other objects documented here.
 \arguments{
   \item{name}{the name of the XML element or entity being declared}
-  \item{atts}{}
+  \item{atts}{named character vector of XML attributes}
   \item{content}{the value/string in the processing instruction or comment}
   \item{target}{the target of the processing instruction, e.g. the R in
     \code{<?R....>}}

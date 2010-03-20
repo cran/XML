@@ -10,6 +10,7 @@
 #include "Utils.h"
 
 #include "libxml/HTMLparser.h"
+#include "libxml/HTMLtree.h"
 
 #include <sys/stat.h>
 #include <unistd.h>  

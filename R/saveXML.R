@@ -30,7 +30,10 @@ saveXML.XMLInternalDocument <-
 function(doc, file = NULL, compression = 0, indent = TRUE,
           prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "", ...)
 {
-  if(is(doctype, "Doctype")) {
+  havePrefix = !missing(prefix)
+
+  isDocType = is(doctype, "Doctype")
+  if(isDocType) {
        # Check that the value in the DOCTYPE for the top-level name is the same as that of the
        # root element
        
@@ -48,7 +51,23 @@ function(doc, file = NULL, compression = 0, indent = TRUE,
     file = path.expand(file)
   
   ans = .Call("R_saveXMLDOM", doc, file, as.integer(compression), as.logical(indent),
-                               as.character(prefix), as.character(encoding), PACKAGE = "XML")
+                               if(is.character(prefix)) prefix else character(), 
+                                as.character(encoding), PACKAGE = "XML")
+
+  if(!isDocType && havePrefix) {
+
+      prefix = as(prefix, "character") # allow for an XMLInternalNode.
+
+     if(length(file)) {
+         txt = c(prefix, readLines(file)[-1])
+         cat(txt, file = file)
+     } else {
+         tmp = strsplit(ans, "\\\n")[[1]]
+         tmp = c(prefix, tmp[-1])
+         ans = paste(tmp, collapse = "\n")
+     }
+
+  }
 
   if(length(file))
     file
