@@ -61,4 +61,7 @@ typedef struct _R_NodeGCInfo {
     int count;
 
 } R_NodeGCInfo;
+
+
+void initDocRefCounter(xmlDocPtr doc);
 #endif

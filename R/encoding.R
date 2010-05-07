@@ -11,7 +11,7 @@ setMethod("getEncodingREnum", "XMLInternalDocument",
            function(doc, ...) 
               getEncodingREnum( getEncoding(doc) ))
 
-setMethod("getEncodingREnum", "XMLInternalElement",
+setMethod("getEncodingREnum", "XMLInternalElementNode", # was XMLInternalElement, but no such class?
            function(doc, ...) 
               getEncodingREnum( as(doc, "XMLInternalDocument") ))
 

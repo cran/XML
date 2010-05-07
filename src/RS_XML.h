@@ -7,9 +7,15 @@
 
 #define RS_XML(a) RS_XML_##a
 
-/* #define R_XML_DEBUG 1 */
+/* #define R_XML_DEBUG 1    */
 
-/* #define XML_REF_COUNT_NODES 1 */
+#if 1
+#define XML_REF_COUNT_NODES 1   
+#else
+#ifdef XML_REF_COUNT_NODES
+#undef XML_REF_COUNT_NODES
+#endif
+#endif
 
 typedef enum {RS_XML_FILENAME, RS_XML_TEXT, RS_XML_CONNECTION, RS_XML_INVALID_CONTENT} RS_XML_ContentSourceType;
 

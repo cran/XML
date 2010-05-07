@@ -47,7 +47,7 @@ earlier.
 How do we define a default namespace?
 }
 \usage{
-xmlDoc(node, addFinalizer = FALSE)
+xmlDoc(node, addFinalizer = TRUE)
 newXMLDoc(dtd = NA, namespaces=NULL, addFinalizer = TRUE, 
            name = character(), node = NULL)
 newXMLNode(name, ..., attrs = NULL, namespace = character(),

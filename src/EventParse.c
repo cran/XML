@@ -407,6 +407,8 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
          memcpy(tmp, tmpString, newLen); tmp[newLen] = '\0';
       }
       xmlAddChild(parserData->current, xmlNewText(tmp));
+//XXX???
+      if(newLen < 0) free(tmp);
       return;
   }
   /* Last case handles ignoring the new line between the two nodes if trim is TRUE.

@@ -318,6 +318,8 @@ echo "Checking directory of LIBXML_INCDIR"
    echo "Located parser file ${LIBXML_INCDIR}/parser.h"
   fi
 
+dnl Do we need this? XXX
+#LIBS="${LIBS} ${LIBXML_INCDIR}"
 
   if test -z "${LIBXML2}" ; then
 CPPFLAGS="${PKG_CPPFLAGS} ${LIBXML_INCDIR}"

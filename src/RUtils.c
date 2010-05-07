@@ -316,3 +316,6 @@ R_lookString(SEXP rstr)
     str = CHAR(STRING_ELT(rstr, 0));
     return(ScalarInteger(strlen(str)));
 }
+
+
+

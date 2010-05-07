@@ -339,3 +339,32 @@ R_matchNodesInList(SEXP r_nodes, SEXP r_target, SEXP r_nomatch)
 
     return(ans);
 }
+
+
+
+#if 0  /* taken from Sxslt and should be left there or moved here.*/
+
+USER_OBJECT_
+RXSLT_export_xmlXPathObject(xmlNodeSetPtr val, const char * className)
+{
+  USER_OBJECT_ ans;
+  USER_OBJECT_ klass;
+  PROTECT(klass = MAKE_CLASS(className));
+  PROTECT(ans = NEW(klass));
+  SET_SLOT(ans, Rf_install("ref"), R_MakeExternalPtr(val, Rf_install(className), R_NilValue));
+  UNPROTECT(2);
+  return(ans);
+}
+
+
+USER_OBJECT_
+R_xmlXPathNewNodeSet(USER_OBJECT_ s_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+
+    xmlXPathObjectPtr nodeset;
+    nodeset = xmlXPathNewNodeSet(node);
+    return(RXSLT_export_xmlXPathObject(nodeset->nodesetval, "XPathNodeSet"));
+}
+
+#endif

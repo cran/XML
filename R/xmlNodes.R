@@ -85,6 +85,9 @@ function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simpl
 
 
 
+
+
+
 xmlName.XMLInternalNode =
 function(node, full = FALSE)
 {
@@ -112,9 +115,9 @@ function(x)
 
 
 xmlAttrs.XMLInternalNode = 
-function(node, addNamespace = FALSE, ...)
+function(node, addNamespacePrefix = FALSE, addNamespaceURLs = TRUE, ...)
 {
-  .Call("RS_XML_xmlNodeAttributes",  node, as.logical(addNamespace), PACKAGE = "XML")
+  .Call("RS_XML_xmlNodeAttributes",  node, as.logical(addNamespacePrefix), as.logical(addNamespaceURLs), PACKAGE = "XML")
 }
 
 
@@ -151,6 +154,7 @@ function(obj)
   .Call("RS_XML_xmlNodeNumChildren", obj, PACKAGE = "XML")
 
 "[[.XMLInternalNode" <-
+#setMethod("[[", "XMLInternalNode",
 function(x, i, j, ...)
 {
   if(inherits(i, "formula")) {
@@ -394,6 +398,9 @@ function(name, ..., attrs = NULL,
          sibling = NULL, manageMemory = TRUE
          )
 {
+
+ noNamespace = length(namespace) == 0 && !missing(namespace)
+ 
     # make certain we have a character vector for the attributes.
  if(length(attrs)) {
      ids = names(attrs)
@@ -416,6 +423,7 @@ function(name, ..., attrs = NULL,
   if(length(name) == 2) {
      ns = nsPrefix = name[1]
      name = name[2]
+     noNamespace = FALSE
   }
 
    # if there is no doc, but we have a parent which is an XMLInternalDocument, use that.
@@ -522,6 +530,10 @@ function(name, ..., attrs = NULL,
     } else  {
       i = match("", names(nsDefs))
       ns = if(is.na(i)) NULL else nsDefs[[i]]
+
+      if(!noNamespace && length(ns) == 0 && length(parent) > 0) {
+          ns = xmlNamespaceRef(parent)
+      }
     }
 
  
@@ -540,6 +552,11 @@ function(name, ..., attrs = NULL,
 
  node
 }
+
+
+xmlNamespaceRef =
+function(node)
+  .Call("R_getXMLNsRef", node, PACKAGE = "XML")
 
 
 

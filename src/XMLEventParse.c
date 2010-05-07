@@ -378,6 +378,14 @@ fprintf(stderr, "Freeing XML node from a branch\n");
   R_SetExternalPtrAddr(node, NULL_USER_OBJECT);
 }
 
+int numDocsCreated = 0;
+
+void
+R_reportDocGC()
+{
+    fprintf(stderr, "<r:docReport createdInBranch='%d' createdByXMLPackage='%d' freed='%d'/>\n", numDocsCreated, R_numXMLDocs, R_numXMLDocsFreed);
+}
+
 void
 R_endBranch(RS_XMLParserData *rinfo,
             const xmlChar * localname, 
@@ -386,6 +394,7 @@ R_endBranch(RS_XMLParserData *rinfo,
 {
     if(rinfo->current) {
         xmlNodePtr tmp;
+	xmlDocPtr doc = NULL;
         tmp = rinfo->current;
         if(tmp->parent == NULL) {
             /* Call the function with the given node.*/
@@ -398,10 +407,17 @@ R_endBranch(RS_XMLParserData *rinfo,
  	    }
 
 	    PROTECT(args = NEW_LIST(1));
+	    if(tmp->doc == NULL) {
+		doc = xmlNewDoc("1.0");
+		initDocRefCounter(doc);
+   	        xmlDocSetRootElement(doc, tmp);
+/*		fprintf(stderr, "<r:createDoc addr='%p'/>\n", doc); */
+		numDocsCreated++;
+	    }
 	    SET_VECTOR_ELT(args, 0, rnode = R_createXMLNodeRef(tmp));
 	    /* Done in createXMLNodeRef() R_RegisterCFinalizer(rnode, R_xmlFreeNode); */
 	    RS_XML(invokeFunction)(fun, args, NULL, rinfo->ctx);
-	    UNPROTECT(1);
+ 	    UNPROTECT(1);
 	    /*
             xmlFreeNode(rinfo->top);
             rinfo->top = NULL;
@@ -417,6 +433,8 @@ R_endBranch(RS_XMLParserData *rinfo,
         }
 
         rinfo->current = rinfo->current->parent;
+	if(rinfo->current && rinfo->current->type == XML_DOCUMENT_NODE)
+            rinfo->current = NULL;
     }
 }
 

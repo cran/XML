@@ -61,9 +61,9 @@ setMethod("readHTMLTable", "HTMLInternalDocument",
    names(ans) = sapply(tbls, getHTMLTableName)
 
    if(length(which) && length(tbls) == 1)
-     ans[[1]]
+      ans[[1]]
    else
-     ans
+      ans
 })
 
 getHTMLTableName =

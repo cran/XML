@@ -143,8 +143,20 @@ setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
 setOldClass("XMLNamespace")
 
 
+setClass("XPathNodeSet", representation(ref = "externalptr"))
+
+
 ############
 
+#setMethod("[[", c("XMLInternalElementNode", "numeric") ,
+"[[.XMLInternalElementNode" = 
+function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE))
+{
+   if(is(i, "numeric"))
+     .Call("R_getNodeChildByIndex", x, as.integer(i), PACKAGE = "XML")
+   else
+       NextMethod()
+}
 
 
 xmlChildren <-
@@ -725,7 +737,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 }
 
 xmlDoc =
-function(node, addFinalizer = FALSE)
+function(node, addFinalizer = TRUE)
 {
  doc = .Call("RS_XML_createDocFromNode", node, PACKAGE = "XML")
  addDocFinalizer(doc, addFinalizer)

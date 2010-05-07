@@ -1,3 +1,30 @@
+Version 3.1-0
+
+  *   Method for [[ for internal element nodes that is much faster (by avoiding
+      creating the list of children and then indexing that R list). 
+      Thanks to Stavros Mackracis for raising the issue.
+
+Version 3.0-0
+
+  *   This is not a major release, but an incremental numbering from 2.9-0 to 3.0-0, but with
+      one potentially significant change related to creating nodes.  newXMLNode() now uses
+      the namespace of the parent node if the namespace argument is not specified.
+
+  *   Refinments to improve the garbage counting and referencing counting on internal nodes.
+
+
+Version 2.9-0
+
+  *   xmlAttrs(, TRUE) for internal nodes returns the URL of each namespace definition
+      in the names of the attr(, "namespaces") vector.
+
+  *   Added parseXMLAndAdd() to parse XML from a string text and 
+      add the nodes to a parent node.  This facilitates creating
+      a large number of quite regular nodes using string processing
+      techniques (e.g. sprintf(), paste())
+
+  *   xmlEventParse() with branches now has garbage collecting activated.
+
 Version 2.8-1
 
   *   Filled in missing documentation

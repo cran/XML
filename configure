@@ -3650,6 +3650,7 @@ fi
    echo "Located parser file ${LIBXML_INCDIR}/parser.h"
   fi
 
+#LIBS="${LIBS} ${LIBXML_INCDIR}"
 
   if test -z "${LIBXML2}" ; then
 CPPFLAGS="${PKG_CPPFLAGS} ${LIBXML_INCDIR}"

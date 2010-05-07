@@ -1,6 +1,7 @@
 \name{[.XMLNode}
 \alias{[.XMLNode}
 \alias{[[.XMLNode}
+\alias{[[.XMLInternalElementNode}
 \alias{[[.XMLDocumentContent}
 \title{Convenience accessors for the children of XMLNode objects.}
 \description{

@@ -300,7 +300,9 @@ docName.XMLDocumentContent =
 function(doc, ...)
 {
   doc$file
-}  
+}
+
+setOldClass("XMLDocumentContent")
 setMethod("docName", "XMLDocumentContent", docName.XMLDocumentContent)
 
 setGeneric("docName<-", function(x, value)
@@ -321,4 +323,23 @@ function(x, value)
   assign(".doc", value, x)
   x
 })
+
+
+parseXMLAndAdd =
+function(txt, parent = NULL, top = "tmp")
+{
+  txt = paste(txt, collapse = "")
+  if(!inherits(txt, "AsIs") && length(top) > 0)
+     tmp = sprintf("<%s>%s</%s>", top, txt, top)
+  else
+     tmp = txt
+  
+  doc = xmlParse(tmp, asText = TRUE)
+  if(!is.null(parent))
+     invisible(.Call("R_insertXMLNode", xmlChildren(xmlRoot(doc)), parent, -1L, FALSE,  PACKAGE = "XML"))
+  else
+     xmlRoot(doc)
+}
+
+
 

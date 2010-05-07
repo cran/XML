@@ -214,21 +214,21 @@ S3method(xmlValue, XMLInternalNode)
 #exportS3method("xmlValue", "NULL")
 S3method("xmlValue", "NULL")
 
-
-
 S3method("[", XMLNode)
+
+if(TRUE) {
 S3method("[[", XMLNode)
 S3method("[[", XMLDocumentContent)
 
 S3method("[[", XMLInternalNode)
-S3method("[", XMLInternalNode)
-
-S3method("[", XMLInternalDocument)
 S3method("[[", XMLInternalDocument)
-S3method("names", XMLInternalNode)
-
 S3method("[[", XMLHashTreeNode)
+S3method("[[", XMLInternalElementNode)
+}
 
+S3method("[", XMLInternalNode)
+S3method("[", XMLInternalDocument)
+S3method("names", XMLInternalNode)
 S3method("[<-", XMLNode)
 S3method("[[<-", XMLNode)
 
@@ -396,6 +396,7 @@ exportMethods(getEncoding)
 exportClass("XMLCodeFile")
 exportClass("XMLCodeDoc")
 exportMethods("[[")
+
 export(xmlCodeFile)
 exportMethods(source)
 
@@ -453,3 +454,9 @@ exportMethods(xmlToDataFrame)
 
 export(compareXMLDocs)
 S3method(summary, XMLInternalDocument)
+
+
+export(parseXMLAndAdd)
+
+
+#exportClass("XPathNodeSet")

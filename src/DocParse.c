@@ -1140,12 +1140,21 @@ RS_XML_xmlNodeNamespace(USER_OBJECT_ snode)
     return(ans);
 }
 
+enum  {
+    R_XML_NS_ADD_PREFIX = 1,
+    R_XML_NS_ADD_URL_DEFS = 2
+};
+
 USER_OBJECT_
-RS_XML_xmlNodeAttributes(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces)
+RS_XML_xmlNodeAttributes(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces, USER_OBJECT_ addNamespaceURLs)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     R_XMLSettings parserSettings;
-    parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaces)[0];
+    parserSettings.addAttributeNamespaces = 0;
+    if(LOGICAL_DATA(addNamespaces)[0])
+	parserSettings.addAttributeNamespaces |= R_XML_NS_ADD_PREFIX;
+    if(LOGICAL_DATA(addNamespaceURLs)[0])
+	parserSettings.addAttributeNamespaces |= R_XML_NS_ADD_URL_DEFS;
 
     return(RS_XML(AttributeList)(node, &parserSettings));
 }
@@ -1173,6 +1182,7 @@ RS_XML_xmlNodeNumChildren(USER_OBJECT_ snode)
     }
     return(ScalarInteger(count));
 }
+
 
 USER_OBJECT_
 RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
@@ -1205,6 +1215,28 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
     UNPROTECT(1 + addNames);
    
     return(ans);
+}
+
+USER_OBJECT_
+R_getNodeChildByIndex(USER_OBJECT_ snode, USER_OBJECT_ r_index)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    int count = 0, num;
+    xmlNodePtr ptr = node->children;
+    
+    num = INTEGER(r_index)[0] - 1;
+    if(num < 0) {
+	PROBLEM "cannot index an internal node with a negative number %d", num
+	    ERROR;
+    }
+	
+
+    while(ptr && count < num) {
+	count++;
+	ptr = ptr->next;
+    }
+
+   return(ptr ? R_createXMLNodeRef(ptr) : NULL_USER_OBJECT);
 }
 
 
@@ -1367,12 +1399,15 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
     }
 
   if(n > 0) {
-    SEXP ans_namespaces;
+    SEXP ans_namespaces, ans_namespaceDefs;
     int nonTrivialAttrNamespaces = 0;
+    int addNSPrefix = parserSettings->addAttributeNamespaces & R_XML_NS_ADD_PREFIX;
+    int retNSDefs = parserSettings->addAttributeNamespaces & R_XML_NS_ADD_URL_DEFS;
 
     PROTECT(ans = NEW_CHARACTER(n));
     PROTECT(ans_names = NEW_CHARACTER(n));
     PROTECT(ans_namespaces = NEW_CHARACTER(n));
+    PROTECT(ans_namespaceDefs = NEW_CHARACTER(retNSDefs ? n : 0));
 
          /* Loop over the attributes and create the string elements
             and the elements of the name vector.
@@ -1397,15 +1432,17 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
 
 #endif
          if(atts->name) {
-           if(parserSettings->addAttributeNamespaces && atts->ns && atts->ns->prefix) {
+           if(addNSPrefix && atts->ns && atts->ns->prefix) {
              char buf[400];
              sprintf(buf, "%s:%s", atts->ns->prefix, atts->name);
              SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(buf));
 	   } else
              SET_STRING_ELT(ans_names, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->name)));
 
-	   if(atts->ns && atts->ns->prefix) {
+	   if((addNSPrefix | retNSDefs) && atts->ns && atts->ns->prefix) {
 	     SET_STRING_ELT(ans_namespaces, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->ns->prefix)));
+	     if(retNSDefs)
+    	         SET_STRING_ELT(ans_namespaceDefs, i, COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->ns->href)));
 	     nonTrivialAttrNamespaces++;
 	   }
 	 }
@@ -1413,11 +1450,14 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
          atts = atts->next;
      }
 
-    if(nonTrivialAttrNamespaces)
-        Rf_setAttrib(ans, Rf_install("namespaces"), ans_namespaces);
+   if(nonTrivialAttrNamespaces) {
+       if(retNSDefs) 
+          Rf_setAttrib(ans_namespaces, Rf_install("names"), ans_namespaceDefs);
+       Rf_setAttrib(ans, Rf_install("namespaces"), ans_namespaces);
+   }
     SET_NAMES(ans, ans_names);
 
-    UNPROTECT(nonTrivialAttrNamespaces ? 3 : 3);
+    UNPROTECT(nonTrivialAttrNamespaces ? 4 : 4);
    }
 #if 0
    else

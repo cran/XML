@@ -552,9 +552,13 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 	    /* tmp = xmlCopyNode(n, 1); */
 	} else {
 	    tmp = n;
-#ifdef R_XML_DEBUG
+
             if(n->_private)
+#ifdef R_XML_DEBUG
   	       fprintf(stderr, "insertXMLNode: %p incrementing document (%p)  %d\n", n, p->doc, *(int *) n->_private);
+	    if(strcmp(n->name, "table") == 0) {
+		fprintf(stderr, "table\n");
+	    }
 #endif
 	    incrementDocRefBy(p->doc, getNodeCount(n));
 	}
@@ -864,7 +868,7 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 xmlDocPtr currentDoc;
 #endif
 
-int R_XML_MemoryMgrMarker = 10101010011;
+int R_XML_MemoryMgrMarker = 1010101011;
 
 void
 initDocRefCounter(xmlDocPtr doc)
@@ -872,6 +876,7 @@ initDocRefCounter(xmlDocPtr doc)
     int *val;
     if(doc->_private)
 	return;
+
     doc->_private = calloc(2, sizeof(int));
     val = (int *) doc->_private;
     val[1] = R_MEMORY_MANAGER_MARKER;
@@ -993,6 +998,16 @@ R_convertXMLNsRef(SEXP r_ns)
   return(ans);
 }
 
+USER_OBJECT_
+R_getXMLNsRef(USER_OBJECT_ r_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+
+    if(!node) 
+	return(R_NilValue);
+
+    return(node->ns ? R_createXMLNsRef(node->ns) : R_NilValue);
+}
 
 
 
@@ -1082,10 +1097,10 @@ R_getXMLRefCount(SEXP rnode)
 }
 
 int
-checkDescendantsInR(xmlNodePtr node)
+checkDescendantsInR(xmlNodePtr node, int process)
 {
     xmlNodePtr p;
-    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node))
+    if(!node && (process || IS_NOT_OUR_NODE_TO_TOUCH(node)))
 	return(0);
 
     if(node->_private)
@@ -1093,7 +1108,7 @@ checkDescendantsInR(xmlNodePtr node)
 
     p = node->children;
     while(p) {
-	if(checkDescendantsInR(p))
+	if(checkDescendantsInR(p, 0))
 	    return(1);
 	p = p->next;
     }
@@ -1105,13 +1120,16 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 {
     int *val;
        /* */    
-    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node) || !node->_private) 
+    if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node))
                                  /* if node->_private == NULL, should
 				  * we free this node?, i.e. if it is
 				  * not in a parent or a document.
                                   No! Basically we shouldn't get here
                                   if we have not set the _private. We
                                   set the finalizer having set the _private */
+	return;
+
+    if(!node->_private)
 	return;
 
 
@@ -1137,9 +1155,10 @@ internal_decrementNodeRefCount(xmlNodePtr node)
     fprintf(stderr, "decremented node (%s, %d) to %d  (%p)\n", node->name, node->type, *val, node);fflush(stderr);
 #endif
     if(*val == 0) {
+
 	free(node->_private);
         node->_private = NULL;
-	if(node->doc) {
+	if(node->doc && !IS_NOT_OUR_DOC_TO_TOUCH(node->doc)) {
 	    val = (int *) node->doc->_private;
 	    if(val) (*val)--;
 	    if(!val || *val == 0) {
@@ -1149,12 +1168,13 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 #endif
 		if(val) free(node->doc->_private);
 		node->doc->_private = NULL;
+/*		fprintf(stderr, "<r:freeDoc addr='%p'/>\n", node->doc); */
 		xmlFreeDoc(node->doc);
 		R_numXMLDocsFreed++;
 	    }
 	} else if(!node->parent) {
             int hold;
-	    hold = checkDescendantsInR(node);
+	    hold = checkDescendantsInR(node, 1);
             if(!hold)
    	       xmlFreeNode(node);
 	} else {
@@ -1171,7 +1191,7 @@ internal_decrementNodeRefCount(xmlNodePtr node)
             xmlNodePtr p = node->parent;
 	    while(p->parent)  p = p->parent;
 
-	    hold = checkDescendantsInR(p);
+	    hold = checkDescendantsInR(p, 0);
 	    if(!hold)
 		xmlFree(p);
         
@@ -1196,6 +1216,10 @@ R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer)
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
 #ifdef XML_REF_COUNT_NODES
+#ifdef XML_WITH_DEBUG
+fprintf(stderr, "Creating reference with finalizer for %s (%p) '%s'\n", 
+            node->name, node, node->type == XML_TEXT_NODE ? node->content : "");fflush(stderr);
+#endif
   if(addFinalizer > 0 || (addFinalizer < 0 && !IS_NOT_OUR_NODE_TO_TOUCH(node)))
      R_RegisterCFinalizer(ref, decrementNodeRefCount);
 #endif
@@ -1222,7 +1246,8 @@ clearNodeMemoryManagement(xmlNodePtr node)
     tmp = node->children;
     while(tmp) {
 	tmp = tmp->next;
-	ctr += clearNodeMemoryManagement(tmp);
+        if(tmp)
+   	   ctr += clearNodeMemoryManagement(tmp);
     }
     return(ctr);
 }
@@ -1268,7 +1293,7 @@ R_createXMLNodeRef(xmlNodePtr node)
       if(*val == 1)
 	  incrementDocRef(node->doc);
 #ifdef R_XML_DEBUG
-  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p) (doc = %p count = %d)\n", node->name, node->type, (int) *val, node, node->doc,  ((int *)node->doc->_private)[0]);
+  fprintf(stderr, "creating reference to node (%s, %d) count = %d (%p) (doc = %p count = %d)\n", node->name, node->type, (int) *val, node, node->doc,  (node->doc && node->doc->_private) ? ((int *)node->doc->_private)[0] : -1);
 #endif
   }
 
@@ -1285,7 +1310,7 @@ SEXP
 R_addXMLNodeFinalizer(SEXP r_node)
 {
    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-#ifdef XML_REF_COUNT_NODES
+#ifdef XML_REF_COUNT_NODES /* ??? should this be ifndef or ifdef.??  */
   R_RegisterCFinalizer(r_node, decrementNodeRefCount);
 #endif
   return(r_node);
@@ -1638,6 +1663,7 @@ R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
      ans = ScalarString(mkCharCE(tmp, INTEGER(r_encoding)[0]));
 #endif
 
+     free(tmp);
 //     ans = mkString(XMLCHAR_TO_CHAR(tmp));
      // Just playing:  ans = ScalarString(mkCharCE(tmp, CE_UTF8));
    } else 

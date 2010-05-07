@@ -194,9 +194,12 @@ extern int R_XML_MemoryMgrMarker;
 
 #define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc->_private == NULL ||  ((int*)doc->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
 #define IS_NOT_OUR_NODE_TO_TOUCH(node) ((node->_private == NULL) || ((int*)node->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
+
 #else
+
 #define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc && doc->name && strcmp((doc)->name, " fake node libxslt") == 0)
 #define IS_NOT_OUR_NODE_TO_TOUCH(node) (node && (node)->doc && IS_NOT_OUR_DOC_TO_TOUCH((node)->doc))
+
 #endif
 
 
