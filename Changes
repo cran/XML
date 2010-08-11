@@ -1,3 +1,7 @@
+Version 3.1-1
+
+  *   Minor change in readHTMLTable method to identify table header better.
+
 Version 3.1-0
 
   *   Method for [[ for internal element nodes that is much faster (by avoiding

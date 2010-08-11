@@ -109,9 +109,7 @@ function(doc, header = NA ,
   headerFromTable = FALSE
   dropFirstRow = FALSE
 
-  tbody = getNodeSet(node, "./tbody")
-  if(length(tbody))
-     node = tbody[[1]]
+
   
      # check if we have a header
   if(length(header) ==1 && is.na(header))                                                                   # this node was doc
@@ -125,6 +123,13 @@ function(doc, header = NA ,
        dropFirstRow = TRUE
     }
   }
+
+     # Moved this from before the check for header as we set node here and that seems
+     # premature. Checked on
+     #     readHTMLTable("http://www.google.com/finance?q=NASDAQ:MSFT&fstype=ii", header = TRUE, which = 1)
+  tbody = getNodeSet(node, "./tbody")
+  if(length(tbody))
+     node = tbody[[1]]  
 
   if(is(header, "XMLInternalElementNode"))   {
      header = as.character(xpathSApply(header, "./*/th|./*/td", elFun))

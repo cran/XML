@@ -118,6 +118,7 @@ HTML4.0 specification
 
   zz = readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
   zz = zz[[4]]  # 4th table
+    # convert columns to numeric.  Could use colClasses in the call to readHTMLTable()
   zz[-1] = lapply(zz[-1], function(x) as.numeric(gsub(".* ", "", as.character(x))))
   matplot(1:12, t(zz[-c(1, 14)]), type = "l")
 

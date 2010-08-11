@@ -9,7 +9,7 @@
 
 /* #define R_XML_DEBUG 1    */
 
-#if 1
+#if 0
 #define XML_REF_COUNT_NODES 1   
 #else
 #ifdef XML_REF_COUNT_NODES
