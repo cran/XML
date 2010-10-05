@@ -1,3 +1,7 @@
+Version 3.2-0
+
+  *    Change to reference to normalizePath() which was moved from utils to base in R-devel/R-2.13
+
 Version 3.1-1
 
   *   Minor change in readHTMLTable method to identify table header better.

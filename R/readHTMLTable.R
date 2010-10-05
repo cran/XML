@@ -202,7 +202,7 @@ function(doc, header = NA ,
      ans = as.data.frame(ans, ...)
      if(is.character(header))
         names(ans) = header
-     else
+     else if(nrow(ans) > 0)
        names(ans) = paste("V", seq(along = ans), sep = "")
    }
     

@@ -404,7 +404,7 @@ exportMethods(source)
 export(xmlClone)
 export(findXInclude)
 
-export(getLineNumber)
+export(getLineNumber, getNodeLocation)
 
 export(ensureNamespace)
 

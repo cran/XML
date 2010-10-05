@@ -1498,6 +1498,17 @@ function(x, asNode = FALSE)
 }
 
 
+getNodeLocation =
+function(node)
+{
+   fil = findXInclude(node)
+   if(is.null(fil))
+     fil = docName(node)
+
+   list(file = fil, line = getLineNumber(node))
+}
+
+
 getLineNumber =
 function(node, ...)
 {

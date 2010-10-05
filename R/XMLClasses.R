@@ -739,9 +739,13 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 xmlDoc =
 function(node, addFinalizer = TRUE)
 {
- doc = .Call("RS_XML_createDocFromNode", node, PACKAGE = "XML")
- addDocFinalizer(doc, addFinalizer)
- doc
+  if(!is(node, "XMLInternalElementNode"))
+    stop("xmlDoc must be passed an internal XML node")
+  
+  doc = .Call("RS_XML_createDocFromNode", node, PACKAGE = "XML")
+  addDocFinalizer(doc, addFinalizer)
+  
+  doc
 }
 
 
