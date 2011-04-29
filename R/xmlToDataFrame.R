@@ -25,23 +25,23 @@ setGeneric("xmlToDataFrame",
   # z = xmlToDataFrame("~/size.xml", c("integer", "integer", "numeric"))
   #
            
-           function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list())
+           function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list(), stringsAsFactors = default.stringsAsFactors())
               standardGeneric("xmlToDataFrame"))
 
 setMethod("xmlToDataFrame", "character",
              # parse the XML document if it is a file name and
              # not a regular XML document already.          
-          function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list())
-            xmlToDataFrame(xmlParse(doc), colClasses, homogeneous, collectNames))
+          function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list(), stringsAsFactors = default.stringsAsFactors())
+               xmlToDataFrame(xmlParse(doc), colClasses, homogeneous, collectNames, stringsAsFactors = stringsAsFactors))
 
 
 
 setMethod("xmlToDataFrame", c("XMLInternalDocument", nodes = "missing"),
-function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list())
-  xmlToDataFrame(doc, colClasses, homogeneous, collectNames, nodes = xmlChildren(xmlRoot(doc))))
+  function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list(), stringsAsFactors = default.stringsAsFactors())
+      xmlToDataFrame(doc, colClasses, homogeneous, collectNames, nodes = xmlChildren(xmlRoot(doc)), stringsAsFactors))
 
 tmp = 
-function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list())
+function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list(), stringsAsFactors = default.stringsAsFactors())
 {
 
   if(length(nodes) == 0)
@@ -61,7 +61,7 @@ function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = 
   }
 
   if(!homogeneous) 
-    return(fromRaggedXML2DataFrame(nodes, varNames, c(length(nfields), length(varNames)), colClasses))
+    return(fromRaggedXML2DataFrame(nodes, varNames, c(length(nfields), length(varNames)), colClasses, stringsAsFactors))
     
      # Function to operate on each 
   fun = function(x) {
@@ -81,33 +81,41 @@ function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = 
        as.data.frame(lapply(seq(along = colClasses),
                                        function(i) {
                                           as(ans[, i], colClasses[i])
-                                       }))
+                                       }), stringsAsFactors = stringsAsFactors)
   } else
-     as.data.frame(ans)
+     as.data.frame(ans, stringsAsFactors = stringsAsFactors)
 
   names(ans) = varNames
 
   ans
 }
 
+bob =
+function(doc, colClasses = NULL, homogeneous = NA, collectNames = TRUE, nodes = list(), stringsAsFactors = default.stringsAsFactors())
+  xmlToDataFrame(nodes = doc, colClasses = colClasses, homogeneous = homogeneous, collectNames = collectNames, stringsAsFactors = stringsAsFactors)
+
 setMethod("xmlToDataFrame", c(nodes = "XMLNodeSet"), tmp)
 setMethod("xmlToDataFrame", c(nodes = "list"), tmp)
 setOldClass("XMLInternalNodeList")
 setMethod("xmlToDataFrame", c(nodes = "XMLInternalNodeList"), tmp)
 
+setMethod("xmlToDataFrame", "XMLNodeSet",   bob)
+setMethod("xmlToDataFrame", "XMLInternalNodeList",   bob)
+setMethod("xmlToDataFrame", "list",   bob)
 
 fromRaggedXML2DataFrame =
   #
   # This reads data from the nodes of an XML document and assumes
   # that they do not all have the same number or even names of fields.
-  # So this does extra work to match each observation to the collection of
-  # 
+  # So this does extra work to match each observation to the union of
+  # the field names across all nodes.
   #
   # o = fromRaggedXML2DataFrame("size2.xml")
   # o = fromRaggedXML2DataFrame("size1.xml")  
   #
 function(nodes, varNames = unique(unlist( lapply(nodes, names) )),
-          dims = c(length(nodes), length(varNames)),   colClasses = NULL)
+          dims = c(length(nodes), length(varNames)),   colClasses = NULL,
+          stringsAsFactors = default.stringsAsFactors())
 {
   #XXX
   if(is.character(nodes))
@@ -132,7 +140,7 @@ function(nodes, varNames = unique(unlist( lapply(nodes, names) )),
     ans = as.data.frame(lapply(seq(length = ncol(ans)),
                                 function(i) {
                                   as(ans[, i], colClasses[[i]])
-                                }))
+                                }), stringsAsFactors = stringsAsFactors)
   }
 
   names(ans) = varNames  

@@ -3,6 +3,12 @@
 \alias{readHTMLTable,character-method}
 \alias{readHTMLTable,HTMLInternalDocument-method}
 \alias{readHTMLTable,XMLInternalElementNode-method}
+\alias{coerce,character,FormattedInteger-method}
+\alias{coerce,character,FormattedNumber-method}
+\alias{coerce,character,Percent-method}
+\alias{FormattedInteger-class}
+\alias{FormattedNumber-class}
+\alias{Percent-class}
 \title{Read data from one or more HTML tables}
 \description{
  This function and its methods provide somewhat robust methods for
@@ -25,10 +31,17 @@ readHTMLTable(doc, header = NA,
 \arguments{
   \item{doc}{the HTML document which can be a file name or a URL
     or an already parsed \code{HTMLInternalDocument}, or
-    an HTML node of class \code{XMLInternalElementNode}.}
+    an HTML node of class \code{XMLInternalElementNode},
+    or a character vector containing the HTML content to parse and process.}
   \item{header}{either a logical value indicating whether the table has
     column labels, e.g. the first row or a \code{thead}, or alternatively
-   a character vector giving the names to use for the resulting columns.}
+    a character vector giving the names to use for the resulting columns.
+   This can be a logical vector and the individual values will be used
+   in turn for the different tables. This allows the caller to control
+   whether individual tables are processed as having column names.
+   Alternatively, one can read a specific table via the \code{which}
+   parameter and control how that is processed with a single scalar logical.
+  }
   \item{colClasses}{either a list or a vector that gives the names of
     the data types for the different columns in the table, or
     alternatively a function used to convert the string values to the
@@ -41,6 +54,12 @@ readHTMLTable(doc, header = NA,
     and not factors, use \code{stringsAsFactors = TRUE}.
     This typically applies only to an individual table and so for the
     method applied to a \code{XMLInternalElementNode} object.
+
+    In addition to the usual "integer", "numeric", "logical", "character", etc.
+    names of R data types, one can use
+    "FormattedInteger", "FormattedNumber" and "Percent" to specify that
+    format of the values are numbers possibly with commas (,) separating
+    groups of digits or a number followed by a percent sign (\%).
    }
   \item{skip.rows}{an integer vector indicating which rows to ignore.}
   \item{trim}{a logical value indicating whether to remove leading and
@@ -136,6 +155,23 @@ xt <- readHTMLTable(table,
                                    "character","character","character"),
                     trim = TRUE, stringsAsFactors = FALSE
                    )
+
+
+ # Here is a totally different way of reading tables from HTML documents.
+ # The data are formatted using a PRE and so can be read via read.table
+ u = "http://tidesonline.nos.noaa.gov/data_read.shtml?station_info=9414290+San+Francisco,+CA"
+ h = htmlParse(u)
+ p = getNodeSet(h, "//pre")
+ con = textConnection(xmlValue(p[[2]]))
+ tides = read.table(con)
+
+   # header as a logical vector
+ tt = readHTMLTable("http://www.sfgate.com/weather/rainfall.shtml",
+                     header = c(FALSE, FALSE, TRUE, FALSE, FALSE))
+
+   #
+ tt = readHTMLTable("http://www.sfgate.com/weather/rainfall.shtml",
+                        which = 3, header = TRUE)
 }
 \keyword{IO}
 \keyword{data}

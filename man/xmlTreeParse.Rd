@@ -488,7 +488,7 @@ m <- xmlTreeParse(fileName,
             }
 
    h = counter()
-   xmlTreeParse(system.file("exampleData", "mtcars.xml", package="XML"),  handlers = h, useInternalNodes = TRUE)
+   xmlParse(system.file("exampleData", "mtcars.xml", package="XML"),  handlers = h)
    h$counts()
 
 

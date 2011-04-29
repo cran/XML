@@ -112,7 +112,8 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
 		        USER_OBJECT_ s_useHTML, USER_OBJECT_ isSchema,
 		        USER_OBJECT_ fullNamespaceInfo, USER_OBJECT_ r_encoding,
 		        USER_OBJECT_ useDotNames,
-		        USER_OBJECT_ xinclude, USER_OBJECT_ errorFun)
+      		         USER_OBJECT_ xinclude, USER_OBJECT_ errorFun,
+                         USER_OBJECT_ manageMemory)
 {
 
   const char *name;
@@ -142,7 +143,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   parserSettings.internalNodeReferences = LOGICAL_DATA(internalNodeReferences)[0];
 
   parserSettings.addAttributeNamespaces = LOGICAL_DATA(addNamespaceAttributes)[0];
-
+  parserSettings.finalize = manageMemory;
 
   if(asTextBuffer == 0) {
     struct stat tmp_stat;  
@@ -324,7 +325,7 @@ NodeTraverse(xmlNodePtr root, USER_OBJECT_ converterFunctions, R_XMLSettings *pa
 #endif
         if(tmp)
 	    NodeTraverse(tmp, converterFunctions, parserSettings);
-	PROTECT(ref = R_createXMLNodeRef(c));
+	PROTECT(ref = R_createXMLNodeRef(c, parserSettings->finalize));
 	convertNode(ref, c, parserSettings);
 	UNPROTECT(1);
 	c = c->next;
@@ -1160,12 +1161,12 @@ RS_XML_xmlNodeAttributes(USER_OBJECT_ snode, USER_OBJECT_ addNamespaces, USER_OB
 }
 
 USER_OBJECT_
-RS_XML_xmlNodeParent(USER_OBJECT_ snode)
+RS_XML_xmlNodeParent(USER_OBJECT_ snode, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     if(node->parent && node->parent->type == XML_DOCUMENT_NODE)
 	return(NULL_USER_OBJECT);
-    return(R_createXMLNodeRef(node->parent));
+    return(R_createXMLNodeRef(node->parent, manageMemory));
 }
 
 
@@ -1185,7 +1186,7 @@ RS_XML_xmlNodeNumChildren(USER_OBJECT_ snode)
 
 
 USER_OBJECT_
-RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
+RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     USER_OBJECT_ ans, names = R_NilValue;
@@ -1206,7 +1207,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
 	PROTECT(names = NEW_CHARACTER(count));
 
     for(i = 0; i < count ; i++, ptr = ptr->next) {
-	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr));
+	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr, manageMemory));
 	if(addNames)
 	    SET_STRING_ELT(names, i, COPY_TO_USER_STRING(ptr->name ? XMLCHAR_TO_CHAR(ptr->name) : ""));
     }
@@ -1218,7 +1219,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames)
 }
 
 USER_OBJECT_
-R_getNodeChildByIndex(USER_OBJECT_ snode, USER_OBJECT_ r_index)
+R_getNodeChildByIndex(USER_OBJECT_ snode, USER_OBJECT_ r_index, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     int count = 0, num;
@@ -1236,7 +1237,7 @@ R_getNodeChildByIndex(USER_OBJECT_ snode, USER_OBJECT_ r_index)
 	ptr = ptr->next;
     }
 
-   return(ptr ? R_createXMLNodeRef(ptr) : NULL_USER_OBJECT);
+    return(ptr ? R_createXMLNodeRef(ptr, manageMemory) : NULL_USER_OBJECT);
 }
 
 
@@ -1506,7 +1507,7 @@ R_getLineNumber(SEXP r_node)
 
 
 SEXP
-R_xmlReadFile(SEXP r_filename, SEXP r_encoding, SEXP r_options)
+R_xmlReadFile(SEXP r_filename, SEXP r_encoding, SEXP r_options) //, SEXP manageMemory)
 {
     const char *filename;
     const char *encoding = NULL;
@@ -1523,7 +1524,7 @@ R_xmlReadFile(SEXP r_filename, SEXP r_encoding, SEXP r_options)
 }
 
 SEXP
-R_xmlReadMemory(SEXP r_txt, SEXP len, SEXP r_encoding, SEXP r_options, SEXP r_base)
+R_xmlReadMemory(SEXP r_txt, SEXP len, SEXP r_encoding, SEXP r_options, SEXP r_base) //, SEXP manageMemory)
 {
     const char *txt;
     const char *encoding = NULL;
@@ -1548,12 +1549,12 @@ R_xmlReadMemory(SEXP r_txt, SEXP len, SEXP r_encoding, SEXP r_options, SEXP r_ba
 #if 1
 
 int 
-addXInclude(xmlNodePtr ptr, SEXP *ans, int level)
+addXInclude(xmlNodePtr ptr, SEXP *ans, int level, SEXP manageMemory)
 {
 	if(ptr->type == XML_XINCLUDE_START) {
             int len = Rf_length(*ans) + 1;
 	    PROTECT(*ans = SET_LENGTH(*ans, len));
-	    SET_VECTOR_ELT(*ans, len - 1, R_createXMLNodeRef(ptr));
+	    SET_VECTOR_ELT(*ans, len - 1, R_createXMLNodeRef(ptr, manageMemory));
 	    return(1);
 	} else
 	    return(0);
@@ -1561,14 +1562,14 @@ addXInclude(xmlNodePtr ptr, SEXP *ans, int level)
 }
 
 int
-processKids(xmlNodePtr ptr, SEXP *ans, int  level)
+processKids(xmlNodePtr ptr, SEXP *ans, int  level, SEXP manageMemory)
 {
         xmlNodePtr kids;
 	int count = 0;
 	kids = ptr->children;
         while(kids) {
-	    count += addXInclude(kids, ans, level);
-            count += processKids(kids, ans, level + 1);
+	    count += addXInclude(kids, ans, level, manageMemory);
+            count += processKids(kids, ans, level + 1, manageMemory);
             kids = kids->next;
       	}
 	return(count);
@@ -1602,7 +1603,7 @@ findXIncludeStartNodes(xmlNodePtr node, SEXP *ans, int level)
  This is a recursive version. We want an iterative version.
  */
 SEXP
-R_findXIncludeStartNodes(SEXP r_root)
+R_findXIncludeStartNodes(SEXP r_root, SEXP manageMemory)
 {
     xmlNodePtr root;
     SEXP ans;
@@ -1614,7 +1615,7 @@ R_findXIncludeStartNodes(SEXP r_root)
 
     PROTECT(ans = allocVector(VECSXP, 0));
 //    count = findXIncludeStartNodes(root, &ans, 0);
-    count = addXInclude(root, ans, 0) + processKids(root, &ans, 0);
+    count = addXInclude(root, &ans, 0, manageMemory) + processKids(root, &ans, 0, manageMemory);
     UNPROTECT(count + 1);
     return(ans);
 }

@@ -96,11 +96,13 @@
 }
 \usage{
 getNodeSet(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), 
-                    fun = NULL, sessionEncoding = CE_NATIVE, ...)
-xpathApply(doc, path, fun, ... , namespaces =  xmlNamespaceDefinitions(doc, simplify = TRUE),
-                    resolveNamespaces = TRUE)
-xpathSApply(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-                    resolveNamespaces = TRUE, simplify = TRUE)
+                    fun = NULL, sessionEncoding = CE_NATIVE, addFinalizer = NA, ...)
+xpathApply(doc, path, fun, ... ,
+            namespaces =  xmlNamespaceDefinitions(doc, simplify = TRUE),
+              resolveNamespaces = TRUE, addFinalizer = NA)
+xpathSApply(doc, path, fun = NULL, ... ,
+             namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+               resolveNamespaces = TRUE, simplify = TRUE, addFinalizer = NA)
 matchNamespaces(doc, namespaces,
                                nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE),
                                  defaultNs = getDefaultNamespace(doc))
@@ -154,7 +156,10 @@ matchNamespaces(doc, namespaces,
    in comparison to \code{\link[base]{lapply}}.
  }
 %XXX
-\item{sessionEncoding}{experimental functionality and parameter related to encoding.}
+\item{sessionEncoding}{experimental functionality and parameter related
+  to encoding.}
+  \item{addFinalizer}{a logical value or identifier for a C routine
+        that controls whether we register finalizers on the intenal node.}   
 }
 \details{
   When a namespace is defined on a node in the XML document,
@@ -228,7 +233,7 @@ So we would use
  \code{\link{xmlTreeParse}} with \code{useInternalNodes} as \code{TRUE}.
 }
 \examples{
- doc = xmlTreeParse(system.file("exampleData", "tagnames.xml", package = "XML"), useInternalNodes = TRUE)
+ doc = xmlParse(system.file("exampleData", "tagnames.xml", package = "XML"))
  
  els = getNodeSet(doc, "/doc//a[@status]")
  sapply(els, function(el) xmlGetAttr(el, "status"))
@@ -247,7 +252,7 @@ So we would use
 
  #####
  f = system.file("exampleData", "eurofxref-hist.xml.gz", package = "XML") 
- e = xmlTreeParse(f, useInternal = TRUE)
+ e = xmlParse(f)
  ans = getNodeSet(e, "//o:Cube[@currency='USD']", "o")
  sapply(ans, xmlGetAttr, "rate")
 
@@ -259,7 +264,7 @@ So we would use
 
   # Using a namespace
  f = system.file("exampleData", "SOAPNamespaces.xml", package = "XML") 
- z = xmlTreeParse(f, useInternal = TRUE)
+ z = xmlParse(f)
  getNodeSet(z, "/a:Envelope/a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
  getNodeSet(z, "//a:Body", c("a" = "http://schemas.xmlsoap.org/soap/envelope/"))
  # free(z)
@@ -267,7 +272,7 @@ So we would use
 
   # Get two items back with namespaces
  f = system.file("exampleData", "gnumeric.xml", package = "XML") 
- z = xmlTreeParse(f, useInternalNodes = TRUE)
+ z = xmlParse(f)
  getNodeSet(z, "//gmr:Item/gmr:name", c(gmr="http://www.gnome.org/gnumeric/v2"))
 
  #free(z)
@@ -279,7 +284,7 @@ So we would use
   # or locally.
 
  uri = system.file("exampleData", "eurofxref-hist.xml.gz", package = "XML")
- doc = xmlTreeParse(uri, useInternalNodes = TRUE)
+ doc = xmlParse(uri)
 
    # The default namespace for all elements is given by
  namespaces <- c(ns="http://www.ecb.int/vocabulary/2002-08-01/eurofxref")
@@ -314,7 +319,7 @@ So we would use
 
    #
   uri = system.file("exampleData", "namespaces.xml", package = "XML")
-  d = xmlTreeParse(uri, useInternalNodes = TRUE)
+  d = xmlParse(uri)
   getNodeSet(d, "//c:c", c(c="http://www.c.org"))
 
   getNodeSet(d, "/o:a//c:c", c("o" = "http://www.omegahat.org", "c" = "http://www.c.org"))
@@ -399,7 +404,7 @@ So we would use
      # XMLInternalDocument in the getNodeSet().
 
     f = system.file("exampleData", "book.xml", package = "XML")
-    doc = xmlTreeParse(f, useInternal = TRUE)
+    doc = xmlParse(f)
     ch = getNodeSet(doc, "//chapter")
     xpathApply(ch[[2]], "//section/title", xmlValue)
 

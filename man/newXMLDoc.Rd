@@ -56,13 +56,16 @@ newXMLNode(name, ..., attrs = NULL, namespace = character(),
 	     at = NA, cdata = FALSE,
              suppressNamespaceWarning =
                  getOption("suppressXMLNamespaceWarning", FALSE),
-             sibling = NULL, manageMemory = TRUE)
+             sibling = NULL, addFinalizer = NA,
+              noNamespace = length(namespace) == 0 && !missing(namespace))
 newXMLTextNode(text, parent = NULL, doc = NULL, cdata = FALSE, 
-                escapeEntities = is(text, "AsIs"))
-newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA, sep = "\n")
-newXMLCommentNode(text, parent = NULL, doc = NULL, at = NA)
-newXMLPINode(name, text, parent = NULL, doc = NULL, at = NA)
-newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = NULL)  
+                escapeEntities = is(text, "AsIs"), addFinalizer = NA)
+newXMLCDataNode(text, parent = NULL, doc = NULL, at = NA, sep = "\n",
+                   addFinalizer = NA)
+newXMLCommentNode(text, parent = NULL, doc = NULL, at = NA, addFinalizer = NA)
+newXMLPINode(name, text, parent = NULL, doc = NULL, at = NA, addFinalizer = NA)
+newXMLDTDNode(nodeName, externalID = character(),
+              systemID = character(), doc = NULL, addFinalizer = NA)  
 }
 \arguments{
   \item{node}{a \code{XMLInternalNode} object that will be copied to
@@ -73,12 +76,14 @@ newXMLDTDNode(nodeName, externalID = character(), systemID = character(), doc = 
   with each element specifying a name space identifier and the
   corresponding URI for that namespace
   that are to be declared and used in the XML document, \\
-   e.g. \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
-\item{addFinalizer}{a logical value indicating whether the
+  e.g. \code{c(shelp = "http://www.omegahat.org/XML/SHelp")}}
+ \item{addFinalizer}{a logical value indicating whether the
   default finalizer routine should be registered to
   free the internal xmlDoc when R no longer has a reference to this
   external pointer object.
-}
+  This can also be the name of a C routine or a reference
+  to a C routine retrieved using
+  \code{\link[base]{getNativeSymbolInfo}}. }
  \item{name}{the tag/element name for the XML node and
    the for a Processing Instruction (PI) node, this is the "target",
    e.g. the identifier for the system for whose attention this PI node is intended.}
@@ -177,12 +182,14 @@ This is just a convenient form of \code{parent = xmlParent(node)}.}
   added. The default means at the end and this can be any position
   from 0 to the current number of children.}
   \item{sep}{when adding text nodes, this is used as an additional separator text to insert between the specified strings.}
-  \item{manageMemory}{a logical value that controls whether we register finalizers on the intenal node.}
-
 
   \item{escapeEntities}{a logical value indicating whether to mark the 
   internal text node in such a way that protects characters in its contents from
-  being escaped as entities when being serialized via \code{\link{saveXML}}}
+  being escaped as entities when being serialized via
+  \code{\link{saveXML}}}
+ \item{noNamespace}{a logical value that allows the caller to specify
+  that the new node has no namespace. This can avoid searching parent
+  and ancestor nodes up the tree for the default namespace.}
 }
 \details{
 These create internal C level objects/structure instances

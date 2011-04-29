@@ -55,7 +55,7 @@ a \code{XMLInternalDocument} or which is a file name or string
 }
 \examples{
 if(FALSE) {
-  xsd = xmlTreeParse(system.file("exampleData", "author.xsd", package = "XML"), isSchema =TRUE, useInternal = TRUE)
+  xsd = xmlParse(system.file("exampleData", "author.xsd", package = "XML"), isSchema =TRUE)
   doc = xmlInternalTreeParse(system.file("exampleData", "author.xml",  package = "XML"))
   xmlSchemaValidate(xsd, doc)
 }

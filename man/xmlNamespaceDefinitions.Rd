@@ -28,8 +28,8 @@
   \code{\link{getNodeSet}}.
 }
 \usage{
-xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE,  simplify  = FALSE)
-xmlNamespaces(x, addNames = TRUE, recursive = FALSE,  simplify  = FALSE)
+xmlNamespaceDefinitions(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)
+xmlNamespaces(x, addNames = TRUE, recursive = FALSE,  simplify = FALSE, ...)
 getDefaultNamespace(doc) 
 }
 \arguments{
@@ -40,7 +40,7 @@ getDefaultNamespace(doc)
     one can avoid the (very small) overhead of computing these with this
     parameter.}
   \item{doc}{the XMLInternalDocument object obtained from a call to
-    \code{xmlTreeParse(, useInternalNodes = TRUE)}
+    \code{\link{xmlParse}}
   }
   \item{recursive}{a logical value indicating whether to extract the
     namespace definitions for just this node (\code{FALSE})
@@ -57,7 +57,8 @@ getDefaultNamespace(doc)
     of name space definitions which also identify 
    whether the definition is local to the particular node or inherited
    from an ancestor.
-  }
+ }
+ \item{\dots}{additional parameters for methods}
 }
 \value{
   A list with as many elements as there are namespace definitions.

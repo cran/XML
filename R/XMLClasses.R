@@ -150,10 +150,10 @@ setClass("XPathNodeSet", representation(ref = "externalptr"))
 
 #setMethod("[[", c("XMLInternalElementNode", "numeric") ,
 "[[.XMLInternalElementNode" = 
-function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE))
+function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE), addFinalizer = NA)
 {
    if(is(i, "numeric"))
-     .Call("R_getNodeChildByIndex", x, as.integer(i), PACKAGE = "XML")
+     .Call("R_getNodeChildByIndex", x, as.integer(i), addFinalizer, PACKAGE = "XML")
    else
        NextMethod()
 }
@@ -616,7 +616,6 @@ function(doc, namespaces,
     } else if(length(defaultNs) == 0)
         stop("There is no default namespace on the target XML document")
   }
-
   
   if(!is.character(namespaces) || ( length(namespaces) > 1 && length(names(namespaces)) == 0))
      stop("Namespaces must be a named character vector")
@@ -630,17 +629,19 @@ function(doc, namespaces,
 
 
 getNodeSet =
-function(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), fun = NULL, sessionEncoding = CE_NATIVE, ...)
+function(doc, path, namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE), fun = NULL, sessionEncoding = CE_NATIVE,
+          addFinalizer = NA,  ...)
 {
-  xpathApply(doc, path, fun, ...,  namespaces = namespaces, sessionEncoding = sessionEncoding)
+  xpathApply(doc, path, fun, ...,  namespaces = namespaces, sessionEncoding = sessionEncoding, addFinalizer = addFinalizer)
 }
 
 
 xpathSApply =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, simplify = TRUE)
+          resolveNamespaces = TRUE, simplify = TRUE, addFinalizer = NA)
 {
-  answer = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+  answer = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces,
+                         addFinalizer = addFinalizer)
 
     # Taken from sapply
     if (simplify && length(answer) && length(common.len <- unique(unlist(lapply(answer, 
@@ -666,7 +667,7 @@ xpathApply =
   #
   #
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE)
+          resolveNamespaces = TRUE, addFinalizer = NA)
 {
   UseMethod("xpathApply")
 }  
@@ -683,7 +684,7 @@ function(x, ...)
 
 xpathApply.XMLNode =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE)
+          resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE)
 {
   idoc = xmlParse(saveXML(doc), asText = TRUE)
   ans = xpathApply(idoc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces,
@@ -699,12 +700,9 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL, noMatchOkay = FALSE, 
+          resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE, 
            sessionEncoding = CE_NATIVE) # native
 {
-#  if(!inherits(doc, "XMLInternalDocument"))
-#    stop("Need XMLInternalDocument object for XPath query")
-
   if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)
   
@@ -723,7 +721,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
              else
                 getEncodingREnum(sessionEncoding)
 
-  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, encoding, PACKAGE = "XML")
+  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, encoding, addFinalizer, PACKAGE = "XML")
 
   if(!noMatchOkay && length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]
@@ -853,7 +851,7 @@ xpathSubNodeApply =
   #
 function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-           resolveNamespaces = TRUE)
+           resolveNamespaces = TRUE, addFinalizer = NA)
 {
   node = doc
 
@@ -896,7 +894,7 @@ function(doc, path, fun = NULL, ...,
     doc = newXMLDoc(addFinalizer = FALSE)
     parent = xmlParent(node)
     .Call("RS_XML_setRootNode", doc, node, PACKAGE = "XML")
-    on.exit({ .Call("RS_XML_unsetDoc", node, unlink = TRUE, parent, PACKAGE = "XML")
+    on.exit({ .Call("RS_XML_unsetDoc", node, unlink = TRUE, parent, TRUE, PACKAGE = "XML")
               .Call("RS_XML_freeDoc", doc, PACKAGE = "XML")
               if(!is.null(tmp)) {
                                         # Need to create a new document with the current node as the root.
@@ -910,13 +908,14 @@ function(doc, path, fun = NULL, ...,
     docName(doc) = paste("created for xpathApply for", path, "in node", xmlName(node))
    
 
-  ans = xpathApply(doc, path, NULL, namespaces = namespaces, resolveNamespaces = resolveNamespaces)
+  ans = xpathApply(doc, path, NULL, namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer)
 
   if(length(ans) == 0)
     return(ans)
   
     # now check if the result was actually a descendant of our top-level node for this
     # query. It is possible that it arose from a different sub-tree.
+browser()  
   w = sapply(ans, function(el) .Call("RS_XML_isDescendantOf", el, node, strict = FALSE, PACKAGE = "XML"))
 
   ans = ans[w]
@@ -926,7 +925,7 @@ function(doc, path, fun = NULL, ...,
 
 #  if(createdNewDocument)
 #       # Need to remove the links  from these nodes to the parent.
-#    lapply(ans, function(x) .Call("RS_XML_unsetDoc", x, unlink = FALSE))
+#    lapply(ans, function(x) .Call("RS_XML_unsetDoc", x, unlink = FALSE, TRUE))
 
   
   if(!is.null(fun))
@@ -941,22 +940,27 @@ if(TRUE)
 xpathApply.XMLInternalNode =
 function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-           resolveNamespaces = TRUE)
+           resolveNamespaces = TRUE, addFinalizer = NA)
 {
-  xpathApply.XMLInternalDocument(as(doc, "XMLInternalDocument"), path, fun, ...,
+  ndoc = as(doc, "XMLInternalDocument")
+  if(is.null(ndoc))
+    xpathSubNodeApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer)
+  else
+    xpathApply.XMLInternalDocument(ndoc, path, fun, ...,
                                  namespaces = namespaces, resolveNamespaces = resolveNamespaces,
-                                 .node = doc)
+                                 .node = doc, addFinalizer = addFinalizer)
 }
 
 
 xpathApply.XMLDocument =
 #xpathApply.XMLNode =  
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL)
+          resolveNamespaces = TRUE, .node = NULL, addFinalizer = NA)
 {
   txt = saveXML(doc)
   doc = xmlParse(txt, asText = TRUE)
-  ans = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = .node)
+  ans = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = .node,
+                     addFinalizer = addFinalizer)
 
   if(length(ans)) 
      ans = lapply(ans, toXMLNode)
@@ -977,11 +981,11 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 getXMLPath =
 function(node, defaultPrefix = "ns")
 {
-  paste(unlist(c("", XML:::xmlAncestors(node, xmlName, defaultPrefix))), collapse = "/")
+  paste(unlist(c("", xmlAncestors(node, xmlName, defaultPrefix))), collapse = "/")
 }
 
 xmlAncestors =
-function(x, fun = NULL, ...)
+function(x, fun = NULL, ..., addFinalizer = NA)
 {
   ans = list()
   tmp = x
@@ -990,11 +994,7 @@ function(x, fun = NULL, ...)
       ans = c(fun(tmp, ...), ans)
     else
       ans = c(tmp, ans)
-    tmp = xmlParent(tmp)    
+    tmp = xmlParent(tmp, addFinalizer = addFinalizer)    
   }
   ans
 }  
-
-
-
-

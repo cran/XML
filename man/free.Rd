@@ -39,7 +39,7 @@ free(obj)
 }
 \examples{
  f = system.file("exampleData", "boxplot.svg", package = "XML")
- doc = xmlTreeParse(f, useInternalNodes = TRUE)
+ doc = xmlParse(f)
  nodes = getNodeSet(doc, "//path")
  rm(nodes)
  # free(doc)

@@ -98,6 +98,10 @@ typedef struct {
        that indicates collect up the node and call this.
      */
   USER_OBJECT_ dynamicBranchFunction;
+
+
+  USER_OBJECT_ finalize;
+
 } RS_XMLParserData;
 
 /* The name of the R element to call fo the general case.
@@ -161,7 +165,7 @@ void RS_XML(processingInstructionHandler)(void *userData, const XML_Char *target
 void RS_XML(textHandler)(void *userData,  const XML_Char *s, int len);
 void RS_XML(startCdataSectionHandler)(void *userData) ;
 void RS_XML(endCdataSectionHandler)(void *userData) ;
-RS_XMLParserData *RS_XML(createParserData)(USER_OBJECT_ handlers);
+RS_XMLParserData *RS_XML(createParserData)(USER_OBJECT_ handlers, USER_OBJECT_ finalize);
 
 
 int RS_XML(parseBufferWithParserData)(char *buf, RS_XMLParserData *parserData);

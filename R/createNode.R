@@ -29,32 +29,41 @@ function(kids, fromTag = TRUE)
 }
 
 setGeneric("xmlChildren<-",
-function(x, value) {
+function(x, ..., value) {
   standardGeneric("xmlChildren<-")
 })
 
 setMethod("xmlChildren<-", "ANY",
-function(x, value) {
-  value = addNames(value)
-  x$children <- value
-  x
+function(x, append = TRUE, ..., value) {
+  #value = addNames(value)
+  #x$children <- value
+  addChildren(x, append = append, ..., kids = value)
 })
 
+# Don't need this.
+# xmlName.character =
+# function(node, full = FALSE)
+#    "text"
+
 setMethod("xmlChildren<-", "XMLInternalNode",
-function(x, value) {
-  x
+function(x, append = TRUE, ..., value) {
+  if(!append)
+     removeNodes(xmlChildren(x))
+  if(!is.list(value))
+    value = list(value)
+  addChildren(x, kids = value)
 })
 
 
 
 
 addChildren =
-function(node, ..., kids = list(...), at = NA, cdata = FALSE)
+function(node, ..., kids = list(...), at = NA, cdata = FALSE, append = TRUE)
   UseMethod("addChildren")
 
 
 addChildren.XMLNode =  
-function(node, ..., kids = list(...), at = NA, cdata = FALSE)
+function(node, ..., kids = list(...), at = NA, cdata = FALSE, append = TRUE)
 {
   kids = lapply(kids,
                 function(i) {
@@ -64,7 +73,7 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
                     i
                 })
 
-  node$children = c(node$children, kids)
+  node$children = if(append) c(node$children, kids) else kids
   node$children = addNames(node$children)
   
   node

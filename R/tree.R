@@ -85,7 +85,7 @@ function(x, skip = TRUE, ...)
 }  
 
 xmlParent.XMLTreeNode =
-function(x)
+function(x, ...)
 {
   p = get(".parents", x$env)
   idx = match(x$id, names(p))
@@ -117,14 +117,14 @@ if(useS4)
 
 
 xmlToList =
-function(node, addAttributes = TRUE)
+function(node, addAttributes = TRUE, simplify = FALSE)
 {
   if(is.character(node))
     node = xmlTreeParse(node)
 
   if(inherits(node, "XMLAbstractDocument"))
     node = xmlRoot(node)
-  
+
   if(any(inherits(node, c("XMLTextNode", "XMLInternalTextNode"))))
      xmlValue(node)
   else if(xmlSize(node) == 0)
@@ -134,13 +134,18 @@ function(node, addAttributes = TRUE)
        tmp = vals = xmlSApply(node, xmlToList, addAttributes)
        tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))       
      } else {
-        tmp = vals = xmlApply(node, xmlToList, addAttributes)
+        tmp = vals = (if(simplify) xmlSApply else xmlApply)(node, xmlToList, addAttributes)
         tt = xmlSApply(node, inherits, c("XMLTextNode", "XMLInternalTextNode"))
      }
-     vals[tt] = lapply(vals[tt], function(x) x[[1]])
+     vals[tt] = (if(simplify) sapply else lapply)(vals[tt], function(x) x[[1]])
 
-     if(addAttributes && length(attrs <- xmlAttrs(node)) > 0)
-        vals[[".attrs"]] = attrs
+     if(length(attrs <- xmlAttrs(node)) > 0) {
+       if(addAttributes)
+         vals[[".attrs"]] = attrs
+       else
+         attributes(vals) = as.list(attrs)
+     }
+     
      if(any(tt) && length(vals) == 1)
        vals[[1]]
      else

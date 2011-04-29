@@ -56,7 +56,7 @@ pairs in the XML tag
  xmlAttrs(xmlRoot(doc)[["variables"]])
 
 
- doc <- xmlTreeParse(fileName, useInternalNodes = TRUE)
+ doc <- xmlParse(fileName)
  d = xmlRoot(doc)
 
  xmlAttrs(d)

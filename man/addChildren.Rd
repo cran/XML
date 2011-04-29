@@ -1,5 +1,6 @@
 \name{addChildren}
 \alias{addChildren}
+\alias{xmlParent<-}
 \alias{removeChildren}
 \alias{removeNodes}
 \alias{replaceNodes}
@@ -25,7 +26,7 @@
   function and methods in the future.
 }
 \usage{
-addChildren(node, ..., kids = list(...), at = NA, cdata = FALSE)
+addChildren(node, ..., kids = list(...), at = NA, cdata = FALSE, append = TRUE)
 removeChildren(node, ..., kids = list(...), free = FALSE)
 removeNodes(node, free = rep(FALSE, length(node)))
 replaceNodes(oldNode, newNode, ...)
@@ -34,6 +35,7 @@ addAttributes(node, ..., .attrs = NULL,
                 append = TRUE)
 removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
                   .all = (length(list(...)) + length(.attrs)) == 0)
+%xmlParent(node) = value
 }
 \arguments{
   \item{node}{the XML node whose state is to be modified,
@@ -129,7 +131,7 @@ removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
       function of that name and invoke it. 
      }
   \item{append}{a logical value that indicates whether (\code{TRUE}) the specified
-   attributes should be added to the existing  attributes on the XML node
+   attributes or children should be added to the existing  attributes on the XML node
    (if any exist), or, if \code{FALSE} these should replace any existing attributes.}
 }
 %\details{}

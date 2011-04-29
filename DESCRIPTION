@@ -1,6 +1,6 @@
 Package: XML
-Version: 3.2-0
-Date: 2010/10/05
+Version: 3.4-0
+Date: 2011/04/29
 Author: Duncan Temple Lang (duncan@wald.ucdavis.edu)
 Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
 Title: Tools for parsing and generating XML within R and S-Plus.
@@ -27,6 +27,7 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         xmlTree.R xmlTreeParse.R hashTree.R zzz.R supports.R parser.R
         libxmlFeatures.R xmlString.R saveXML.R namespaces.R
         readHTMLTable.R reflection.R xmlToDataFrame.R bitList.R
-        compare.R encoding.R fixNS.R
+        compare.R encoding.R fixNS.R xmlRoot.R serialize.R
+        xmlMemoryMgmt.R
 Repository: CRAN
-Date/Publication: 2010-10-05 16:44:24
+Date/Publication: 2011-04-30 13:01:27

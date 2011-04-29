@@ -57,7 +57,12 @@ setMethod("readHTMLTable", "HTMLInternalDocument",
    if(length(which))
        tbls = tbls[which]
 
-   ans = lapply(tbls, readHTMLTable,  header, colClasses, skip.rows, trim, elFun, as.data.frame, ...)
+#   ans = lapply(tbls, readHTMLTable,  header, colClasses, skip.rows, trim, elFun, as.data.frame, ...)
+   header = rep(header, length = length(tbls))
+   ans = mapply(readHTMLTable,
+                 tbls, header,
+                 MoreArgs = list(colClasses = colClasses, skip.rows = skip.rows, trim = trim, elFun = elFun, as.data.frame = as.data.frame, ...),
+                 SIMPLIFY = FALSE)
    names(ans) = sapply(tbls, getHTMLTableName)
 
    if(length(which) && length(tbls) == 1)
@@ -78,6 +83,14 @@ function(node)
     return(xmlValue(cap[[1]]))
 }
 
+setClass("FormattedNumber", contains = "numeric")
+setClass("FormattedInteger", contains = "integer")
+
+setAs('character', 'FormattedNumber', function(from) as.numeric(gsub(",", "", from)))
+setAs('character', 'FormattedInteger', function(from) as.integer(gsub(",", "", from)))
+
+setClass("Percent", contains = "numeric")
+setAs('character', 'Percent', function(from) as.numeric(gsub("%", "", from)))
 
 setMethod("readHTMLTable", "XMLInternalElementNode",
 #readHTMLTable.XMLInternalElementNode  =

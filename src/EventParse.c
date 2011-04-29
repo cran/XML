@@ -88,7 +88,8 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
                 USER_OBJECT_ ignoreBlanks,  USER_OBJECT_ useTagName, USER_OBJECT_ asText,
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
                   USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion,
-   	           USER_OBJECT_ branches, USER_OBJECT_ useDotNames, USER_OBJECT_ errorFun)
+	      USER_OBJECT_ branches, USER_OBJECT_ useDotNames, USER_OBJECT_ errorFun,
+              USER_OBJECT_ manageMemory)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -132,7 +133,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
     input = name;
   }
 
-  parserData = RS_XML(createParserData)(handlers);
+  parserData = RS_XML(createParserData)(handlers, manageMemory);
   parserData->endElementHandlers = endElementHandlers;
   parserData->branches         = branches;
   parserData->fileName         = name; 
@@ -465,12 +466,13 @@ RS_XML(notStandAloneHandler)(void *userData)
   The caller should arrange to free it.
 */
 RS_XMLParserData *
-RS_XML(createParserData)(USER_OBJECT_ handlers) 
+RS_XML(createParserData)(USER_OBJECT_ handlers, USER_OBJECT_ finalize) 
 {
  RS_XMLParserData *parser = (RS_XMLParserData *) R_alloc(1, sizeof(RS_XMLParserData));
 
  memset(parser, '\0', sizeof(RS_XMLParserData));
  parser->methods = handlers;
+ parser->finalize = finalize;
 
 return(parser);
 }

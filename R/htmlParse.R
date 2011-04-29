@@ -61,7 +61,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            FALSE, FALSE, 
            as.logical(isURL), FALSE, 
            as.logical(useInternalNodes), TRUE, FALSE, FALSE, as.character(encoding),
-           as.logical(useDotNames), xinclude, error, PACKAGE = "XML")
+           as.logical(useDotNames), xinclude, error, addFinalizer, PACKAGE = "XML")
 
  if(!missing(handlers) & !as.logical(asTree))
    return(handlers)

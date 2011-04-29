@@ -18,14 +18,12 @@
 #   The value is a character vector containing the identifiers of the
 #   nodes which  are children of this node.
 #
-#
-#
 xmlHashTree =
   #
   # Currently ignore the nodes, parents and children.
   #
 function(nodes = list(), parents = character(), children = list(),
-         env = new.env(TRUE))
+         env = new.env(TRUE, parent = emptyenv()))
 {
     # function to generate a new node identifier.  Can be given the
     # proposed name and will then make one up if that conflicts with another
@@ -140,6 +138,7 @@ function(id, tree, kids = tree$.children)
   ans
 }
 
+  
 
 
 getDescendants =
@@ -192,7 +191,7 @@ function(node)
 
 
 xmlNamespaceDefinitions.XMLAbstractDocument =
-function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)  
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)  
 {
    xmlNamespaces(as(x, "XMLAbstractNode"))
 }
@@ -215,7 +214,7 @@ xmlParent.XMLHashTreeNode =
   # To get the parent of the node 'obj', we have to look in the .parents object
   # for the variable with obj's node identifier and then get the corresponding
   # value which is the identifier of the parent.
-function(x)
+function(x, ...)
 {
   p = get(".parents", x$env)
   idx = exists(x$id, p, inherits = FALSE)
@@ -333,13 +332,12 @@ function(x, skip = TRUE, all = FALSE, ...)
 getSibling =
   # Access the next field in the xmlNodePtr object.
   # not exported.
-function(node, after = TRUE)
+function(node, after = TRUE, ...)
   UseMethod("getSibling")
 
 getSibling.XMLHashTreeNode =
-function(node, after = TRUE)
+function(node, after = TRUE, ...)
 {
-
   .this = node$env
   parent = xmlParent(node)
 
@@ -352,10 +350,17 @@ function(node, after = TRUE)
   if(is.na(i))
     stop("shouldn't happen")
 
-  if(after)
-    kids[[i+1]]
-  else
-    kids[[i-1]]
+  if(after) {
+    if(i < length(kids))
+       kids[[i+1]]
+    else
+       NULL
+  } else {
+    if(i > 1)
+      kids[[i-1]]
+    else
+      NULL
+  }
 }
 
 print.XMLHashTree =
@@ -382,6 +387,7 @@ function(from)
 {
   xx = xmlHashTree()
   ans = .Call("R_convertDOMToHashTree", from, xx, xx$.children, xx$.parents, PACKAGE = "XML")
+  docName(xx) = docName(from)
   xx
 }  
 
@@ -400,7 +406,10 @@ setAs("XMLInternalNode", "XMLHashTree",
 docName.XMLHashTree =
 function(doc)
 {
-  doc$.doc
+  if(exists(".doc", doc))
+     doc$.doc
+  else
+     as.character(NA)
 }
 
 setMethod("docName", "XMLHashTree", docName.XMLHashTree)

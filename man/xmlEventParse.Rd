@@ -67,7 +67,7 @@ xmlEventParse(file, handlers = xmlEventHandler(),
                   state = NULL, replaceEntities = TRUE, validate = FALSE,
                    saxVersion = 1, branches = NULL,
                     useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
-                     error = xmlErrorCumulator())
+                     error = xmlErrorCumulator(), addFinalizer = NA)
 }
 \arguments{
   \item{file}{the source of the XML content.
@@ -313,7 +313,8 @@ If this is True, each callback function  should support
 \item{error}{a function that is called when an XML error is encountered.
    This is called with 6 arguments and is described in \code{\link{xmlTreeParse}}.
  }
-
+\item{addFinalizer}{a logical value or identifier for a C routine
+        that controls whether we register finalizers on the intenal node.}
 }
 \details{
  This is now implemented using the libxml parser.

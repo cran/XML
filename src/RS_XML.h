@@ -7,7 +7,8 @@
 
 #define RS_XML(a) RS_XML_##a
 
-/* #define R_XML_DEBUG 1    */
+/* #define R_XML_DEBUG 1        */
+
 
 #if 0
 #define XML_REF_COUNT_NODES 1   
@@ -34,5 +35,6 @@ typedef enum {RS_XML_FILENAME, RS_XML_TEXT, RS_XML_CONNECTION, RS_XML_INVALID_CO
 #endif /* end of ignoring version details */
 
 #endif /* end of _R_ */
+
 
 #endif

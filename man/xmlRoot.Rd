@@ -18,7 +18,7 @@ that is returned as part of the parsing.
 \usage{
 xmlRoot(x, skip = TRUE, ...)
 \method{xmlRoot}{XMLDocumentContent}(x, skip = TRUE, ...)
-\method{xmlRoot}{XMLInternalDocument}(x, skip = TRUE, ...)
+\method{xmlRoot}{XMLInternalDocument}(x, skip = TRUE, addFinalizer = NA, ...)
 \method{xmlRoot}{HTMLDocument}(x, skip = TRUE, ...)
 }
 \arguments{
@@ -29,6 +29,8 @@ xmlRoot(x, skip = TRUE, ...)
    or not (\code{FALSE}) when returning the root node.}
   \item{...}{arguments that are passed by the generic to the different specialized 
     methods of this generic.}
+  \item{addFinalizer}{a logical value or identifier for a C routine
+        that controls whether we register finalizers on the intenal node.}
 }
 \value{
  An object of class \code{XMLNode}.

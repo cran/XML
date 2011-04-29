@@ -177,16 +177,16 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
 getSibling.XMLInternalNode =
   # Access the next field in the xmlNodePtr object.
   # not exported.
-function(node, after = TRUE)
+function(node, after = TRUE, addFinalizer = NA, ...)
 {
   if(!inherits(node, "XMLInternalNode"))
     stop("can only operate on an internal node")
 
-  .Call("RS_XML_getNextSibling", node, as.logical(after), PACKAGE = "XML")
+  .Call("RS_XML_getNextSibling", node, as.logical(after), addFinalizer, PACKAGE = "XML")
 }
 
 xmlNamespaceDefinitions <-
-function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)
 {
   UseMethod("xmlNamespaceDefinitions")
 }
@@ -194,11 +194,11 @@ function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 xmlNamespaces = xmlNamespaceDefinitions
 
 xmlNamespaceDefinitions.XMLInternalDocument =
-function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
+function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)
 {
-  r = xmlRoot(x)
+  r = xmlRoot(x, addFinalizer = FALSE)
   while(!is.null(r) && !inherits(r, "XMLInternalElementNode")) 
-     r = getSibling(r)
+     r = getSibling(r, addFinalizer = FALSE)
 
   if(is.null(r))
     return(if(simplify) character() else NULL)
@@ -207,7 +207,7 @@ function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE)
 }
 
 xmlNamespaceDefinitions.XMLNode =
-  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
+  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...) {
     ans = unclass(x)$namespaceDefinitions
 
     if(recursive == TRUE) {
@@ -237,7 +237,8 @@ xmlNamespaceDefinitions.XMLNode =
 }
 
 xmlNamespaceDefinitions.XMLInternalNode =
-  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE) {
+  function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)
+{
     ans = .Call("RS_XML_internalNodeNamespaceDefinitions", x, as.logical(recursive), PACKAGE = "XML")
     if(addNames && length(ans) > 0)
       names(ans) = sapply(ans, function(x) x$id)
@@ -254,11 +255,11 @@ xmlNamespaceDefinitions.XMLInternalNode =
   }
 
 setGeneric("getEffectiveNamespaces",
-function(node)
+function(node, ...)
  standardGeneric("getEffectiveNamespaces"))
 
 tmp =
-function(node)
+function(node, ...)
 {  
    ans = xmlNamespaceDefinitions(node)
    merge = function(to, what) {
@@ -267,13 +268,14 @@ function(node)
         ans[names(what)[i]] <<- what[i] 
    }
      
-   tmp = xmlParent(node)
+   tmp = xmlParent(node, manageMemory = FALSE)
    while(!is.null(tmp)) {
       merge(ans, xmlNamespaceDefinitions(tmp))
-      tmp = xmlParent(tmp)
+      tmp = xmlParent(tmp, manageMemory = FALSE)
    }
    ans
 }
+
 setMethod("getEffectiveNamespaces", "XMLInternalNode", tmp)
 setMethod("getEffectiveNamespaces", "XMLHashTreeNode", tmp)
 

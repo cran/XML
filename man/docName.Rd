@@ -5,6 +5,9 @@
 \alias{docName,XMLHashTree-method}
 \alias{docName,XMLInternalDocument-method}
 \alias{docName,XMLInternalNode-method}
+\alias{docName,XMLHashTreeNode-method}
+\alias{docName,NULL-method}
+\alias{docName,XMLNode-method}
 \alias{docName<-}
 \alias{docName<-,XMLInternalDocument-method}
 \alias{docName<-,XMLHashTree-method}

@@ -676,6 +676,7 @@ PKG_CPPFLAGS
 SUPPORTS_LIBXML
 SUPPORTS_EXPAT
 LD_PATH
+EXPORT_MEMORY_MANAGEMENT
 SPLUS
 LIBOBJS
 LTLIBOBJS'
@@ -2973,6 +2974,20 @@ fi
 
 
 
+
+"$R_HOME/bin/R" CMD SHLIB testRemoveFinalizers.c  2>1 >& 5
+if test "$?" = 0 ;  then
+ $R_HOME/bin/R --vanilla < testRemoveFinalizers.R 2>1 >& 5
+fi
+
+if ! test "$?" = 0 ; then
+  echo "No ability to remove finalizers on externalptr objects in this verison of R";
+  EXPORT_MEMORY_MANAGEMENT="FALSE"
+else
+ echo "Have R_RemoveExtPtrWeakRef" ;
+ PKG_CPPFLAGS="$PKG_CPPFLAGS -DR_HAS_REMOVE_FINALIZERS=1";
+ EXPORT_MEMORY_MANAGEMENT="TRUE"
+fi
 
 
 for ac_prog in sed
@@ -6148,7 +6163,7 @@ fi
 
 # Check whether --enable-nodegc was given.
 if test "${enable_nodegc+set}" = set; then
-  enableval=$enable_nodegc;  if test "${enableval}" = "yes" ; then
+  enableval=$enable_nodegc;  if test "${enableval}" = "yes" || test "${enableval}" = "default" ; then
                      LANGUAGE_DEFS="${LANGUAGE_DEFS} -DXML_REF_COUNT_NODES=1"
                  fi;
                  echo "enabling nodegc? ${enableval}"
@@ -6289,6 +6304,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
 
+
+
 if test -n "${USE_SPLUS}" ; then
 
   SPLUS_MAKEFILE=GNUmakefile.Splus
@@ -6312,7 +6329,7 @@ echo "Link flags:               ${PKG_LIBS}"
 echo ""
 echo "****************************************"
 
- ac_config_files="$ac_config_files src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE}"
+ ac_config_files="$ac_config_files NAMESPACE src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE}"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6881,6 +6898,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
+    "NAMESPACE") CONFIG_FILES="$CONFIG_FILES NAMESPACE" ;;
     "src/Makevars") CONFIG_FILES="$CONFIG_FILES src/Makevars" ;;
     "R/supports.R") CONFIG_FILES="$CONFIG_FILES R/supports.R" ;;
     "inst/scripts/RSXML.csh") CONFIG_FILES="$CONFIG_FILES inst/scripts/RSXML.csh" ;;
@@ -7009,12 +7027,13 @@ PKG_CPPFLAGS!$PKG_CPPFLAGS$ac_delim
 SUPPORTS_LIBXML!$SUPPORTS_LIBXML$ac_delim
 SUPPORTS_EXPAT!$SUPPORTS_EXPAT$ac_delim
 LD_PATH!$LD_PATH$ac_delim
+EXPORT_MEMORY_MANAGEMENT!$EXPORT_MEMORY_MANAGEMENT$ac_delim
 SPLUS!$SPLUS$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 66; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 67; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

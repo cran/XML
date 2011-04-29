@@ -4,8 +4,8 @@
 
 
 
-SEXP
-convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding)
+static SEXP
+convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
 {
   SEXP ans, expr = NULL, arg = NULL, ref;
   int i;
@@ -40,7 +40,7 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding)
       } else if(el->type == XML_NAMESPACE_DECL)
 	  ref = R_createXMLNsRef((xmlNsPtr) el);
       else
-	ref = R_createXMLNodeRef(el);
+        ref = R_createXMLNodeRef(el, manageMemory);
 
     if(expr) {
       PROTECT(ref);
@@ -64,14 +64,14 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding)
 }
 
 SEXP
-convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun, int encoding)
+convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun, int encoding, SEXP manageMemory)
 {
   SEXP ans = NULL_USER_OBJECT;
 
   switch(obj->type) {
 
     case XPATH_NODESET:
-        ans = convertNodeSetToR(obj->nodesetval, fun, encoding);
+        ans = convertNodeSetToR(obj->nodesetval, fun, encoding, manageMemory);
 	break;
     case XPATH_BOOLEAN:
 	ans = ScalarLogical(obj->boolval);
@@ -167,7 +167,8 @@ R_XMLInternalDocument_free(SEXP sdoc)
 
 
 SEXP
-RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, SEXP charEncoding)
+RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, SEXP charEncoding,
+                  SEXP manageMemory)
 {
  xmlXPathContextPtr ctxt = NULL;
  xmlXPathObjectPtr result;
@@ -196,7 +197,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, S
  result = xmlXPathEvalExpression(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(path, 0))), ctxt);
 
  if(result)
-     ans = convertXPathObjectToR(result, fun, INTEGER(charEncoding)[0]);
+     ans = convertXPathObjectToR(result, fun, INTEGER(charEncoding)[0], manageMemory);
  
  xmlXPathFreeObject(result);
  xmlXPathFreeContext(ctxt);
@@ -229,7 +230,7 @@ RS_XML_createDocFromNode(USER_OBJECT_ s_node)
 }
 
 USER_OBJECT_
-RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
+RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc, USER_OBJECT_ manageMemory)
 {
  xmlDocPtr doc;
  xmlNodePtr node, ptr;
@@ -241,7 +242,7 @@ RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
  if(TYPEOF(s_node) == EXTPTRSXP) {
      node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
      ptr = xmlDocCopyNode(node, doc, 1);
-     return(R_createXMLNodeRef(ptr));
+     return(R_createXMLNodeRef(ptr, manageMemory));
  }
 
  len = Rf_length(s_node);
@@ -249,7 +250,7 @@ RS_XML_copyNodesToDoc(USER_OBJECT_ s_node, USER_OBJECT_ s_doc)
  for(i = 0; i < len; i++) {
      node = (xmlNodePtr) R_ExternalPtrAddr(VECTOR_ELT(s_node, i));
      ptr = xmlDocCopyNode(node, doc, 1);
-     SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr)); 
+     SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr, manageMemory)); 
  }
  UNPROTECT(1);
  return(ans);

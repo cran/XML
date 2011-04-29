@@ -19,7 +19,8 @@
 }
 \usage{
 isXMLString(str)
-xmlParseString(content, doc = NULL, namespaces = RXMLNamespaces, clean = TRUE) 
+xmlParseString(content, doc = NULL, namespaces = RXMLNamespaces,
+                clean = TRUE, addFinalizer = NA) 
 xml(x) 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -32,6 +33,8 @@ xml(x)
    document level. But it still potentially of some value.}
   \item{namespaces}{a character vector giving the URIs for the XML namespaces which are to be removed if \code{clean} is \code{TRUE}.}
   \item{clean}{a logical value that controls whether namespaces are removed after the document is parsed..}
+  \item{addFinalizer}{a logical value or identifier for a C routine
+        that controls whether we register finalizers on the intenal node.}   
 }
 \details{
 }

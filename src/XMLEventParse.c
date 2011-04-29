@@ -414,8 +414,7 @@ R_endBranch(RS_XMLParserData *rinfo,
 /*		fprintf(stderr, "<r:createDoc addr='%p'/>\n", doc); */
 		numDocsCreated++;
 	    }
-	    SET_VECTOR_ELT(args, 0, rnode = R_createXMLNodeRef(tmp));
-	    /* Done in createXMLNodeRef() R_RegisterCFinalizer(rnode, R_xmlFreeNode); */
+	    SET_VECTOR_ELT(args, 0, rnode = R_createXMLNodeRef(tmp, rinfo->finalize));
 	    RS_XML(invokeFunction)(fun, args, NULL, rinfo->ctx);
  	    UNPROTECT(1);
 	    /*

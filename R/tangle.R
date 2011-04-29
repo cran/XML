@@ -32,6 +32,10 @@ function(doc, files = getTargetFiles(doc, xpath = xpath), dir = ".",
 {
   if(is.character(doc))
     doc = xmlParse(doc)
+
+  if(length(files) == 0 && "r" %in% language) {
+      return(tangleR(doc, out = NA))
+  }
   
   files =
    structure(lapply(names(files),

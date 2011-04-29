@@ -30,7 +30,7 @@ xmlParseString =
   # This should be cured now in the XML package.
   #
   
-function(content, doc = NULL, namespaces = RXMLNamespaces, clean = TRUE)
+function(content, doc = NULL, namespaces = RXMLNamespaces, clean = TRUE, addFinalizer = NA)
 {
   f =
     function(cdata = FALSE)
@@ -48,7 +48,7 @@ function(content, doc = NULL, namespaces = RXMLNamespaces, clean = TRUE)
               sprintf('"%s"', RXMLNamespaces), sep = "=", collapse = " ")
   txt = paste('<para ', ns, '>', content, "</para>", sep = "")
 
-  local.doc = tryCatch(xmlParse(txt, addFinalizer = !inherits(doc, "XMLInternalDocument")),
+  local.doc = tryCatch(xmlParse(txt, addFinalizer = addFinalizer),   # addFinalizer = !inherits(doc, "XMLInternalDocument")
                        error = function(e) e)
 
   if(inherits(local.doc, "condition"))
@@ -63,8 +63,9 @@ function(content, doc = NULL, namespaces = RXMLNamespaces, clean = TRUE)
 
   
    # XXX
-  if(inherits(doc, "XMLInternalDocument"))
-    .Call("RS_XML_copyNodesToDoc", tmp, doc, PACKAGE = "XML")
-  else
+  if(inherits(doc, "XMLInternalDocument")) {
+    manageMemory = manageMemory_p(addFinalizer)
+    .Call("RS_XML_copyNodesToDoc", tmp, doc, addFinalizer, PACKAGE = "XML")
+  } else
     tmp
 }  

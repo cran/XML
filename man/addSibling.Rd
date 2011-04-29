@@ -12,7 +12,7 @@
    }
 
 \usage{
-getSibling(node, after = TRUE)
+getSibling(node, after = TRUE, ...)
 addSibling(node, ..., kids = list(...), after = NA)
 }
 
@@ -70,7 +70,7 @@ addSibling(node, ..., kids = list(...), after = NA)
      # 	
            fileName = system.file("exampleData", "iTunes.plist", package = "XML")
 
-           doc = xmlTreeParse(fileName, useInternal = TRUE)
+           doc = xmlParse(fileName)
            nodes = getNodeSet(doc, "//key[text() = 'Artist']")
            sapply(nodes, function(x)  xmlValue(getSibling(x)))
 	

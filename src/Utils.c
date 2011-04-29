@@ -349,8 +349,11 @@ void R_xmlFreeDoc(SEXP ref)
 	  free(val);
 	  doc->_private = NULL;
 
-      xmlFreeDoc(doc);
-      R_numXMLDocsFreed++;
+#ifdef R_XML_DEBUG
+	  fprintf(stderr, "Freeing the XML doc %p\n", doc);
+#endif
+          xmlFreeDoc(doc);
+          R_numXMLDocsFreed++;
      } /* was before the xmlFreeDoc so that that was unconditional.*/
   }
   R_ClearExternalPtr(ref);

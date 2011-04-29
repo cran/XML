@@ -82,7 +82,7 @@ xmlSource(url, ...,
                      "//r:plot[not(@eval='false')]"),
           namespaces = DefaultXPathNamespaces, section = character(),
           eval = TRUE, init = TRUE)
-xmlSourceFunctions(doc, ids = character(), ...)
+xmlSourceFunctions(doc, ids = character(), parse = TRUE, ...)
 xmlSourceSection(doc, ids = character(),
                  xnodes = c(".//r:function", ".//r:init[not(@eval='false')]", 
                             ".//r:code[not(@eval='false')]",
@@ -184,6 +184,9 @@ xmlSourceSection(doc, ids = character(),
  \item{init}{a logical controlling whether to run the R code in any
     r:init nodes.}
  \item{doc}{the XML document, either a file name, the content of the document or the parsed document.}
+ \item{parse}{a logical value that controls whether we parse the code or
+   just return the text representation from the XML without parsing it.
+   This allows us to get just the code.}
 }
 \details{
   This evaluates the \code{code}, \code{function} and \code{example}

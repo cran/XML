@@ -37,7 +37,7 @@
 
 
 #define R_USE_XML_ENCODING 1
-#include "Utils.h"  /* R_createXMLNodeRef(), Encoding macros. */
+#include "Utils.h"  /* R_createXMLNodeRef, Encoding macros. */
 
 
 #ifdef USE_OLD_ROOT_CHILD_NAMES
@@ -49,7 +49,7 @@
 void incrementDocRef(xmlDocPtr doc);
 int getNodeCount(xmlNodePtr node);
 void incrementDocRefBy(xmlDocPtr doc, int num);
-SEXP R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer);
+
 
 /**
  Create a libxml comment node and return it as an S object
@@ -57,7 +57,7 @@ SEXP R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer);
 */
 
 USER_OBJECT_
-R_xmlNewComment(USER_OBJECT_ str, USER_OBJECT_ sdoc)
+R_xmlNewComment(USER_OBJECT_ str, USER_OBJECT_ sdoc, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node;
     xmlDocPtr doc = NULL;
@@ -69,11 +69,11 @@ R_xmlNewComment(USER_OBJECT_ str, USER_OBJECT_ sdoc)
     txt = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(str, 0)));
     node =  doc ? xmlNewDocComment(doc, txt) : xmlNewComment(txt);
 
-    return(R_createXMLNodeRef(node));
+    return(R_createXMLNodeRef(node, manageMemory));  
 }
 
 USER_OBJECT_
-R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc)
+R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc, SEXP manageMemory)
 {
    xmlNodePtr node;
     xmlDocPtr doc = NULL;
@@ -88,11 +88,11 @@ R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc)
     else
 	node = xmlNewText(txt);
 	
-    return(R_createXMLNodeRef(node));
+    return(R_createXMLNodeRef(node, manageMemory));
 }
 
 USER_OBJECT_
-R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value)
+R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value, USER_OBJECT_ manageMemory)
 {
   xmlDocPtr  doc = NULL;
   xmlNodePtr node;
@@ -105,18 +105,18 @@ R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value)
 
   node = xmlNewCDataBlock(doc, CHAR_TO_XMLCHAR(tmp), strlen(tmp));
 
-  return(R_createXMLNodeRef(node));
+  return(R_createXMLNodeRef(node, manageMemory));
 }
 
 
 USER_OBJECT_
-R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content)
+R_newXMLPINode(USER_OBJECT_ sdoc, USER_OBJECT_ name, USER_OBJECT_ content, USER_OBJECT_ manageMemory)
 {
   xmlDocPtr  doc = NULL;
   xmlNodePtr node;
 
   node = xmlNewPI(CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(content, 0))));
-  return(R_createXMLNodeRef(node));
+  return( R_createXMLNodeRef(node, manageMemory) ); 
 }
 
 
@@ -137,53 +137,23 @@ R_newXMLNode(USER_OBJECT_ name, USER_OBJECT_ attrs, USER_OBJECT_ nameSpace, USER
       CHAR_DEREF(STRING_ELT(nameSpace, 0));
    }
 
-/*   ns = xmlNewNs(xmlGetRootElement(doc), ); */
    node = xmlNewDocNode(doc, ns, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(name, 0))), NULL);
-
-
-#if 0
-/* trying to do this in R now. */
-   if((n = GET_LENGTH(nameSpaceDefinitions)) > 0) {
-       /* Need the default namespace and then also any other */
-     USER_OBJECT_ prefixes = GET_NAMES(nameSpaceDefinitions);
-     for(i = 0; i < n ; i++) {
-         xmlNewNs(node, CHAR_DEREF(STRING_ELT(nameSpaceDefinitions, i)), CHAR_DEREF(STRING_ELT(prefixes, i)));
-     }
-   }
-#endif
-
-#if 0
-/* trying to do this in R now. */
-   n = GET_LENGTH(attrs);
-   if(n > 0) {
-       USER_OBJECT_ attrNames = GET_NAMES(attrs);
-       if(GET_LENGTH(attrNames) != n) {
-	   PROBLEM "names of attributes is not the same length of attributes"
-           ERROR;
-       }
-       for(i = 0; i < n ; i++) {
-            xmlSetProp(node, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrNames, i))),
-			  CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attrs, i))));
-       }
-   }
-#endif
-
 
    if(doc && XML_ROOT(doc) == NULL) {
        XML_ROOT(doc) = node;
    }
 
-   return(INTEGER(manageMemory)[0] > 0 ? R_createXMLNodeRef(node) : R_createXMLNodeRefDirect(node, 0));
+   return( R_createXMLNodeRef(node, manageMemory) );
 }
 
 USER_OBJECT_
-RS_XML_getNextSibling(USER_OBJECT_ s_node, USER_OBJECT_ s_prev)
+RS_XML_getNextSibling(USER_OBJECT_ s_node, USER_OBJECT_ s_prev, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node), ptr;
 
     ptr = LOGICAL(s_prev)[0] ? node->next : node->prev;
 
-    return(ptr ? R_createXMLNodeRef(ptr) : NULL_USER_OBJECT);
+    return(ptr ? R_createXMLNodeRef(ptr, manageMemory) : NULL_USER_OBJECT);
 }
 
 
@@ -218,6 +188,7 @@ RS_XML_setNodeName(USER_OBJECT_ s_node, USER_OBJECT_ s_name)
 
     return(NULL_USER_OBJECT);
 }
+
 
 #if 0
 int
@@ -450,8 +421,9 @@ RS_XML_setRootNode(USER_OBJECT_ r_doc, USER_OBJECT_ r_node)
     doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
 
-    if(!node->doc)
-	node->doc = doc;
+    /*  Set the reference counting information. */
+    //if(!node->doc)
+    //    node->doc = doc;
     xmlDocSetRootElement(doc, node);
 
     return(ScalarLogical(TRUE));
@@ -553,14 +525,13 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 	} else {
 	    tmp = n;
 
-            if(n->_private)
+            if(n->_private) {
 #ifdef R_XML_DEBUG
-  	       fprintf(stderr, "insertXMLNode: %p incrementing document (%p)  %d\n", n, p->doc, *(int *) n->_private);
-	    if(strcmp(n->name, "table") == 0) {
-		fprintf(stderr, "table\n");
-	    }
+               fprintf(stderr, "insertXMLNode: %p to %p, incrementing document (%p)  %d\n", n, p, p->doc, *(int *) n->_private);
 #endif
-	    incrementDocRefBy(p->doc, getNodeCount(n));
+	       if(p->doc)
+ 	           incrementDocRefBy(p->doc, getNodeCount(n));
+            }
 	}
 	check = xmlAddChild(p, tmp);
 
@@ -602,7 +573,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 }
 
 USER_OBJECT_
-RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_after)
+RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_after, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr p, n, ans;
     
@@ -635,11 +606,11 @@ RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_af
 	p->doc->children = n;
 
     incrementDocRefBy(p->doc, getNodeCount(n));
-    return(R_createXMLNodeRef(ans));
+    return(R_createXMLNodeRef(ans, manageMemory));
 }
 
 USER_OBJECT_
-RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new)
+RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr Old, New, ans;
 
@@ -656,7 +627,7 @@ RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new)
     }
 
     ans = xmlReplaceNode(Old, New);
-    return(R_createXMLNodeRef(ans));  
+    return(R_createXMLNodeRef(ans, manageMemory));  
 }
 
 
@@ -701,7 +672,7 @@ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeN
 }
 
 USER_OBJECT_
-R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
+R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd, USER_OBJECT_ manageMemory)
 {
   xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
   xmlNodePtr node = NULL;
@@ -725,7 +696,7 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd)
       return(NULL_USER_OBJECT);
 
 
-  return(R_createXMLNodeRef(node));  
+  return(R_createXMLNodeRef(node, manageMemory));  
 }
 
 
@@ -752,7 +723,7 @@ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces)
 
 
 USER_OBJECT_
-R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sdtdName, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID)
+R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sdtdName, USER_OBJECT_ sexternalID, USER_OBJECT_ ssysID, USER_OBJECT_ manageMemory)
 {
 
     xmlDocPtr doc = NULL;
@@ -781,7 +752,7 @@ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sdtdName, USER_OBJECT_ sexternalID, 
 /* should we do this???
       xmlAddChild((xmlNodePtr) doc, (xmlNodePtr) DTD); 
 */
-    return(R_createXMLNodeRef((xmlNodePtr) node));
+    return(R_createXMLNodeRef((xmlNodePtr) node, manageMemory));
 }
 
 
@@ -810,6 +781,19 @@ R_xmlSetNs(USER_OBJECT_ s_node, USER_OBJECT_ s_ns, USER_OBJECT_ append)
   return(s_ns);
 }
 
+#if 0
+/* remove if the above is sufficient. */
+SEXP
+RS_XML_setNS(SEXP s_node, SEXP r_ns)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    xmlNsPtr ns = (xmlNsPtr) R_ExternalPtrAddr(r_ns);
+    xmlSetNS(node, ns);
+    return(NULL_USER_OBJECT);
+}
+#endif
+
+
 
 USER_OBJECT_
 R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
@@ -835,7 +819,7 @@ R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 
 
 USER_OBJECT_
-RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer)
+RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ manageMemory)
 {
     if(TYPEOF(obj) != EXTPTRSXP) {
 	PROBLEM  "clone can only be applied to an internal, C-level libxml2 object"
@@ -851,11 +835,11 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ addFinalizer
 	xmlNodePtr node, node_ans;
 	node = (xmlNodePtr) R_ExternalPtrAddr(obj);
 	node_ans = xmlCopyNode(node, INTEGER(recursive)[0]);
-	return(R_createXMLNodeRef(node_ans));
+	return(R_createXMLNodeRef(node_ans, manageMemory));
     } else if(R_isInstanceOf(obj, "XMLInternalDocument") || R_isInstanceOf(obj, "XMLInternalDOM")) {
 	xmlDocPtr doc;
 	doc = (xmlDocPtr) R_ExternalPtrAddr(obj);
-	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0])));
+	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0])), manageMemory);
     }
     
     PROBLEM "clone doesn't (yet) understand this internal data type"
@@ -869,6 +853,50 @@ xmlDocPtr currentDoc;
 #endif
 
 int R_XML_MemoryMgrMarker = 1010101011;
+int R_XML_NoMemoryMgmt = 111111111;
+
+/*
+  This returns a value that indicates whether we should 
+  add a finalizer and put the XML node under a C finalizer
+  to reduce the reference count.
+  user is an R object that should be an integer vector of length
+  1 and should be 0, 1 or NA  (effectively a logical)
+  If it is NA, we consult the document object in which  the node
+  is located (or NULL if not part of a document). This document
+  object can have a value in the _private field that tells us 
+  no to 
+ */
+int 
+R_XML_getManageMemory(SEXP user, xmlDocPtr doc, xmlNodePtr node)
+{
+
+    int manage;
+
+    if(TYPEOF(user) == STRSXP || TYPEOF(user) == EXTPTRSXP)
+	return(0);
+
+    manage = INTEGER(user)[0]; // TYPEOF(user) == INTSXP ? INTEGER(user)[0] : INTEGER(asInteger(user))[0];
+    if(manage == R_NaInt) {
+        if(!doc)
+	  manage = 1;
+        else
+	  manage = doc->_private != &R_XML_NoMemoryMgmt;
+    }       
+#ifdef R_XML_DEBUG
+    if(manage)
+	fprintf(stderr, "getManageMemory (%p) %d  (type = %d, name = %s)\n", doc, manage, node->type, node->name);fflush(stderr);
+#endif
+    return(manage);
+}
+
+SEXP
+R_xmlSetNoMemoryMgmt(SEXP r_doc)
+{
+    xmlDocPtr doc;
+    doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
+    doc->_private = &R_XML_NoMemoryMgmt;
+    return(NULL_USER_OBJECT);
+}
 
 void
 initDocRefCounter(xmlDocPtr doc)
@@ -943,7 +971,7 @@ R_createXMLDocRef(xmlDocPtr doc)
 
 #ifdef R_XML_DEBUG
   fprintf(stderr, "creating document reference %s %p, count = %d\n", 
-              doc->URL ? doc->URL : "internally created", doc,
+  	      doc->URL ? doc->URL : "internally created", doc,
               * ((int*) doc->_private));
 #endif
 
@@ -1008,7 +1036,6 @@ R_getXMLNsRef(USER_OBJECT_ r_node)
 
     return(node->ns ? R_createXMLNsRef(node->ns) : R_NilValue);
 }
-
 
 
 const char * 
@@ -1092,7 +1119,7 @@ R_getXMLRefCount(SEXP rnode)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(rnode);
     if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node) || !node->_private)
-	return(R_NilValue);
+	return(ScalarInteger(-1));
     return(ScalarInteger(*((int *) node->_private)));
 }
 
@@ -1115,10 +1142,10 @@ checkDescendantsInR(xmlNodePtr node, int process)
     return(0);
 }
 
-void
+int
 internal_decrementNodeRefCount(xmlNodePtr node)
 {
-    int *val;
+    int *val, status = 0;
        /* */    
     if(!node || IS_NOT_OUR_NODE_TO_TOUCH(node))
                                  /* if node->_private == NULL, should
@@ -1127,10 +1154,10 @@ internal_decrementNodeRefCount(xmlNodePtr node)
                                   No! Basically we shouldn't get here
                                   if we have not set the _private. We
                                   set the finalizer having set the _private */
-	return;
+	return(status);
 
     if(!node->_private)
-	return;
+	return(status);
 
 
     /*  Get the value of the reference count and decrement it by 1.
@@ -1152,7 +1179,7 @@ internal_decrementNodeRefCount(xmlNodePtr node)
     val = (int *) node->_private;
     (*val)--;
 #ifdef R_XML_DEBUG
-    fprintf(stderr, "decremented node (%s, %d) to %d  (%p)\n", node->name, node->type, *val, node);fflush(stderr);
+    fprintf(stderr, "decremented node (%s, %d) to %d (%p)   %s\n", node->name, node->type, *val, node, *val == 0 ? "***" : "");fflush(stderr);
 #endif
     if(*val == 0) {
 
@@ -1166,17 +1193,26 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 #ifdef R_XML_DEBUG
 		fprintf(stderr, "releasing document (for node) %p %s (%s)\n", node->doc, node->doc->URL ? node->doc->URL : "?", val ? "has zero count" : "no count");fflush(stderr);
 #endif
-		if(val) free(node->doc->_private);
+		if(val) 
+                    free(node->doc->_private);
 		node->doc->_private = NULL;
-/*		fprintf(stderr, "<r:freeDoc addr='%p'/>\n", node->doc); */
 		xmlFreeDoc(node->doc);
+                status = 1;
 		R_numXMLDocsFreed++;
 	    }
 	} else if(!node->parent) {
+	    /* If the node is not in a tree by having a parent, then
+	     * check the children and if they aren't being referenced
+               by an R variable, we can free those too. */
             int hold;
 	    hold = checkDescendantsInR(node, 1);
-            if(!hold)
+            if(!hold) {
+#ifdef R_XML_DEBUG
+		fprintf(stderr, "Calling xmlFreeNode() for %p (type = %d)\n", node, node->type);fflush(stderr);
+#endif
    	       xmlFreeNode(node);
+	       status = 1;
+	    }
 	} else {
             /* So we have a parent.  But what if that parent is not
                being held as an R variable. We need to free the node.
@@ -1189,14 +1225,22 @@ internal_decrementNodeRefCount(xmlNodePtr node)
             */
 	    int hold;
             xmlNodePtr p = node->parent;
-	    while(p->parent)  p = p->parent;
+	    while(p->parent) 
+                p = p->parent;
 
 	    hold = checkDescendantsInR(p, 0);
-	    if(!hold)
-		xmlFree(p);
+	    if(!hold) {
+#ifdef R_XML_DEBUG
+		fprintf(stderr, "Calling xmlFree() for %p\n", node);fflush(stderr);
+#endif
+		xmlFree(p); //XXX xmlFree() or xmlFreeNode() ?
+		status = 1;
+	    }
         
 	}
     }
+
+    return(status);
 }
 
 
@@ -1205,7 +1249,10 @@ void
 decrementNodeRefCount(SEXP rnode)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(rnode);
-    internal_decrementNodeRefCount(node);
+    int status;
+    status = internal_decrementNodeRefCount(node);
+    if(status)
+	R_ClearExternalPtr(rnode);
 }
 
 
@@ -1216,12 +1263,14 @@ R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer)
 
   PROTECT(ref = R_MakeExternalPtr(node, Rf_install("XMLInternalNode"), R_NilValue));
 #ifdef XML_REF_COUNT_NODES
-#ifdef XML_WITH_DEBUG
+
+  if(addFinalizer > 0 || (addFinalizer < 0 && !IS_NOT_OUR_NODE_TO_TOUCH(node))) {
+#ifdef R_XML_DEBUG
 fprintf(stderr, "Creating reference with finalizer for %s (%p) '%s'\n", 
             node->name, node, node->type == XML_TEXT_NODE ? node->content : "");fflush(stderr);
 #endif
-  if(addFinalizer > 0 || (addFinalizer < 0 && !IS_NOT_OUR_NODE_TO_TOUCH(node)))
      R_RegisterCFinalizer(ref, decrementNodeRefCount);
+  }
 #endif
   PROTECT(tmp = NEW_CHARACTER(3));
   SET_STRING_ELT(tmp, 0, mkChar(R_getInternalNodeClass(node->type)));
@@ -1238,16 +1287,21 @@ clearNodeMemoryManagement(xmlNodePtr node)
     xmlNodePtr tmp;
     int ctr = 0;
     if(node->_private) {
-	free(node->_private);
+	int a, b;
+	int isOurs = (a = node->_private != &R_XML_NoMemoryMgmt) && (b = ((int *)(node->_private))[1] == (int) &R_XML_MemoryMgrMarker);
+	if(isOurs) {
+ fprintf(stderr, "Removing memory management from %p, %s\n", node, node->name);fflush(stderr);
+   	   free(node->_private);
+   	   ctr++;
+	}
 	node->_private = NULL;
-	ctr++;
     }
 
     tmp = node->children;
     while(tmp) {
-	tmp = tmp->next;
         if(tmp)
    	   ctr += clearNodeMemoryManagement(tmp);
+	tmp = tmp->next;
     }
     return(ctr);
 }
@@ -1269,19 +1323,24 @@ R_clearNodeMemoryManagement(SEXP r_node)
 
 
 /**
-
+Used to be used as 
+R_XML_getManageMemory(manageMemory, node->doc, node) > 0 ? R_createXMLNodeRef() : R_createXMLNodeRefDirect(node, 0)); 
  */
 USER_OBJECT_
-R_createXMLNodeRef(xmlNodePtr node)
+R_createXMLNodeRef(xmlNodePtr node, USER_OBJECT_ finalize)
 {
   int *val;
+  int addFinalizer = 0;
 
   if(!node)
       return(NULL_USER_OBJECT);
 
+
+  addFinalizer = R_XML_getManageMemory(finalize, node->doc, node);
+
 /*  !IS_NOT_OUR_NODE_TO_TOUCH(node) */
-  if((node->_private && ((int*)node->_private)[1] == (int) R_MEMORY_MANAGER_MARKER)
-     || !node->doc || (!(IS_NOT_OUR_DOC_TO_TOUCH(node->doc)))) {
+  if(addFinalizer && ((node->_private && ((int*)node->_private)[1] == (int) R_MEMORY_MANAGER_MARKER)
+		      || !node->doc || (!(IS_NOT_OUR_DOC_TO_TOUCH(node->doc))))) {
       if(node->_private == NULL) {
         node->_private = calloc(2, sizeof(int));
 	val = (int *) node->_private;
@@ -1297,7 +1356,7 @@ R_createXMLNodeRef(xmlNodePtr node)
 #endif
   }
 
-  return(R_createXMLNodeRefDirect(node, !IS_NOT_OUR_NODE_TO_TOUCH(node)));
+  return(R_createXMLNodeRefDirect(node, addFinalizer /* !IS_NOT_OUR_NODE_TO_TOUCH(node) */ ));
 }
 
 
@@ -1465,8 +1524,20 @@ RS_XML_setDoc(USER_OBJECT_ snode, USER_OBJECT_ sdoc)
     return(R_createXMLDocRef(doc));
 }
 
+void
+RS_XML_recursive_unsetDoc(xmlNodePtr node)
+{
+    xmlNodePtr tmp;
+    node->doc = NULL;
+    tmp = node->children;
+    while(tmp) {
+	RS_XML_recursive_unsetDoc(tmp);
+	tmp = tmp->next;
+    }
+}
+
 USER_OBJECT_
-RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent)
+RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent, USER_OBJECT_ recursive)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
     if(!node) {
@@ -1486,6 +1557,10 @@ RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent)
 
     if(r_parent != R_NilValue) {
         node->parent = (xmlNodePtr) R_ExternalPtrAddr(snode);
+    }
+
+    if(LOGICAL(recursive)[0]) {
+	RS_XML_recursive_unsetDoc(node);
     }
 
     return(ScalarLogical(TRUE));
@@ -1723,6 +1798,10 @@ RS_XML_isDescendantOf(USER_OBJECT_ r_node, USER_OBJECT_ r_top, USER_OBJECT_ stri
 	    ERROR;
     }
 
+/*XXX */
+    if(node->type == XML_NAMESPACE_DECL)
+	return(ScalarLogical(TRUE));
+
     ptr = node;
 
     while(ptr && ptr->type != XML_DOCUMENT_NODE) {
@@ -1752,4 +1831,82 @@ R_XML_indexOfChild(SEXP r_node)
     }
 
     return(R_NilValue);
+}
+
+
+
+SEXP
+R_setNamespaceFromAncestors(SEXP r_node)
+{
+    xmlNodePtr node, ptr;
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    ptr = node->parent;
+    while(ptr) {
+	if(ptr->ns && ptr->ns->href && (!ptr->ns->prefix || !ptr->ns->prefix[0])) {
+	    xmlSetNs(node, ptr->ns);
+	    return(ScalarLogical(TRUE));
+	}
+	ptr = ptr->parent;
+    }
+    return(ScalarLogical(FALSE));
+}
+
+
+#ifdef R_HAS_REMOVE_FINALIZERS
+int
+xmlNode_removeFinalizers(xmlNodePtr node)
+{
+  xmlNodePtr tmp;
+  int count = 0;
+
+#if R_XML_DEBUG
+fprintf(stderr, "xml removeFinalizers  %p %s\n", node, node->name);
+#endif
+  count = R_RemoveExtPtrWeakRef_direct(node);
+
+  tmp = node->children;
+  while(tmp) {
+      count += xmlNode_removeFinalizers(tmp);
+      tmp = tmp->next;
+  }
+  return(count);
+}
+
+SEXP
+R_xmlNode_removeFinalizers(SEXP r_node)
+{
+    int num;
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    num = xmlNode_removeFinalizers(node);
+    return(ScalarInteger(num));
+}
+#endif
+
+
+
+
+
+
+SEXP
+R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
+{
+    const char * val;
+    xmlNsPtr ns;
+
+    xmlDocPtr doc = (xmlDocPtr) r_doc == NULL_USER_OBJECT ? NULL : R_ExternalPtrAddr(r_doc);    
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+
+    val = CHAR_DEREF(STRING_ELT(r_ns, 0));
+    
+    ns = LOGICAL(r_asPrefix)[0] ? xmlSearchNs(doc, node, val) : xmlSearchNsByHref(doc, node, val);
+
+    if(!ns)
+	return(NEW_CHARACTER(0));
+    else {
+	SEXP r_ans;
+	PROTECT(r_ans =  mkString(ns->href));
+	SET_NAMES(r_ans, mkString(ns->prefix ? XMLCHAR_TO_CHAR(ns->prefix) : ""));
+	UNPROTECT(1);
+	return(r_ans);
+    }
 }

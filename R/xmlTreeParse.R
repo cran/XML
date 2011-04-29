@@ -96,7 +96,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
               as.logical(isURL), as.logical(addAttributeNamespaces),
               as.logical(useInternalNodes), FALSE, as.logical(isSchema),
               as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames),
-              xinclude, error, PACKAGE = "XML")
+              xinclude, error, addFinalizer, PACKAGE = "XML")
 
 
 

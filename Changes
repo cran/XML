@@ -1,3 +1,62 @@
+Version 3.4
+
+  *    Added xmlSearchNs() to aid looking for XML definitions by URL or prefix.
+
+  *    Support in readHTMLTable() for identifying values formatted as percents 
+       or numbers with commas. Use the classes FormattedInteger, FormattedNumber
+       and Percent in colClasses.
+
+Version 3.3-2
+
+  *    Better handling of namespace definitions and uses in newXMLNode
+       and separation of internal code into a separate function.
+
+Version 3.3-1
+
+  *    Configuration to conditionally compile code and export functions
+       for removing finalizers.  This relies on C routines tha will be 
+       added to the base R distribution, so not present in any released 
+       version of R as yet.
+
+Version 3.3-0
+
+  *    addFinalizer added as parameter to many functions and methods that 
+       can return a reference to an internal/C-level node.  This controls
+       whether a finalizer is added to the node and reference counting
+       is performed.  See MemoryManagement.pdf/.html for more details.
+
+  *    One can set the suppressXMLNamespaceWarning as either an XML option (via setOption())
+       or as a regular R option (via options(suppressXMLNamespaceWarning = ...)  )
+
+  *    Added methods for docName() for XMLHashTreeNode and XMLNode.
+
+  *    added docName when converting from an internal tree to an XMLHashTree.
+
+  *    xmlHashTree() uses an environment with no parent environment, by default.
+
+  *    Added an append parameter to addChildren().
+
+  *    Fixed coercion from XMLInternalNode to XMLNode.
+
+  *    Made the methods (e.g. xmlAttrs<-(), xmlParent(), ...) 
+       for XMLNode and XMLInternalNode consistent.
+
+  *    Made classes agree for xmlParse() and newXMLDoc()
+
+  *    fixed corner/end cases for getSibling for XMLHashTreeNode
+
+  *    Added xmlRoot<- methods for XMLInternalDocument and XMLHashTree.
+
+  *    Minor enhancement to xmlToDataFrame() so that one can pass
+       the value from getNodeSet() directly as the first argument to xmlToDataFrame()
+       without passing it via the nodes parameter.
+
+  *    Registered all of the native routines being invoked via .Call().
+
+Version 3.2-1
+
+  *    Turn reference counting on by default again.
+
 Version 3.2-0
 
   *    Change to reference to normalizePath() which was moved from utils to base in R-devel/R-2.13

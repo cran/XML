@@ -35,8 +35,7 @@ toString.XMLNode(x, ...)
 }
 
 \examples{
- x <- xmlRoot(xmlTreeParse(system.file("exampleData", "gnumeric.xml",
-package = "XML")))
+ x <- xmlRoot(xmlTreeParse(system.file("exampleData", "gnumeric.xml", package = "XML")))
 
  toString(x)
 }

@@ -26,15 +26,24 @@
  
 }
 \usage{
-xmlParent(x)
-xmlAncestors(x, fun = NULL, ...)
+xmlParent(x, ...)
+xmlAncestors(x, fun = NULL, ..., addFinalizer = NA)
 }
 \arguments{
   \item{x}{an object of class \code{XMLInternalNode} whose parent is being requested. }
   \item{fun}{an R function which is invoked for each  node as we walk up
     the tree.}
   \item{\dots}{any additional arguments that are passed in calls to
-    \code{fun} after the node object.}
+    \code{fun} after the node object and for \code{xmlParent} this allows methods to define their
+    own additional parameters.}
+\item{addFinalizer}{a logical value indicating whether the
+  default finalizer routine should be registered to
+  free the internal xmlDoc when R no longer has a reference to this
+  external pointer object.
+  This can also be the name of a C routine or a reference
+  to a C routine retrieved using
+  \code{\link[base]{getNativeSymbolInfo}}.
+ }  
 }
 \details{
  This uses the internal libxml structures to access the parent in the DOM tree. 
@@ -83,11 +92,11 @@ xmlAncestors(x, fun = NULL, ...)
 
   filename = system.file("exampleData", "branch.xml", package = "XML")
   parentNames <- character()
-  xmlTreeParse(filename,
+  xmlParse(filename,
                 handlers =
                   list(h = function(x) {
                    parentNames <<- c(parentNames, xmlName(xmlParent(x)))
-                  }), useInternalNodes = TRUE)
+                  }))
 
   table(parentNames)
 }

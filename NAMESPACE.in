@@ -126,6 +126,7 @@ exportMethods("free")
 S3method(removeChildren, XMLNode)
 S3method(removeChildren, XMLInternalNode)
 
+exportClasses(Percent, FormattedNumber, FormattedInteger)
 
 S3method(xpathApply, XMLInternalNode)
 S3method(xpathApply, XMLInternalDocument)
@@ -460,3 +461,15 @@ export(parseXMLAndAdd)
 
 
 #exportClass("XPathNodeSet")
+
+
+export(xmlSerializeHook, xmlDeserializeHook)
+
+if(@EXPORT_MEMORY_MANAGEMENT@) {
+export(clearMemoryManagement)
+exportMethods(clearMemoryManagement)
+}
+
+export("xmlParent<-")
+
+export(xmlSearchNs)

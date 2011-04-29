@@ -30,6 +30,8 @@ typedef struct {
     int fullNamespaceInfo;
 
     int useDotNames;
+
+    SEXP finalize;
 } R_XMLSettings;
 
 

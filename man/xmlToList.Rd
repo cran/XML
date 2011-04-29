@@ -29,14 +29,18 @@ The ".attrs" element of the list is the character vector of
 attributes from the node \code{<c>...</c>}.
 }
 \usage{
-xmlToList(node, addAttributes = TRUE)
+xmlToList(node, addAttributes = TRUE, simplify = FALSE)
 }
 \arguments{
   \item{node}{the XML node or document to be converted to an R list.
    This can be an "internal" or C-level node (i.e. \code{\link{XMLInternalNode-class}})
    or a regular R-level node (either \code{\link{XMLNode-class}} or \code{XMLHashNode}).}
   \item{addAttributes}{a logical value which controls whether the attributes of an empty node
-   are added to the }
+    are added to the }
+  \item{simplify}{a logical value that controls whether we collapse
+   the list to a vector if the elements all have a common compatible
+   type. Basically, this controls whether we use \code{sapply} or \code{lapply}.
+ }
 }
 \value{
  A list whose elements correspond to the children of the top-level nodes.

@@ -52,7 +52,7 @@ Class \code{\linkS4class{oldClass}}, directly.
 \examples{
 
  f = system.file("exampleData", "mtcars.xml", package="XML")
- doc = xmlTreeParse(f, useInternalNodes = TRUE)
+ doc = xmlParse(f)
  getNodeSet(doc, "//variables[@count]")
  getNodeSet(doc, "//record")
 

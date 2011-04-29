@@ -1,7 +1,7 @@
 xmlRoot.XMLInternalDocument = 
-function(x, skip = TRUE, ...)
+function(x, skip = TRUE, addFinalizer = NA, ...)
 {
-  .Call("R_xmlRootNode", x, as.logical(skip), PACKAGE = "XML")
+  .Call("R_xmlRootNode", x, as.logical(skip), addFinalizer, PACKAGE = "XML")
 }
 
 setAs("XMLNode", "XMLInternalNode",
@@ -63,21 +63,24 @@ function(obj, fun, ...)
 
 asRXMLNode =
 function(node, converters = NULL, trim = TRUE, ignoreBlanks = TRUE)
-   .Call("R_createXMLNode", node, converters, as.logical(trim), as.logical(ignoreBlanks), PACKAGE = "XML")
+{  
+   .Call("R_createXMLNode", node, converters, as.logical(trim), as.logical(ignoreBlanks), PACKAGE = "XML")[[1]]
+}
 
 "[.XMLInternalDocument" =
-function(x, i, j, ..., namespaces = xmlNamespaceDefinitions(x, simplify = TRUE))
+function(x, i, j, ..., namespaces = xmlNamespaceDefinitions(x, simplify = TRUE), addFinalizer = NA)
 {
   if(is.character(i)) {
-    getNodeSet(x, i, ...)
+    getNodeSet(x, i, ..., addFinalizer = addFinalizer)
   } else
      stop("No method for subsetting an XMLInternalDocument with ", class(i))
 }  
 
 "[[.XMLInternalDocument" =
-function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE))
+function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE),
+           addFinalizer = NA)
 {
-  ans = x[i]
+  ans = x[i, addFinalizer = addFinalizer]
   if(length(ans) > 1)
     warning(length(ans), " elements in node set. Returning just the first one! (Use [])")
   ans[[1]]
@@ -123,9 +126,9 @@ function(node, addNamespacePrefix = FALSE, addNamespaceURLs = TRUE, ...)
 
 
 xmlChildren.XMLInternalNode =
-function(x, addNames = TRUE, omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"), ...)
+function(x, addNames = TRUE, omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"), addFinalizer = NA, ...)
 {
-  kids = .Call("RS_XML_xmlNodeChildrenReferences", x, as.logical(addNames), PACKAGE = "XML")
+  kids = .Call("RS_XML_xmlNodeChildrenReferences", x, as.logical(addNames), addFinalizer, PACKAGE = "XML")
   
 if(length(omitNodeTypes))
     kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]   
@@ -155,13 +158,13 @@ function(obj)
 
 "[[.XMLInternalNode" <-
 #setMethod("[[", "XMLInternalNode",
-function(x, i, j, ...)
+function(x, i, j, ..., addFinalizer = NA)
 {
   if(inherits(i, "formula")) {
-    return(getNodeSet(x, i, if(missing(j)) character() else j)[[1]])
+    return(getNodeSet(x, i, if(missing(j)) character() else j, addFinalizer = addFinalizer, ...)[[1]])
   }
   
-  kids = xmlChildren(x)
+  kids = xmlChildren(x, addFinalizer = addFinalizer)
   if(length(kids) == 0)
     return(NULL)
   
@@ -177,9 +180,9 @@ function(x, i, j, ...)
 
 
 "[.XMLInternalNode" <-
-function(x, i, j, ...)
+function(x, i, j, ..., addFinalizer = NA)
 {
-  kids = xmlChildren(x)
+  kids = xmlChildren(x, addFinalizer = addFinalizer)
   if(is.logical(i))
     i = which(i)
 
@@ -206,9 +209,10 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = CE_NATIVE)
      if(xmlSize(x) == 0)
        return(character())
 
-    i = sapply(xmlChildren(x), inherits, "XMLInternalTextNode")
+    kids = xmlChildren(x, addFinaliizer = FALSE)
+    i = sapply(kids, inherits, "XMLInternalTextNode")
     if(any(i))
-      return(paste(unlist(lapply(xmlChildren(x)[i], xmlValue, ignoreComments, recursive = TRUE, encoding = encoding)), collapse = ""))
+      return(paste(unlist(lapply(kids[i], xmlValue, ignoreComments, recursive = TRUE, encoding = encoding)), collapse = ""))
     else
       return(character())
    }
@@ -252,21 +256,21 @@ setMethod("xmlValue<-", "XMLAbstractNode",
 
 names.XMLInternalNode =
 function(x)
-  xmlSApply(x, xmlName)
+  xmlSApply(x, xmlName, addFinalizer = FALSE)
 
 xmlApply.XMLInternalNode =
-function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"))
+function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"), addFinalizer = NA)
 {
-   kids = xmlChildren(X)
+   kids = xmlChildren(X, addFinalizer = addFinalizer)
    if(length(omitNodeTypes))
      kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]   
    lapply(kids, FUN, ...)
 }  
 
 xmlSApply.XMLInternalNode =
-function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"))
+function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndNode"), addFinalizer = NA)
 {
-   kids = xmlChildren(X)
+   kids = xmlChildren(X, addFinalizer = addFinalizer)
    if(length(omitNodeTypes))
      kids = kids[! sapply(kids, function(x) any(inherits(x, omitNodeTypes)) )]
    sapply(kids, FUN, ...)
@@ -275,26 +279,27 @@ function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndN
 
 
 xmlParent =
-function(x)
+function(x, ...)
  UseMethod("xmlParent")
 
 
 xmlParent.XMLInternalNode =
-function(x)
+function(x, addFinalizer = NA, ...)
 {
-  .Call("RS_XML_xmlNodeParent", x, PACKAGE = "XML")
+  .Call("RS_XML_xmlNodeParent", x, addFinalizer, PACKAGE = "XML")
 }
 
 
 newXMLDTDNode <-
-function(nodeName, externalID = character(), systemID = character(), doc = NULL)  
+function(nodeName, externalID = character(), systemID = character(), doc = NULL, addFinalizer = NA)  
 {
   if(length(nodeName) > 1 && missing(externalID))
     externalID = nodeName[2]
   if(length(nodeName) > 2 && missing(systemID))
     systemID = nodeName[3]  
 
-  .Call("R_newXMLDtd", doc, as.character(nodeName), as.character(externalID), as.character(systemID), PACKAGE = "XML")
+  .Call("R_newXMLDtd", doc, as.character(nodeName), as.character(externalID), as.character(systemID),
+          addFinalizer, PACKAGE = "XML")
 }
 
 setInternalNamespace =
@@ -333,19 +338,18 @@ newXMLDoc <-
 function(dtd = NA, namespaces = NULL, addFinalizer = TRUE, name = character(), node = NULL) 
 {
   ans = .Call("R_newXMLDoc", dtd, namespaces, PACKAGE = "XML")
-
+  class(ans) = oldClass(class(ans))
+  
   addDocFinalizer(ans, addFinalizer)
-
+  
   if(length(name))
-    docName(ans) = as.character(name)
+     docName(ans) = as.character(name)
 
   if(length(node)) {
-#   if(missing(shallow)) {
-#     shallow = !is.null(as(node, "XMLInternalDocument"))
-#   }
-#    if(!deep) 
-#      .Call("R_insertXMLNode", ans, node, as.integer(NA), FALSE, PACKAGE = "XML")
-    addChildren(ans, node)
+    if(is.character(node))
+       newXMLTextNode(node, addFinalizer = FALSE, parent = doc)
+    else
+       addChildren(ans, node)
   }
 
   ans
@@ -356,7 +360,7 @@ getOption =
 function(name, default = NULL, converter = NULL)
 {
   if(!exists(name, XMLOptions, inherits = FALSE)) 
-    return(default)
+    return(base::getOption(name, default))
 
    ans = get(name, XMLOptions)
 
@@ -395,11 +399,12 @@ function(name, ..., attrs = NULL,
          at = NA,
          cdata = FALSE,
          suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE), #  i.e. warn.
-         sibling = NULL, manageMemory = TRUE
-         )
+         sibling = NULL, addFinalizer = NA,
+         noNamespace = length(namespace) == 0 && !missing(namespace)
+        )
 {
+   # determine whether we know now that there is definitely no namespace.
 
- noNamespace = length(namespace) == 0 && !missing(namespace)
  
     # make certain we have a character vector for the attributes.
  if(length(attrs)) {
@@ -418,10 +423,10 @@ function(name, ..., attrs = NULL,
 
      # allow the caller to specify the node name as  ns_prefix:name
      # but we have to create it as name and the set the namespace.
-  ns = nsPrefix = character()
+  ns = character()  # the namespace prefix
   name = strsplit(name, ":")[[1]]
   if(length(name) == 2) {
-     ns = nsPrefix = name[1]
+     ns = name[1]
      name = name[2]
      noNamespace = FALSE
   }
@@ -445,12 +450,12 @@ function(name, ..., attrs = NULL,
 
      # xmlSetProp() routine in R_newXMLNode() handles namespaces on the attribute names, even checking them.
   node <- .Call("R_newXMLNode", as.character(name), character(), character(), doc, namespaceDefinitions, 
-                   as.integer(manageMemory), PACKAGE = "XML")
+                   addFinalizer, PACKAGE = "XML")
 
- if(!is.null(sibling))
-    addSibling(sibling, node, after = as.logical(at))
- else if(!is.null(parent))
-    addChildren(parent, node, at = at)
+  if(!is.null(sibling))
+     addSibling(sibling, node, after = as.logical(at))
+  else if(!is.null(parent))
+     addChildren(parent, node, at = at)
 
 
  if(TRUE) { # Create the name space definitions here rather than in C code.
@@ -458,96 +463,34 @@ function(name, ..., attrs = NULL,
                    function(i) 
                      newNamespace(node, namespaceDefinitions[[i]], names(namespaceDefinitions)[i], set = FALSE)
                    )
-      names(nsDefs) = names(namespaceDefinitions)
-  }  else
+      if(length(namespaceDefinitions))
+         names(nsDefs) = if(length(names(namespaceDefinitions))) names(namespaceDefinitions) else ""
+  } else
       nsDefs = xmlNamespaceDefinitions(node)
 
        # Now that the namespaces are defined, we can define the attributes which _may_ use them.
   addAttributes(node, .attrs = attrs, suppressNamespaceWarning = suppressNamespaceWarning)
- 
 
- if(length(namespace) > 0) {
-#XXX   cat("<newXMLNode> have namespace", length(namespace) , paste(namespace, collapse = ", "), "\n")
-          # a single element with no name so this is the prefix.
-    if(length(namespace) == 1 && length(names(namespace)) == 0 && !(substring(namespace, 1, 3) %in% c("htt", "ftp"))) {
-      if(namespace != "")
-        ns = nsPrefix = namespace
-    } else {
+ if(is(namespace, "XMLNamespaceRef")) {
+    setInternalNamespace(node, namespace)
+ } else if(is.na(noNamespace) || !noNamespace)  {
+    ns = getNodeNamespace(ns, nsDefs, node, namespace, noNamespace, namespaceDefinitions, parent, suppressNamespaceWarning)
+    if(is.null(ns))
+       .Call("R_setNamespaceFromAncestors", node, PACKAGE = "XML")
+ }
 
-           # we have names and/or more than one element. So these are namespace definitions
-      if(length(names(namespace)) == 0) 
-        names(namespace) <- rep("", length(namespace))
 
-      if(length(namespace) > 1 && !is.na(match(namespace[1], names(namespace)[-1]))) {
-        if(length(ns)) 
-          warning("ignoring first element of namespace and using prefix from node name, ", ns)
-        else {
-          ns = namespace[1]
-          namespace = namespace[-1]
-        }
-      }
-        
-      
 
-      if(length(namespace) > 1 && sum(names(namespace) == "") > 1)
-        warning("more than one namespace to use as the default")
-
-      nsDefs = lapply(seq(along = namespace),
-                      function(i) {
-                        prefix = names(namespace)[i]
-
-                        newNamespace(node, namespace[[i]], prefix)
-                                # Don't set the namespace. This is just a definition/declaration for
-                                # this node, but not necessarily the namespace to use for this node.
-                                # We set this below
-                      })
-      names(nsDefs) = names(namespace)
-    }
-  }
-
-          # Now handle the prefix for this node.
-    if(length(ns)) {
-      i = match(ns, names(nsDefs))
-      if(is.na(i)) {
-         if(!is.null(parent)) 
-           ns = findNamespaceDefinition(node, ns)
-         else {
-            if(is.character(suppressNamespaceWarning))
-               f = get(suppressNamespaceWarning, mode = "function")
-            else if(is.logical(suppressNamespaceWarning) && !suppressNamespaceWarning) {
-               f = warning 
-            } else
-               f = function(...) {}
-                
-            f("cannot find namespace definition because the node is not in the document and there are no local namespace definitions for this node")
-            attr(node, "xml:namespace") = ns
-            ns = NULL
-          }
-          if(!inherits(ns, "XMLNamespaceRef"))
-             ns <- newNamespace(node, ns, "")
-      } else
-         ns <- nsDefs[[i]]
-    } else  {
-      i = match("", names(nsDefs))
-      ns = if(is.na(i)) NULL else nsDefs[[i]]
-
-      if(!noNamespace && length(ns) == 0 && length(parent) > 0) {
-          ns = xmlNamespaceRef(parent)
-      }
-    }
-
- 
      # Here is where we set the namespace for this node.
- if(length(ns) && (inherits(ns, c("XMLNamespaceRef", "XMLNamespaceDeclaration")) || (is.character(ns) && ns != ""))) {
-#XXX   cat("<newXMLNode> set namespace\n")   
+ if(length(ns) && (inherits(ns, c("XMLNamespaceRef", "XMLNamespaceDeclaration")) || (is.character(ns) && ns != ""))) 
      setXMLNamespace( node, ns) # should this be append = FALSE ?
-   }
 
+
+    # Add any children to this node.
  if(length(.children))  {
    if(!is.list(.children))
       .children = list(.children)
-#XXX   cat("<newXMLNode> add children", length(.children), "\n")
-   addChildren(node, kids = .children, cdata = cdata)
+   addChildren(node, kids = .children, cdata = cdata, addFinalizer = addFinalizer)
  }
 
  node
@@ -768,12 +711,13 @@ newXMLTextNode =
   #
   #  cdata allows the caller to specify that the text be 
   #  wrapped in a newXMLCDataNode
-function(text,  parent = NULL, doc = NULL, cdata = FALSE, escapeEntities = is(text, "AsIs"))
+function(text,  parent = NULL, doc = NULL, cdata = FALSE, escapeEntities = is(text, "AsIs"),
+          addFinalizer = NA)
 {
   if(cdata) 
-    return(newXMLCDataNode(text, parent, doc))
+    return(newXMLCDataNode(text, parent, doc, addFinalizer = addFinalizer))
 
-  a = .Call("R_newXMLTextNode", as.character(text), doc, PACKAGE = "XML")
+  a = .Call("R_newXMLTextNode", as.character(text), doc, addFinalizer, PACKAGE = "XML")
   if(escapeEntities)
     setNoEnc(a)
   
@@ -784,28 +728,28 @@ function(text,  parent = NULL, doc = NULL, cdata = FALSE, escapeEntities = is(te
 }
 
 newXMLPINode <-
-function(name,  text,  parent = NULL, doc = NULL, at = NA)
+function(name,  text,  parent = NULL, doc = NULL, at = NA, addFinalizer = NA)
 {
-  a = .Call("R_newXMLPINode", doc, as.character(name), as.character(text), PACKAGE = "XML")
+  a = .Call("R_newXMLPINode", doc, as.character(name), as.character(text), addFinalizer, PACKAGE = "XML")
   if(!is.null(parent))
     addChildren(parent, a, at = at)
   a  
 }
 
 newXMLCDataNode <-
-function(text, parent = NULL, doc = NULL, at = NA, sep = "\n")
+function(text, parent = NULL, doc = NULL, at = NA, sep = "\n", addFinalizer = NA)
 {
   text = paste(as.character(text), collapse = "\n")
-  a = .Call("R_newXMLCDataNode", doc,  text, PACKAGE = "XML")
+  a = .Call("R_newXMLCDataNode", doc,  text, addFinalizer, PACKAGE = "XML")
   if(!is.null(parent))
     addChildren(parent, a, at = at)
   a  
 }
 
 newXMLCommentNode <-
-function(text, parent = NULL, doc = NULL, at = NA) 
+function(text, parent = NULL, doc = NULL, at = NA, addFinalizer = NA) 
 {
-  a = .Call("R_xmlNewComment",  as.character(text), doc, PACKAGE = "XML")
+  a = .Call("R_xmlNewComment",  as.character(text), doc, addFinalizer, PACKAGE = "XML")
   if(!is.null(parent))
     addChildren(parent, a, at = at)
   a  
@@ -818,13 +762,13 @@ function(oldNode, newNode, ...)
 }
 
 replaceNodes.XMLInternalNode =
-function(oldNode, newNode, ...)
+function(oldNode, newNode, addFinalizer = NA, ...)
 {
   oldNode = as(oldNode, "XMLInternalNode")
   #XXX deal with a list of nodes.
   newNode = as(newNode, "XMLInternalNode")
   
-  .Call("RS_XML_replaceXMLNode", oldNode, newNode, PACKAGE = "XML")
+  .Call("RS_XML_replaceXMLNode", oldNode, newNode, addFinalizer, PACKAGE = "XML")
 }  
 
 "[[<-.XMLInternalNode" =
@@ -861,7 +805,7 @@ addChildren.XMLInternalDocument =
   # in kids.  This is not just the length of kids but
   # the number of nodes since some of the elements might be lists.
   #
-function(node, ..., kids = list(...), at = NA, cdata = FALSE)
+function(node, ..., kids = list(...), at = NA, cdata = FALSE, addFinalizer = NA)
 {
   kids = unlist(kids, recursive = FALSE)
 
@@ -894,7 +838,7 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
                i = kids[[j]]
 
                if(is.character(i)) 
-                 i = newXMLTextNode(i, cdata = cdata)
+                 i = newXMLTextNode(i, cdata = cdata, addFinalizer = addFinalizer)
 
                if(!inherits(i, "XMLInternalNode")) #XX is(i, "XMLInternalNode")
                  i = as(i, "XMLInternalNode")
@@ -912,7 +856,7 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
                   if(xmlSize(node) < at[j])
                     .Call("R_insertXMLNode", i, node, as.integer(NA), FALSE, PACKAGE = "XML")
                   else
-                    .Call("RS_XML_xmlAddSiblingAt", node[[ at[j] ]], i, after, PACKAGE = "XML") # if at = 0, then shove it in before the sibling.
+                    .Call("RS_XML_xmlAddSiblingAt", node[[ at[j] ]], i, after, addFinalizer, PACKAGE = "XML") # if at = 0, then shove it in before the sibling.
                }
             }))
   }
@@ -922,14 +866,14 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE)
       
       if(is.list(i)) {  # can't happen now since we unlist()
          for(k in i)
-            addChildren(node, k)
+            addChildren(node, k, addFinalizer = addFinalizer)
       } else {
 
         if(is.null(i))
            next
      
         if(is.character(i)) 
-           i = newXMLTextNode(i, cdata = cdata)
+           i = newXMLTextNode(i, cdata = cdata, addFinalizer = FALSE)
 
 
         if(!inherits(i, "XMLInternalNode")) {
@@ -988,7 +932,7 @@ function(node, ..., kids = list(...), after = NA)
 }
 
 addSibling.XMLInternalNode =
-function(node, ..., kids = list(...), after = TRUE)  
+function(node, ..., kids = list(...), after = TRUE, addFinalizer = NA)  
 {
    #XXX Why add as children?
    if(FALSE && is.na(after))
@@ -996,7 +940,7 @@ function(node, ..., kids = list(...), after = TRUE)
    else {
      lapply(kids,
             function(x) {
-              .Call("RS_XML_xmlAddSiblingAt", node, x, as.logical(after), PACKAGE = "XML")
+              .Call("RS_XML_xmlAddSiblingAt", node, x, as.logical(after), addFinalizer, PACKAGE = "XML")
             })
    }
   
@@ -1221,7 +1165,6 @@ tmp =
 function(node, append = TRUE, suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE), value)
 {
    addAttributes(node, .attrs = value, suppressNamespaceWarning = suppressNamespaceWarning, append = append)
-   node
 }
 
 setMethod("xmlAttrs<-", "XMLInternalElementNode", tmp)
@@ -1450,9 +1393,9 @@ function(node, recursive = TRUE, addFinalizer = FALSE, ...)
            })
 
 setMethod("xmlClone", "XMLInternalDocument",           
-function(node, recursive = TRUE, addFinalizer = TRUE, ...)
+function(node, recursive = TRUE, addFinalizer = NA, ...)
 {
-  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
+  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizero, PACKAGE = "XML")
   addDocFinalizer(ans, addFinalizer)
   ans
 })
@@ -1548,4 +1491,27 @@ function(doc, what)
      names(what)[w]
   } else
      names(defs)[i]
+}
+
+
+"xmlParent<-" =
+ function(x, ..., value) {
+  addChildren(value, ..., kids = list(x))                
+}
+
+
+setOldClass("XMLNamespaceRef")
+setAs("XMLNamespaceRef", "character",
+       function(from) {
+ 	.Call("R_convertXMLNsRef", from)
+       })
+
+
+
+
+xmlSearchNs =
+function(node, ns, asPrefix = TRUE, doc = as(node, "XMLInternalDocument"))
+{
+
+ .Call("R_xmlSearchNs", doc, node, as.character(ns), as.logical(asPrefix), PACKAGE = "XML")
 }

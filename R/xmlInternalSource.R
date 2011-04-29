@@ -438,7 +438,7 @@ function(node)
 
 
 setGeneric("xmlSourceFunctions",
-            function(doc, ids = character(), ...) {
+            function(doc, ids = character(), parse = TRUE, ...) {
                   standardGeneric("xmlSourceFunctions")
             })
 
@@ -447,9 +447,9 @@ setMethod("xmlSourceFunctions", "character",
   #
   # evaluate the r:function nodes, or restricted to @id from ids.
   #
-function(doc, ids = character(), ...)
+function(doc, ids = character(), parse = TRUE, ...)
 {
-  xmlSourceFunctions(xmlParse(doc), ids, ...)
+  xmlSourceFunctions(xmlParse(doc), ids, parse = parse, ...)
 })
 
 
@@ -461,13 +461,16 @@ setMethod("xmlSourceFunctions", "XMLInternalDocument",
   #
   # evaluate the r:function nodes, or restricted to @id from ids.
   #
-function(doc, ids = character(), ...)
+function(doc, ids = character(), parse = TRUE, ...)
 {
 
   if(length(ids))
      nodes = getNodeSet(doc, paste("//r:function[", paste("@id", sQuote(ids), sep = "=", collapse = " or " ), "]"), c(r = "http://www.r-project.org"))
   else
      nodes = getNodeSet(doc, "//r:function", c(r = "http://www.r-project.org"))
+
+  if(parse == FALSE)
+     return(nodes)
 
   xmlSource(nodes, ...)
 })

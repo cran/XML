@@ -244,7 +244,7 @@ if(FALSE) {
 
 setAs("XMLInternalNode", "XMLNode",
         function(from) 
-           asRXMLNode(from)$top
+           asRXMLNode(from)
         )
 
 
@@ -266,13 +266,24 @@ function(x, skip = TRUE, ...)
     xmlRoot(doc, skip = skip)
 }
 
-if(FALSE)  {
- my.docName =
+
      # Get the name of the file/URI for the document.
- function(doc)
-   UseMethod("docName")
-} else
- setGeneric("docName", function(doc, ...) standardGeneric("docName"))
+setGeneric("docName", function(doc, ...) standardGeneric("docName"))
+
+setMethod("docName", "NULL",
+           function(doc, ...)
+             as.character(NA)
+         )
+
+setMethod("docName", "XMLNode",
+           function(doc, ...)
+             as.character(NA)
+         )
+
+setMethod("docName", "XMLHashTreeNode",
+           function(doc, ...)
+             docName(doc$env, ...)              
+         )
 
 docName.XMLInternalDocument =
 function(doc, ...)
@@ -307,6 +318,8 @@ setMethod("docName", "XMLDocumentContent", docName.XMLDocumentContent)
 
 setGeneric("docName<-", function(x, value)
                          standardGeneric("docName<-"))
+
+
 
 setMethod("docName<-", "XMLInternalDocument",
 function(x, value)
