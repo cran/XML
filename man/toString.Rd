@@ -7,7 +7,7 @@
   a document.
 }
 \usage{
-toString.XMLNode(x, ...)
+\method{toString}{XMLNode}(x, ...)
 }
 \arguments{
   \item{x}{an object of class \code{XMLNode}.}

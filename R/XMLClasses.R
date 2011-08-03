@@ -143,7 +143,7 @@ setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
 setOldClass("XMLNamespace")
 
 
-setClass("XPathNodeSet", representation(ref = "externalptr"))
+#setClass("XPathNodeSet", representation(ref = "externalptr"))
 
 
 ############

@@ -1,3 +1,15 @@
+Version 3.4.1
+   
+  *    Type in C code for method for xmlClone().
+
+  *    Minor fixes for formatting of 2 help/Rd files.
+
+  *    Removed definition of XPathNodeSet which is never used here but redefined in Sxslt.
+
+  *    Fix when adding a default namespace to a node in an HTML document.
+
+  *    Fix when adding a default namespace to a node in an HTML document.
+
 Version 3.4
 
   *    Added xmlSearchNs() to aid looking for XML definitions by URL or prefix.

@@ -839,7 +839,7 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ manageMemory
     } else if(R_isInstanceOf(obj, "XMLInternalDocument") || R_isInstanceOf(obj, "XMLInternalDOM")) {
 	xmlDocPtr doc;
 	doc = (xmlDocPtr) R_ExternalPtrAddr(obj);
-	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0])), manageMemory);
+	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0]))); // , manageMemory));
     }
     
     PROBLEM "clone doesn't (yet) understand this internal data type"
@@ -1707,6 +1707,14 @@ R_setXMLInternalTextNode_value(SEXP node, SEXP value)
    return(node);
 }
 
+SEXP 
+R_xmlSetContent(SEXP node, SEXP content)
+{
+    xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
+    xmlNodeSetContent(n, CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(content, 0))));
+    return(R_NilValue);
+}
+
 SEXP
 R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
 {
@@ -1842,7 +1850,7 @@ R_setNamespaceFromAncestors(SEXP r_node)
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
     ptr = node->parent;
     while(ptr) {
-	if(ptr->ns && ptr->ns->href && (!ptr->ns->prefix || !ptr->ns->prefix[0])) {
+	if(ptr->type != XML_HTML_DOCUMENT_NODE && ptr->ns && ptr->ns->href && (!ptr->ns->prefix || !ptr->ns->prefix[0])) {
 	    xmlSetNs(node, ptr->ns);
 	    return(ScalarLogical(TRUE));
 	}

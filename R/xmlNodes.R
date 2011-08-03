@@ -314,7 +314,7 @@ function(doc, finalizer)
 {
   fun = NULL
   if(is.logical(finalizer)) {
-    if(!finalizer)
+    if(is.na(finalizer) || !finalizer)
       return()
     else
       fun = NULL
@@ -1395,7 +1395,8 @@ function(node, recursive = TRUE, addFinalizer = FALSE, ...)
 setMethod("xmlClone", "XMLInternalDocument",           
 function(node, recursive = TRUE, addFinalizer = NA, ...)
 {
-  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizero, PACKAGE = "XML")
+  ans = .Call("RS_XML_clone", node, as.logical(recursive), addFinalizer, PACKAGE = "XML")
+
   addDocFinalizer(ans, addFinalizer)
   ans
 })

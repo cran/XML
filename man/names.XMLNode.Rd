@@ -7,7 +7,7 @@ of each of the sub-nodes of a given
 \code{XMLNode} object.
 }
 \usage{
-names.XMLNode(x)
+\method{names}{XMLNode}(x)
 }
 \arguments{
   \item{x}{the \code{XMLNode} whose sub-node tag names are being

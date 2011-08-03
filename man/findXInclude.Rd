@@ -9,8 +9,13 @@
  Each top-level node that results from an include href=... in the libxml2 parser
  is sandwiched between nodes of class
   XMLXIncludeStartNode and XMLXIncludeStartNode.
- These are the sibling nodes. 
- 
+  These are the sibling nodes.
+
+  Another approach to finding the origin of the XInclude for a given
+  node is to search for an attribute xml:base. This only works if the
+  document being XInclude'd is in a different directory than the base document.
+  If this is the case, we can use an XPath query to find the node
+  containing the attribute via \code{"./ancestor::*[@xml:base]"}.
 }
 \usage{
 findXInclude(x, asNode = FALSE)

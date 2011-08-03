@@ -157,6 +157,7 @@ xt <- readHTMLTable(table,
                    )
 
 
+if(FALSE) {
  # Here is a totally different way of reading tables from HTML documents.
  # The data are formatted using a PRE and so can be read via read.table
  u = "http://tidesonline.nos.noaa.gov/data_read.shtml?station_info=9414290+San+Francisco,+CA"
@@ -164,6 +165,7 @@ xt <- readHTMLTable(table,
  p = getNodeSet(h, "//pre")
  con = textConnection(xmlValue(p[[2]]))
  tides = read.table(con)
+}
 
    # header as a logical vector
  tt = readHTMLTable("http://www.sfgate.com/weather/rainfall.shtml",
