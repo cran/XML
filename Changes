@@ -1,3 +1,10 @@
+Version 3.4.3
+
+  *    Set default of append parameter in xmlChildren<-() method for non-internal nodes
+       to FALSE so that we replace the existing nodes.
+
+Version 3.4.2
+
 Version 3.4.1
    
   *    Type in C code for method for xmlClone().

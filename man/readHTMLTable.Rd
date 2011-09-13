@@ -174,6 +174,12 @@ if(FALSE) {
    #
  tt = readHTMLTable("http://www.sfgate.com/weather/rainfall.shtml",
                         which = 3, header = TRUE)
+
+
+if(require(RCurl)) {
+  tt =  getURL("http://www.omegahat.org/RCurl/testPassword/table.html",  userpwd = "bob:duncantl")
+  readHTMLTable(tt)
+}
 }
 \keyword{IO}
 \keyword{data}

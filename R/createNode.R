@@ -34,7 +34,7 @@ function(x, ..., value) {
 })
 
 setMethod("xmlChildren<-", "ANY",
-function(x, append = TRUE, ..., value) {
+function(x, append = FALSE, ..., value) {
   #value = addNames(value)
   #x$children <- value
   addChildren(x, append = append, ..., kids = value)

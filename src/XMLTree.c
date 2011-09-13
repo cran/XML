@@ -1904,6 +1904,9 @@ R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
     xmlDocPtr doc = (xmlDocPtr) r_doc == NULL_USER_OBJECT ? NULL : R_ExternalPtrAddr(r_doc);    
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
 
+    if(Rf_length(r_ns) == 0)
+	return(NEW_CHARACTER(0));
+
     val = CHAR_DEREF(STRING_ELT(r_ns, 0));
     
     ns = LOGICAL(r_asPrefix)[0] ? xmlSearchNs(doc, node, val) : xmlSearchNsByHref(doc, node, val);
