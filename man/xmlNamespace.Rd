@@ -4,6 +4,8 @@
 \alias{xmlNamespace.XMLInternalNode}
 \alias{xmlNamespace.character}
 \alias{XMLNamespace-class}
+\alias{xmlNamespace<-}
+\alias{xmlNamespace<-,XMLInternalNode-method}
 \title{Retrieve the namespace value of an XML node.}
 \description{
 Each XML node has a namespace identifier which is a string indicating
@@ -21,9 +23,13 @@ The class of the result is
 }
 \usage{
 xmlNamespace(x)
+xmlNamespace(x, ...) <- value
 }
 \arguments{
-\item{x}{the object whose namespace is to be computed}
+  \item{x}{the object whose namespace is to be computed}
+  \item{value}{the prefix for a namespace that is defined in the node or
+ any of the ancestors.}
+  \item{\dots}{additional arguments for setting the name space}
 }
 \value{
  For non-root nodes, this returns a string giving the identifier
@@ -60,5 +66,17 @@ namespace.}
 
   node <- xmlNode("arg", xmlNode("name", "foo"), namespace="R")
   xmlNamespace(node)
+
+
+   doc = xmlParse('<top xmlns:r="http://www.r-project.org"><bob><code>a = 1:10</code></bob></top>')
+   node = xmlRoot(doc)[[1]][[1]]
+   xmlNamespace(node) = "r"
+   node
+
+
+   doc = xmlParse('<top xmlns:r="http://www.r-project.org"><bob><code>a = 1:10</code></bob></top>')
+   node = xmlRoot(doc)[[1]][[1]]
+   xmlNamespaces(node, set = TRUE) = c(omg = "http://www.omegahat.org")
+   node
 }
 \keyword{file}

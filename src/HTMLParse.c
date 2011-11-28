@@ -103,7 +103,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   Copied from  RS_XML_printXMLNode (XMLTree.c)  with minor changes.
  */
 USER_OBJECT_
-RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent)
+RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent, USER_OBJECT_ outFile)
 {
     USER_OBJECT_ ans;
     xmlDocPtr node;
@@ -119,12 +119,24 @@ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_enco
 
     xmlIndentTreeOutput =  LOGICAL(indent)[0];
 
-    xbuf = xmlBufferCreate();
+#if ADD_XML_OUTPUT_BUFFER_CODE
+    if(Rf_length(outFile)) {
+       htmlSaveFile(CHAR_DEREF(STRING_ELT(outFile, 0)), node);
+       return(R_NilValue);
+    }
+#endif
+
    
     if(GET_LENGTH(r_encoding))
 	encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
 
+    xbuf = xmlBufferCreate();
+
+#if 1
     buf = xmlOutputBufferCreateBuffer(xbuf, NULL);
+#else
+    buf = xmlOutputBufferCreateFilename("/tmp/test.out", NULL, 0);
+#endif
 
     htmlDocContentDumpFormatOutput(buf, node, encoding, INTEGER(format)[0]);
     xmlOutputBufferFlush(buf);

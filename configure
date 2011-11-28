@@ -678,6 +678,7 @@ SUPPORTS_EXPAT
 LD_PATH
 EXPORT_MEMORY_MANAGEMENT
 SPLUS
+ADD_XML_OUTPUT_BUFFER
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -4979,9 +4980,9 @@ ac_res=`eval echo '${'$as_ac_Lib'}'`
 	       { echo "$as_me:$LINENO: result: $ac_res" >&5
 echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; fi;
+  echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; else ADD_XML_OUTPUT_BUFFER=no ; fi;
 else
-   echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"
+   echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; ADD_XML_OUTPUT_BUFFER=1
 fi
 
 
@@ -6329,6 +6330,15 @@ echo "Link flags:               ${PKG_LIBS}"
 echo ""
 echo "****************************************"
 
+if test "$ADD_XML_OUTPUT_BUFFER" = "no" ; then
+  ADD_XML_OUTPUT_BUFFER=0
+fi
+if test "$ADD_XML_OUTPUT_BUFFER" = "yes" ; then
+  ADD_XML_OUTPUT_BUFFER=1
+fi
+
+
+
  ac_config_files="$ac_config_files NAMESPACE src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE}"
 
 cat >confcache <<\_ACEOF
@@ -7029,11 +7039,12 @@ SUPPORTS_EXPAT!$SUPPORTS_EXPAT$ac_delim
 LD_PATH!$LD_PATH$ac_delim
 EXPORT_MEMORY_MANAGEMENT!$EXPORT_MEMORY_MANAGEMENT$ac_delim
 SPLUS!$SPLUS$ac_delim
+ADD_XML_OUTPUT_BUFFER!$ADD_XML_OUTPUT_BUFFER$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 67; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 68; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

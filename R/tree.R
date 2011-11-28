@@ -84,16 +84,6 @@ function(x, skip = TRUE, ...)
 #XXX   
 }  
 
-xmlParent.XMLTreeNode =
-function(x, ...)
-{
-  p = get(".parents", x$env)
-  idx = match(x$id, names(p))
-  if(is.na(idx))
-      return(NULL)
-
-  get(".nodes", x$env)[[ p[x$id] ]]
-}  
 
 
 xmlChildren.XMLTreeNode =
@@ -113,6 +103,19 @@ function(x, addNames = TRUE, ...)
 
 if(useS4)
   setMethod("xmlChildren", "XMLTreeNode", xmlChildren.XMLTreeNode)
+
+
+
+setMethod("xmlParent", "XMLTreeNode",
+function(x, ...)
+{
+  p = get(".parents", x$env)
+  idx = match(x$id, names(p))
+  if(is.na(idx))
+      return(NULL)
+
+  get(".nodes", x$env)[[ p[x$id] ]]
+})
 
 
 

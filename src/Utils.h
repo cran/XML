@@ -108,7 +108,7 @@ USER_OBJECT_ RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJEC
 
 USER_OBJECT_ RS_XML_printXMLNode(USER_OBJECT_ node, USER_OBJECT_ level, USER_OBJECT_ format, USER_OBJECT_ indent, USER_OBJECT_ r_encoding);
 
- USER_OBJECT_ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent);
+USER_OBJECT_ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent, USER_OBJECT_ outFile);
 
 USER_OBJECT_ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeNode);
 
@@ -237,24 +237,7 @@ SEXP CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str);
 #define R_CHECK_INTERRUPTS R_CheckUserInterrupt();
 
 
-#if 1
-/*
- We use the address of a global variable as a marker/signature that
- indicates we created the value of _private.
-*/
-extern int R_XML_MemoryMgrMarker;
-extern int R_XML_NoMemoryMgmt;
-#define R_MEMORY_MANAGER_MARKER &R_XML_MemoryMgrMarker
-
-#define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc->_private == NULL || (doc->_private && doc->_private == &R_XML_NoMemoryMgmt) || ((int*)doc->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
-#define IS_NOT_OUR_NODE_TO_TOUCH(node) ((node->_private == NULL) || (node->doc && node->doc->_private && node->doc->_private == &R_XML_NoMemoryMgmt) || ((int*)node->_private)[1] != (int) R_MEMORY_MANAGER_MARKER)
-
-#else
-  /* Not used. */
-#define IS_NOT_OUR_DOC_TO_TOUCH(doc) (doc && doc->name && strcmp((doc)->name, " fake node libxslt") == 0)
-#define IS_NOT_OUR_NODE_TO_TOUCH(node) (node && (node)->doc && IS_NOT_OUR_DOC_TO_TOUCH((node)->doc))
-
-#endif
+//#include "NodeGC.h"
 
 
 SEXP R_createXMLNodeRefDirect(xmlNodePtr node, int addFinalizer);

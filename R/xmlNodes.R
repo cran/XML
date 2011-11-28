@@ -278,16 +278,12 @@ function(X, FUN, ..., omitNodeTypes = c("XMLXIncludeStartNode", "XMLXIncludeEndN
 
 
 
-xmlParent =
-function(x, ...)
- UseMethod("xmlParent")
 
-
-xmlParent.XMLInternalNode =
+setMethod("xmlParent", "XMLInternalNode",
 function(x, addFinalizer = NA, ...)
 {
   .Call("RS_XML_xmlNodeParent", x, addFinalizer, PACKAGE = "XML")
-}
+})
 
 
 newXMLDTDNode <-
@@ -431,6 +427,14 @@ function(name, ..., attrs = NULL,
      noNamespace = FALSE
   }
 
+ if(is.list(parent)) {
+    if(length(parent) < 1 ||
+        !(is(parent[[1]], "XMLInternalElementNode") || is(parent[[1]], "XMLInternalDocument")))
+        stop("incorrect value for parent")
+    
+    parent = parent[[1]]
+  }
+
    # if there is no doc, but we have a parent which is an XMLInternalDocument, use that.
  if(missing(doc) && !missing(parent) &&
      inherits(parent, "XMLInternalDocument")) {
@@ -441,8 +445,10 @@ function(name, ..., attrs = NULL,
     # Get the doc from the parent node/document.
  if(is.null(doc) && !is.null(parent))  {
    # doc = as(parent, "XMLInternalDocument")
-   doc = if(inherits(parent, "XMLInternalDocument")) parent
-         else .Call("R_getXMLNodeDocument", parent, PACKAGE = "XML")
+   doc = if(inherits(parent, "XMLInternalDocument"))
+            parent
+         else
+            .Call("R_getXMLNodeDocument", parent, PACKAGE = "XML")
  }
 
 
@@ -580,6 +586,16 @@ setAs("XMLNamespaceDefinition", "character",
        function(from)
          structure(from$uri, names = from$id))
 
+
+setGeneric("xmlNamespace<-",
+            function(x, ..., value)
+              standardGeneric("xmlNamespace<-"))
+
+setMethod("xmlNamespace<-", "XMLInternalNode",
+            function(x, ..., value) {
+               setXMLNamespace(x, value)
+               x
+            })
 
 
 setGeneric("xmlNamespaces<-",
@@ -809,6 +825,8 @@ function(node, ..., kids = list(...), at = NA, cdata = FALSE, addFinalizer = NA)
 {
   kids = unlist(kids, recursive = FALSE)
 
+  removeNodes(kids)
+
   if(length(kids) == 1 && inherits(kids[[1]], "XMLInternalNode") && is.na(at)) {
      .Call("R_insertXMLNode", kids[[1]], node, -1L, FALSE, PACKAGE = "XML")
      return(node)
@@ -950,22 +968,35 @@ function(node, ..., kids = list(...), after = TRUE, addFinalizer = NA)
 
 removeNodes =
 function(node, free = rep(FALSE, length(node)))
+  UseMethod("removeNodes")
+
+removeNodes.default =
+function(node, free = rep(FALSE, length(node)))
+ NULL
+
+removeNodes.list =
+function(node, free = rep(FALSE, length(node)))
 {
-  if(is.list(node))  {
-    if(!all(sapply(node, inherits, "XMLInternalNode")))
-      stop("removeNode only works on internal nodes at present")
+   if(!all(sapply(node, inherits, "XMLInternalNode"))) {
+      warning("removeNode only works on internal nodes at present")
+      return(NULL)
+   }
 
     free = as.logical(free)
     free = rep(free, length = length(node))
-  } else if(!inherits(node, "XMLInternalNode"))
-     stop("removeNode is intended only for internal nodes")
-  else {            
+    .Call("R_removeInternalNode", node, free, PACKAGE = "XML")
+}
+
+removeNodes.XMLInternalNode =
+function(node, free = rep(FALSE, length(node)))
+{  
     node = list(node)
     free = as.logical(free)
-  }
-     
-  .Call("R_removeInternalNode", node, free, PACKAGE = "XML")
-}  
+    .Call("R_removeInternalNode", node, free, PACKAGE = "XML")
+}
+
+
+
 
 removeChildren =
 function(node, ..., kids = list(...), free = FALSE)

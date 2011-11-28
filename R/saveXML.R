@@ -148,12 +148,24 @@ setMethod("saveXML", "XMLFlatTree", saveXML.sink)
 setMethod("saveXML", "HTMLInternalDocument",
           function(doc, file = NULL, compression = 0, indent = TRUE,
              prefix = '<?xml version="1.0"?>\n',  doctype = NULL, encoding = "", ...) {
-               ans = .Call("RS_XML_dumpHTMLDoc", doc, as.integer(indent), as.character(encoding), as.logical(indent), PACKAGE = "XML")
 
-               if(length(file)) {
+            if(ADD_XML_OUTPUT_BUFFER) {
+              if(length(file)  && is.character(file))
+                 out = file
+              else 
+                out = tempfile()
+            } else
+              out = character()
+            
+            ans = .Call("RS_XML_dumpHTMLDoc", doc, as.integer(indent), as.character(encoding), as.logical(indent), as.character(out), PACKAGE = "XML")
+
+               if(length(file) && length(out) == 0) {
                  cat(ans, file = file)
                  file
-               } else
+               } else if(length(out)) {
+                 paste(readLines(out), collapse = "\n")
+               } else {
                  ans
+               }
           })
 

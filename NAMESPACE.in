@@ -95,6 +95,9 @@ export(
 # xmlFlatListTree       
 )
 
+S3method(removeNodes, "list")
+S3method(removeNodes, "XMLInternalNode")
+
 exportMethods("addAttributes", "removeAttributes")
 
 exportMethods("toHTML")
@@ -113,6 +116,7 @@ exportClasses("XMLInternalNode", "XMLInternalElementNode",
               "XMLXIncludeStartNode", "XMLXIncludeEndNode", "XMLEntityDeclNode",
               "XMLAttributeDeclNode", "XMLDocumentNode", "XMLDocumentTypeNode",
               "XMLDocumentFragNode", "XMLNamespaceDeclNode")
+exportClass("XMLTreeNode")
 
 exportClass(XMLNamespace)
 
@@ -183,9 +187,14 @@ S3method(xmlChildren, XMLInternalNode)
 } else
   exportMethods("xmlChildren")
 
+if(FALSE)  {
 S3method(xmlParent, XMLTreeNode)
 S3method(xmlParent, XMLHashTreeNode)
 S3method(xmlParent, XMLInternalNode)
+} else
+ exportMethods(xmlParent)
+
+
 S3method(xmlSize, XMLHashTreeNode)
 
 
@@ -473,3 +482,5 @@ exportMethods(clearMemoryManagement)
 export("xmlParent<-")
 
 export(xmlSearchNs)
+export("xmlNamespace<-")
+

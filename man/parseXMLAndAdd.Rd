@@ -24,7 +24,7 @@
   This function facilitates using strings and returning structured content.
 }
 \usage{
-parseXMLAndAdd(txt, parent = NULL, top = "tmp")
+parseXMLAndAdd(txt, parent = NULL, top = "tmp", nsDefs = character())
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,6 +33,8 @@ parseXMLAndAdd(txt, parent = NULL, top = "tmp")
     \code{txt} will be added as children}
   \item{top}{the name for the top-level node. If \code{parent} is
     specified, this is used but irrelevant.}
+  \item{nsDefs}{a character vector of name = value pairs giving
+  namespace definitions to be added to the top node.}
 }
 \value{
   If \code{parent} is \code{NULL}, the root node of the
@@ -77,6 +79,18 @@ Duncan Temple Lang
            },
          long, lat) 
   xmlSize(f)
+
+
+  o = c("<x>dog</x>", "<omg:x>cat</omg:x>")
+  node = parseXMLAndAdd(o, nsDefs  = c("http://cran.r-project.org",
+                                       omg = "http://www.omegahat.org"))
+  xmlNamespace(node[[1]])
+  xmlNamespace(node[[2]])
+
+  tt = newXMLNode("myTop")
+  node = parseXMLAndAdd(o, tt, nsDefs  = c("http://cran.r-project.org",
+                                           omg = "http://www.omegahat.org"))
+  tt
 }
 
 

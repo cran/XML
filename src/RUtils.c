@@ -179,7 +179,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_xmlNodeNumChildren, 1),
         ENTRY(RS_XML_unsetDoc, 4),
         ENTRY(RS_XML_printXMLNode, 5),
-        ENTRY(RS_XML_dumpHTMLDoc, 4),
+        ENTRY(RS_XML_dumpHTMLDoc, 5),
         ENTRY(RS_XML_removeChildren, 3),
         ENTRY(RS_XML_clone, 3),
         ENTRY(RS_XML_addNodeAttributes, 2),

@@ -2,8 +2,8 @@
 # the XML parsing facilities for both R and S.
 # Currently this works for R.
 #
-# This was implemented by Friedrich Leisch
-# with some modifications for the next version
+# This was originally implemented by Friedrich Leisch
+# with modifications for subsequent versions 
 # by Duncan Temple Lang.
 #
 
@@ -500,7 +500,7 @@ fi
 
 dnl Here we added the check of the flag to determine if the user wants to force
 dnl the XML_OUTPUT_BUFFER code in XMLTree.c
-AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlOutputBufferCreateBuffer, [echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; fi;], [ echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"])
+AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlOutputBufferCreateBuffer, [echo "have xmlOutputBufferCreateBuffer()"; if test "${ADD_XML_OUTPUT_BUFFER}" = "yes" ; then PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; else ADD_XML_OUTPUT_BUFFER=no ; fi; ], [ echo "Using local xmlOutputBufferCreateBuffer.  You might think about installing a newer version of libxml2, at least 2.6.23" ; PKG_CPPFLAGS="${PKG_CPPFLAGS} -DADD_XML_OUTPUT_BUFFER_CODE=1"; ADD_XML_OUTPUT_BUFFER=1])
 
 AC_CHECK_LIB(${USE_XMLLIB_NAME}, xmlDocDumpFormatMemoryEnc, PKG_CPPFLAGS="${PKG_CPPFLAGS} -DDUMP_WITH_ENCODING=1")
 
@@ -796,6 +796,15 @@ echo "Link flags:               ${PKG_LIBS}"
 
 echo ""
 echo "****************************************"
+
+if test "$ADD_XML_OUTPUT_BUFFER" = "no" ; then
+  ADD_XML_OUTPUT_BUFFER=0
+fi
+if test "$ADD_XML_OUTPUT_BUFFER" = "yes" ; then
+  ADD_XML_OUTPUT_BUFFER=1
+fi
+
+AC_SUBST(ADD_XML_OUTPUT_BUFFER)
 
  dnl create the different targets
 AC_OUTPUT(NAMESPACE src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE})

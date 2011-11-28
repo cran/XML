@@ -1,3 +1,4 @@
+
 trim =
 function(x)
   gsub("(^[[:space:]]+|[[:space:]]+$)", "", x)
@@ -118,6 +119,7 @@ function(doc, header = NA ,
           colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
             as.data.frame = TRUE, ...)
 {
+
   node = doc
   headerFromTable = FALSE
   dropFirstRow = FALSE
@@ -153,7 +155,7 @@ function(doc, header = NA ,
    }
   
      # Process each row, by getting the content of each "cell" (th/td)
-  rows = getNodeSet(node, "./tr")
+  rows = getNodeSet(node, ".//tr")
   if(dropFirstRow)
      rows = rows[-1]
   els =  lapply(rows, function(row) {
@@ -163,6 +165,10 @@ function(doc, header = NA ,
                            else
                               tmp
                         })
+
+
+#  spans = getNodeSet(node, ".//td[@rowspan] | .//th[@rowspan]")
+
   
   if(length(skip.rows)) {
     infs = (skip.rows == Inf)
@@ -205,7 +211,11 @@ function(doc, header = NA ,
                       function(i) 
                          if(is.function(colClasses[[i]]))
                             colClasses[[i]](ans[[i]])
-                         else
+                         else if(colClasses[[i]] == "factor")
+                             factor(ans[[i]])
+                         else if(colClasses[[i]] == "ordered")
+                             ordered(ans[[i]])        
+                         else 
                             as(ans[[i]], colClasses[[i]])
                    )
 
@@ -221,3 +231,20 @@ function(doc, header = NA ,
     
   ans
 })
+
+
+
+getTableWithRowSpan =
+function(node, r = xmlSize(node),
+          c = max(xmlSApply(node, function(x) length(getNodeSet(x, "./td | ./th")))))
+{
+  ans = matrix(NA_character_, r, c)
+  for(i in seq(length = r)) {
+     col = 1
+     kids = getNodeSet(node[[i]], "./th | ./td")
+     for(k in seq(along = kids)) {
+       sp = xmlGetAttr(k, "rowspan", 1)
+       ans[seq(i, length = sp)] = xmlValue(k)
+     }
+  }
+}

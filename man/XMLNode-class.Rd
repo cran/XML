@@ -4,6 +4,7 @@
 \alias{XMLAbstractNode-class}
 \alias{RXMLNode-class}
 \alias{XMLNode-class}
+\alias{XMLTreeNode-class}
 \alias{XMLInternalNode-class}
 \alias{XMLInternalTextNode-class}
 \alias{XMLInternalElementNode-class}

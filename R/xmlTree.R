@@ -339,12 +339,17 @@ function(x, value)
 
 
 parseXMLAndAdd =
-function(txt, parent = NULL, top = "tmp")
+function(txt, parent = NULL, top = "tmp", nsDefs = character())
 {
   txt = paste(txt, collapse = "")
-  if(!inherits(txt, "AsIs") && length(top) > 0)
-     tmp = sprintf("<%s>%s</%s>", top, txt, top)
-  else
+  if(!inherits(txt, "AsIs") && length(top) > 0) {
+     open = sprintf("%s%s", top,
+                            paste(sprintf(' xmlns%s%s="%s"', ifelse(names(nsDefs) != "", ":", ""),
+                                                             names(nsDefs),
+                                                             nsDefs),
+                                       collapse = ""))
+     tmp = sprintf("<%s>%s</%s>", open, txt, top)
+  } else
      tmp = txt
   
   doc = xmlParse(tmp, asText = TRUE)

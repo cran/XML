@@ -2,6 +2,9 @@
 \alias{xmlParent}
 \alias{xmlAncestors}
 \alias{xmlParent.XMLInternalNode}
+\alias{xmlParent,XMLInternalNode-method}
+\alias{xmlParent,XMLHashTreeNode-method}
+\alias{xmlParent,XMLTreeNode-method}
 \title{Get parent node of XMLInternalNode or ancestor nodes}
 \description{
  \code{xmlParent} operates on an XML node
@@ -27,7 +30,7 @@
 }
 \usage{
 xmlParent(x, ...)
-xmlAncestors(x, fun = NULL, ..., addFinalizer = NA)
+xmlAncestors(x, fun = NULL, ..., addFinalizer = NA, count = -1L)
 }
 \arguments{
   \item{x}{an object of class \code{XMLInternalNode} whose parent is being requested. }
@@ -43,7 +46,10 @@ xmlAncestors(x, fun = NULL, ..., addFinalizer = NA)
   This can also be the name of a C routine or a reference
   to a C routine retrieved using
   \code{\link[base]{getNativeSymbolInfo}}.
- }  
+}
+ \item{count}{an integer that indicates how many levels of the hierarchy
+   to traverse. This allows us to get the \code{count} most recent
+   ancestors of the node.}
 }
 \details{
  This uses the internal libxml structures to access the parent in the DOM tree. 

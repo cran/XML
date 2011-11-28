@@ -3,6 +3,8 @@
 \alias{xmlParent<-}
 \alias{removeChildren}
 \alias{removeNodes}
+\alias{removeNodes.list}
+\alias{removeNodes.XMLInternalNode}
 \alias{replaceNodes}
 \alias{addAttributes}
 \alias{removeAttributes}
@@ -222,6 +224,18 @@ o = addChildren(z,
                 "some text",
                 xmlNode("a", "a link", attrs = c(href = "http://www.omegahat.org/RSXML")))
 o
+
+
+  # removing nodes
+
+ doc = xmlParse("<top><a/><b/><c><d/><e>bob</e></c></top>")
+ top = xmlRoot(doc)
+ top
+ 
+ removeNodes(list(top[[1]], top[[3]]))
+
+    # a and c have disappeared.
+ top
 
 }
 \keyword{IO }

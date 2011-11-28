@@ -57,7 +57,8 @@ oldClassTable =  list(
   "XMLDocument" = c("XMLAbstractDocument"),
   "XMLHashTree" = c("XMLAbstractDocument"),
   "XMLInternalDocument" = c("XMLAbstractDocument"),
-  "HTMLInternalDocument" = c("XMLInternalDocument", "XMLAbstractDocument")
+  "HTMLInternalDocument" = c("XMLInternalDocument", "XMLAbstractDocument"),
+  "XMLTreeNode" = c("RXMLAbstractNode")    
 )
 
 
@@ -107,6 +108,9 @@ setOldClass(c("XMLPINode", "XMLNode"))
 setOldClass(c("XMLCommentNode", "XMLNode"))
 setOldClass(c("XMLProcessingInstruction", "XMLNode"))
 setOldClass(c("XMLCDataNode", "XMLNode"))
+
+
+setOldClass(c("XMLTreeNode", "XMLNode", "RXMLAbstractNode", "XMLAbstractNode" ))
 
 
 
@@ -164,6 +168,12 @@ function(x, addNames = TRUE, ...)
 {
  UseMethod("xmlChildren")
 }
+
+setGeneric("xmlParent", 
+            function(x, ...)
+                standardGeneric("xmlParent"))
+ 
+
 
 
 xmlChildren.XMLNode <-
@@ -701,7 +711,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
           resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE, 
-           sessionEncoding = CE_NATIVE) # native
+           sessionEncoding = CE_NATIVE, noResultOk = FALSE) # native
 {
   if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)
@@ -727,7 +737,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
     tmp = strsplit(path, "/")[[1]]
        # if they have a function call, ignore.
     tmp = tmp[ - grep("\\(", path) ]
-    if(length(grep(":", tmp)) != length(tmp))
+    if(length(grep(":", tmp)) != length(tmp) && !noResultOk)
         warning("the XPath query has no namespace, but the target document has a default namespace. This is often an error and may explain why you obtained no results")
   }
 
@@ -915,7 +925,7 @@ function(doc, path, fun = NULL, ...,
   
     # now check if the result was actually a descendant of our top-level node for this
     # query. It is possible that it arose from a different sub-tree.
-browser()  
+
   w = sapply(ans, function(el) .Call("RS_XML_isDescendantOf", el, node, strict = FALSE, PACKAGE = "XML"))
 
   ans = ans[w]
@@ -985,7 +995,7 @@ function(node, defaultPrefix = "ns")
 }
 
 xmlAncestors =
-function(x, fun = NULL, ..., addFinalizer = NA)
+function(x, fun = NULL, ..., addFinalizer = NA, count = -1L)
 {
   ans = list()
   tmp = x
@@ -994,6 +1004,10 @@ function(x, fun = NULL, ..., addFinalizer = NA)
       ans = c(fun(tmp, ...), ans)
     else
       ans = c(tmp, ans)
+
+    if(count > 0 && length(ans) == count)
+      break
+    
     tmp = xmlParent(tmp, addFinalizer = addFinalizer)    
   }
   ans

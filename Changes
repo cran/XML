@@ -1,11 +1,47 @@
-Version 3.4.3
+Version 3.6-0
+
+  *    xmlParent() is an S4 generic with methods.
+
+  *    xmlAncestors() has a count argument to limit the number of ancestors
+       returned.
+
+  *    removeNodes() is generic.
+
+  *    addChildren() now removes "internal" nodes from their current parent, if any.
+       Avoids memory corruption in XML tree.
+
+  *    ADD_XMLOUTPUT_BUFFER R variable for Windows.
+
+  *    Defined XMLTreeNode as an old-style class.
+
+Version 3.5-1
+
+  *    Additional workaround for libxml2 2.6.16 for printing HTML document.
+  
+  *    noMatchOk parameter for xpathApply.XMLInternalNode to suppress warnings about 
+       finding no nodes when there is a namespace in the query.
+
+  *    xmlNamespace<-() function and methods to allow one to set the namespace
+       on a node, e.g., by the namespace prefix.
+
+  *    readHTMLTable() allows "factor" as an entry in colClasses.
+
+
+Version 3.5-0
+
+  *    Addeds nsDef parameter for parseXMLAndAdd().
+
+  *    Minor addition to readHTMLTable() methods to handle malformed HTML 
+       with all the tr nodes in the thead. 
+
+Version 3.4-3
 
   *    Set default of append parameter in xmlChildren<-() method for non-internal nodes
        to FALSE so that we replace the existing nodes.
 
-Version 3.4.2
+Version 3.4-2
 
-Version 3.4.1
+Version 3.4-1
    
   *    Type in C code for method for xmlClone().
 
@@ -17,7 +53,7 @@ Version 3.4.1
 
   *    Fix when adding a default namespace to a node in an HTML document.
 
-Version 3.4
+Version 3.4-0
 
   *    Added xmlSearchNs() to aid looking for XML definitions by URL or prefix.
 

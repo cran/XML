@@ -210,7 +210,7 @@ function(x, name)
   get(name, x, inherits = FALSE)
 
 
-xmlParent.XMLHashTreeNode =
+setMethod("xmlParent", "XMLHashTreeNode",
   # To get the parent of the node 'obj', we have to look in the .parents object
   # for the variable with obj's node identifier and then get the corresponding
   # value which is the identifier of the parent.
@@ -222,7 +222,7 @@ function(x, ...)
       return(NULL)
 
   get(get(x$id, p), x$env)
-}  
+}  )
 
 
 xmlChildren.XMLHashTreeNode =
