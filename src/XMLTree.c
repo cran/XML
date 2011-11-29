@@ -543,6 +543,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 #endif
 	break;
     case XML_DOCUMENT_NODE:	
+    case XML_HTML_DOCUMENT_NODE:	
 	check = xmlAddChild(p, n);
 	incrementDocRef((xmlDocPtr) p);
 	break;
@@ -946,6 +947,9 @@ R_getInternalNodeClass(xmlElementType type)
         case XML_ELEMENT_NODE:
               p = "XMLInternalElementNode";
               break;
+        case XML_ELEMENT_DECL:
+              p = "XMLInternalElementDeclNode";
+              break;
         case XML_TEXT_NODE:
               p = "XMLInternalTextNode";
               break;
@@ -987,6 +991,9 @@ R_getInternalNodeClass(xmlElementType type)
               break;
         case XML_DOCUMENT_NODE:
               p = "XMLDocumentNode";
+              break;
+        case XML_HTML_DOCUMENT_NODE:
+              p = "XMLHTMLDocumentNode";
               break;
         case XML_DOCUMENT_TYPE_NODE:
               p = "XMLDocumentTypeNode";
@@ -1525,7 +1532,7 @@ RS_XML_isDescendantOf(USER_OBJECT_ r_node, USER_OBJECT_ r_top, USER_OBJECT_ stri
 
     ptr = node;
 
-    while(ptr && ptr->type != XML_DOCUMENT_NODE) {
+    while(ptr && ptr->type != XML_DOCUMENT_NODE && ptr->type != XML_HTML_DOCUMENT_NODE) {
 	if(ptr == top)
 	    return(ScalarLogical(ptr == node && LOGICAL(strict)[0] ? FALSE : TRUE));
 	ptr = ptr->parent;

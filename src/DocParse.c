@@ -1164,7 +1164,7 @@ USER_OBJECT_
 RS_XML_xmlNodeParent(USER_OBJECT_ snode, USER_OBJECT_ manageMemory)
 {
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(snode);
-    if(node->parent && node->parent->type == XML_DOCUMENT_NODE)
+    if(node->parent && (node->parent->type == XML_DOCUMENT_NODE || node->parent->type == XML_HTML_DOCUMENT_NODE))
 	return(NULL_USER_OBJECT);
     return(R_createXMLNodeRef(node->parent, manageMemory));
 }
@@ -1478,7 +1478,7 @@ R_getDocEncoding(SEXP r_doc)
     const xmlChar *encoding;
     SEXP ans;
 
-    if(doc->type != XML_DOCUMENT_NODE)
+    if(doc->type != XML_DOCUMENT_NODE && doc->type != XML_HTML_DOCUMENT_NODE)
 	doc = ((xmlNodePtr) doc)->doc;
     if(!doc)
 	return(NEW_CHARACTER(0));

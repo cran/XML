@@ -196,7 +196,7 @@ processNode(xmlNodePtr root, xmlNodePtr parent, unsigned int *ctr, int parentId,
   
   defineVar(Rf_install(id), rnode, env);
 
-  if(root->parent && root->parent->type != XML_DOCUMENT_NODE) {
+  if(root->parent && root->parent->type != XML_DOCUMENT_NODE && root->parent->type != XML_HTML_DOCUMENT_NODE) {
       /* Put an entry in the .parents environment for this current id with the single value
          which is the value of the parentId as a string, equivalent of 
            assign(curId,  parentId, parentEnv)

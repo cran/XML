@@ -987,6 +987,13 @@ function(node, free = rep(FALSE, length(node)))
     .Call("R_removeInternalNode", node, free, PACKAGE = "XML")
 }
 
+removeNodes.XMLNodeSet =
+function(node, free = rep(FALSE, length(node)))
+{
+   removeNodes.list(node, free)
+}
+    
+
 removeNodes.XMLInternalNode =
 function(node, free = rep(FALSE, length(node)))
 {  

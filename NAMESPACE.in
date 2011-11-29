@@ -96,6 +96,7 @@ export(
 )
 
 S3method(removeNodes, "list")
+S3method(removeNodes, "XMLNodeSet")
 S3method(removeNodes, "XMLInternalNode")
 
 exportMethods("addAttributes", "removeAttributes")

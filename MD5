@@ -1,10 +1,10 @@
-336fa925120f8c8e2695c1a360671cec *Changes
-a81d7cae7cf7c5157c1bf46480882b7b *DESCRIPTION
+745bddf8dab6a45f7b565b08d853768e *Changes
+8b03980e62f46c5f3f86cdf56b019e69 *DESCRIPTION
 287c12a6a7dde9df019e89761bec1142 *GNUmakefile.Splus.in
-1b6e9ee367fc128a890c154b52342c9b *INSTALL
+69d7ea1a501a85f868db134b2ac38a75 *INSTALL
 27713c679bd7e19617307059a2f6c2e5 *INSTALL_R
 f2593b4f7983640aaa304b2087c74e62 *INSTALL_S
-9ab92fae55e30d3577c463cc25cdeda8 *NAMESPACE.in
+b19bf9e598917325f68da3b8f132d73e *NAMESPACE.in
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
 05aace6af9a5a1b841570d5af955146f *R/DTD.R
 ff35133bf0deee2608952a104a91a913 *R/DTDClasses.R
@@ -46,7 +46,7 @@ f9b71d5e77dca8dd43401827f567ca8b *R/version.R
 e7aa7373fed505f7521b09824262b821 *R/xmlHandler.R
 b177059c7b942093373fb9e218c40f0d *R/xmlInternalSource.R
 15ad6051d702385e91e4ff5009b53249 *R/xmlMemoryMgmt.R
-8f75e0601457a90b33677b8e4d687803 *R/xmlNodes.R
+2ab8f2f7d6507bed9806e77b3119a791 *R/xmlNodes.R
 78fd94e38f70bce6a608c41d94a9b902 *R/xmlOutputBuffer.R
 e205d31713bd8e88abff6e4f9f925613 *R/xmlOutputDOM.R
 58e1c8f1d96c1b01ac399ce0bee9b42e *R/xmlRoot.R
@@ -235,7 +235,7 @@ a57bb47dea4b1574bd4e1adc21f9c12a *man/Doctype.Rd
 c6b8b5d6d21961baaecfd3ccda26806c *man/XMLCodeFile-class.Rd
 bbcd3978ff06bf56acd15f464090af45 *man/XMLInternalDocument.Rd
 aeed2669ee49be4e607711d68c783ca9 *man/XMLNode-class.Rd
-26e78ddf26f055d3231edcfbe49fd25a *man/addChildren.Rd
+a7c754b2261e90a5b9bbf808dac47b9a *man/addChildren.Rd
 9e647c2332e050c1174f0cb970bff986 *man/addNode.Rd
 559d78cddaaf4b1f8b9587b4765931eb *man/addSibling.Rd
 ea4832282f873d188ba4d90d167bfbd3 *man/append.XMLNode.Rd
@@ -315,7 +315,7 @@ aad592a388de4a41563832e2e980e49e *man/xmlSource.Rd
 636fa8a264443b8e1119efd2364a00c3 *man/xmlTree.Rd
 2f5b95e53c734afd62db87d0a5cfbc9b *man/xmlTreeParse.Rd
 a9ab3d02121e6ce4046123f2aec1a023 *man/xmlValue.Rd
-45b13fa5d092cc9402dda7b1d9ccc6b0 *src/DocParse.c
+a34f199bc94f806ee781fd4bfbfdfc3d *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 57c81ee8c20ac940ed4570df4eb7f849 *src/EventParse.c
 98a4d11fd70007448bf2c8f0e5278434 *src/EventParse.h
@@ -334,9 +334,9 @@ f7fc2ef0235cff91215667c5a676b837 *src/RUtils.c
 03074fb2977f7e985ce25c447336e302 *src/Rcatalog.c
 13037cd5446805f08cf2656588523dd2 *src/Utils.c
 3ccd062e0f04457f5cac7f942def948a *src/Utils.h
-aae21e5c4ce223c8ae95e90209c5bab5 *src/XMLEventParse.c
-06d22ff162ee46e8d5e455e94327c962 *src/XMLHashTree.c
-ddfb2677f4c8db782fe8b9c469134979 *src/XMLTree.c
+b1eaafb8d5c87bc03796b32f3a624333 *src/XMLEventParse.c
+2eba41754a9482f57b3cb0e3a1d850ab *src/XMLHashTree.c
+95e85aeafa533cf03a946567eba5e88d *src/XMLTree.c
 2a1e9d2603aa6eba81a88659ece71cad *src/libxmlFeatures.c
 55e23091cd2f7526d67e2676021e9dbc *src/schema.c
 ab7c254f538351689fc3ccc31f02cf71 *src/xmlsecurity.c

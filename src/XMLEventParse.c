@@ -432,7 +432,7 @@ R_endBranch(RS_XMLParserData *rinfo,
         }
 
         rinfo->current = rinfo->current->parent;
-	if(rinfo->current && rinfo->current->type == XML_DOCUMENT_NODE)
+	if(rinfo->current && (rinfo->current->type == XML_DOCUMENT_NODE || rinfo->current->type == XML_HTML_DOCUMENT_NODE))
             rinfo->current = NULL;
     }
 }

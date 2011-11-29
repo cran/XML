@@ -1,3 +1,11 @@
+Version 3.6-1
+
+  *    Fix bug which caused XMLInternalUnknownNode in xmlParent() for HTML documents.
+
+  *    General improvements to support nodes of type XML_HTML_DOCUMENT_NODE.
+
+  *    removeNodes() method for XMLNodeSet.
+
 Version 3.6-0
 
   *    xmlParent() is an S4 generic with methods.
