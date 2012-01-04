@@ -1,3 +1,23 @@
+Version 3.7-2
+
+  *    Import methods package explicitly.
+
+Version 3.7-1
+
+  *    Added an alias for the coerce method for Currency.
+
+  *    Added a C routine to query if reference counting is enabled.
+       See tests/checkRefCounts.R.
+
+Version 3.7-0
+
+  *    Added Currency as an option for colClass in readHTMLTable to
+       convert strings of the form $xxx,yyy,zzz, i.e. comma-separated
+       and preceeded by a $.  (No other currency supported yet.)
+
+  *    Fix for newXMLNode() that caused a seg fault if a node was specified 
+       as the document.  Thanks to Jeff Allen.
+
 Version 3.6-2
 
   *    Changed URL in readHTMLTable() example to new page for population of 
