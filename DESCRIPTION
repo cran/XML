@@ -1,6 +1,6 @@
 Package: XML
-Version: 3.7-2
-Date: 2012/01/04
+Version: 3.7-3
+Date: 2012/01/10
 Author: Duncan Temple Lang (duncan@wald.ucdavis.edu)
 Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
 Title: Tools for parsing and generating XML within R and S-Plus.
@@ -9,9 +9,10 @@ Imports: methods
 Suggests: bitops
 SystemRequirements: libxml2 (>= 2.6.3)
 LazyLoad: yes
-Description: This package provides many approaches for both reading and creating XML (and HTML)
-      documents (including DTDs), both local and accessible via HTTP or FTP.  It also offers
-      access to an XPath "interpreter".
+Description: This package provides many approaches for both reading and
+        creating XML (and HTML) documents (including DTDs), both local
+        and accessible via HTTP or FTP.  It also offers access to an
+        XPath "interpreter".
 Note: The versions numbers 1.0 and 2.0 do not have any special
         significance, but are merely the result of incrementing the
         minor count by 1 for each release. Specifically, there is no
@@ -30,4 +31,4 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         compare.R encoding.R fixNS.R xmlRoot.R serialize.R
         xmlMemoryMgmt.R
 Repository: CRAN
-Date/Publication: 2012-01-08 15:41:35
+Date/Publication: 2012-01-11 08:43:52
