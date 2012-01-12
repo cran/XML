@@ -1,10 +1,10 @@
-8438a45a463f4d3e318701124f7190a7 *Changes
-eb80ed6a5dbd05fdd9ccee3b7470ac0a *DESCRIPTION
+634e2f37cdadea36100f693b7097f261 *Changes
+c1b1bc1248fdb8586adbdc688c22e0e8 *DESCRIPTION
 287c12a6a7dde9df019e89761bec1142 *GNUmakefile.Splus.in
-08a5ce6dcd7ca06ce46fab7623f6b0c2 *INSTALL
+59e9341f729cf96184ef706bf5377583 *INSTALL
 27713c679bd7e19617307059a2f6c2e5 *INSTALL_R
 f2593b4f7983640aaa304b2087c74e62 *INSTALL_S
-5da80417208d838c08e1a3aff4e1a2e9 *NAMESPACE.in
+8022daf9326930827429eeb04c82d634 *NAMESPACE.in
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
 05aace6af9a5a1b841570d5af955146f *R/DTD.R
 ff35133bf0deee2608952a104a91a913 *R/DTDClasses.R
@@ -24,6 +24,7 @@ ba6349c17af87052ebf27693a1ee4e5b *R/encoding.R
 544d510c5e0b68b2ca36d30e6ca100a7 *R/flatTree.R
 8590ccaa7349a49aef52dcff19e7521b *R/hashTree.R
 737a1017e612c994536b5764246ebb1f *R/htmlParse.R
+a87a8433c0110d652f72cbdd77cea65c *R/keyValueDB.R
 87fc1f8084549a2a96aeac61d19ef396 *R/libxmlFeatures.R
 048c2efb1985bd6fc43d07f43ba5d2de *R/namespaces.R
 dcb35cba0dbac953c0fefca55d19d6ad *R/nodeAccessors.R
@@ -34,6 +35,7 @@ ef3669c755c641d7d951e1e4f0913fd0 *R/parser.R
 88d5a1cee0c08e96f361d24a5bbe0494 *R/saveXML.R
 d730ab49c3bb0224d137c8087876e930 *R/schema.S
 da2153fc4017a2360b0f0ed2c5df3a23 *R/serialize.R
+259011df0d240b5733ac69d90949c1c9 *R/solrDocs.R
 c22e8fd9040964cb01d67ee418444726 *R/summary.R
 1eced5424f333bdd41bc79db551556d2 *R/supports.R.in
 fead2c9d63dc1a7acf3244431d84e1e0 *R/tangle.R
@@ -274,6 +276,8 @@ b7e3ce6a6df365f62d34bb3cf2b8a39d *man/parseDTD.Rd
 37a7cae244e55e2359b01b7e682309e2 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
 42a9e60ea424acd1f16cf626aaff0dec *man/readHTMLTable.Rd
+e91a47b6b30d550810076e8fc7a7e5a0 *man/readKeyValueDB.Rd
+aaeed4493d9fa9bba4e8437deb0c9b43 *man/readSolrDoc.Rd
 4052e6a3da272438a980474b6442de63 *man/removeXMLNamespaces.Rd
 52404a3568991fa47b98b775416caae1 *man/saveXML.Rd
 d8ac705967e43e1873a7ec590b9f36ff *man/schema-class.Rd
