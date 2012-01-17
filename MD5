@@ -1,7 +1,7 @@
-634e2f37cdadea36100f693b7097f261 *Changes
-c1b1bc1248fdb8586adbdc688c22e0e8 *DESCRIPTION
+2d391f05e3e6460c8012e81db61fa84b *Changes
+3db17917c45aabcfa29463bb8e2bf399 *DESCRIPTION
 287c12a6a7dde9df019e89761bec1142 *GNUmakefile.Splus.in
-59e9341f729cf96184ef706bf5377583 *INSTALL
+1bb7490cd0849bb8542818e155480b7c *INSTALL
 27713c679bd7e19617307059a2f6c2e5 *INSTALL_R
 f2593b4f7983640aaa304b2087c74e62 *INSTALL_S
 8022daf9326930827429eeb04c82d634 *NAMESPACE.in
@@ -46,7 +46,7 @@ f9b71d5e77dca8dd43401827f567ca8b *R/version.R
 65d281b1b17dcac2c51b57a044337d09 *R/xmlEventHandler.R
 3921b1486120fafd678bbe3617a9105c *R/xmlEventParse.R
 e7aa7373fed505f7521b09824262b821 *R/xmlHandler.R
-eefc0b133b7821b6edc816a9cca61069 *R/xmlInternalSource.R
+12bc49ca0363cbf2e00614114484d064 *R/xmlInternalSource.R
 15ad6051d702385e91e4ff5009b53249 *R/xmlMemoryMgmt.R
 2ab8f2f7d6507bed9806e77b3119a791 *R/xmlNodes.R
 78fd94e38f70bce6a608c41d94a9b902 *R/xmlOutputBuffer.R
@@ -275,7 +275,7 @@ b7e3ce6a6df365f62d34bb3cf2b8a39d *man/parseDTD.Rd
 25e24b0b3ab5f7532a5defe814a7a258 *man/parseXMLAndAdd.Rd
 37a7cae244e55e2359b01b7e682309e2 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
-42a9e60ea424acd1f16cf626aaff0dec *man/readHTMLTable.Rd
+d0561e8d90fe7bcaf3744e61a115736f *man/readHTMLTable.Rd
 e91a47b6b30d550810076e8fc7a7e5a0 *man/readKeyValueDB.Rd
 aaeed4493d9fa9bba4e8437deb0c9b43 *man/readSolrDoc.Rd
 4052e6a3da272438a980474b6442de63 *man/removeXMLNamespaces.Rd
@@ -311,7 +311,7 @@ baf43908852a0c6b644a66726fa68bcf *man/xmlParserContextFunction.Rd
 d52a6950529a28b6177533bbb4b0f0fd *man/xmlSearchNs.Rd
 db0692471da012061bae2fa32a0edea0 *man/xmlSerializeHook.Rd
 1ab03609175fb7d7653473d0881d66bf *man/xmlSize.Rd
-18e21021740f44eab9dde0e685d43103 *man/xmlSource.Rd
+5a67944fbb80cf5444cd9b4deaa6cf95 *man/xmlSource.Rd
 52b079e639f02b3e4780beed343de405 *man/xmlStopParser.Rd
 2e7b37b9b6f1531eee912f6e8d865cf0 *man/xmlStructuredStop.Rd
 52c33f78ee2dcfd2bb712aaa04a74865 *man/xmlSubset.Rd
@@ -321,11 +321,11 @@ db0692471da012061bae2fa32a0edea0 *man/xmlSerializeHook.Rd
 636fa8a264443b8e1119efd2364a00c3 *man/xmlTree.Rd
 2f5b95e53c734afd62db87d0a5cfbc9b *man/xmlTreeParse.Rd
 a9ab3d02121e6ce4046123f2aec1a023 *man/xmlValue.Rd
-a34f199bc94f806ee781fd4bfbfdfc3d *src/DocParse.c
+9b6a5f4e02c70e9e6cadab4c2fca37c3 *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
-57c81ee8c20ac940ed4570df4eb7f849 *src/EventParse.c
+ec52dd7171f1cbbe4ccfafc6b9d72444 *src/EventParse.c
 98a4d11fd70007448bf2c8f0e5278434 *src/EventParse.h
-4410ad023ba7ca18dc72cfa4e9057281 *src/ExpatParse.c
+9faae64cf580ca671c10472749066776 *src/ExpatParse.c
 21327b0c7a0406a35e0aa87168d02fd9 *src/ExpatParse.h
 579a035113c8ccf0dd177969ceb0edc4 *src/HTMLParse.c
 f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
@@ -339,10 +339,10 @@ d51866b3b7de881b366d5f57819156f6 *src/RSDTD.h
 f7fc2ef0235cff91215667c5a676b837 *src/RUtils.c
 03074fb2977f7e985ce25c447336e302 *src/Rcatalog.c
 13037cd5446805f08cf2656588523dd2 *src/Utils.c
-3ccd062e0f04457f5cac7f942def948a *src/Utils.h
-b1eaafb8d5c87bc03796b32f3a624333 *src/XMLEventParse.c
-2eba41754a9482f57b3cb0e3a1d850ab *src/XMLHashTree.c
-8c5514e9beb6012e342ba7b04e93c1e7 *src/XMLTree.c
+b01e0351df524615a6465ef354b4974a *src/Utils.h
+590b21a482acdaaffc57c8c9b0364453 *src/XMLEventParse.c
+581fe47a4b48f203188881c76411ad3d *src/XMLHashTree.c
+dca9bb830ee9782bf46d0b2f53bec50a *src/XMLTree.c
 2a1e9d2603aa6eba81a88659ece71cad *src/libxmlFeatures.c
 55e23091cd2f7526d67e2676021e9dbc *src/schema.c
 ab7c254f538351689fc3ccc31f02cf71 *src/xmlsecurity.c
