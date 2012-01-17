@@ -1,3 +1,14 @@
+Version 3.9-2
+
+  *    Static NAMESPACE (rather than generated via configure)
+
+  *    Default for directory in Makevars.win to search for header files and libraries needed
+       for compilation.
+
+Version 3.9-1
+
+  *     Added method for removeNodes for XMLNodeList.
+
 Version 3.9-0
 
   *     Enabled additional encoding for element, attribute and namespace names, and 

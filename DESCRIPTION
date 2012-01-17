@@ -1,6 +1,6 @@
 Package: XML
-Version: 3.9-0
-Date: 2012/01/17
+Version: 3.9-2
+ReleaseDate: 2012/01/20
 Author: Duncan Temple Lang (duncan@wald.ucdavis.edu)
 Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
 Title: Tools for parsing and generating XML within R and S-Plus.
@@ -8,15 +8,20 @@ Depends: R (>= 1.2.0), methods, utils
 Imports: methods
 Suggests: bitops
 SystemRequirements: libxml2 (>= 2.6.3)
-LazyLoad: yes
+xxxLazyLoad: yes
 Description: This package provides many approaches for both reading and
         creating XML (and HTML) documents (including DTDs), both local
         and accessible via HTTP or FTP.  It also offers access to an
         XPath "interpreter".
-Note: The versions numbers 1.0 and 2.0 do not have any special
-        significance, but are merely the result of incrementing the
-        minor count by 1 for each release. Specifically, there is no
-        change in the interface.
+Note: In version 2.4.0 of this package, a new approach to garbage
+        collection has been implemented and it is experimental. You can
+        disable it via the configuration option --enable-nodegc=no.
+        However, you are encouraged to use this and report problems as
+        the results are beneficial and being able to produce any errors
+        should they occur will be very helpful. The versions numbers
+        1.0 and 2.0 do not have any special significance, but are
+        merely the result of incrementing the minor count by 1 for each
+        release. Specifically, there is no change in the interface.
 URL: http://www.omegahat.org/RSXML
 License: BSD
 Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
@@ -29,6 +34,6 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         libxmlFeatures.R xmlString.R saveXML.R namespaces.R
         readHTMLTable.R reflection.R xmlToDataFrame.R bitList.R
         compare.R encoding.R fixNS.R xmlRoot.R serialize.R
-        xmlMemoryMgmt.R keyValueDB.R solrDocs.R
+        xmlMemoryMgmt.R keyValueDB.R solrDocs.R XMLRErrorInfo.R
 Repository: CRAN
-Date/Publication: 2012-01-18 15:14:22
+Date/Publication: 2012-01-21 10:13:30

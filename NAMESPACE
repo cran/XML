@@ -1,5 +1,5 @@
 # Avoided if we are using Windows so that we can specify the directory to find the libxml DLL.
-# useDynLib(XML)
+#  useDynLib(XML)
 
 import(methods)
 
@@ -98,6 +98,7 @@ export(
 
 S3method(removeNodes, "list")
 S3method(removeNodes, "XMLNodeSet")
+S3method(removeNodes, "XMLNodeList")
 S3method(removeNodes, "XMLInternalNode")
 
 exportMethods("addAttributes", "removeAttributes")
@@ -476,7 +477,7 @@ export(parseXMLAndAdd)
 
 export(xmlSerializeHook, xmlDeserializeHook)
 
-if(@EXPORT_MEMORY_MANAGEMENT@) {
+if(FALSE) {
 export(clearMemoryManagement)
 exportMethods(clearMemoryManagement)
 }
