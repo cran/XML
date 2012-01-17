@@ -1,3 +1,17 @@
+Version 3.9-4
+
+  *    readHTMLTable() passes the encoding to the cell function.
+
+  *    xmlValue() and saveXML() use the encoding from the document, improving conversion of strings.
+
+  *    More methods for getEncoding()
+
+Version 3.9-3
+
+  *    getEncoding() returns NA when the encoding is not known.  Previously, this might seg-fault!
+
+  *    readHTMLTable() passes an encoding argument to the call to xmlValue (and the value of elFun).
+
 Version 3.9-2
 
   *    Static NAMESPACE (rather than generated via configure)
