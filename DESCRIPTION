@@ -1,14 +1,12 @@
 Package: XML
-Version: 3.9-4
-ReleaseDate: 2012/01/30
-Author: Duncan Temple Lang (duncan@wald.ucdavis.edu)
-Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Version: 3.95-0
+Author: Duncan Temple Lang
+Maintainer: Duncan Temple Lang <duncan@r-project.org>
 Title: Tools for parsing and generating XML within R and S-Plus.
 Depends: R (>= 1.2.0), methods, utils
 Imports: methods
-Suggests: bitops
+Suggests: bitops, RCurl
 SystemRequirements: libxml2 (>= 2.6.3)
-xxxLazyLoad: yes
 Description: This package provides many approaches for both reading and
         creating XML (and HTML) documents (including DTDs), both local
         and accessible via HTTP or FTP.  It also offers access to an
@@ -26,14 +24,16 @@ URL: http://www.omegahat.org/RSXML
 License: BSD
 Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         applyDOM.R assignChild.R catalog.R createNode.R dynSupports.R
-        error.R flatTree.R htmlParse.R nodeAccessors.R parseDTD.R
-        schema.S summary.R tangle.R toString.S tree.R version.R
-        xmlErrorEnums.R xmlEventHandler.R xmlEventParse.R xmlHandler.R
+        error.R flatTree.R nodeAccessors.R parseDTD.R schema.S
+        summary.R tangle.R toString.S tree.R version.R xmlErrorEnums.R
+        xmlEventHandler.R xmlEventParse.R xmlHandler.R
         xmlInternalSource.R xmlOutputDOM.R xmlNodes.R xmlOutputBuffer.R
-        xmlTree.R xmlTreeParse.R hashTree.R zzz.R supports.R parser.R
-        libxmlFeatures.R xmlString.R saveXML.R namespaces.R
-        readHTMLTable.R reflection.R xmlToDataFrame.R bitList.R
-        compare.R encoding.R fixNS.R xmlRoot.R serialize.R
+        xmlTree.R xmlTreeParse.R htmlParse.R hashTree.R zzz.R
+        supports.R parser.R libxmlFeatures.R xmlString.R saveXML.R
+        namespaces.R readHTMLTable.R reflection.R xmlToDataFrame.R
+        bitList.R compare.R encoding.R fixNS.R xmlRoot.R serialize.R
         xmlMemoryMgmt.R keyValueDB.R solrDocs.R XMLRErrorInfo.R
+        xincludes.R namespaceHandlers.R tangle1.R
+Packaged: 2012-09-30 18:44:41 UTC; hornik
 Repository: CRAN
-Date/Publication: 2012-01-31 07:37:18
+Date/Publication: 2012-09-30 18:47:43

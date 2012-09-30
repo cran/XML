@@ -39,7 +39,8 @@ xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              useInternalNodes = FALSE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
              useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
+             isHTML = FALSE, options = integer())
 
 xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
@@ -47,7 +48,8 @@ xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FAL
              useInternalNodes = TRUE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
              useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
+             isHTML = FALSE, options = integer())
 
 xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
              asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
@@ -55,15 +57,27 @@ xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE
              useInternalNodes = TRUE, isSchema = FALSE,
              fullNamespaceInfo = FALSE, encoding = character(),
              useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
+             isHTML = FALSE, options = integer())
 
-htmlTreeParse(file, ignoreBlanks = TRUE, handlers = NULL,
-              replaceEntities = FALSE, asText = FALSE, trim = TRUE,
-              isURL = FALSE, asTree = FALSE, 
-              useInternalNodes = FALSE, encoding = character(),
-              useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
-              xinclude = FALSE, addFinalizer = TRUE, 
-              error = function(...){}) 
+
+htmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
+             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
+             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+             useInternalNodes = FALSE, isSchema = FALSE,
+             fullNamespaceInfo = FALSE, encoding = character(),
+             useDotNames = length(grep("^\\\\.", names(handlers))) > 0,
+             xinclude = TRUE, addFinalizer = TRUE, error = htmlErrorHandler,
+             isHTML = TRUE, options = integer())
+
+htmlParse(file, ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE, 
+          asText = FALSE, trim = TRUE, validate = FALSE, getDTD = TRUE, 
+           isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE, 
+            useInternalNodes = TRUE, isSchema = FALSE, fullNamespaceInfo = FALSE, 
+             encoding = character(), 
+             useDotNames = length(grep("^\\\\.", names(handlers))) > 0, 
+              xinclude = TRUE, addFinalizer = TRUE, 
+               error = htmlErrorHandler, isHTML = TRUE, options = integer()) 
 
 xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
 }
@@ -116,11 +130,13 @@ logical indicating whether to use a validating parser or not, or in other words
 check the contents against the DTD specification. If this is true, warning
 messages will be displayed about errors in the DTD and/or document, but the parsing 
 will proceed except for the presence of terminal errors.
+This is ignored when parsing an HTML document.
 }
 \item{getDTD}{
 logical flag indicating whether the DTD (both internal and external)
 should be returned along with the document nodes. This changes the 
 return type.
+This is ignored when parsing an HTML document.
 }
  \item{isURL}{
    indicates whether the \code{file}  argument refers to a URL
@@ -157,6 +173,8 @@ return type.
   return value is a reference to the internal C-level document pointer.
   This can be used to do post-processing via XPath expressions using
   \code{\link{getNodeSet}}.
+
+  This is ignored when parsing an HTML document.
 }
 \item{isSchema}{a logical value indicating whether the document
   is an XML schema (\code{TRUE}) and should be parsed as such using
@@ -168,6 +186,8 @@ return type.
   package behaved.   However, using
   \code{TRUE} is more informative and we will make this
   the default in the future.
+
+  This is ignored when parsing an HTML document.
 }
 \item{encoding}{ a character string (scalar) giving the encoding for the
   document.  This is optional as the document should contain its own
@@ -233,6 +253,15 @@ return type.
     package  \code{\link{xmlStructuredStop}} is invoked and this will 
     raise an error in R at that time in R.
 }
+\item{isHTML}{a logical value that allows this function to be used for parsing HTML documents.
+  This causes validation and processing of a DTD to be turned off.
+  This is currently experimental so that we can implement
+  \code{htmlParse} with this same function.}
+\item{options}{an integer value or vector of values that are combined
+  (OR'ed) together
+    to specify options for the XML parser. This is the same as the
+    \code{options} parameter for \code{\link{xmlParseDoc}}.
+   }
 }
 \details{
  The \code{handlers} argument is used similarly

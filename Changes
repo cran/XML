@@ -1,3 +1,105 @@
+Version 3.95-0
+
+  *     Moved development version of the source code for the package to github -
+        https://github.com/omegahat/XML.git
+
+  *     Changes to the structure of the package to allow installation directly rather than
+        via a one-step staging into the R package structure.
+
+  *     Sample XML documents moved from data/ to exampleData, and examples updated.
+
+  *     getDefaultNamespace() and matchNamespaces() use simplify = TRUE to call
+        xmlNamespaceDefinitions() to get the namespaces as a character vector rather than
+        list.
+
+  *     Documentation updates
+ 
+
+Version 3.94-0
+
+  *     getNodeLocation() now reports the actual line number for text nodes rather than 0,
+        using the sibling nodes' or parent node's line number. 
+
+  *     xpathApply() and related functions work with builtin type "functions", 
+        e.g. class.
+
+  *     xpathApply() and related functions (getNodeSet, xpathSApply) allow
+        the caller to specify multiple queries as a character vector
+        and these are pasted together as compound location paths by
+        separating them with a '|'.  This makes it easier for the
+        caller to manage the different queries.
+
+  *     assigning to a child of a node works, e.g. node[["abc"]] = text/node
+        and node[[index]] = text/node.  We replace a matching name.  If the
+        replacement value is text, we use the name to 
+
+  *     getChildrenStrings() is a function that implements the equivalent of
+        xmlApply(node, xmlValue) but faster because we avoid the function call
+        for each element.
+
+  *     options parameter for xmlParse() and htmlParse() for controlling the parser.
+        (Currently only used when encoding is explicitly specified.)
+
+  *     encoding parameter for xmlParse() and xmlTreeParse() now works for XML documents,
+        not just HTML documents.
+
+  *     Update for readHTMLTable() method so that we look at just the final <tr> node 
+        in a <thead>.
+
+Version 3.93-1
+
+  *     Fixed bug in findXInclude() that sometimes got the wrong XMLXIncludeStartNode.
+        Hence getNodeLocation() might report the wrong file, but correct line number!
+
+  *     findXInclude() now has a recursive parameter that resolves the chain of XIncludes.
+        This returns the full path to the file, relative to the base/top-level document,
+        not just the parent document.
+
+  *     Change to the default value of the error parameter in htmlParse() and htmlTreeParse() 
+        which will generate a structured R error if there is an IO error.
+        The set of issues that will raise an error will be broadened in the future.
+
+Version 3.93-0
+
+  *    Enabled the fixing of <dummy> namespaces by finding the definition o
+       for that prefix in the ancestor nodes. 
+
+Version 3.92-2
+
+  *    Synchronized compilation flags for Windows with those on OSX & Linux.
+
+Version 3.92-1
+
+  *    Restore original error handler function for htmlParse() and htmlTreeParse()
+
+  *    Fixed a reference counting problem caused by not adding a finalizer in the
+       as() method for coercing an XMLInternalNode to an XMLInternalDocument.
+       Example from Janko Thyson.
+
+  *    Fixed up some partial argument names found by R CMD check!
+
+
+Version 3.92-0
+
+  *    Added --enable-xml-debug option for the configure script and this activates
+       the debugging diagnostic reporting, mainly for the garbage collection and node
+       reference counts.
+
+  *    Work-around for HTML documents not being freed (but XML documents are!)
+
+  *    Added an isHTML parameter for xmlTreeParse.
+
+  *    Merge htmlTreeParse/htmlParse with xmlTreeParse.
+
+  *    Implemented some diagnostic facilities to determine if an external pointer
+       is in R's weak references list.   This needs support within R. (Ask for code if 
+       you want.)
+
+Version 3.91-0
+
+  *    Start of implementation to allow nested calls to newXMLNode() to use namespace prefixes
+       defined in ancestor nodes.  Disabled at present.
+
 Version 3.9-4
 
   *    readHTMLTable() passes the encoding to the cell function.

@@ -150,6 +150,12 @@ setOldClass(c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
 #setClass("XPathNodeSet", representation(ref = "externalptr"))
 
 
+setAs("XMLDocument", "XMLInternalDocument",
+       function(from) {
+         xmlParse(saveXML(from$doc$children$doc))
+       })
+
+
 ############
 
 #setMethod("[[", c("XMLInternalElementNode", "numeric") ,
@@ -536,14 +542,21 @@ function(el, name, recursive = FALSE)
 
 
 getDefaultNamespace =
-function(doc)
+function(doc, ns = xmlNamespaceDefinitions(doc, simplify = simplify), simplify = FALSE)
 {
-  ns = xmlNamespaceDefinitions(doc)
-  val = unlist(sapply(ns, function(x) if(x$id == "") x$uri))
-  if(length(val))
-     val[1]
-  else   
+  if(length(ns) == 0)
+      return(character())
+  i = which(names(ns) == "")
+  if(length(i))
+     ns[i]
+  else
      character()
+  
+#  val = unlist(sapply(ns, function(x) if(x$id == "") x$uri))
+#  if(length(val))
+#     val[1]
+#  else   
+#     character()
 }  
 
 matchNamespaces =
@@ -558,8 +571,8 @@ matchNamespaces =
   #
   #
 function(doc, namespaces,
-          nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE),
-          defaultNs = getDefaultNamespace(doc)
+          nsDefs = xmlNamespaceDefinitions(doc, recursive = TRUE, simplify = FALSE),
+          defaultNs = getDefaultNamespace(doc, simplify = TRUE)
         )
 {
 
@@ -575,11 +588,16 @@ function(doc, namespaces,
 
     # if it is a single "prefix" and we have a default namespace, then map the prefix to the default URI
     # and return.
-  if(is.character(namespaces) && length(namespaces) == 1 && is.null(names(namespaces)) && length(defaultNs) > 0) {
+  if(is.character(namespaces) && length(namespaces) == 1 &&
+        is.null(names(namespaces)) && length(defaultNs) > 0) {
        tmp = defaultNs
        names(tmp)[names(tmp) == ""] = namespaces
-       namespaces = tmp
-       return(namespaces)       
+         # make certain to convert to c(id = url) form from an XMLNamespaceDefinition
+       tmp = as(tmp[[1]], "character")
+         # if no name, so default namespace, then use the one in namespaces.
+       if(length(names(tmp)) == 0 || names(tmp) == "")
+         names(tmp) = namespaces
+       return(tmp)
    }
 
     # fix the names so that we have empty ones if we have none at all.
@@ -713,6 +731,8 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
           resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE, 
            sessionEncoding = CE_NATIVE, noResultOk = FALSE) # native
 {
+  path = paste(path, collapse = " | ")
+    
   if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)
   
@@ -863,6 +883,8 @@ function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
            resolveNamespaces = TRUE, addFinalizer = NA)
 {
+  path = paste(path, collapse = " | ")
+  
   node = doc
 
   addDocAttribute = FALSE

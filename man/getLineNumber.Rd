@@ -15,11 +15,17 @@
 }
 \usage{
 getLineNumber(node, ...)
-getNodeLocation(node)
+getNodeLocation(node, recursive = TRUE, fileOnly = FALSE)
 }
 \arguments{
   \item{node}{the node whose location or line number is of interest}
   \item{\dots}{additional parameters for methods should they be defined.}
+  \item{recursive}{a logical value that controls whether the 
+    full path of the nested includes is returned or just the
+    path in the immediate XInclude element.}
+  \item{fileOnly}{a logical value which if \code{TRUE} means that only
+  the name of the file is returned, and not the \code{xpointer} attribute or
+  line number .}
 }
 
 \value{
@@ -27,6 +33,9 @@ getNodeLocation(node)
   \code{getNodeLocation} returns a list with two elements -
   \code{file} and \code{line} which are a character string
   and the integer line number.
+
+  For text nodes, the line number is taken from the previous sibling
+  nodes or the parent node.
 }
 \references{libxml2 }
 \author{Duncan Temple Lang}

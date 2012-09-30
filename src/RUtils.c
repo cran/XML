@@ -162,9 +162,9 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_getDTD, 5),
 	ENTRY(RS_XML_libxmlVersion, 0),
 	ENTRY(RS_XML_Parse, 17),
-	ENTRY(RS_XML_ParseTree, 19),
+	ENTRY(RS_XML_ParseTree, 20),
 	ENTRY(R_newXMLDtd, 5),
-	ENTRY(R_newXMLDoc, 2),
+	ENTRY(R_newXMLDoc, 3),
 	ENTRY(R_newXMLNode, 6),
 	ENTRY(R_newXMLTextNode, 3),
 	ENTRY(R_xmlNewComment, 3),
@@ -244,6 +244,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_getDefaultValiditySetting, 1),
 	ENTRY(RS_XML_xmlXIncludeProcessFlags, 2),
 	ENTRY(RS_XML_xmlXIncludeProcessTreeFlags, 2),
+	ENTRY(R_convertXMLNsRef, 1),
 	{NULL, NULL, 0}
 };
 

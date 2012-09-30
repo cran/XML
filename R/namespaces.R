@@ -51,7 +51,15 @@ getNodeNamespace =
 function(ns, nsDefs, node, namespace, noNamespace, namespaceDefinitions = NULL, parent = NULL,
           suppressNamespaceWarning = FALSE)
 {
-  if((is.list(namespace) || is.character(namespace)) && length(namespace) > 0) {
+  if(noNamespace)
+    return(NULL)
+
+ if(is.character(namespace) && length(namespace) && !is.na(namespace) && namespace == "") {
+   if(length(namespaceDefinitions) == 0)
+       return(findNamespaceDefinition(node, ""))
+ }
+  
+ if((is.list(namespace) || is.character(namespace)) && length(namespace) > 0) {
            # a single element with no name so this is the prefix.
     if(length(namespace) == 1 && length(names(namespace)) == 0) {
       if(namespace %in% namespaceDefinitions) {
@@ -97,16 +105,10 @@ function(ns, nsDefs, node, namespace, noNamespace, namespaceDefinitions = NULL, 
          if(!is.null(parent)) 
            ns = findNamespaceDefinition(node, ns)
          else {
-            if(is.character(suppressNamespaceWarning))
-               f = get(suppressNamespaceWarning, mode = "function")
-            else if(is.logical(suppressNamespaceWarning) && !suppressNamespaceWarning) {
-               f = warning 
-            } else
-               f = function(...) {}
-                
-            f("cannot find namespace definition for '", ns, "' because the node is not in a document and there are no matching local namespace definitions for this node")
-            attr(node, "xml:namespace") = ns
-            ns = NULL
+#	     raiseNsWarning(ns, suppressNamespaceWarning)
+#            attr(node, "xml:namespace") = ns
+#            ns = NULL
+   	    ns = newNamespace(node, character(), ns)
           }
           if(!inherits(ns, "XMLNamespaceRef"))
              ns <- newNamespace(node, ns, "")
@@ -126,4 +128,48 @@ function(ns, nsDefs, node, namespace, noNamespace, namespaceDefinitions = NULL, 
     }
 
    ns
+}
+
+raiseNsWarning = 
+function(ns, suppressNamespaceWarning)
+{
+   if(is.character(suppressNamespaceWarning))
+       f = get(suppressNamespaceWarning, mode = "function")
+   else if(is.logical(suppressNamespaceWarning)) {
+     if(!suppressNamespaceWarning) 
+        f = warning 
+     else
+        return(NULL)
+ } else
+    f = function(...) {}
+                
+    f("cannot find namespace definition for '", ns, "' because the node is not in a document and there are no matching local namespace definitions for this node")
+}
+
+
+fixDummyNS = 
+function(node, suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE))
+{
+
+return(NULL)
+   nodes = getNodeSet(node, "//*[./namespace::*[. = '<dummy>']]", addFinalizer = FALSE)
+   lapply(nodes, completeDummyNS, suppressNamespaceWarning = suppressNamespaceWarning)
+}
+
+completeDummyNS = 
+function(node, suppressNamespaceWarning = getOption('suppressXMLNamespaceWarning', FALSE))
+{
+  if(is.null(xmlParent(node)))
+     return(FALSE)
+
+  prefix = names(xmlNamespace(node))
+  ns = findNamespaceDefinition(xmlParent(node), prefix, error = FALSE)
+  if(is.null(ns))
+    raiseNsWarning(prefix, suppressNamespaceWarning)
+#    (if(suppressNamespaceWarning) warning else stop)("can't find namespace definition for prefix ", prefix)
+  else {
+      # remove the current namespace definition and kill it.
+    .Call("R_replaceDummyNS", node, ns, prefix, PACKAGE = "XML")
+    # setXMLNamespace(node, ns)
+  }
 }

@@ -32,6 +32,7 @@
 #else
 #include <libxml/parserInternals.h>
 #include <libxml/xmlmemory.h>
+#include <libxml/HTMLtree.h>
 #endif
 
 
@@ -240,6 +241,23 @@ removeNodeNamespaceByName(xmlNodePtr node, const char * const id)
 
     return(0);
 }
+
+SEXP
+R_replaceDummyNS(USER_OBJECT_ s_node, USER_OBJECT_ newNS, USER_OBJECT_ prefix)
+{
+    xmlNodePtr node;
+    if(TYPEOF(s_node) != EXTPTRSXP) {
+	PROBLEM "non external pointer passed to R_replaceDummyNS"
+	    ERROR;
+    }
+	
+    node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
+    removeNodeNamespaceByName(node, CHAR(STRING_ELT(prefix, 0)));
+    
+    return(R_xmlSetNs(s_node, newNS, ScalarLogical(0))); 
+//    return(newNS);
+}
+
 
 SEXP 
 RS_XML_removeAllNodeNamespaces(SEXP s_node)
@@ -708,17 +726,26 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd, USER_OBJECT_ manageMemory
 /**
  Create an S object representing a newly created internal 
  XML document object.
-
  */
 
 int R_numXMLDocs = 0;
 int R_numXMLDocsFreed = 0;
 
 USER_OBJECT_
-R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces)
+R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces, USER_OBJECT_ isHTML)
 {
   xmlDocPtr doc;
-  doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+  if(LOGICAL(isHTML)[0]) {
+      const char *d = (TYPEOF(dtd) == STRSXP && Rf_length(dtd)) ? 
+                                CHAR_DEREF(STRING_ELT(dtd, 0)) : NULL;
+      if(d[0] == '5')
+	  doc = htmlNewDoc("", NULL);
+      else
+	  doc = htmlNewDocNoDtD(d && d[0] ? CHAR_TO_XMLCHAR(d) : NULL, NULL);
+
+  } else
+      doc = xmlNewDoc(CHAR_TO_XMLCHAR("1.0"));
+
   R_numXMLDocs++;
 
   return(R_createXMLDocRef(doc));
@@ -762,7 +789,7 @@ R_newXMLDtd(USER_OBJECT_ sdoc, USER_OBJECT_ sdtdName, USER_OBJECT_ sexternalID, 
 
 
 /*
-  The append section here is irrelevant!
+
  */
 USER_OBJECT_
 R_xmlSetNs(USER_OBJECT_ s_node, USER_OBJECT_ s_ns, USER_OBJECT_ append)
@@ -799,12 +826,13 @@ RS_XML_setNS(SEXP s_node, SEXP r_ns)
 #endif
 
 
+static const char *DummyNamespaceHREF = "<dummy>";
 
 USER_OBJECT_
 R_xmlNewNs(USER_OBJECT_ sdoc, USER_OBJECT_ shref, USER_OBJECT_ sprefix)
 {
   xmlNodePtr doc = (xmlNodePtr) R_ExternalPtrAddr(sdoc);
-  const char *href = CHAR_DEREF(STRING_ELT(shref, 0));
+  const char *href = Rf_length(shref) == 0 ? DummyNamespaceHREF : CHAR_DEREF(STRING_ELT(shref, 0));
   const char *prefix = NULL;
   xmlNsPtr ns;
 
@@ -881,7 +909,7 @@ R_createXMLDocRef(xmlDocPtr doc)
 
   PROTECT(ref = R_MakeExternalPtr(doc, Rf_install("XMLInternalDocument"), R_NilValue));
   PROTECT(tmp = NEW_CHARACTER(1));
-  SET_STRING_ELT(tmp, 0, mkChar("XMLInternalDocument"));
+  SET_STRING_ELT(tmp, 0, mkChar( doc->type == XML_HTML_DOCUMENT_NODE ? "HTMLInternalDocument" : "XMLInternalDocument"));
   SET_CLASS(ref, tmp);
   UNPROTECT(2);
   return(ref);
@@ -1647,4 +1675,97 @@ R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
 	UNPROTECT(1);
 	return(r_ans);
     }
+}
+
+
+USER_OBJECT_
+R_getChildByIndex(USER_OBJECT_ r_node, USER_OBJECT_ r_index, USER_OBJECT_ r_addFinalizer)
+{
+    xmlNodePtr node, parent, ptr;
+    int i = 0, idx;
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    ptr = node->children;
+    idx = INTEGER(r_index)[0];
+
+    while(ptr && i < idx) {
+	ptr = ptr->next;
+	i++;
+    }
+
+    return(R_createXMLNodeRef(ptr, r_addFinalizer));
+}
+
+
+USER_OBJECT_
+R_getChildByName(USER_OBJECT_ r_node, USER_OBJECT_ r_index, USER_OBJECT_ r_addFinalizer)
+{
+    xmlNodePtr node, parent, ptr;
+    int i = 0, idx;
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    ptr = node->children;
+    const char *name = CHAR_DEREF(STRING_ELT(r_index, 0));
+
+    while(ptr) {
+	if(ptr->name && strcmp(name, ptr->name) == 0)
+	    break;
+	ptr = ptr->next;
+    }
+
+    return(R_createXMLNodeRef(ptr, r_addFinalizer));
+}
+
+
+/*
+ This is a C-level version equivalent to
+     xmlApply(node, xmlValue)
+
+ 
+*/
+
+USER_OBJECT_
+R_childStringValues(SEXP r_node, SEXP r_len, SEXP r_asVector, SEXP r_encoding, SEXP r_addNames)
+{
+    xmlNodePtr node, kid;
+    int len, i;
+    SEXP ans, names = NULL;
+    int asVector = LOGICAL(r_asVector)[0];
+    int encoding = INTEGER(r_encoding)[0];
+    xmlChar *tmp;
+    int nprotect = 0;
+
+    node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+    len = INTEGER(r_len)[0];
+
+    if(asVector)
+	ans = NEW_CHARACTER(len);
+    else
+	ans = NEW_LIST(len);
+
+    PROTECT(ans); nprotect++;
+
+    if(LOGICAL(r_addNames)[0]) {
+	PROTECT(names = NEW_CHARACTER(len));
+	nprotect++;
+    }
+
+
+    for(i = 0, kid = node->children; kid && i < len; i++, kid = kid->next) {
+	tmp  = xmlNodeGetContent(kid);	
+	SEXP val = mkCharCE(tmp, encoding);
+	PROTECT(val);
+	if(asVector)
+	    SET_STRING_ELT(ans, i, val);
+	else
+	    SET_VECTOR_ELT(ans, i, ScalarString(val));
+	if(names && kid->name) {
+	    SET_STRING_ELT(names, i, mkCharCE(kid->name, encoding));
+	}
+	UNPROTECT(1);
+    }
+
+    if(names)
+	SET_NAMES(ans, names);
+
+    UNPROTECT(nprotect);
+    return(ans);
 }

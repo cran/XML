@@ -21,8 +21,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
            useInternalNodes = FALSE, isSchema = FALSE,
            fullNamespaceInfo = FALSE, encoding = character(),
-           useDotNames = length(grep("^\\.", names(handlers))) > 0,  # will be switched to TRUE in the future.
-           xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator())
+           useDotNames = length(grep("^\\.", names(handlers))) > 0, 
+           xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(), isHTML = FALSE, options = integer())
 {
   if(length(file) > 1) {
     file = paste(file, collapse = "\n")
@@ -35,6 +35,14 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
   if(missing(isURL) && !asText) 
     isURL <- length(grep("^(http|ftp|file)://", file, useBytes = TRUE, perl = TRUE))
 
+
+  if(isHTML) {
+    validate = FALSE
+    getDTD = FALSE
+    isSchema = FALSE
+    docClass = "HTMLInternalDocument"
+  } else
+    docClass = character()
 
   checkHandlerNames(handlers, "DOM")
 
@@ -91,31 +99,30 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
   .oldErrorHandler = setXMLErrorHandler(error)
   on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
+
+  if(length(options))
+     options = sum(options)  #XXX coerce to parser options
   
  ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
               as.logical(ignoreBlanks), as.logical(replaceEntities),
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
               as.logical(isURL), as.logical(addAttributeNamespaces),
-              as.logical(useInternalNodes), FALSE, as.logical(isSchema),
+              as.logical(useInternalNodes), as.logical(isHTML), as.logical(isSchema),
               as.logical(fullNamespaceInfo), as.character(encoding), as.logical(useDotNames),
-              xinclude, error, addFinalizer, PACKAGE = "XML")
+              xinclude, error, addFinalizer, as.integer(options), PACKAGE = "XML")
 
 
-
-#  if(inherits(ans, "XMLParseError"))
-#    stop(ans)
-  
-  if(!missing(handlers) & !as.logical(asTree))
+  if(!missing(handlers) && length(handlers) && !as.logical(asTree))
     return(handlers)
 
   if(!isSchema && length(class(ans)))
-    class(ans) = oldClass(class(ans))
+    class(ans) = c(docClass, oldClass(class(ans)))
 
   if(inherits(ans, "XMLInternalDocument"))
     addDocFinalizer(ans, addFinalizer)
   else if(!getDTD && !isSchema) {
        #??? is this a good idea.
-     class(ans) = oldClass("XMLDocumentContent")
+     class(ans) =  oldClass("XMLDocumentContent")
   } 
 
   ans

@@ -122,7 +122,7 @@ setMethod("readHTMLTable", "XMLInternalElementNode",
 
 function(doc, header = NA ,
           colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-            as.data.frame = TRUE, ...)
+            as.data.frame = TRUE, encoding = 0L, ...)
 {
 
   node = doc
@@ -132,14 +132,15 @@ function(doc, header = NA ,
 
   
      # check if we have a header
-  if(length(header) ==1 && is.na(header))                                                                   # this node was doc
-      header = (xmlName(doc) %in% c("table", "tbody") && ("thead" %in% names(doc) || length(getNodeSet(node, "./tr[1]/th")) > 0))
+  if(length(header) ==1 && is.na(header))                                     # this node was doc
+      header = (xmlName(doc) %in% c("table", "tbody") &&
+                      ("thead" %in% names(doc) || length(getNodeSet(node, "./tr[1]/th")) > 0))
 
   if(is.logical(header) && (is.na(header) || header) &&  xmlName(node) == "table") {
     if("thead" %in% names(node))
        header = node[["thead"]]
     else if(all(names(node[["tr"]]) %in% c('text', 'th'))) {
-       header = xpathSApply(node[["tr"]], "./th", xmlValue)
+       header = xpathSApply(node[["tr"]], "./th", xmlValue, encoding = encoding)
        dropFirstRow = TRUE
     }
   }
@@ -152,7 +153,15 @@ function(doc, header = NA ,
      node = tbody[[1]]  
 
   if(is(header, "XMLInternalElementNode"))   {
-     header = as.character(xpathSApply(header, "./*/th|./*/td", elFun))
+      # get the last tr in the thead
+     if(xmlName(header) == "thead") {
+        i = which(names(header) == "tr")
+        header = header[[ i [ length(i) ] ]]
+        xpath = "./th | ./td"
+     } else
+        xpath = "./*/th | ./*/td"
+
+     header = as.character(xpathSApply(header, xpath, elFun, encoding = encoding))
      headerFromTable = TRUE
 
      if(xmlName(node) == "table" && "tbody" %in% names(node))
@@ -241,7 +250,8 @@ function(doc, header = NA ,
 
 getTableWithRowSpan =
 function(node, r = xmlSize(node),
-          c = max(xmlSApply(node, function(x) length(getNodeSet(x, "./td | ./th")))))
+          c = max(xmlSApply(node, function(x) length(getNodeSet(x, "./td | ./th")))),
+           encoding = 0L)
 {
   ans = matrix(NA_character_, r, c)
   for(i in seq(length = r)) {
@@ -249,7 +259,7 @@ function(node, r = xmlSize(node),
      kids = getNodeSet(node[[i]], "./th | ./td")
      for(k in seq(along = kids)) {
        sp = xmlGetAttr(k, "rowspan", 1)
-       ans[seq(i, length = sp)] = xmlValue(k)
+       ans[seq(i, length = sp)] = xmlValue(k, encoding = encoding)
      }
   }
 }

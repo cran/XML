@@ -1,0 +1,6 @@
+library("XML")
+doc <- htmlParse("m49alpha.htm")
+out <- xpathSApply(doc, "//table[2]//tr//td", xmlValue)
+pos <- tail(grep("ISO ALPHA-3", out), n = 1L)
+out <- sub("^[[:space:]]*", "", out[- seq_len(pos) ])
+out <- sub("[[:space:]]*$", "", out)

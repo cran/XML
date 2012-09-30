@@ -80,6 +80,7 @@ AC_PROG_CC
 AC_PROG_CPP
 
 
+
 dnl ======================================================
 
 dnl Check whether we are compiling this for use with SPlus
@@ -118,9 +119,11 @@ AC_ARG_WITH(xmlsec, [  --with-xmlsec           add support (experimental) for XM
 
 dnl
 
-"$R_HOME/bin/R" CMD SHLIB testRemoveFinalizers.c  2>1 >& AS_MESSAGE_LOG_FD
+
+dnl Redirection: http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-3.html
+"$R_HOME/bin/R" CMD SHLIB testRemoveFinalizers.c &> AS_MESSAGE_LOG_FD
 if test "$?" = 0 ;  then
- $R_HOME/bin/R --vanilla < testRemoveFinalizers.R 2>1 >& AS_MESSAGE_LOG_FD
+ $R_HOME/bin/R --slave --vanilla < testRemoveFinalizers.R &> AS_MESSAGE_LOG_FD
 fi
 
 if ! test "$?" = 0 ; then
@@ -713,6 +716,15 @@ AC_ARG_ENABLE(nodegc, [  --enable-nodegc  enable node garbage collection],
                  [echo "nodegc default $enableval"; LANGUAGE_DEFS="${LANGUAGE_DEFS} -DXML_REF_COUNT_NODES=1"])
 
 
+
+AC_ARG_ENABLE(xml-debug, [  --enable-xml-debug  enable debugging information, primarily for memory management], 
+               [ if test "${enableval}" = "yes" || test "${enableval}" = "default" ; then
+                     LANGUAGE_DEFS="${LANGUAGE_DEFS} -DR_XML_DEBUG=1"
+                 fi;
+                 echo "enabling xml-debug? ${enableval}"],
+                 [echo "xml-debug default $enableval"; LANGUAGE_DEFS="${LANGUAGE_DEFS}"])
+
+
 dnl  ---------------------------------------------------
 
 AC_DEFUN([CHECK_ENUM], [
@@ -805,6 +817,12 @@ if test "$ADD_XML_OUTPUT_BUFFER" = "yes" ; then
 fi
 
 AC_SUBST(ADD_XML_OUTPUT_BUFFER)
+
+
+if test -n "${_R_CHECK_TIMINGS_}" ; then
+  PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_XML_MEMORY_SHOW_ROUTINE=1"
+fi
+
 
  dnl create the different targets
  dnl We had NAMESPACE here when were conditionally exporting the functions to 

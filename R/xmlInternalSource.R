@@ -66,7 +66,7 @@ function(url, ...,
           namespaces = DefaultXPathNamespaces,
           section = character(), eval = TRUE, init = TRUE, setNodeNames = FALSE, parse = TRUE)
 {
-  doc = xmlTreeParse(url, ..., useInternal = TRUE)
+  doc = xmlTreeParse(url, ..., useInternalNodes = TRUE)
   xmlSource(doc, ..., envir = envir, xpath = xpath, ids = ids, omit = omit,
              ask = ask, example = example, fatal = fatal, verbose = verbose,
               print = print, xnodes = xnodes, namespaces = namespaces,
@@ -113,7 +113,8 @@ function(url, ...,
       }
 
        # find any r:init nodes which are not inside an example.
-      init = getNodeSet(doc, "//r:init[not(ancestor::r:example)]", namespace = c(r = "http://www.r-project.org"))
+      init = getNodeSet(doc, "//r:init[not(ancestor::r:example)]",
+                           c(r = "http://www.r-project.org"))
       if(length(init)) {
         xmlSource(init, envir = envir, omit = omit, verbose = verbose, namespaces = namespaces, eval = eval)
         cat("Done doc-level init", length(init), "\n")
@@ -318,7 +319,7 @@ function(node, namespaces = c(r = "http://www.r-project.org"), recursive = TRUE)
   if(inherits(x, c("XMLInternalCommentNode", "XMLInternalPINode"))) {
 
   } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) %in% c("r:code", "r:frag")) {
-     ref = xmlGetAttr(x, "ref")
+     ref = xmlGetAttr(x, "ref", NA)
      if(!is.na(ref)) {
          v = getNodeSet(as(x, "XMLInternalDocument"),
                         paste(sapply(c("code", "frag"),
