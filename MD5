@@ -5,11 +5,12 @@ b68e31a553eb7e40342cbe05ca8bd729 *Bug.R
 b6a2d1416f613554d0444dba4cd116b4 *Bugs/createXMLNode.R
 fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 0a84634dfd53d03299668d5df1c2f3a9 *Bugs/wormmart.R
+58fae401e09eb1c0e589ca21f17dbce1 *CRAN_changes
 16a9c1af50a646ee6a25bfca90b18124 *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
 0b3b8ce6fd20c02d923efa867f9932c9 *Copyright
-b5678540a0efa14f7774839be043431b *DESCRIPTION
+fbec5b66f093d2884586b209481c2159 *DESCRIPTION
 124390dbf9e429c01651798b785ee964 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
 a58ec3397e2521adbd1e9d1cd1f3b8c4 *Docs/GeneralHandlers.xml
@@ -150,6 +151,7 @@ e580f0d358e8b11fc9e29e66e083376f *checkLinks/other_checkLinks.R
 b0777f8f8a90181ea55c9efd274ba7d3 *cleanup
 45de3aef04bc7ec3426ee6b284e11b11 *configure
 d282345fbc07fc59c8c38987e079f9bf *configure.in
+f99bbde173f150b8f35f06097f6d9662 *configure.win
 6cbbef73ce40214a62cfadf62d1caf6d *dotCalls
 1fc5d029b746693125eda5e6154585be *expat/GNUmakefile
 6a50818ca42ac661e37a931fc887625c *expat/GNUmakefile.lib
@@ -597,7 +599,7 @@ ec52dd7171f1cbbe4ccfafc6b9d72444 *src/EventParse.c
 21327b0c7a0406a35e0aa87168d02fd9 *src/ExpatParse.h
 a80157991fc463bcc9b25a0302dbffd3 *src/HTMLParse.c
 f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
-029cd5d67d92406eb7b91b6d2459af11 *src/Makevars.win
+71c00bad0068967ed4d3d9154b504d5f *src/Makevars.win
 74b06e8da63977516eb869c3ac57a8e1 *src/NodeGC.c
 be8ca75c80e25c82190a6e69151edad9 *src/NodeGC.h
 7161feb34f46d2d229953c0d54c88b69 *src/RSCommon.h
@@ -618,7 +620,6 @@ c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
 55e23091cd2f7526d67e2676021e9dbc *src/schema.c
 ab7c254f538351689fc3ccc31f02cf71 *src/xmlsecurity.c
 7294ec1152aa4cec5a6c40b15f3c0c38 *src/xpath.c
-44d26f61c698af8cf0c227e51a63621d *symbols.rds
 cad19b351da7f9fbac273bf3345a73d5 *testRemoveFinalizers.R
 f37499c1cbb30d205bf1f316cea3e9fe *testRemoveFinalizers.c
 715cd99344f18ec47e2733ac2a799519 *xpathPointer.xml

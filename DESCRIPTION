@@ -1,5 +1,5 @@
 Package: XML
-Version: 3.95-0
+Version: 3.95-0.1
 Author: Duncan Temple Lang
 Maintainer: Duncan Temple Lang <duncan@r-project.org>
 Title: Tools for parsing and generating XML within R and S-Plus.
@@ -34,6 +34,6 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         bitList.R compare.R encoding.R fixNS.R xmlRoot.R serialize.R
         xmlMemoryMgmt.R keyValueDB.R solrDocs.R XMLRErrorInfo.R
         xincludes.R namespaceHandlers.R tangle1.R
-Packaged: 2012-09-30 18:44:41 UTC; hornik
+Packaged: 2012-10-02 08:10:17 UTC; ripley
 Repository: CRAN
-Date/Publication: 2012-09-30 18:47:43
+Date/Publication: 2012-10-02 08:12:36

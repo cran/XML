@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "supportsExpat <- function() FALSE" > R/supports.R
+echo "supportsLibxml <- function() TRUE" >> R/supports.R
+echo "ADD_XML_OUTPUT_BUFFER = FALSE" >> R/supports.R
+
+sed -e 's/@EXPORT_MEMORY_MANAGEMENT@/FALSE/' NAMESPACE.in > NAMSPACE
