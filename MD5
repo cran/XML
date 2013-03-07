@@ -10,7 +10,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
 0b3b8ce6fd20c02d923efa867f9932c9 *Copyright
-fbec5b66f093d2884586b209481c2159 *DESCRIPTION
+3fa29c9aa794b3fa343ce63ba3112d9d *DESCRIPTION
 124390dbf9e429c01651798b785ee964 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
 a58ec3397e2521adbd1e9d1cd1f3b8c4 *Docs/GeneralHandlers.xml
@@ -116,7 +116,7 @@ d79e29581564fcb906eb9900437a8ee2 *R/xmlString.R
 c832894a8f4bcc1aef0bb25e4acd5ace *R/xmlToDataFrame.R
 8b33b9583824359c60b2f7f54f753d03 *R/xmlTree.R
 02a99c34b79a8a6da9aee5bbf4313fda *R/xmlTreeParse.R
-41b29d66252a0d314d1b03389f5422c3 *R/zzz.R
+737c3e612a832777f6b35be8d18b28de *R/zzz.R
 081453acd1b3e6642a8ba518d2d14251 *README
 b7e40dfcb5012e0e244fee59e8e83750 *README.windows
 c98b6227af28f4baefaa6a0dce5f7147 *Rsamples/addChildren.R
@@ -402,7 +402,7 @@ b7e3ce6a6df365f62d34bb3cf2b8a39d *man/parseDTD.Rd
 25e24b0b3ab5f7532a5defe814a7a258 *man/parseXMLAndAdd.Rd
 37a7cae244e55e2359b01b7e682309e2 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
-9f38e224cf100ccbb58c66d3ef6b3a90 *man/readHTMLTable.Rd
+91aa918b7a8bf61260ce18f4b4346808 *man/readHTMLTable.Rd
 e91a47b6b30d550810076e8fc7a7e5a0 *man/readKeyValueDB.Rd
 aaeed4493d9fa9bba4e8437deb0c9b43 *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd
@@ -489,7 +489,6 @@ e778f54f8e63d43763ada1c8a1ffe58e *myTests/format.xml
 b15f10385552915a2b00c4ae15c832cb *myTests/gc.R
 943f9871d01f2427d85de4bc179bb3ac *myTests/gc/Makevars
 d8c935187f8cb7f30e3b6b1e159acc99 *myTests/gc/addChild.c
-a6ef041e438d359a55bb824da54aa188 *myTests/gc/addChild.so
 c5eabcfa7ea04fa569391f5b92a05eb0 *myTests/gc/children.R
 8e36fc534632a00382ccd8633aebadad *myTests/gc/comm.R
 a44a10f26d6f34abadb93d78fe60fc51 *myTests/gc/comment.R
@@ -506,7 +505,6 @@ f195b1efa02309c6bdb26fc91dab0375 *myTests/gc/procXInclude.R
 aa17f86059ecb246be244495158290f8 *myTests/gc/simpleAdd.R
 cd958418bfbca9287472593d037f51fd *myTests/gc/testgc.R
 8da81ad74a15027d2472a003615a92cc *myTests/gc/testgc.c
-c38ac118607679fd192ada9140fad39c *myTests/gc/testgc.so
 f85f6dce009cfa1e928c229b3176c6e8 *myTests/gc/text.R
 adfb00306f825df76503115ac0c280ab *myTests/gc/xinclude.R
 00dd84f8878d54c17e893954bf8ee39d *myTests/gc1.R
@@ -611,7 +609,7 @@ c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
 8bfb598c2e2ebe0a41719443214e9ed6 *src/SPlus/SUtils.c
 23b34871f8798e51a3d79cf88064770b *src/SPlus/SUtils.h
 96a737dcf067e9178ba08204a1cde88e *src/Utils.c
-190bec719a16e5138c9023e0ca47c675 *src/Utils.h
+c00cca1e50c944d50c3eec97e3cdfe0c *src/Utils.h
 67f342b0949b447a1a3c19170666f023 *src/XMLEventParse.c
 581fe47a4b48f203188881c76411ad3d *src/XMLHashTree.c
 04eb5d9e01bc03153377f9ec79e26760 *src/XMLTree.c

@@ -1,16 +1,3 @@
-.First.lib <-
-function(libname, pkgname)
-{
- library.dynam("XML", pkgname, libname)
-
- if(.useNamespacesInXMLPackage && exists("setMethod")) {
-   .InitSAXMethods()
- }
-
-   # Set the error handlers to our local ones.
- .C("RSXML_setErrorHandlers", PACKAGE = "XML")
-}
-
 .onLoad =
 function(libname, pkgname)
 {
