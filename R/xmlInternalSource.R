@@ -340,7 +340,7 @@ function(node, namespaces = c(r = "http://www.r-project.org"), recursive = TRUE)
             else
               xmlValue(x)
      }
-  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) == "r:output") {
+  } else if(inherits(x, "XMLInternalElementNode") && xmlName(x, full = TRUE) %in% c("r:error", "r:output")) {
   }  else
      xmlValue(x)
  })

@@ -99,8 +99,43 @@ HTML4.0 specification
   \code{\link{xpathSApply}}    
 }
 \examples{
+# u = "http://en.wikipedia.org/wiki/World_population"
+ u = "http://en.wikipedia.org/wiki/List_of_countries_by_population"
+ 
+ tables = readHTMLTable(u)
+ names(tables)
+
+ tables[[2]]
+  # Print the table. Note that the values are all characters
+  # not numbers. Also the column names have a preceding X since
+  # R doesn't allow the variable names to start with digits.
+ tmp = tables[[2]]
+
+
+   # Let's just read the second table directly by itself.
+ doc = htmlParse(u)
+ tableNodes = getNodeSet(doc, "//table")
+ tb = readHTMLTable(tableNodes[[2]])
+
+  # Let's try to adapt the values on the fly.
+  # We'll create a function that turns a th/td node into a val
+ tryAsInteger = function(node) {
+                  val = xmlValue(node)
+                  ans = as.integer(gsub(",", "", val))
+                  if(is.na(ans))
+                      val
+                  else
+                      ans
+                }
+
+ tb = readHTMLTable(tableNodes[[2]], elFun = tryAsInteger)
+
+ tb = readHTMLTable(tableNodes[[2]], elFun = tryAsInteger,
+                       colClasses = c("character", rep("integer", 9)))
+
+
   zz = readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
-  if(any(i <- sapply(zz, ncol) == 14)) {  # guard against the structure of the page changing.
+  if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {  # guard against the structure of the page changing.
     zz = zz[[which(i)[1]]]  # 4th table
         # convert columns to numeric.  Could use colClasses in the call to readHTMLTable()
     zz[-1] = lapply(zz[-1], function(x) as.numeric(gsub(".* ", "", as.character(x))))
@@ -131,13 +166,6 @@ if(FALSE) {
  tides = read.table(con)
 }
 
-   # header as a logical vector
- tt = tryCatch(readHTMLTable("http://www.sfgate.com/weather/rainfall.shtml",
-                               header = c(FALSE, FALSE, TRUE, FALSE, FALSE)),
-                "XML_IO_LOAD_ERROR"= function(err, ...) {
-                                         cat("cannot connect to sfgate.com\n")
-                                         NULL
-                                     })
 
 if(require(RCurl) && url.exists("http://www.omegahat.org/RCurl/testPassword/table.html")) {
   tt =  getURL("http://www.omegahat.org/RCurl/testPassword/table.html",  userpwd = "bob:duncantl")

@@ -428,7 +428,7 @@ print.XMLNode <-
 function(x, ..., indent = "", tagSeparator = "\n")
 {
  if(length(xmlAttrs(x))) {
-   tmp <- paste(names(xmlAttrs(x)),paste("\"", xmlAttrs(x),"\"", sep=""), sep="=", collapse=" ")
+   tmp <- paste(names(xmlAttrs(x)),paste("\"", insertEntities(xmlAttrs(x)), "\"", sep=""), sep="=", collapse=" ")
  } else 
    tmp <- ""
 
@@ -732,6 +732,10 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
            sessionEncoding = CE_NATIVE, noResultOk = FALSE) # native
 {
   path = paste(path, collapse = " | ")
+
+  if(is(namespaces, "list") && all(sapply(namespaces, is, "XMLNamespaceDefinition"))) {
+     namespaces = structure(sapply(namespaces, `[[`, "uri"), names = names(namespaces))
+  }
     
   if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)

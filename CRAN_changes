@@ -1,3 +1,0 @@
-Needs configure.win to create NAMESPACE.in and R/supports.R
-
-src/Makevars.win need changes for biarch builds.
