@@ -1,6 +1,0 @@
-<top xmlns="http://www.omegahat.org" 
-     xmlns:r="http:www.r-project.org">
- <two>
-   <r:func>bob</r:func>
- </two>
-</top>
