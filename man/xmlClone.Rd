@@ -42,7 +42,8 @@ xmlClone(node, recursive = TRUE, addFinalizer = FALSE, ...)
   \code{\link{newXMLDoc}}
 }
 \examples{
-  doc = xmlParse('<doc><author  id="dtl"><firstname>Duncan</firstname><surname>Temple  Lang</surname></author></doc>')
+doc =
+xmlParse('<doc><author id="dtl"><firstname>Duncan</firstname><surname>Temple Lang</surname></author></doc>')
 
   au = xmlRoot(doc)[[1]]
      # make a copy

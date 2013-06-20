@@ -401,7 +401,6 @@ if(libxmlVersion()$major >= 2) {
 
  startElement = function(x, ...) cat(x, "\n")
 
-
  xmlEventParse(file(f), handlers = list(startElement = startElement))
 
 
@@ -461,7 +460,8 @@ if(libxmlVersion()$major >= 2) {
           endElement = function(name, uri) {
                           cat("Finishing", name, "\n")
             }) 
- xmlEventParse(system.file("exampleData", "namespaces.xml", package="XML"), handlers = h, saxVersion = 2)
+ xmlEventParse(system.file("exampleData", "namespaces.xml", package="XML"),
+               handlers = h, saxVersion = 2)
 
 
  # This example is not very realistic but illustrates how to use the
@@ -483,8 +483,10 @@ if(libxmlVersion()$major >= 2) {
 
   filename = system.file("exampleData", "branch.xml", package="XML")
    
-  invisible(xmlEventParse(filename, branches = list(b = function(node) {print(names(node))})))
-  invisible(xmlEventParse(filename, branches = list(b = function(node) {print(xmlName(xmlChildren(node)[[1]]))})))
+  invisible(xmlEventParse(filename, branches = list(b = function(node) {
+                          print(names(node))})))
+  invisible(xmlEventParse(filename, branches = list(b = function(node) {
+                          print(xmlName(xmlChildren(node)[[1]]))})))
 }
 
   
@@ -506,7 +508,8 @@ if(libxmlVersion()$major >= 2) {
     cat("ending", name, "\n")
 
   fileName = system.file("exampleData", "catalog.xml", package = "XML")
-  xmlEventParse(fileName, handlers = list(startElement = startElement, endElement = endElement))
+  xmlEventParse(fileName, handlers = list(startElement = startElement,
+                                          endElement = endElement))
 }
 \keyword{file}
 \keyword{IO}

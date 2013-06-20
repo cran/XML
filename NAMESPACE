@@ -504,6 +504,8 @@ export(getChildrenStrings)
 export(getHTMLLinks)
 export(readHTMLList)
 
-export(getXIncludes)
+export(getXIncludes, xmlXIncludes)
 export(getHTMLExternalFiles)
+
+export(xmlCleanNamespaces)
 

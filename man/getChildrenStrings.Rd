@@ -38,10 +38,10 @@ Duncan Temple Lang
   \code{\link{xmlValue}}
 }
 \examples{
-doc = xmlParse("<doc><a>a string</a> some text <b>another piece of text</b></doc>")
+doc = xmlParse("<doc><a>a string</a> some text <b>another</b></doc>")
 getChildrenStrings(xmlRoot(doc))
 
-doc = xmlParse("<doc><a>a string</a> some text <b>another piece of text</b><c/><d>abc<e>xyz</e></d></doc>")
+doc = xmlParse("<doc><a>a string</a> some text <b>another</b><c/><d>abc<e>xyz</e></d></doc>")
 getChildrenStrings(xmlRoot(doc))
 }
 \keyword{programming}

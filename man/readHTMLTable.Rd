@@ -134,18 +134,20 @@ HTML4.0 specification
                        colClasses = c("character", rep("integer", 9)))
 
 
-  zz = readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
-  if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {  # guard against the structure of the page changing.
+zz =
+  readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
+if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {
+  # guard against the structure of the page changing.
     zz = zz[[which(i)[1]]]  # 4th table
-        # convert columns to numeric.  Could use colClasses in the call to readHTMLTable()
+    # convert columns to numeric.  Could use colClasses in the call to readHTMLTable()
     zz[-1] = lapply(zz[-1], function(x) as.numeric(gsub(".* ", "", as.character(x))))
     matplot(1:12, t(zz[-c(1, 14)]), type = "l")
-  }
+}
 
 
 # From Marsh Feldman on R-help
 doc <- "http://www.nber.org/cycles/cyclesmain.html"
-     # The  main table is the second one because it's embedded in the page table.
+# The  main table is the second one because it's embedded in the page table.
 table <- getNodeSet(htmlParse(doc),"//table") [[2]]   
 xt <- readHTMLTable(table,
                     header = c("peak","trough","contraction",
