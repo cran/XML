@@ -1,3 +1,5 @@
+## it looks like <<- assignments here should actually be to env.
+
 # Represent the tree as a flat collection of nodes
 # but allocate the list ahead of time and grow it
 # by doubling the space. This makes things a lot faster
@@ -92,6 +94,7 @@ function(nodes = list(),
                             x$id = f( ifelse(ids[ i ] == "", xmlName(x), ids[i]) )
 
                          if(!inherits(x, "XMLTreeNode")) {
+			    ## no 'e' is visible here
                             x$env = e
                             class(x) = c("XMLTreeNode", class(x))
                          }
@@ -214,6 +217,7 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
                             x$id = f( ifelse(ids[ i ] == "", xmlName(x), ids[i]) )
 
                          if(!inherits(x, "XMLTreeNode")) {
+				## FIXME: there is no visible 'e' here
                             x$env = e
                             class(x) = c("XMLTreeNode", class(x))
                          }

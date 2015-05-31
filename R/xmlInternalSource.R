@@ -431,7 +431,7 @@ function(doc)
 getCodeVar =
 function(node)
 {
-     e = parse(text = XML:::getRCode(node))
+     e = parse(text = getRCode(node))
      e = e[[length(e)]]
      # This should use the code in ptoc in RTools.
      id = if(class(e) %in% c("=", "<-"))

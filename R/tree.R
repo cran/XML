@@ -1,3 +1,7 @@
+## needed for sanity
+.children <- .this <- .nodes <- .parents <- NULL
+
+
 nodeIdGenerator =
   #
   # Not currently used. See asXMLTreeNode and the alternative default

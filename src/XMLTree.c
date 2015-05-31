@@ -1095,7 +1095,7 @@ R_createXMLNodeRef(xmlNodePtr node, USER_OBJECT_ finalize)
   addFinalizer = R_XML_getManageMemory(finalize, node->doc, node);
 
 /*  !IS_NOT_OUR_NODE_TO_TOUCH(node) */
-  if(addFinalizer && ((node->_private && ((int*)node->_private)[1] == (int) R_MEMORY_MANAGER_MARKER)
+  if(addFinalizer && ((node->_private && ((int*)node->_private)[1] == R_MEMORY_MANAGER_MARKER)
 		      || !node->doc || (!(IS_NOT_OUR_DOC_TO_TOUCH(node->doc))))) {
       if(node->_private == NULL) {
         node->_private = calloc(2, sizeof(int));

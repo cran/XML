@@ -2,7 +2,7 @@ bitlist =
   # Taken from RAutoGenRuntime
 function(...)
 {
-  library(bitops)
+  bitOr = bitops::bitOr
   x = unlist(list(...))
   if(length(x) == 1)
     return(x)

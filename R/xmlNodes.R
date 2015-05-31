@@ -445,6 +445,7 @@ function(dtd = "", namespaces = NULL, addFinalizer = TRUE, name = character(), n
 
   if(length(node)) {
     if(is.character(node))
+	## FIXME: there is no visible 'doc' here
        newXMLTextNode(node, addFinalizer = FALSE, parent = doc)
     else
        addChildren(ans, node)

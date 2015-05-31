@@ -416,7 +416,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
      <abc/>
      <next>
      */
- if(s == (XML_Char*)NULL || s[0] == (XML_Char)NULL || len == 0 
+ if(s == (XML_Char*)NULL || s[0] == (XML_Char)0 || len == 0 
        || (len == 1 && ((const char *) s)[0] == '\n' && parserData->trim))
     return;
 

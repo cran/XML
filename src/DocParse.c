@@ -1590,7 +1590,8 @@ addXInclude(xmlNodePtr ptr, SEXP *ans, int level, SEXP manageMemory)
 {
 	if(ptr->type == XML_XINCLUDE_START) {
             int len = Rf_length(*ans) + 1;
-	    PROTECT(*ans = SET_LENGTH(*ans, len));
+	    SEXP oans = *ans; // avoid sequence-point error
+            PROTECT(*ans = SET_LENGTH(oans, len));
 	    SET_VECTOR_ELT(*ans, len - 1, R_createXMLNodeRef(ptr, manageMemory));
 	    return(1);
 	} else
