@@ -14,7 +14,8 @@
 \description{
  This function and its methods provide somewhat robust methods for
  extracting data from HTML tables in an HTML document.
- One can read all the tables in a document given by filename or URL,
+ One can read all the tables in a document given by filename or (\code{http:}
+ or \code{ftp:}) URL,
  or having already parsed the document via \code{\link{htmlParse}}.
  Alternatively, one can specify an individual \code{<table>}
  node in the document.
@@ -99,9 +100,11 @@ HTML4.0 specification
   \code{\link{xpathSApply}}    
 }
 \examples{
+\dontrun{
+## This changed to using https: in June 2015, and that is unsupported.
 # u = "http://en.wikipedia.org/wiki/World_population"
- u = "http://en.wikipedia.org/wiki/List_of_countries_by_population"
- 
+ u = "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population"
+
  tables = readHTMLTable(u)
  names(tables)
 
@@ -132,7 +135,7 @@ HTML4.0 specification
 
  tb = readHTMLTable(tableNodes[[2]], elFun = tryAsInteger,
                        colClasses = c("character", rep("integer", 9)))
-
+}
 
 zz =
   readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
@@ -145,11 +148,15 @@ if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {
 }
 
 
-# From Marsh Feldman on R-help
+# From Marsh Feldman on R-help, possibly
+# https://stat.ethz.ch/pipermail/r-help/2010-March/232586.html
+# That site was non-responsive in June 2015,
+# and this does not do a good job on the current table.
+
 doc <- "http://www.nber.org/cycles/cyclesmain.html"
 # The  main table is the second one because it's embedded in the page table.
-table <- getNodeSet(htmlParse(doc),"//table") [[2]]   
-xt <- readHTMLTable(table,
+tables <- getNodeSet(htmlParse(doc), "//table")
+xt <- readHTMLTable(tables[[2]],
                     header = c("peak","trough","contraction",
                                "expansion","trough2trough","peak2peak"),
                     colClasses = c("character","character","character",
@@ -157,10 +164,9 @@ xt <- readHTMLTable(table,
                     trim = TRUE, stringsAsFactors = FALSE
                    )
 
-
 if(FALSE) {
  # Here is a totally different way of reading tables from HTML documents.
- # The data are formatted using a PRE and so can be read via read.table
+ # The data are formatted using PRE and so can be read via read.table
  u = "http://tidesonline.nos.noaa.gov/data_read.shtml?station_info=9414290+San+Francisco,+CA"
  h = htmlParse(u)
  p = getNodeSet(h, "//pre")
@@ -168,11 +174,13 @@ if(FALSE) {
  tides = read.table(con)
 }
 
-
-if(require(RCurl) && url.exists("http://www.omegahat.org/RCurl/testPassword/table.html")) {
-  tt =  getURL("http://www.omegahat.org/RCurl/testPassword/table.html",  userpwd = "bob:duncantl")
+\dontrun{
+## This is not accessible without authentication ...
+u = "http://www.omegahat.org/RCurl/testPassword/table.html"
+if(require(RCurl) && url.exists(u)) {
+  tt =  getURL(u, userpwd = "bob:duncantl")
   readHTMLTable(tt)
-}
+}}
 }
 \keyword{IO}
 \keyword{data}

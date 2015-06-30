@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-0277fe35e8ec50f9688d939d5c7daa64 *DESCRIPTION
+5d3166172b47bff8fe69ed4f793d423f *DESCRIPTION
 b19ac0c3926deb1a7880b462c17b62df *DESCRIPTION.in
 124390dbf9e429c01651798b785ee964 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -52,7 +52,7 @@ d1d76c29eb36b2e0270f0738b683c0d7 *GNUmakefile.admin
 a602d60e1528bf0d634c2c7b5eb7cbef *LICENSE
 bc3539f0233b1dd024e4b22e45000dbd *Makevars.in
 ea01ea9993d94339188b2e8a32ae89a0 *MemoryBug.R
-b273080a0e25f6ff6adfda285f608c22 *NAMESPACE
+18f3c4d2f9f5afd06df400d903cab84b *NAMESPACE
 e20cacc1ff8ab892393c28f6fba88c02 *NAMESPACE.in
 bc2c1239c0e233c52121e0ec1a2f5ca1 *NodeFuns
 524aa3fe6e4d5c3212edb68eb5c39695 *Notes
@@ -413,7 +413,7 @@ f3a360b48e00da3244a91347c92987bd *man/newXMLDoc.Rd
 37a7cae244e55e2359b01b7e682309e2 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
 291afd5ebced13bc96436e747eefb715 *man/readHTMLList.Rd
-c16de3eb185daeac8e7e255adadcd312 *man/readHTMLTable.Rd
+8816b561bde36f56c7a1d0d75620e383 *man/readHTMLTable.Rd
 8f81d16226120619817fa1a172679a08 *man/readKeyValueDB.Rd
 8d15b91eaa346f72664bbb62ab5455fc *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd
