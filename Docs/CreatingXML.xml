@@ -43,7 +43,7 @@ doc = xmlTreeParse(fileName, useInternalNodes = TRUE)
 The next thing we want to do is to find the author.
 We can do this by matching names or using an XPath query:
 <r:code>
-author = getNodeSet(doc, "//shelp:authors/shelp:author", namespace = c(shelp = 'http://www.omegahat.org/XML/RShelp'))[[1]]
+author = getNodeSet(doc, "//shelp:authors/shelp:author", namespace = c(shelp = 'http://www.omegahat.net/XML/RShelp'))[[1]]
 </r:code>
 If we want to see what this looks like, we can coerce it to a string
 <r:code>

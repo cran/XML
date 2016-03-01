@@ -1,6 +1,6 @@
 library(XML)
 gctorture(TRUE)
-b = newXMLNode("bob", namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org"))
+b = newXMLNode("bob", namespace = c(r = "http://www.r-project.org", omg = "http://www.omegahat.net"))
 
 cat(saveXML(b), "\n")
 
@@ -61,5 +61,5 @@ z = xmlNode("arg", attrs = c(default="TRUE"),
 
 o = addChildren(z,
                 "some text",
-                xmlNode("a", "a link", attrs = c(href = "http://www.omegahat.org/RSXML")))
+                xmlNode("a", "a link", attrs = c(href = "http://www.omegahat.net/RSXML")))
 o

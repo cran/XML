@@ -6,14 +6,14 @@
 <script xmlns="" type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/element/element-min.js"></script>
 <script xmlns="" type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/tabview/tabview-min.js"></script>
 <script xmlns="" type="text/javascript" src="/Users/duncan/Classes/StatComputing/XDynDocs/inst/JavaScript/yahooTabUtils.js"></script>
-<script xmlns="" type="text/javascript" src="http://www.omegahat.org/DynDocs/JavaScript/toggleHidden.js"></script>
+<script xmlns="" type="text/javascript" src="http://www.omegahat.net/DynDocs/JavaScript/toggleHidden.js"></script>
 </head><body class="yui-skin-sam">
 <script xmlns="" type="text/javascript"><!--
 var toggleCodeIds = [
  
 ];
 --></script><p xmlns=""></p>
-<div class="article" title="The XML package: Best Practices"><div class="titlepage"><div><div><h2 class="title"><a id="id36046311"></a>The <a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RSXML">XML</a> package: Best Practices</h2></div><div><div class="author"><h3 class="author"><span class="firstname">Duncan</span> <span class="surname">Temple Lang</span></h3><div class="affiliation"><span class="orgname">University of California at Davis<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div></div><hr></hr></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id36097555"></a></h2></div></div></div><p>
+<div class="article" title="The XML package: Best Practices"><div class="titlepage"><div><div><h2 class="title"><a id="id36046311"></a>The <a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RSXML">XML</a> package: Best Practices</h2></div><div><div class="author"><h3 class="author"><span class="firstname">Duncan</span> <span class="surname">Temple Lang</span></h3><div class="affiliation"><span class="orgname">University of California at Davis<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div></div><hr></hr></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id36097555"></a></h2></div></div></div><p>
 I have received several emails recently (early 2011) asking me about
 aspects of the XML package that I no longer recommend. These
 questions were probably based on documentation for the package
@@ -84,7 +84,7 @@ serializing these XML representations so that they can be faithfully restored.
 We can use <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="" class="rfunc"><a href="Help//xmlSerializeHook.html">xmlSerializeHook()
   </a></i> and <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="" class="rfunc"><a href="Help//xmlDeserializeHook.html">xmlDeserializeHook()
   </a></i>
-in the <a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RSXML">XML</a> package to do this.
+in the <a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RSXML">XML</a> package to do this.
 </p></div><div class="section" title="Creating XML Content in R"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id36292835"></a>Creating XML Content in R</h2></div></div></div><p>
 There are two styles of creating XML (or HTML) content in R.
 The most common and obvious us to create the content by <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="" class="rfunc"><a href="Help//paste.html">paste()
@@ -115,7 +115,7 @@ e.g. <font xmlns:xp="http://www.w3.org/TR/xpath" xmlns="" class="xmlTag">&lt;Pla
 Google Earth).
 In this case, we can create the collection of these nodes easily using 
 </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>string methods to construct the text for the nodes</p></li><li class="listitem"><p>surround this text within a temporary, unused node</p></li><li class="listitem"><p>parse the string content as XML to create actual nodes</p></li><li class="listitem"><p>add these as children of the real XML node we constructed</p></li></ol></div><p>
-A good  example of this  is in the <a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RKML">RKML</a> package.
+A good  example of this  is in the <a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RKML">RKML</a> package.
 </p><p>
 This gives us the best of both worlds where we can write a function
 that returns actual XML nodes or adds those nodes to an existing parent node,
@@ -140,8 +140,8 @@ format.Which should you use?
 This is true when dealing with XML or JSON in an context, and not
 just Web Services. Which format should you prefer?
 In many cases, you won't have a choice and then the good news is that
-there are tools in R for both - <a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RSXML">XML</a>, 
-<a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RJSONIO">RJSONIO</a> and <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns=""><a href="http://cran.r-project.org/web/packages/rjson/index.html">rjson</a></i>.
+there are tools in R for both - <a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RSXML">XML</a>, 
+<a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RJSONIO">RJSONIO</a> and <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns=""><a href="http://cran.r-project.org/web/packages/rjson/index.html">rjson</a></i>.
 </p><p>
 The answer on which format to use depends on what you want to do with the content/document.
 If the result is large, the JSON representation is likely
@@ -155,7 +155,7 @@ have used repetitious and silly XML representations.
 JSON is very simple to read into R, e.g. using the
 <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="" class="rfunc"><a href="Help//fromJSON.html">fromJSON()
   </a></i> function in either of the
-<a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/RJSONIO">RJSONIO</a> or <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns=""><a href="http://cran.r-project.org/web/packages/rjson/index.html">rjson</a></i> packages.
+<a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/RJSONIO">RJSONIO</a> or <i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns=""><a href="http://cran.r-project.org/web/packages/rjson/index.html">rjson</a></i> packages.
 (<i xmlns:s3="http://www.r-project.org/S3" xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="" class="rfunc"><a href="Help//RJSONIO.html">RJSONIO()
   </a></i> is faster as it uses a C-based parser.)
 This simplicity means less control over how the results are represented
@@ -169,7 +169,7 @@ XPath is likely to be more efficient in both speed and memory.
 There is no standard, widely implemented equivalent of XPath for JSON.
 (There are implementations of <a class="ulink" href="http://bluelinecity.com/software/jpath/" target="_top">JPath</a>
 but that is not a standard and is implemented only in JavaScript and so not easily brought
-into R (although we use <a xmlns:omg="http://www.omegahat.org" xmlns:rwx="http://www.omegahat.org/RwxWidgets" xmlns="" href="http://www.omegahat.org/SpiderMonkey">SpiderMonkey</a> to call JavaScript code from R).)
+into R (although we use <a xmlns:omg="http://www.omegahat.net" xmlns:rwx="http://www.omegahat.net/RwxWidgets" xmlns="" href="http://www.omegahat.net/SpiderMonkey">SpiderMonkey</a> to call JavaScript code from R).)
 </p><p>
 Basically, JSON is slightly more succinct than XML and that is good,
 but not as much as is touted by some people and compression can effectively remove 

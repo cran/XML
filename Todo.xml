@@ -3,7 +3,7 @@
 <?xml-stylesheet type="text/xsl" href="../../Docs/XSL/Todo.xsl" ?> 
 
 <!--<?xml-stylesheet type="text/xsl" href="file:///Users/duncan/Projects/org/omegahat/Docs/XSL/Todo.xsl" ?> -->
-<!-- <?xml-stylesheet type="text/xsl" href="http://www.omegahat.org/Todo.xsl" ?> -->
+<!-- <?xml-stylesheet type="text/xsl" href="http://www.omegahat.net/Todo.xsl" ?> -->
 
 <topics xmlns:r="http://www.r-project.org">
 <title>XML package</title>
@@ -387,7 +387,7 @@ But we have xmlNamespaces as a synonym for xmlNamespaceDefinitions.
 Set the namespace definitions on an XMLInternalNode
 <r:code>
 z = newXMLNode("bob")
-xmlNamespaces(z, append = TRUE) = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org")
+xmlNamespaces(z, append = TRUE) = c(r = "http://www.r-project.org", omg = "http://www.omegahat.net")
 names(xmlNamespaces(z))
 </r:code>
 </item>
@@ -416,7 +416,7 @@ Check we can pass a list of namespace definitions, e.g. from an XMLInternalNode
 to xmlNode(), in addition to a character vector.
 <br/>
 <pre>
-x = xmlNode("bob", namespaceDefinitions = c(r = "http://www.r-project.org", omg = "http://www.omegahat.org"))
+x = xmlNode("bob", namespaceDefinitions = c(r = "http://www.r-project.org", omg = "http://www.omegahat.net"))
 </pre>
 </item>
 

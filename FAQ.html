@@ -263,7 +263,7 @@ causes an error in the parser something like
     For example, suppose we have a document that looks like
 <pre>
 <![CDATA[
- <doc xmlns="http://www.omegahat.org">
+ <doc xmlns="http://www.omegahat.net">
      <topic><title>My Title</title></topic>
  </doc>      
 ]]>
@@ -274,10 +274,10 @@ causes an error in the parser something like
 <pre>
   /ns:doc/ns:topci/ns:title    
 </pre>
-  And then we need to map ns to the URI "http://www.omegahat.org".
+  And then we need to map ns to the URI "http://www.omegahat.net".
   We do this in a call to getNodeSet() as
 <pre>
-  getNodeSet(doc, "/ns:doc/ns:topci/ns:title", c(ns = "http://www.omegahat.org"))
+  getNodeSet(doc, "/ns:doc/ns:topci/ns:title", c(ns = "http://www.omegahat.net"))
 </pre>
 
 <p/>

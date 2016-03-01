@@ -18,7 +18,7 @@ setOldClass("XMLNodeSet")
 DefaultXPathNamespaces = 
                  c(r = "http://www.r-project.org",
                    s = "http://cm.bell-labs.com/stat/S4",
-                   omg = "http://www.omegahat.org",
+                   omg = "http://www.omegahat.net",
                  
                    mlb = "http://www.mathworks.com",  # matlab
 
@@ -416,7 +416,7 @@ setMethod("[[", "XMLCodeFile",
              doc = updateIds(doc, save = x)
             }
 
-            eval(parse(text = xmlValue(n[[1]])), env = env)
+            eval(parse(text = xmlValue(n[[1]])), envir = env)
           })
 
 updateIds =

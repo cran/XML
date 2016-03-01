@@ -563,8 +563,8 @@ matchNamespaces =
   # d = xmlTreeParse("data/namespaces.xml", useInternal = TRUE)
   #   "omg"
   #   c("ns", "omegahat", "r")
-  #   c("ns", omegahat = "http://www.omegahat.org", "r")  
-  #   c("ns" = "http://www.omegahat.org", "omg" = "http://www.omegahat.org/XML", "r")
+  #   c("ns", omegahat = "http://www.omegahat.net", "r")  
+  #   c("ns" = "http://www.omegahat.net", "omg" = "http://www.omegahat.net/XML", "r")
   #
   #  Error because z and rs are not defined in the document.
   #  matchNamespaces(d, c("omg", "z", "rs"))

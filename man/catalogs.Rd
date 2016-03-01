@@ -117,9 +117,9 @@ catalogDump(fileName = tempfile(), asText = TRUE)
 # Add a rewrite rule
 # 
 # 	
-catalogAdd(c("http://www.omegahat.org/XML" = system.file("XML", package
+catalogAdd(c("http://www.omegahat.net/XML" = system.file("XML", package
 = "XML")))
-catalogAdd("http://www.omegahat.org/XML", system.file("XML", package =
+catalogAdd("http://www.omegahat.net/XML", system.file("XML", package =
 "XML"))
 catalogAdd("http://www.r-project.org/doc/",
            paste(R.home(), "doc", "", sep = .Platform$file.sep))

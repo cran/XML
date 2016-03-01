@@ -75,7 +75,7 @@ xmlParseDoc(file, options = 1L, encoding = character(),
  txt =
      '<top xmlns:r="http://www.r-project.org">
         <b xmlns:r="http://www.r-project.org">
-          <c xmlns:omg="http:/www.omegahat.org"/>
+          <c xmlns:omg="http:/www.omegahat.net"/>
         </b>
       </top>'
 
@@ -84,7 +84,7 @@ xmlParseDoc(file, options = 1L, encoding = character(),
  txt =
      '<top xmlns:r="http://www.r-project.org"  xmlns:r="http://www.r-project.org">
         <b xmlns:r="http://www.r-project.org">
-          <c xmlns:omg="http:/www.omegahat.org"/>
+          <c xmlns:omg="http:/www.omegahat.net"/>
         </b>
       </top>'
 

@@ -18,7 +18,7 @@ Note: In version 2.4.0 of this package, a new approach to garbage collection has
       The versions numbers 1.0 and 2.0 do not have any special significance, but are merely
       the result of incrementing the minor count by 1 for each release.  
       Specifically, there is no change in the interface.
-URL:  http://www.omegahat.org/RSXML
+URL:  http://www.omegahat.net/RSXML
 License: BSD
 Collate: AAA.R
 	DTD.R

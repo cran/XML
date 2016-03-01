@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <article xmlns:r='http://www.r-project.org'
-         xmlns:omg="http://www.omegahat.org">
+         xmlns:omg="http://www.omegahat.net">
 
 <articleinfo>
 <title>Reading an HTML table into a Data Frame using XPath</title>

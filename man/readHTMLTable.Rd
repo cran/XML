@@ -176,7 +176,7 @@ if(FALSE) {
 
 \dontrun{
 ## This is not accessible without authentication ...
-u = "http://www.omegahat.org/RCurl/testPassword/table.html"
+u = "http://www.omegahat.net/RCurl/testPassword/table.html"
 if(require(RCurl) && url.exists(u)) {
   tt =  getURL(u, userpwd = "bob:duncantl")
   readHTMLTable(tt)

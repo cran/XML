@@ -6,16 +6,16 @@ getRelativeURL =
   # the baseURL or if it is a fully qualified file or URL.
 
   #
-  #  getRelativeURL("/foo", "http://www.omegahat.org")
-  #  getRelativeURL("/foo", "http://www.omegahat.org/")
-  #  getRelativeURL("foo", "http://www.omegahat.org/")
-  #  getRelativeURL("http://www.foo.org", "http://www.omegahat.org/")
+  #  getRelativeURL("/foo", "http://www.omegahat.net")
+  #  getRelativeURL("/foo", "http://www.omegahat.net/")
+  #  getRelativeURL("foo", "http://www.omegahat.net/")
+  #  getRelativeURL("http://www.foo.org", "http://www.omegahat.net/")
   #
   # XXX test - baseURL with /path/ and u as /other/path. Looks okay. See
   # ParsingStrategies example for kaggle.
-  #   getRelativeURL("../foo/xyz/bar.html", "http://www.omegahat.org/a/b.html")
-  # getRelativeURL("./foo/xyz/bar.html", "http://www.omegahat.org/a/b.html")
-  #  getRelativeURL("../foo/xyz/bar.html", "http://www.omegahat.org/a/b.html")
+  #   getRelativeURL("../foo/xyz/bar.html", "http://www.omegahat.net/a/b.html")
+  # getRelativeURL("./foo/xyz/bar.html", "http://www.omegahat.net/a/b.html")
+  #  getRelativeURL("../foo/xyz/bar.html", "http://www.omegahat.net/a/b.html")
   #
   #
   #  BROKEN
@@ -24,9 +24,9 @@ getRelativeURL =
   #
   # [Fixed] not working for ../...
   #  fails
-  #    getRelativeURL("../foo", "http://www.omegahat.org/a/b.html")
-  # should be http://www.omegahat.org/foo
-  # or at least http://www.omegahat.org/a/../foo
+  #    getRelativeURL("../foo", "http://www.omegahat.net/a/b.html")
+  # should be http://www.omegahat.net/foo
+  # or at least http://www.omegahat.net/a/../foo
 function(u, baseURL, sep = "/", addBase = TRUE, simplify = TRUE)  
 {
    if(length(u) > 1)

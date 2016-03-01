@@ -1,5 +1,5 @@
 <article xmlns:r="http://www.r-project.org"
-         xmlns:omg="http://www.omegahat.org"
+         xmlns:omg="http://www.omegahat.net"
 	 xmlns:xi="http://www.w3.org/2003/XInclude" >
 
 <title>A Short Introduction to the <r:pkg>XML</r:pkg> package for R</title>
@@ -39,7 +39,7 @@ If you are working with small to moderately sized XML files, it is
 easiest to use <r:func>xmlInternalTreeParse</r:func> to first read the
 XML tree into memory.
 <r:code>
-#"http://www.omegahat.org/RSXML/index.html"
+#"http://www.omegahat.net/RSXML/index.html"
 doc = xmlInternalTreeParse("Install/Web/index.html.in")
 </r:code>
 Then you can traverse the tree looking for the
@@ -289,7 +289,7 @@ So for example, we can create the tree we discussed <xref linkend="XYZ-nodes"/> 
 W can change a odes attributes using 
 <r:func>xmlAttrs</r:func> as in
 <r:code>
-xmlAttrs(node)["src"]  = "http://www.omegahat.org"
+xmlAttrs(node)["src"]  = "http://www.omegahat.net"
 </r:code>
 </para>
 

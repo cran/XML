@@ -51,7 +51,7 @@ endif
 
 include $(R_CONFIG_DIR)/GNUmakefile.Rlib
 
-# externalWeb  rule to put on omegahat.org in download/R/
+# externalWeb  rule to put on omegahat.net in download/R/
 #   index.html, Todo.html, xml.tar.gz
 
 EXTERNAL_WEB_DIR=/home/ftp/pub/Omega/download/contrib/RS-XML
