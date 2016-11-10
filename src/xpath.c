@@ -20,7 +20,8 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
     SETCAR(expr, fun);
     arg = CDR(expr);
   } else if(TYPEOF(fun) == LANGSXP) {
-    expr = fun;
+    // change from Tomas Kalibera 2016-11-10
+    PROTECT(expr = duplicate(fun));
     arg = CDR(expr);
   }
 
@@ -52,10 +53,10 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
       SET_VECTOR_ELT(ans, i, ref);
   }
 
-  if(expr) {
-    if(TYPEOF(fun) == CLOSXP || TYPEOF(fun) == BUILTINSXP)
-      UNPROTECT(1);
-  } else
+  // change from Tomas Kalibera 2016-11-10
+  if(expr)
+    UNPROTECT(1);
+  else
     SET_CLASS(ans, mkString("XMLNodeSet"));
 
   UNPROTECT(1);

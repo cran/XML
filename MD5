@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-acfbb5b8faa027b92f0ea25523490b09 *DESCRIPTION
+2b318e84ea1c40dafff86c8c1a72d775 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -490,7 +490,7 @@ fb5b4696df49b796496830adbecbad84 *src/XMLHashTree.c
 2a1e9d2603aa6eba81a88659ece71cad *src/libxmlFeatures.c
 55e23091cd2f7526d67e2676021e9dbc *src/schema.c
 ab7c254f538351689fc3ccc31f02cf71 *src/xmlsecurity.c
-4eafb54b10105189032ad12fbd0b9b57 *src/xpath.c
+01559d554a20e840696187c21ae5a942 *src/xpath.c
 5368924763bb56b2e73523bcdcbc4251 *testRemoveFinalizers.R
 f37499c1cbb30d205bf1f316cea3e9fe *testRemoveFinalizers.c
 715cd99344f18ec47e2733ac2a799519 *xpathPointer.xml
