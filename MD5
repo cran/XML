@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-2b318e84ea1c40dafff86c8c1a72d775 *DESCRIPTION
+503b2c116d8c80b0d46cc622844359fd *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -413,7 +413,7 @@ ba3d9741b3731bec887a47f3cc2b6470 *man/parseURI.Rd
 176d202aa4ba2469ef9bb1c826e2e7c4 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
 2c62b651f8a6c113f83b79c705c0cbbd *man/readHTMLList.Rd
-ab7dd6d42ee4dad555852e2a6cef6e2b *man/readHTMLTable.Rd
+8d896e49227d1852b9ed76f9adbb444e *man/readHTMLTable.Rd
 8f81d16226120619817fa1a172679a08 *man/readKeyValueDB.Rd
 8d15b91eaa346f72664bbb62ab5455fc *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd

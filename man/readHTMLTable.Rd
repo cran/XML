@@ -138,7 +138,7 @@ HTML4.0 specification
 }
 
 zz =
-  readHTMLTable("http://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
+  readHTMLTable("https://www.inflationdata.com/Inflation/Consumer_Price_Index/HistoricalCPI.aspx")
 if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {
   # guard against the structure of the page changing.
     zz = zz[[which(i)[1]]]  # 4th table
