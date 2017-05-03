@@ -1,6 +1,6 @@
 library(XML)
 
-doc = htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates", useInternalNodes = TRUE)
+doc = htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates?bypass=true", useInternalNodes = TRUE)
 
 # Use XPath expression to find the nodes 
 #  <div><table class="yfirttbl">..

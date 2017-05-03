@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-503b2c116d8c80b0d46cc622844359fd *DESCRIPTION
+350cdaf5854fe9168e6bd7864d9dcf28 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -286,7 +286,7 @@ a17eeb45d631e58e1e785439d1abd62f *inst/examples/RhelpInfo.xml
 ca5f6777ece68d2225789bf573ab7aa6 *inst/examples/SSource.dtd
 931407aa812b6b22dd8734e3b861a541 *inst/examples/author.R
 e0110777dd3603557e1156f003a70175 *inst/examples/bondYields.R
-6bb3e28048f72f89c064e8e9a9d21f8b *inst/examples/bondsTables.R
+eb96f280983ffc7eda3b75d6fdf28fe7 *inst/examples/bondsTables.R
 93e43213dcc1c972d7ab3bb5acb9ac07 *inst/examples/catalog.R
 7b96bde0f308701b272590496b1a4b4c *inst/examples/connections.R
 1d881dcf97c18a05a545d8caf9cbd589 *inst/examples/connections1.R
@@ -396,7 +396,7 @@ d3e3902ea4fe25d3857aa794dec075b0 *man/findXInclude.Rd
 d1d52af8afbc713a165d0aa318259d49 *man/getEncoding.Rd
 149d11e4c86c3c0aa151ace7a560a4e9 *man/getHTMLLinks.Rd
 f59f6290846bb3c59920def0f2e46cfd *man/getLineNumber.Rd
-0d87d65d2cb1fddaa1c2aaba648e2387 *man/getNodeSet.Rd
+7341f7c7a561803f57ce9c3d817420ff *man/getNodeSet.Rd
 508a146a4735eeb398e77bae4da33145 *man/getRelativeURL.Rd
 9d4e564bd124d3b65c8268449e0071de *man/getXIncludes.Rd
 06c8875adc9c85d66bfd9d706c906406 *man/getXMLErrors.Rd

@@ -367,10 +367,11 @@ So we would use
    # From bondsTables.R in examples/
 
   doc =
- htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates",
+ htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates?bypass=true",
                useInternalNodes = TRUE)
   if(is.null(xmlRoot(doc))) 
-     doc = htmlTreeParse("http://finance.yahoo.com/bonds", useInternalNodes = TRUE)
+     doc = htmlTreeParse("http://finance.yahoo.com/bonds?bypass=true",
+			 useInternalNodes = TRUE)
 
      # Use XPath expression to find the nodes 
      #  <div><table class="yfirttbl">..
