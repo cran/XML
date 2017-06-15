@@ -212,11 +212,12 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
    xml_args[2] = systemId; xml_args[3] = publicId;
    xml_args[4] = notationName;
 
-  opArgs = NEW_LIST(num);
+  opArgs = PROTECT(NEW_LIST(num));
   for(i =0;i < num; i++) {
    SET_VECTOR_ELT(opArgs, i,  NEW_CHARACTER(1));
    SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, ENC_COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] :  "")); 
   }
+  UNPROTECT(1);
 
   RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "entityDeclaration"), 
                            (const char*)NULL, parserData, opArgs);
@@ -416,19 +417,19 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
      <abc/>
      <next>
      */
- if(s == (XML_Char*)NULL || s[0] == (XML_Char)0 || len == 0 
+  if(s == (XML_Char*)NULL || s[0] == (XML_Char)0 || len == 0 
        || (len == 1 && ((const char *) s)[0] == '\n' && parserData->trim))
     return;
 
            /*XXX Deal with encoding, memory cleanup, 
              1 more than length so we can put a \0 on the end. */
-    tmp = tmpString = (char*)calloc(len+1, sizeof(char));
-    strncpy(tmpString, s, len);
+  tmp = tmpString = (char*)calloc(len+1, sizeof(char));
+  strncpy(tmpString, s, len);
  
-    if(parserData->trim) {
-      tmpString = trim(tmpString);
-      len = strlen(tmpString);
-    }
+  if(parserData->trim) {
+    tmpString = trim(tmpString);
+    len = strlen(tmpString);
+  }
 
   if(len > 0 || parserData->ignoreBlankLines == 0 ) {
     PROTECT(opArgs = NEW_LIST(1));

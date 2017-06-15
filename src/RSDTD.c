@@ -279,7 +279,8 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
   if(n > 0) {
     USER_OBJECT_ dtdNames = NULL_USER_OBJECT;
 
-    PROTECT(dtdEls = NEW_LIST(n));
+    PROTECT_INDEX ipx;
+    PROTECT_WITH_INDEX(dtdEls = NEW_LIST(n), &ipx);
     PROTECT(dtdNames = NEW_CHARACTER(n));
 #ifdef LIBXML2
  {
@@ -291,6 +292,7 @@ RS_XML(ProcessElements)(xmlElementTablePtr table, xmlParserCtxtPtr ctxt)
    xmlHashScan(table, RS_xmlElementTableConverter, &scanData);
 
    SET_LENGTH(dtdEls, scanData.counter);
+   REPROTECT(dtdEls, ipx);
    SET_LENGTH(dtdNames, scanData.counter);
  }
 #else
@@ -350,7 +352,8 @@ RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
   if(n > 0) {
     USER_OBJECT_ dtdNames;
 
-    PROTECT(dtdEls = NEW_LIST(n));
+    PROTECT_INDEX ipx;
+    PROTECT_WITH_INDEX(dtdEls = NEW_LIST(n), &ipx);
     PROTECT(dtdNames = NEW_CHARACTER(n));
 
 #ifdef LIBXML2
@@ -367,6 +370,7 @@ RS_XML(ProcessEntities)(xmlEntitiesTablePtr table, xmlParserCtxtPtr ctxt)
       */
 
    SET_LENGTH(dtdEls, scanData.counter);
+   REPROTECT(dtdEls, ipx);
    SET_LENGTH(dtdNames, scanData.counter);
 
  }

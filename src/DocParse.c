@@ -431,9 +431,11 @@ processNamespaceDefinitions(xmlNs *ns, xmlNodePtr node, R_XMLSettings *parserSet
   PROTECT(names = NEW_CHARACTER(n));
 
   for(n = 0, ptr = ns; ptr ; n++, ptr = ptr->next) {
-    tmp = RS_XML(createNameSpaceIdentifier)(ptr,node);
+    // protection suggested by rchk
+    tmp = PROTECT(RS_XML(createNameSpaceIdentifier)(ptr,node));
     (void) RS_XML(notifyNamespaceDefinition)(tmp, parserSettings);
     SET_VECTOR_ELT(ans, n, tmp);
+    UNPROTECT(1);
     if(ptr->prefix)
        SET_STRING_ELT(names, n, ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ptr->prefix)));
   }
@@ -881,18 +883,19 @@ addNodesToTree(xmlNodePtr node, R_XMLSettings *parserSettings)
    SETCAR(e, parserSettings->converters);
    id = NEW_CHARACTER(0);
 
-   ptr = node;
+   ptr = PROTECT(node);
 
    /* loop over the sibling nodes here in case we have multiple roots, 
       e.g. a comment, PI and a real node. See xysize.svg
     */
    while(ptr) {
       SETCAR(CDR(CDR(e)), id);
+      // rchk says ptr needs protection, so protected above
       addNodeAndChildrenToTree(ptr, id, e, parserSettings, &ctr);
       ptr = ptr->next;
    }
 
-   UNPROTECT(1);
+   UNPROTECT(2);
    return(ScalarInteger(ctr));
 }
 
@@ -1593,6 +1596,7 @@ addXInclude(xmlNodePtr ptr, SEXP *ans, int level, SEXP manageMemory)
 	    SEXP oans = *ans; // avoid sequence-point error
             PROTECT(*ans = SET_LENGTH(oans, len));
 	    SET_VECTOR_ELT(*ans, len - 1, R_createXMLNodeRef(ptr, manageMemory));
+	    UNPROTECT(1);
 	    return(1);
 	} else
 	    return(0);

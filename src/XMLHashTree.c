@@ -192,9 +192,9 @@ processNode(xmlNodePtr root, xmlNodePtr parent, unsigned int *ctr, int parentId,
 
 
   if(root->type != XML_XINCLUDE_START && root->type != XML_XINCLUDE_END) {
-  rnode = makeHashNode(root, id, env, parserSettings);
-  
+  rnode = PROTECT(makeHashNode(root, id, env, parserSettings));
   defineVar(Rf_install(id), rnode, env);
+  UNPROTECT(1);
 
   if(root->parent && root->parent->type != XML_DOCUMENT_NODE && root->parent->type != XML_HTML_DOCUMENT_NODE) {
       /* Put an entry in the .parents environment for this current id with the single value
@@ -203,7 +203,8 @@ processNode(xmlNodePtr root, xmlNodePtr parent, unsigned int *ctr, int parentId,
        */
      SET_NODE_NAME(id, curId, root);
      SET_NODE_NAME(buf, parentId, parent);
-     defineVar(Rf_install(id), mkString(buf), parentEnv);
+     defineVar(Rf_install(id), PROTECT(mkString(buf)), parentEnv);
+     UNPROTECT(1);
    }
 
   if(root->children) {

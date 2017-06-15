@@ -403,7 +403,7 @@ stop(const char *className, const char *msg, ...)
     SETCAR(e, findVarInFrame(ns_env, Rf_install("xmlStop")));
     SETCAR(CDR(e), error);
     Rf_eval(e, R_GlobalEnv);
-    UNPROTECT(2);
+    UNPROTECT(3);
 
 /*
     errorcall(error, "%s", msg);

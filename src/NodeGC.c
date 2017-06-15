@@ -382,7 +382,9 @@ clearNodeMemoryManagement(xmlNodePtr node)
     int ctr = 0;
     if(node->_private) {
 	int a, b;
-	int isOurs = (a = node->_private != &R_XML_NoMemoryMgmt) && (b = ((int *)(node->_private))[1] == (int *) &R_XML_MemoryMgrMarker);
+	// This compares and int and a pointer.  Changed to be like NodeGC.h
+	// int isOurs = (a = node->_private != &R_XML_NoMemoryMgmt) && (b = ((int *)(node->_private))[1] == (int *) &R_XML_MemoryMgrMarker);
+	int isOurs = (a = node->_private != &R_XML_NoMemoryMgmt) && (b = ((int *)(node->_private))[1] == R_MEMORY_MANAGER_MARKER);
 	if(isOurs) {
 #if R_XML_DEBUG
  fprintf(stderr, "Removing memory management from %p, %s\n", node, node->name);fflush(stderr);

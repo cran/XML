@@ -366,6 +366,7 @@ So we would use
    # Work with the nodes and their content (not just attributes) from the node set.
    # From bondsTables.R in examples/
 
+\dontrun{## fails to download as from May 2017
   doc =
  htmlTreeParse("http://finance.yahoo.com/bonds/composite_bond_rates?bypass=true",
                useInternalNodes = TRUE)
@@ -380,6 +381,7 @@ So we would use
   if(!is.null(xmlRoot(doc))) {
 
    o = getNodeSet(doc, "//div/table[@class='yfirttbl']")
+}
 
     # Write a function that will extract the information out of a given table node.
    readHTMLTable =
