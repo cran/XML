@@ -881,21 +881,20 @@ addNodesToTree(xmlNodePtr node, R_XMLSettings *parserSettings)
    int ctr = 0;
    PROTECT(e = allocVector(LANGSXP, 3));
    SETCAR(e, parserSettings->converters);
-   id = NEW_CHARACTER(0);
+   PROTECT(id = NEW_CHARACTER(0));
 
-   ptr = PROTECT(node);
+   ptr = node;
 
    /* loop over the sibling nodes here in case we have multiple roots, 
       e.g. a comment, PI and a real node. See xysize.svg
     */
    while(ptr) {
       SETCAR(CDR(CDR(e)), id);
-      // rchk says ptr needs protection, so protected above
       addNodeAndChildrenToTree(ptr, id, e, parserSettings, &ctr);
       ptr = ptr->next;
    }
 
-   UNPROTECT(2);
+   UNPROTECT(2); /* e, id */
    return(ScalarInteger(ctr));
 }
 

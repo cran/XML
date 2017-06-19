@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-b45d3f9e2426b61806d93d507a8c1493 *DESCRIPTION
+67f425bbeaee4d1f9f82499d07c4bb09 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -462,7 +462,7 @@ cf3cf99a84d8ec4908732863236efd58 *man/xmlToDataFrame.Rd
 ee3b71a6c94f5688b9563ddaa3cfd11c *man/xmlTreeParse.Rd
 8e63213e0feed979bc71b1124833a0a3 *man/xmlValue.Rd
 bda49c28041b1df112a3a0ae3d9100d3 *scrapingData.xml
-030bc66113860cd7d004415b7b0fc260 *src/DocParse.c
+762773c5317c86db02307af50387b0c6 *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 ef6a0e22bd1288c0e269ecb5c10f1b3e *src/EventParse.c
 98a4d11fd70007448bf2c8f0e5278434 *src/EventParse.h
