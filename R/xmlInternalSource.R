@@ -413,7 +413,9 @@ setMethod("[[", "XMLCodeFile",
             n = getNodeSet(doc, paste("//*[@id=", sQuote(i), "]"))
             if(length(n) == 0) {
               # This needs code from ptoc to determine the name of an "element"
-             doc = updateIds(doc, save = x)
+             ## was updateIds(doc, save = x), which was giving
+             ## byte-compilation warnings in *other* packages.
+             doc = updateIds(doc)
             }
 
             eval(parse(text = xmlValue(n[[1]])), envir = env)

@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-67f425bbeaee4d1f9f82499d07c4bb09 *DESCRIPTION
+842f502bb89551647b7bd58dd7bc19a6 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -109,7 +109,7 @@ f9b71d5e77dca8dd43401827f567ca8b *R/version.R
 3921b1486120fafd678bbe3617a9105c *R/xmlEventParse.R
 e7aa7373fed505f7521b09824262b821 *R/xmlHandler.R
 71564d6d190daf2f147582abd5fd3238 *R/xmlIncludes.R
-1ef72835ae38e3c0100b057a6056bd14 *R/xmlInternalSource.R
+c673d236475a5db93085172fd561bb71 *R/xmlInternalSource.R
 9d5a05b12bcffd8afe0b4bb154ecc7c2 *R/xmlMemoryMgmt.R
 71b95699d3f5f1ce4ce64b7a946688ad *R/xmlNodes.R
 468ff02fdbebfe9f72ee1d7b45cecfd0 *R/xmlOutputBuffer.R
