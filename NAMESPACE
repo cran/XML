@@ -313,6 +313,7 @@ S3method(xmlNamespace, character)
 
 # No effect if append is not generic.
 S3method(append, XMLNode)
+S3method(append, default)
 
 exportMethods(saveXML)
 # S3method(saveXML, XMLInternalDocument)

@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-842f502bb89551647b7bd58dd7bc19a6 *DESCRIPTION
+a0e51f259f6ccab60e003f3cd01c187c *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -52,7 +52,7 @@ d7c21ff9e57559867252009ef6a987b7 *GNUmakefile.admin
 a602d60e1528bf0d634c2c7b5eb7cbef *LICENSE
 bc3539f0233b1dd024e4b22e45000dbd *Makevars.in
 ea01ea9993d94339188b2e8a32ae89a0 *MemoryBug.R
-18f3c4d2f9f5afd06df400d903cab84b *NAMESPACE
+c69a61402d150eed7b09feff995dd3ef *NAMESPACE
 e20cacc1ff8ab892393c28f6fba88c02 *NAMESPACE.in
 bc2c1239c0e233c52121e0ec1a2f5ca1 *NodeFuns
 524aa3fe6e4d5c3212edb68eb5c39695 *Notes
@@ -66,7 +66,7 @@ ff35133bf0deee2608952a104a91a913 *R/DTDClasses.R
 be1b08bbf064a214506304b32aae230b *R/XMLClasses.R
 2f7e79941ed0b53c43367ba90cc3b7bd *R/XMLRErrorInfo.R
 ac3aac6bc1944fff50ee7c5522154a21 *R/applyDOM.R
-57ae744d4f2876eccb4afb3d22c8b9d0 *R/assignChild.R
+adc22ba1ee262070930e0f9c63c1a332 *R/assignChild.R
 231e85de6cb9ea078ef0cb2c2213108d *R/bitList.R
 a15627f62c15dddff63f50d038855fe4 *R/catalog.R
 284dc88fce56e922416b0f8a4f4c93e6 *R/compare.R
@@ -477,7 +477,7 @@ bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
 4e5133bdc000b6843c7c2f4c304ad313 *src/RSDTD.c
 d51866b3b7de881b366d5f57819156f6 *src/RSDTD.h
 c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
-8a3acc23a53bbf72fd352d9bb6c7fa7c *src/RUtils.c
+f6e41a32a284ed1ca51ac9d45710fd14 *src/RUtils.c
 03074fb2977f7e985ce25c447336e302 *src/Rcatalog.c
 8bfb598c2e2ebe0a41719443214e9ed6 *src/SPlus/SUtils.c
 23b34871f8798e51a3d79cf88064770b *src/SPlus/SUtils.h

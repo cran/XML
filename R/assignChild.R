@@ -27,7 +27,7 @@ function(x, i, value)
  x
 }
 
-
+append <-
 append.xmlNode <-
 function(to, ...)
 {
@@ -55,6 +55,10 @@ function(to, ...)
  to
 }
 
+append.default <-
+function(to, ...)
+    base::append(to, ...)
+    
 if(FALSE) {
 xmlAddChild <-
 function(node, child) {

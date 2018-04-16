@@ -228,7 +228,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(RS_XML_xmlNodeName, 1),
 	ENTRY(RS_XML_xmlNodeNamespace, 1),
 	ENTRY(RS_XML_xmlNodeAttributes, 3),
-	ENTRY(RS_XML_xmlNodeChildrenReferences, 3),
+	// ENTRY(RS_XML_xmlNodeChildrenReferences, 3), // duplicate
 	ENTRY(R_xmlNodeValue, 3),
 	ENTRY(R_setXMLInternalTextNode_value, 2),
 	ENTRY(RS_XML_xmlNodeParent, 2),
