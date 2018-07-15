@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-a0e51f259f6ccab60e003f3cd01c187c *DESCRIPTION
+9323759ce691ef477b6673a7ec87084c *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -434,7 +434,7 @@ f50da2266db027f451641ddb2abcc29b *man/xmlDOMApply.Rd
 368fa01a925a08db5b309623c46b99ed *man/xmlElementSummary.Rd
 ccf81cec0a0850c707df4df5038053fc *man/xmlElementsByTagName.Rd
 77eb4f60381367677e552c0a65e7ec9d *man/xmlEventHandler.Rd
-45b85b5a3df12c62e6bb095da17bcd13 *man/xmlEventParse.Rd
+22757e3654dfae778763eb919b11eb4e *man/xmlEventParse.Rd
 a0fb94cc85e99c21933b1f144d1fea52 *man/xmlFlatListTree.Rd
 264749d211ae30eeba8caae4d742fbe2 *man/xmlGetAttr.Rd
 250d5985ae0d9cff4259f085dcf3d059 *man/xmlHandler.Rd

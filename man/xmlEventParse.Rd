@@ -401,8 +401,8 @@ if(libxmlVersion()$major >= 2) {
 
  startElement = function(x, ...) cat(x, "\n")
 
- xmlEventParse(file(f), handlers = list(startElement = startElement))
-
+ xmlEventParse(ff <- file(f), handlers = list(startElement = startElement))
+ close(ff)
 
  # Parse with a function providing the input as needed.
  xmlConnection = 
@@ -441,13 +441,16 @@ if(libxmlVersion()$major >= 2) {
   }
  }
 
+ \donttest{## this leaves a connection open
+ ## xmlConnection would need amending to return the connection.
  ff = xmlConnection(f)
  xmlEventParse(ff, handlers = list(startElement = startElement))
+ }
 
   # Parse from a connection. Each time the parser needs more input, it
   # calls readLines(<con>, 1)
- xmlEventParse(file(f),  handlers = list(startElement = startElement))
-
+ xmlEventParse(ff <-file(f),  handlers = list(startElement = startElement))
+ close(ff)
 
   # using SAX 2
  h = list(startElement = function(name, attrs, namespace, allNamespaces){ 
