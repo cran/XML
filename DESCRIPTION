@@ -1,5 +1,5 @@
 Package: XML
-Version: 3.98-1.12
+Version: 3.98-1.13
 Author: Duncan Temple Lang and the CRAN Team
 Maintainer: ORPHANED
 Title: Tools for Parsing and Generating XML Within R and S-Plus
@@ -27,9 +27,9 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.S XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R
 NeedsCompilation: yes
-Packaged: 2018-07-15 17:08:56 UTC; ripley
+Packaged: 2018-07-26 15:53:44 UTC; hornik
 X-CRAN-Original-Maintainer: Duncan Temple Lang <duncan@r-project.org>
 X-CRAN-Comment: Orphaned on 2017-06-19: all updates have been by the
         CRAN team for some years.
 Repository: CRAN
-Date/Publication: 2018-07-15 17:11:40 UTC
+Date/Publication: 2018-08-01 08:57:22 UTC

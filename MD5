@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-9323759ce691ef477b6673a7ec87084c *DESCRIPTION
+b6f642ea0aa840979d9d03612bc99fd2 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -91,7 +91,7 @@ e9d76cabc61ce2459a6373d4a36f4bab *R/namespaces.R
 ef3669c755c641d7d951e1e4f0913fd0 *R/parser.R
 bbabab5771d6ec3c7481c141a8ab8a31 *R/readHTMLTable.R
 812bce63aa441db21767b140a3503c80 *R/reflection.R
-5140f134f20d11bce1770c48a1755a8f *R/saveXML.R
+9dc1ee46d1277d6edfb4e846c89663c0 *R/saveXML.R
 0174abe554d6680eb0d0af339152e2e3 *R/schema.S
 da2153fc4017a2360b0f0ed2c5df3a23 *R/serialize.R
 2fb09d82bbc6ab332646981cada8eee3 *R/simplifyPath.R

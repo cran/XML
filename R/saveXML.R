@@ -112,6 +112,9 @@ function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml versi
     on.exit(sink())
   }
 
+  if(asString)
+      on.exit(close(file), add = TRUE)      
+
   if(!is.null(prefix))
     cat(as.character(prefix))
 
