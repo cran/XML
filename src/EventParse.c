@@ -215,7 +215,7 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
   opArgs = PROTECT(NEW_LIST(num));
   for(i =0;i < num; i++) {
    SET_VECTOR_ELT(opArgs, i,  NEW_CHARACTER(1));
-   SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, ENC_COPY_TO_USER_STRING(xml_args[i] ? xml_args[i] :  "")); 
+   SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, ENC_COPY_TO_USER_STRING(xml_args[i] ? (const xmlChar *)xml_args[i] :  (const xmlChar *)"")); 
   }
   UNPROTECT(1);
 
@@ -403,7 +403,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
       tmpString = s;
 #endif
       if(newLen < 0)
-	tmp = strdup("");
+	tmp = (xmlChar *)strdup("");
       else {
          tmp = (xmlChar *) S_alloc(newLen + 2, sizeof(xmlChar));
          memcpy(tmp, tmpString, newLen); tmp[newLen] = '\0';
@@ -490,7 +490,7 @@ RS_XML(callUserFunction)(const char *opName, const char *preferredName, RS_XMLPa
 {
   USER_OBJECT_ fun = NULL, val;
   USER_OBJECT_ _userObject = parserData->methods;
-  int general = 0;
+  // int general = 0;
 
   R_CHECK_INTERRUPTS
 
@@ -499,7 +499,7 @@ RS_XML(callUserFunction)(const char *opName, const char *preferredName, RS_XMLPa
   }
 
   if(fun == NULL) {
-    general = 1;
+    // general = 1;
     fun = RS_XML(findFunction)(opName, _userObject);
   }
 

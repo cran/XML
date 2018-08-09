@@ -221,7 +221,7 @@ removeNodeNamespaceByName(xmlNodePtr node, const char * const id)
 	return(0);
     prev = node->nsDef;
     p = node->nsDef;
-    if(!(id[0] && !p->prefix) || (p->prefix && strcmp(p->prefix, id) ==  0)) {
+    if(!(id[0] && !p->prefix) || (p->prefix && strcmp((const char *)p->prefix, id) ==  0)) {
                 /*XXX Free or not */
         if(node->ns == p)
 	    node->ns = NULL;
@@ -230,7 +230,7 @@ removeNodeNamespaceByName(xmlNodePtr node, const char * const id)
     }
 
     while(1) {
-	if((!id[0] && !p->prefix) || (p->prefix && strcmp(p->prefix, id) == 0)) {
+	if((!id[0] && !p->prefix) || (p->prefix && strcmp((const char *)p->prefix, id) == 0)) {
 	    prev->next = p->next;
 	    if(node->ns == p)
 		node->ns = NULL;
@@ -305,7 +305,7 @@ RS_XML_removeNodeNamespaces(SEXP s_node, SEXP r_ns)
 	    LOGICAL(ans)[i] = removeNodeNamespaceByName(node, prefix);
 	} else if(TYPEOF(el) == EXTPTRSXP) {
 	    xmlNsPtr p = (xmlNsPtr) R_ExternalPtrAddr(el);
-	    LOGICAL(ans)[i] = removeNodeNamespaceByName(node, p->prefix);
+	    LOGICAL(ans)[i] = removeNodeNamespaceByName(node, (const char *)p->prefix);
 	}
     }
 
@@ -480,7 +480,8 @@ R_isNodeChildOfAt(SEXP rkid, SEXP rnode, SEXP rat)
 USER_OBJECT_
 R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OBJECT_ shallow)
 {
-    xmlNodePtr n, p, check, tmp = NULL;
+    // check is currently set but unused.
+    xmlNodePtr n, p, /*check,*/ tmp = NULL;
     
     if(TYPEOF(parent) != EXTPTRSXP) {
        PROBLEM "R_insertXMLNode expects XMLInternalNode objects for the parent node"
@@ -500,7 +501,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
         int i;
 	p = (xmlNodePtr) R_ExternalPtrAddr(parent);	
 	for(i = 0; i < GET_LENGTH(node); i++) {
-  	    n = xmlNewText(CHAR(STRING_ELT(node, i)));
+  	    n = xmlNewText((const xmlChar *)CHAR(STRING_ELT(node, i)));
    	    xmlAddChild(p, n);
 	}
 	return(NULL_USER_OBJECT);
@@ -556,7 +557,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
  	           incrementDocRefBy(p->doc, getNodeCount(n));
             }
 	}
-	check = xmlAddChild(p, tmp);
+	/* check = */ xmlAddChild(p, tmp);
 
 #if 0
 /* XXXX */
@@ -566,7 +567,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 	break;
     case XML_DOCUMENT_NODE:	
     case XML_HTML_DOCUMENT_NODE:	
-	check = xmlAddChild(p, n);
+	/*check = */ xmlAddChild(p, n);
 	incrementDocRef((xmlDocPtr) p);
 	break;
     case XML_PI_NODE:
@@ -740,7 +741,7 @@ R_newXMLDoc(USER_OBJECT_ dtd, USER_OBJECT_ namespaces, USER_OBJECT_ isHTML)
       const char *d = (TYPEOF(dtd) == STRSXP && Rf_length(dtd)) ? 
                                 CHAR_DEREF(STRING_ELT(dtd, 0)) : NULL;
       if(d[0] == '5')
-	  doc = htmlNewDoc("", NULL);
+	  doc = htmlNewDoc((const xmlChar *)"", NULL);
       else
 	  doc = htmlNewDocNoDtD(d && d[0] ? CHAR_TO_XMLCHAR(d) : NULL, NULL);
 
@@ -941,7 +942,7 @@ R_createXMLNsRef(xmlNsPtr ns)
 USER_OBJECT_
 R_convertXMLNsRef(SEXP r_ns)
 {
-  SEXP ref, ans;
+  SEXP ans;
   xmlNsPtr ns;
 
   if(TYPEOF(r_ns) != EXTPTRSXP) {
@@ -951,7 +952,7 @@ R_convertXMLNsRef(SEXP r_ns)
 
   ns = (xmlNsPtr) R_ExternalPtrAddr(r_ns);
 
-  PROTECT(ans =  mkString(ns->href));
+  PROTECT(ans =  mkString((const char *)ns->href));
   SET_NAMES(ans, mkString(ns->prefix ? XMLCHAR_TO_CHAR(ns->prefix) : ""));
 
   UNPROTECT(1);
@@ -1125,7 +1126,7 @@ SEXP
 R_addXMLNodeFinalizer(SEXP r_node)
 {
 #ifdef XML_REF_COUNT_NODES /* ??? should this be ifndef or ifdef.??  */
-   xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
+//   xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
   R_RegisterCFinalizer(r_node, decrementNodeRefCount);
 #endif
   return(r_node);
@@ -1453,9 +1454,9 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
     if(xbuf->use > 0) {
         /*XXX this const char * in CHARSXP means we have to make multiple copies. */
      if(INTEGER(r_encoding_int)[0] == CE_NATIVE)
-        ans = ScalarString(CreateCharSexpWithEncoding(encoding, xbuf->content));
+        ans = ScalarString(CreateCharSexpWithEncoding((const xmlChar *)encoding, (const xmlChar *)xbuf->content));
      else
-        ans = ScalarString(mkCharCE(xbuf->content, INTEGER(r_encoding_int)[0]));
+        ans = ScalarString(mkCharCE((const char *)xbuf->content, INTEGER(r_encoding_int)[0]));
     } else
       ans = NEW_CHARACTER(1);
 
@@ -1484,7 +1485,7 @@ R_setXMLInternalTextNode_value(SEXP node, SEXP value)
 //   xmlChar *tmp;
    const char *str;
 
-   DECL_ENCODING_FROM_NODE(n)
+   // DECL_ENCODING_FROM_NODE(n)
 
    if(n->type != XML_TEXT_NODE) {
        PROBLEM  "Can only set value on an text node"
@@ -1492,7 +1493,7 @@ R_setXMLInternalTextNode_value(SEXP node, SEXP value)
    }
 
    str = CHAR(STRING_ELT(value, 0));
-   xmlNodeSetContent(n, str);
+   xmlNodeSetContent(n, (const xmlChar *)str);
     
    return(node);
 }
@@ -1533,7 +1534,7 @@ R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
      if(INTEGER(r_encoding)[0] == CE_NATIVE)
         ans = ScalarString(CreateCharSexpWithEncoding(encoding, tmp));
      else
-        ans = ScalarString(mkCharCE(tmp, INTEGER(r_encoding)[0]));
+        ans = ScalarString(mkCharCE((const char *)tmp, INTEGER(r_encoding)[0]));
 
 
      free(tmp);
@@ -1689,16 +1690,16 @@ R_xmlNode_removeFinalizers(SEXP r_node)
 SEXP
 R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
 {
-    const char * val;
+    const xmlChar * val;
     xmlNsPtr ns;
 
-    xmlDocPtr doc = (xmlDocPtr) r_doc == NULL_USER_OBJECT ? NULL : R_ExternalPtrAddr(r_doc);    
+    xmlDocPtr doc = (r_doc == NULL_USER_OBJECT) ? NULL : R_ExternalPtrAddr(r_doc);    
     xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
 
     if(Rf_length(r_ns) == 0)
 	return(NEW_CHARACTER(0));
 
-    val = CHAR_DEREF(STRING_ELT(r_ns, 0));
+    val = (const xmlChar *)CHAR_DEREF(STRING_ELT(r_ns, 0));
     
     ns = LOGICAL(r_asPrefix)[0] ? xmlSearchNs(doc, node, val) : xmlSearchNsByHref(doc, node, val);
 
@@ -1706,7 +1707,7 @@ R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
 	return(NEW_CHARACTER(0));
     else {
 	SEXP r_ans;
-	PROTECT(r_ans =  mkString(ns->href));
+	PROTECT(r_ans =  mkString((const char *)ns->href));
 	SET_NAMES(r_ans, mkString(ns->prefix ? XMLCHAR_TO_CHAR(ns->prefix) : ""));
 	UNPROTECT(1);
 	return(r_ans);
@@ -1717,7 +1718,7 @@ R_xmlSearchNs(SEXP r_doc, SEXP r_node, SEXP r_ns, SEXP r_asPrefix)
 USER_OBJECT_
 R_getChildByIndex(USER_OBJECT_ r_node, USER_OBJECT_ r_index, USER_OBJECT_ r_addFinalizer)
 {
-    xmlNodePtr node, parent, ptr;
+    xmlNodePtr node, ptr;
     int i = 0, idx;
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
     ptr = node->children;
@@ -1735,14 +1736,13 @@ R_getChildByIndex(USER_OBJECT_ r_node, USER_OBJECT_ r_index, USER_OBJECT_ r_addF
 USER_OBJECT_
 R_getChildByName(USER_OBJECT_ r_node, USER_OBJECT_ r_index, USER_OBJECT_ r_addFinalizer)
 {
-    xmlNodePtr node, parent, ptr;
-    int i = 0, idx;
+    xmlNodePtr node, ptr;
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
     ptr = node->children;
     const char *name = CHAR_DEREF(STRING_ELT(r_index, 0));
 
     while(ptr) {
-	if(ptr->name && strcmp(name, ptr->name) == 0)
+	if(ptr->name && strcmp(name, (const char *)ptr->name) == 0)
 	    break;
 	ptr = ptr->next;
     }
@@ -1787,14 +1787,14 @@ R_childStringValues(SEXP r_node, SEXP r_len, SEXP r_asVector, SEXP r_encoding, S
 
     for(i = 0, kid = node->children; kid && i < len; i++, kid = kid->next) {
 	tmp  = xmlNodeGetContent(kid);	
-	SEXP val = mkCharCE(tmp, encoding);
+	SEXP val = mkCharCE((const char *)tmp, encoding);
 	PROTECT(val);
 	if(asVector)
 	    SET_STRING_ELT(ans, i, val);
 	else
 	    SET_VECTOR_ELT(ans, i, ScalarString(val));
 	if(names && kid->name) {
-	    SET_STRING_ELT(names, i, mkCharCE(kid->name, encoding));
+	    SET_STRING_ELT(names, i, mkCharCE((const char *)kid->name, encoding));
 	}
 	UNPROTECT(1);
     }

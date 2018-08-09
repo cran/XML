@@ -290,7 +290,7 @@ RS_XML_getStructuredErrorHandler()
     SEXP ans;
     PROTECT(ans = NEW_LIST(2));
     SET_VECTOR_ELT(ans, 0, R_MakeExternalPtr(xmlGenericErrorContext, Rf_install("xmlGenericErrorContext"), R_NilValue));
-    SET_VECTOR_ELT(ans, 1, R_MakeExternalPtr(xmlStructuredError, Rf_install("xmlStructuredErrorFunc"), R_NilValue));
+    SET_VECTOR_ELT(ans, 1, R_MakeExternalPtr((void *)xmlStructuredError, Rf_install("xmlStructuredErrorFunc"), R_NilValue));
     UNPROTECT(1);
     return(ans);
 }
@@ -338,19 +338,19 @@ CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str)
 #ifdef HAVE_R_CETYPE_T
     cetype_t enc = CE_NATIVE;
 
-    if(encoding == (const xmlChar *) NULL || encoding == (const xmlChar *) "") {
+    if(encoding == (const xmlChar *) NULL || xmlStrcmp(encoding, (const xmlChar *) "")) {
   	    enc = CE_NATIVE;
-    } else if(xmlStrcmp(encoding, "UTF-8") == 0 || xmlStrcmp(encoding, "utf-8") == 0)
+    } else if(xmlStrcmp(encoding, (xmlChar *)"UTF-8") == 0 || xmlStrcmp(encoding, (xmlChar *)"utf-8") == 0)
 	    enc = CE_UTF8;
-    else if(xmlStrcmp(encoding, "ISO-8859-1") == 0 || xmlStrcmp(encoding, "iso-8859-1") == 0)
+    else if(xmlStrcmp(encoding, (xmlChar *)"ISO-8859-1") == 0 || xmlStrcmp(encoding, (xmlChar *)"iso-8859-1") == 0)
 	    enc = CE_LATIN1;
     else {
-	str = translateChar(mkChar(str));
+	str = (xmlChar *)translateChar(mkChar((const char *) str));
     }
 // REprintf("encoding: %d\n", enc);
-    ans = mkCharCE(str, enc);
+    ans = mkCharCE((const char *) str, enc);
 #else
-    ans = mkChar(str);
+    ans = mkChar((const char *) str);
 #endif
     return(ans);
 }

@@ -63,7 +63,7 @@ static const char * const nodeElementNames[] =  {
    uniqueness.  Ignore the next definition in the comment!
 #define SET_NODE_NAME(x, id) sprintf(x, "%d", id)
 */
-#define SET_NODE_NAME(x, id, node) sprintf(x, "%p", node)
+#define SET_NODE_NAME(x, id, node) sprintf(x, "%p", (void *)node)
 
 
 SEXP
@@ -84,19 +84,19 @@ makeHashNode(xmlNodePtr node, char *buf, SEXP env, R_XMLSettings *parserSettings
   PROTECT(ans = NEW_LIST(numEls));
   PROTECT(tmp = mkString(node->name ? XMLCHAR_TO_CHAR(node->name) : ""));
   if(node->ns) 
-    SET_NAMES(tmp, mkString(node->ns->prefix));
+    SET_NAMES(tmp, mkString((const char *)node->ns->prefix));
 
   SET_VECTOR_ELT(ans, i++, tmp);
   UNPROTECT(1);
 
   SET_VECTOR_ELT(ans, i++, RS_XML(AttributeList)(node, parserSettings));
-  SET_VECTOR_ELT(ans, i++, ScalarString(ENC_COPY_TO_USER_STRING(node->ns && node->ns->prefix ? XMLCHAR_TO_CHAR(node->ns->prefix) : "")));
+  SET_VECTOR_ELT(ans, i++, ScalarString(ENC_COPY_TO_USER_STRING(node->ns && node->ns->prefix ? node->ns->prefix: (const xmlChar *)"")));
      /* skip the children */
   i = 4; 
   SET_VECTOR_ELT(ans, i++, mkString(buf));
   SET_VECTOR_ELT(ans, i++, env);
   if(hasValue) 
-     SET_VECTOR_ELT(ans, i++, mkString(node->content));
+     SET_VECTOR_ELT(ans, i++, mkString((const char *)node->content));
   if(node->nsDef) 
     SET_VECTOR_ELT(ans, i++, processNamespaceDefinitions(node->nsDef, node, parserSettings));
 

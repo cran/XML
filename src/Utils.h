@@ -231,7 +231,8 @@ SEXP CreateCharSexpWithEncoding(const xmlChar *encoding, const xmlChar *str);
 /*
 #define COPY_TO_USER_STRING(x)  CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR (x))
 */
-#define COPY_TO_USER_STRING(x)  mkChar(CHAR_TO_XMLCHAR (x)) 
+// #define COPY_TO_USER_STRING(x)  mkChar(CHAR_TO_XMLCHAR (x)) 
+#define COPY_TO_USER_STRING(x)  mkChar((const char *) (x))
 #define ENC_COPY_TO_USER_STRING(x)  CreateCharSexpWithEncoding(encoding, CHAR_TO_XMLCHAR (x)) 
 #endif
 

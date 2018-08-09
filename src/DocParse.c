@@ -372,7 +372,9 @@ RS_XML(convertXMLDoc)(const char *fileName, xmlDocPtr doc, USER_OBJECT_ converte
  
     /* Insert the name of the file being processed */
     SET_VECTOR_ELT(rdoc, FILE_ELEMENT_NAME, NEW_CHARACTER(1));
-    SET_STRING_ELT(VECTOR_ELT(rdoc, FILE_ELEMENT_NAME), 0, ENC_COPY_TO_USER_STRING(doc->name ? XMLCHAR_TO_CHAR(doc->name) : fileName));
+    SET_STRING_ELT(VECTOR_ELT(rdoc, FILE_ELEMENT_NAME), 0,
+		   ENC_COPY_TO_USER_STRING(doc->name ? (const xmlChar*)doc->name : (const xmlChar*)fileName));
+    //SET_STRING_ELT(VECTOR_ELT(rdoc, FILE_ELEMENT_NAME), 0, ENC_COPY_TO_USER_STRING(doc->name ? XMLCHAR_TO_CHAR(doc->name) : fileName));
     SET_STRING_ELT(rdoc_el_names, FILE_ELEMENT_NAME, COPY_TO_USER_STRING("file"));
 
     /* Insert the XML version information */
@@ -1225,7 +1227,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames, US
     for(i = 0; i < count ; i++, ptr = ptr->next) {
 	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr, manageMemory));
 	if(addNames)
-	    SET_STRING_ELT(names, i, ENC_COPY_TO_USER_STRING(ptr->name ? XMLCHAR_TO_CHAR(ptr->name) : ""));
+	    SET_STRING_ELT(names, i, ENC_COPY_TO_USER_STRING(ptr->name ?  ptr->name : (const xmlChar *)""));
     }
     if(addNames)
 	SET_NAMES(ans, names);
@@ -1350,12 +1352,12 @@ RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
     xmlNodePtr node;
     int flags = INTEGER(r_flags)[0];
     int n;
-    xmlNodePtr prev, parent;
+    //xmlNodePtr prev, parent;
     SEXP ans = R_NilValue;
 
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-    prev = node->prev;
-    parent = node->parent;
+    //prev = node->prev;
+    //parent = node->parent;
 
     n = xmlXIncludeProcessTreeFlags(node, flags);
 

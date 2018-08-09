@@ -29,5 +29,6 @@ R_xmlSecCryptoShutdown()
     return(ScalarInteger(status));
 }
 #else
+// avoid a warning about an empty translation unit.
 static int foo;
 #endif

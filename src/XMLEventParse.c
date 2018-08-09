@@ -132,7 +132,7 @@ typedef struct {
 int
 RS_XML_readConnectionInput(void *context, char *buffer, int len)
 {
-  SEXP e, tmp, arg;
+  SEXP e, tmp, arg = R_NilValue /* -Wall */;
   int n;
   int errorOccurred;
   const char *str;
@@ -380,7 +380,7 @@ R_processBranch(RS_XMLParserData * rinfo,
 	  const xmlChar **ptr = p;
 	  for(i = 0; i < nb_attributes; i++, ptr += 5) {
 	    /*XXX does this get freed later on?*/
-            xmlSetProp(node, xmlStrdup(ptr[0]), getPropertyValue(ptr));
+            xmlSetProp(node, xmlStrdup(ptr[0]), (const xmlChar *)getPropertyValue(ptr));
 	  }
 	}
     }
@@ -439,7 +439,7 @@ R_endBranch(RS_XMLParserData *rinfo,
 
 	    PROTECT(args = NEW_LIST(1));
 	    if(tmp->doc == NULL) {
-		doc = xmlNewDoc("1.0");
+		doc = xmlNewDoc((const xmlChar*) "1.0");
 		initDocRefCounter(doc);
    	        xmlDocSetRootElement(doc, tmp);
 /*		fprintf(stderr, "<r:createDoc addr='%p'/>\n", doc); */
@@ -525,7 +525,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   PROTECT(tmp = NEW_CHARACTER(1));
   if(URI) {
      SET_STRING_ELT(tmp, 0, ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(URI))); 
-     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding,  ( (void*)prefix ? XMLCHAR_TO_CHAR(prefix) : "")))); 
+     SET_NAMES(tmp, ScalarString(CreateCharSexpWithEncoding(encoding,  ( (void*)prefix ? prefix : (const xmlChar *)"")))); 
   }
   SET_VECTOR_ELT(opArgs, 2, tmp);
   UNPROTECT(1);
@@ -576,12 +576,12 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
   PROTECT(args = NEW_LIST(2));
   SET_VECTOR_ELT(args, 0, ScalarString(ENC_COPY_TO_USER_STRING(localname)));
 
-  PROTECT(tmp = ScalarString(ENC_COPY_TO_USER_STRING((XMLCHAR_TO_CHAR(URI)) ? XMLCHAR_TO_CHAR(URI) : ""))); 
+  PROTECT(tmp = ScalarString(ENC_COPY_TO_USER_STRING(URI ? URI : (const xmlChar *)""))); 
   if(prefix)
       SET_NAMES(tmp, ScalarString(ENC_COPY_TO_USER_STRING(prefix)));
   SET_VECTOR_ELT(args, 1, tmp);
 
-  fun = findEndElementFun(localname, rinfo);
+  fun = findEndElementFun((const char *)localname, rinfo);
   if(fun)  {
       USER_OBJECT_ val = RS_XML(invokeFunction)(fun, args, rinfo->stateObject, rinfo->ctx);
       updateState(val, rinfo);
@@ -593,10 +593,12 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
 
 
 
+#if 0
 static void
 RS_XML(xmlSAX2StartDocument)(void *userData)
 {
 }
+#endif
 
 void
 RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion)

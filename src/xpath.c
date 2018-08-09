@@ -34,7 +34,7 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
 	  SET_NAMES(ref, mkString(el->name));
 #else
 	  PROTECT(ref = ScalarString(mkCharCE((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : "", encoding)));
-	  SET_NAMES(ref, ScalarString(mkCharCE(el->name, encoding)));
+	  SET_NAMES(ref, ScalarString(mkCharCE((const char *)el->name, encoding)));
 #endif
 	  SET_CLASS(ref, mkString("XMLAttributeValue"));
 	  UNPROTECT(1);
