@@ -70,9 +70,14 @@ typedef struct {
    char *elType;
 } HashGatherer;
 
+#if LIBXML_VERSION >= 20908
+# define CONST const
+#else
+# define CONST
+#endif
 
 static void
-getKeys(void *el, void *data, const xmlChar *name)
+getKeys(void *el, void *data, CONST xmlChar *name)
 {
    HashGatherer *d = (HashGatherer *)data;
    SET_STRING_ELT(d->names, d->pos, COPY_TO_USER_STRING(name));

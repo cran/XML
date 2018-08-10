@@ -248,12 +248,18 @@ struct ElementTableScanner {
   int counter;
 };
 
-#ifndef NO_XML_HASH_SCANNER_RETURN
-void *RS_xmlElementTableConverter(void *payload, void *data, const xmlChar *name);
-void* RS_xmlEntityTableConverter(void *payload, void *data, const xmlChar *name);
+#if LIBXML_VERSION >= 20908
+# define CONST const
 #else
-void RS_xmlElementTableConverter(void *payload, void *data, const xmlChar *name);
-void RS_xmlEntityTableConverter(void *payload, void *data, const xmlChar *name);
+# define CONST
+#endif
+
+#ifndef NO_XML_HASH_SCANNER_RETURN
+void *RS_xmlElementTableConverter(void *payload, void *data, CONST xmlChar *name);
+void* RS_xmlEntityTableConverter(void *payload, void *data, CONST xmlChar *name);
+#else
+void RS_xmlElementTableConverter(void *payload, void *data, CONST xmlChar *name);
+void RS_xmlEntityTableConverter(void *payload, void *data, CONST xmlChar *name);
 #endif
 
 
@@ -319,7 +325,7 @@ void*
 #else
 void
 #endif
-RS_xmlElementTableConverter(void *payload, void *data, const xmlChar *name)
+RS_xmlElementTableConverter(void *payload, void *data, CONST xmlChar *name)
 {
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
 
@@ -395,7 +401,7 @@ void*
 #else
 void
 #endif
-RS_xmlEntityTableConverter(void *payload, void *data, const xmlChar *name)
+RS_xmlEntityTableConverter(void *payload, void *data, CONST xmlChar *name)
 {
   struct ElementTableScanner *scanData = (struct ElementTableScanner *)data;
 

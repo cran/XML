@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-e18f3bf80764338a466acdb68644d341 *DESCRIPTION
+2d61357bf7137d8d6bc9e0121475941d *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -474,7 +474,7 @@ f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
 251c144c12ee1e31a84ff7ab6ada7687 *src/NodeGC.c
 bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
 7161feb34f46d2d229953c0d54c88b69 *src/RSCommon.h
-0281f618c7a9edfb827ad148bc58411a *src/RSDTD.c
+68547939e251293e36547f92fd2c1f09 *src/RSDTD.c
 d51866b3b7de881b366d5f57819156f6 *src/RSDTD.h
 c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
 f27dd2fba1b9a9b093188fb67f11795d *src/RUtils.c
@@ -488,7 +488,7 @@ bef497ee4c6ba12d0c8203008352b5ae *src/Utils.c
 b48f3f3aaf2b61de572462ae08bc9c3f *src/XMLTree.c
 06dff24eae84b53211ddb5d1ad52dfcb *src/fixNS.c
 2a1e9d2603aa6eba81a88659ece71cad *src/libxmlFeatures.c
-9f7d8dcc047cafd67a6e15e8c134dd9a *src/schema.c
+81640c3e9f304ec7b228a69de3bcd74f *src/schema.c
 ff5758f6e170478b002355c4061d7911 *src/xmlsecurity.c
 c3744694bf293018f41a826b2009ee1a *src/xpath.c
 5368924763bb56b2e73523bcdcbc4251 *testRemoveFinalizers.R
