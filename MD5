@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-9dd9fc41326cbb5c0d24ba193b9800f9 *DESCRIPTION
+2728f9824fc4df8cf450fa83b132192a *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -394,7 +394,7 @@ d3e3902ea4fe25d3857aa794dec075b0 *man/findXInclude.Rd
 9944244ef917edf863cfe0eb93bf6c1d *man/genericSAXHandlers.Rd
 3d95b1004bd3e03b0d136bf4b3be8eae *man/getChildrenStrings.Rd
 d1d52af8afbc713a165d0aa318259d49 *man/getEncoding.Rd
-149d11e4c86c3c0aa151ace7a560a4e9 *man/getHTMLLinks.Rd
+edd1b3222c5e5cbb6aa59b75b3fcd60b *man/getHTMLLinks.Rd
 f59f6290846bb3c59920def0f2e46cfd *man/getLineNumber.Rd
 82a238627dd84299c8dfcb0514ba0efa *man/getNodeSet.Rd
 508a146a4735eeb398e77bae4da33145 *man/getRelativeURL.Rd
@@ -412,8 +412,8 @@ ba3d9741b3731bec887a47f3cc2b6470 *man/parseURI.Rd
 50c24e96c73b558008a1f95d12ae91e7 *man/parseXMLAndAdd.Rd
 176d202aa4ba2469ef9bb1c826e2e7c4 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
-2c62b651f8a6c113f83b79c705c0cbbd *man/readHTMLList.Rd
-8d896e49227d1852b9ed76f9adbb444e *man/readHTMLTable.Rd
+6bb9a613d1ac1fdd1381dc0f2befe1c2 *man/readHTMLList.Rd
+1a28e659d861a5b131bdabe70e612cd6 *man/readHTMLTable.Rd
 8f81d16226120619817fa1a172679a08 *man/readKeyValueDB.Rd
 8d15b91eaa346f72664bbb62ab5455fc *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd
@@ -462,7 +462,7 @@ cf3cf99a84d8ec4908732863236efd58 *man/xmlToDataFrame.Rd
 ee3b71a6c94f5688b9563ddaa3cfd11c *man/xmlTreeParse.Rd
 8e63213e0feed979bc71b1124833a0a3 *man/xmlValue.Rd
 bda49c28041b1df112a3a0ae3d9100d3 *scrapingData.xml
-7d931a94163fd9d3c5694667bb2738b6 *src/DocParse.c
+81d2aeab3b1006505a2dc1b0aab33fed *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 9bd0dcb88a9f538c032b558fb976e825 *src/EventParse.c
 98a4d11fd70007448bf2c8f0e5278434 *src/EventParse.h

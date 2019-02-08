@@ -50,13 +50,13 @@ Duncan Temple Lang
 \seealso{
   \code{\link{getXIncludes}}
 }
-\examples{
+\examples{\donttest{ # site is flaky
   getHTMLLinks("http://www.omegahat.net")
 
   getHTMLLinks("http://www.omegahat.net/RSXML")
 
   unique(getHTMLExternalFiles("http://www.omegahat.net"))
-}
+}}
 \keyword{IO}
 \keyword{programming}
 

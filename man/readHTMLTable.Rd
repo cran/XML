@@ -153,6 +153,7 @@ if(any(i <- sapply(zz, function(x) if(is.null(x)) 0 else ncol(x)) == 14)) {
 # That site was non-responsive in June 2015,
 # and this does not do a good job on the current table.
 
+\donttest{
 doc <- "http://www.nber.org/cycles/cyclesmain.html"
 # The  main table is the second one because it's embedded in the page table.
 tables <- getNodeSet(htmlParse(doc), "//table")
@@ -163,7 +164,7 @@ xt <- readHTMLTable(tables[[2]],
                                    "character","character","character"),
                     trim = TRUE, stringsAsFactors = FALSE
                    )
-
+}
 if(FALSE) {
  # Here is a totally different way of reading tables from HTML documents.
  # The data are formatted using PRE and so can be read via read.table

@@ -1273,6 +1273,8 @@ makeSchemaReference(xmlSchemaPtr schema)
 */
 }
 
+// unused
+#define NO_XML_MEMORY_SHOW_ROUTINE 1
 
 #ifndef NO_XML_MEMORY_SHOW_ROUTINE
 void
