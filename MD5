@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-2728f9824fc4df8cf450fa83b132192a *DESCRIPTION
+fd345e7ba44cbfd48a80662512e86803 *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -78,14 +78,14 @@ e6e506d5fee0a21b59c2fddcf652699e *R/error.R
 7fe7e32f36e81ed725bd745a32d48d6b *R/flatTree.R
 5787c5a855a65a857873f3d15f48012c *R/getDependencies.R
 ac958547496ece97188299b4a5c0180b *R/getRelativeURL.R
-b91a444cc8d177556dd83fb4d8ebdf07 *R/hashTree.R
+a6bf923a5a5e66ca887ecd9dbccdab46 *R/hashTree.R
 c1001a4a49a44e593ae73d9dd2da4873 *R/htmlLinks.R
 9865b82f2c355021d696f2a219997dd3 *R/htmlLists.R
 31aba90b32ddddcf6c97822bd23cf283 *R/htmlParse.R
 319ad3af61d22bfb1b18b17889fea6c9 *R/keyValueDB.R
 87fc1f8084549a2a96aeac61d19ef396 *R/libxmlFeatures.R
 694bac4ce6060c28841e70a4715f0a33 *R/namespaceHandlers.R
-e9d76cabc61ce2459a6373d4a36f4bab *R/namespaces.R
+57957d2e3fe9252d2df2d88a70b9f1dc *R/namespaces.R
 3307eee14dee415df09f47be0fddb428 *R/nodeAccessors.R
 0a08d749c99681148ef8c635de0cd6cd *R/parseDTD.R
 ef3669c755c641d7d951e1e4f0913fd0 *R/parser.R
@@ -152,8 +152,8 @@ c1dff0ef16e9305052cacbdbdb2f9922 *Todo.xml
 ba06630f83ed709d4f5553e6ab2612f4 *checkLinks/checkLinks.R
 e580f0d358e8b11fc9e29e66e083376f *checkLinks/other_checkLinks.R
 b0777f8f8a90181ea55c9efd274ba7d3 *cleanup
-7f9dd6ec94e41c7c6c2a3bb49ed440c8 *configure
-72929643c8cf6f46369bd80252eaf773 *configure.in
+e9f2c29f85aba4c055d5bd7cfde95bdc *configure
+72929643c8cf6f46369bd80252eaf773 *configure.ac
 f99bbde173f150b8f35f06097f6d9662 *configure.win
 6cbbef73ce40214a62cfadf62d1caf6d *dotCalls
 1fc5d029b746693125eda5e6154585be *expat/GNUmakefile

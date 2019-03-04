@@ -77,7 +77,7 @@ function(ns, nsDefs, node, namespace, noNamespace, namespaceDefinitions = NULL, 
   if(noNamespace)
     return(NULL)
 
- if(is.character(namespace) && length(namespace) && !is.na(namespace) && namespace == "") {
+ if(is.character(namespace) && length(namespace) == 1L && !is.na(namespace) && namespace == "") {
    if(length(namespaceDefinitions) == 0)
        return(findNamespaceDefinition(node, ""))
  }
