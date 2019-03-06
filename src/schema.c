@@ -204,6 +204,7 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
     xmlSchemaValidCtxtPtr ctxt;
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
     xmlSchemaPtr schema = (xmlSchemaPtr) R_ExternalPtrAddr(r_schema);
+    int nprot = 0;
 //    ctxt = (xmlSchemaValidCtxtPtr) R_ExternalPtrAddr(r_ctxt);
 
     int status;
@@ -224,8 +225,7 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
 
     status = xmlSchemaValidateDoc(ctxt, doc);
     xmlSchemaFreeValidCtxt(ctxt); /* R_alloc this if possible. */
-    if(numErrHandlers > 0) 
-	UNPROTECT(1);
+    if(numErrHandlers > 0) UNPROTECT(1);
 
     return(ScalarInteger(status));
 }

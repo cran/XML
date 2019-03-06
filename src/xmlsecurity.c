@@ -30,5 +30,6 @@ R_xmlSecCryptoShutdown()
 }
 #else
 // avoid a warning about an empty translation unit.
+// instead, this gives one about an unused variable!
 static int foo;
 #endif

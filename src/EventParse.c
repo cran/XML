@@ -217,10 +217,10 @@ RS_XML(entityDeclarationHandler)(void *userData, const XML_Char *entityName,
    SET_VECTOR_ELT(opArgs, i,  NEW_CHARACTER(1));
    SET_STRING_ELT(VECTOR_ELT(opArgs, i), 0, ENC_COPY_TO_USER_STRING(xml_args[i] ? (const xmlChar *)xml_args[i] :  (const xmlChar *)"")); 
   }
-  UNPROTECT(1);
 
   RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "entityDeclaration"), 
                            (const char*)NULL, parserData, opArgs);
+  UNPROTECT(1);
 }
 
 
@@ -385,6 +385,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
  USER_OBJECT_ opArgs = NULL;
  RS_XMLParserData *parserData = (RS_XMLParserData*)userData; 
  DECL_ENCODING_FROM_EVENT_PARSER(parserData)
+ int nprot = 0;
 
    /* XXX Here is where we have to ignoreBlankLines and use the trim setting in parserData */
   if(parserData->current) {
@@ -432,9 +433,9 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
   }
 
   if(len > 0 || parserData->ignoreBlankLines == 0 ) {
-    PROTECT(opArgs = NEW_LIST(1));
-     SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
-     SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, ENC_COPY_TO_USER_STRING(tmpString));
+    PROTECT(opArgs = NEW_LIST(1)); nprot++;
+    SET_VECTOR_ELT(opArgs, 0, NEW_CHARACTER(1));
+    SET_STRING_ELT(VECTOR_ELT(opArgs, 0), 0, ENC_COPY_TO_USER_STRING(tmpString));
   }
 
   free(tmp);
@@ -444,9 +445,9 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
      */
 
   if(opArgs != NULL) {
-      RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "text"), (const char *)NULL, ((RS_XMLParserData*) userData), opArgs);
-     UNPROTECT(1);
+    RS_XML(callUserFunction)(HANDLER_FUN_NAME(parserData, "text"), (const char *)NULL, ((RS_XMLParserData*) userData), opArgs);
   }
+  UNPROTECT(nprot);
 }
 
 

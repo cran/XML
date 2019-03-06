@@ -137,6 +137,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
   int errorOccurred;
   const char *str;
   int left = len-1, count;
+  int nprot = 0;
 
 #ifdef R_XML_DEBUG
   char *orig = buffer;
@@ -162,12 +163,11 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
      if they gave us a connection. */
   if(isFunction(fun)) {
      /* Invoke the user-provided function to get the next line. */
-    PROTECT(e = allocVector(LANGSXP, 2));
+    PROTECT(e = allocVector(LANGSXP, 2)); nprot++;
     SETCAR(e, fun);
-    PROTECT(arg = NEW_INTEGER(1));
+    PROTECT(arg = NEW_INTEGER(1)); nprot++;
     INTEGER_DATA(arg)[0] = len;
     SETCAR(CDR(e), arg);
-    UNPROTECT(1);
   } else 
       e = fun;
 
@@ -183,7 +183,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
    tmp = R_tryEval(e, R_GlobalEnv, &errorOccurred);
 
    if(errorOccurred || !IS_CHARACTER(tmp)) {
-     UNPROTECT(1);
+     UNPROTECT(nprot);
      if ((ctx->sax != NULL) && (ctx->sax->error != NULL))  /* throw an XML error. */
            ctx->sax->error(ctx->userData, "Failed to call read on XML connection");
      return(-1);
@@ -222,7 +222,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
 /*  fprintf(stderr, "size (n=%d, count=%d) %s '%s'\n", n, count, str, orig);fflush(stderr); */
 #endif
 
-  UNPROTECT(1);
+  UNPROTECT(nprot);
 
 
   return(count);

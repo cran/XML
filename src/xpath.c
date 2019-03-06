@@ -9,19 +9,20 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
 {
   SEXP ans, expr = NULL, arg = NULL, ref;
   int i;
+  int nprot = 0;
 
   if(!obj)
      return(NULL_USER_OBJECT);
 
-  PROTECT(ans = NEW_LIST(obj->nodeNr));
+  PROTECT(ans = NEW_LIST(obj->nodeNr)); nprot++;
 
   if(GET_LENGTH(fun) && (TYPEOF(fun) == CLOSXP || TYPEOF(fun) == BUILTINSXP)) {
-    PROTECT(expr = allocVector(LANGSXP, 2));
+    PROTECT(expr = allocVector(LANGSXP, 2)); nprot++;
     SETCAR(expr, fun);
     arg = CDR(expr);
   } else if(TYPEOF(fun) == LANGSXP) {
     // change from Tomas Kalibera 2016-11-10
-    PROTECT(expr = duplicate(fun));
+    PROTECT(expr = duplicate(fun)); nprot++;
     arg = CDR(expr);
   }
 
@@ -31,6 +32,7 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
       if(el->type == XML_ATTRIBUTE_NODE) {
 #if 0
 	  PROTECT(ref = mkString((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : ""));
+	  nprot++;
 	  SET_NAMES(ref, mkString(el->name));
 #else
 	  PROTECT(ref = ScalarString(mkCharCE((el->children && el->children->content) ? XMLCHAR_TO_CHAR(el->children->content) : "", encoding)));
@@ -54,12 +56,10 @@ convertNodeSetToR(xmlNodeSetPtr obj, SEXP fun, int encoding, SEXP manageMemory)
   }
 
   // change from Tomas Kalibera 2016-11-10
-  if(expr)
-    UNPROTECT(1);
-  else
+  if(!expr)
     SET_CLASS(ans, mkString("XMLNodeSet"));
 
-  UNPROTECT(1);
+  UNPROTECT(nprot);
 
   return(ans);
 }

@@ -487,16 +487,19 @@ getNamespaceDefs(xmlNodePtr node, int recursive)
 	  USER_OBJECT_ tmp;
 	  int i;
 
+          PROTECT(nsDef); numProtects++;
 	  while(ptr) {
-	      tmp = getNamespaceDefs(ptr, 1);
+	      PROTECT(tmp = getNamespaceDefs(ptr, 1));
 /*	  nsDef = Rf_appendList(nsDef, tmp); */
 	      if(Rf_length(tmp)) {
 		  n = Rf_length(nsDef); 
 		  PROTECT(SET_LENGTH(nsDef, n + Rf_length(tmp)));
-		  numProtects++;
 		  for(i = 0; i < Rf_length(tmp); i++) 
 		      SET_VECTOR_ELT(nsDef, n + i, VECTOR_ELT(tmp, i));
-	      }
+                  UNPROTECT(3); /* old nsDef, tmp, new nsDef */
+                  PROTECT(nsDef);
+	      } else
+   	          UNPROTECT(1); /* tmp */
 	      ptr = ptr->next;
 	  }
       }
@@ -1212,6 +1215,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames, US
     xmlNodePtr ptr =  node->children;
     int addNames = LOGICAL(r_addNames)[0];
     DECL_ENCODING_FROM_NODE(node)
+    int nprot = 0;
 
     while(ptr) {
 	count++;
@@ -1220,9 +1224,11 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames, US
 
     ptr = node->children;
 
-    PROTECT(ans = NEW_LIST(count));
-    if(addNames) 
+    PROTECT(ans = NEW_LIST(count)); nprot++;
+    if(addNames) {
 	PROTECT(names = NEW_CHARACTER(count));
+	nprot++;
+    }
 
     for(i = 0; i < count ; i++, ptr = ptr->next) {
 	SET_VECTOR_ELT(ans, i, R_createXMLNodeRef(ptr, manageMemory));
@@ -1231,7 +1237,7 @@ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r_addNames, US
     }
     if(addNames)
 	SET_NAMES(ans, names);
-    UNPROTECT(1 + addNames);
+    UNPROTECT(nprot);
    
     return(ans);
 }
@@ -1481,7 +1487,7 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
    }
     SET_NAMES(ans, ans_names);
 
-    UNPROTECT(nonTrivialAttrNamespaces ? 4 : 4);
+    UNPROTECT(4);
    }
 #if 0
    else
@@ -1661,7 +1667,8 @@ R_findXIncludeStartNodes(SEXP r_root, SEXP manageMemory)
     PROTECT(ans = allocVector(VECSXP, 0));
 //    count = findXIncludeStartNodes(root, &ans, 0);
     count = addXInclude(root, &ans, 0, manageMemory) + processKids(root, &ans, 0, manageMemory);
-    UNPROTECT(count + 1);
+//    UNPROTECT(count + 1);
+    UNPROTECT(1);
     return(ans);
 }
 
