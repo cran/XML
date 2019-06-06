@@ -119,7 +119,7 @@ con$addTag("number", "582-3217")
 con$closeTag() # phone
 con$closeTag() # address
 
-saveXML(con$value(), file="out.xml")
+saveXML(con$value(), file=file.path(tempdir(), "out.xml"))
 
 
 # Work with entities

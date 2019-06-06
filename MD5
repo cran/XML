@@ -7,7 +7,7 @@ fc0788e66d9abcc645d921b584ea8275 *Bugs/memory.R
 cc46d376f15b65b2e979877f234b4f6a *Changes
 5ad14e0d49727cecee4feb2b133f2d0e *Check
 5dea0428fb5a0a9f76fb39256d171989 *CodeDetails
-8bee676234969dbb7d8353ac826d3ef9 *DESCRIPTION
+ac780297276fdda6a928f5aa9596056a *DESCRIPTION
 9a9fc8721d04e32253353f731880ec47 *DESCRIPTION.in
 1509ffea77dc0ee9bb8d3fcb004e0970 *Docs/CreatingXML.xml
 619252fca9e7941fddbefdf1a6ea3056 *Docs/GNUmakefile
@@ -417,7 +417,7 @@ d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
 8f81d16226120619817fa1a172679a08 *man/readKeyValueDB.Rd
 8d15b91eaa346f72664bbb62ab5455fc *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd
-9b8af92476fcac68220c4079db5cc6a8 *man/saveXML.Rd
+df82df78db3f9ea8798dcbef6cde88f9 *man/saveXML.Rd
 24b46bf8f25897bacbcb7915b3d54687 *man/schema-class.Rd
 d56bfed177c3648de5284ef766500b3a *man/setXMLNamespace.Rd
 e4ad747f474ff6a5c88c0abde7b069df *man/supportsExpat.Rd
@@ -449,7 +449,7 @@ be5f3c2c9f4878e8b4df61c6df89a38c *man/xmlParserContextFunction.Rd
 80e3c13f002de371997548f8ce932d6b *man/xmlRoot.Rd
 927722ec945cb55d1abb0e256f1b992e *man/xmlSchemaValidate.Rd
 37b7957855c872a54bb1c60abef9e0b3 *man/xmlSearchNs.Rd
-ca8a61d0e2d628408ff285efc93a68b1 *man/xmlSerializeHook.Rd
+c46b46924ef8c9ffa852eb614be70963 *man/xmlSerializeHook.Rd
 c8375f808943fcab2de24d71a8cd1f5d *man/xmlSize.Rd
 4b2da64130eb937287a0a2d1e35fe069 *man/xmlSource.Rd
 52b079e639f02b3e4780beed343de405 *man/xmlStopParser.Rd

@@ -60,10 +60,12 @@ hdoc = as(doc, "XMLHashTree")
 
 nodes = getNodeSet(doc, "//pred")
 
-saveRDS(list(a = 1:10, z = z, doc = doc, hdoc = hdoc, nodes = nodes), "tmp.rda",
+ff <- file.path(tempdir(), "tmp.rda")
+saveRDS(list(a = 1:10, z = z, doc = doc, hdoc = hdoc, nodes = nodes), ff,
           refhook = xmlSerializeHook)
 
-v = readRDS("tmp.rda", refhook = xmlDeserializeHook)
+v = readRDS(ff, refhook = xmlDeserializeHook)
+unlink(ff)
 }
 \keyword{IO}
 
