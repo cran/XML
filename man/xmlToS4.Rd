@@ -31,8 +31,8 @@ xmlToS4(node, obj = new(xmlName(node)), ...)
  \code{\link{makeClassTemplate}}  
 }
 \examples{
- txt =
- "<doc><part><name>ABC</name><type>XYZ</type><cost>3.54</cost><status>available</status></part></doc>"
+ txt = paste0("<doc><part><name>ABC</name><type>XYZ</type>',
+              <cost>3.54</cost><status>available</status></part></doc>")
  doc = xmlParse(txt)
 
  setClass("part", representation(name = "character",

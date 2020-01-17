@@ -80,7 +80,7 @@ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_d
       char *tmp;
       int len;
 
-      len = (ptr[4] - ptr[3] + 1);
+      len = (int)(ptr[4] - ptr[3] + 1);
       tmp = malloc(sizeof(char) * len);
       if(!tmp) {
          PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
@@ -192,7 +192,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
    if(GET_LENGTH(tmp)) {
 
       str = CHAR_DEREF(STRING_ELT(tmp, 0));
-      n = strlen(str);
+      n = (int)strlen(str);
 
 
       if(n != 0) { /* Just add a new line and do it again. */
@@ -265,7 +265,7 @@ RS_XML_xmlCreateConnectionParserCtxt(USER_OBJECT_ con)
 
 int
 RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_XML_ContentSourceType asText,
-                          int saxVersion)
+			 int saxVersion, USER_OBJECT_ r_encoding)
 {
  xmlSAXHandlerPtr xmlParserHandler;
  xmlParserCtxtPtr ctx; 
@@ -305,6 +305,11 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
   ctx->userData = parserData;
   ctx->sax = xmlParserHandler;
 
+  if(Rf_length(r_encoding) && STRING_ELT(r_encoding, 0) != R_NaString) { 
+//      Rf_PrintValue(r_encoding);
+      ctx->encoding = xmlStrdup((const xmlChar *)CHAR(STRING_ELT(r_encoding, 0)));
+  }
+
   status = xmlParseDocument(ctx);
 
   ctx->sax = NULL;
@@ -343,7 +348,7 @@ getPropertyValue(const xmlChar **ptr)
   int len;
   char *tmp;
 
-      len = (ptr[4] - ptr[3] + 1);
+  len = (int)(ptr[4] - ptr[3] + 1);
       tmp = malloc(sizeof(char) * len);
       if(!tmp) {
          PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
@@ -792,7 +797,7 @@ do_getEntityHandler(void *userData, const xmlChar *name, const char * r_funName)
 	    ans->name = xmlStrdup(name);
 	    ans->orig = NULL; // xmlStrdup(CHAR_TO_XMLCHAR(value));
 	    ans->content = xmlStrdup(CHAR_TO_XMLCHAR(value));	    
-	    ans->length = strlen(value);
+	    ans->length = (int)strlen(value);
 #ifndef NO_CHECKED_ENTITY_FIELD
 	    ans->checked = 1;
 #endif

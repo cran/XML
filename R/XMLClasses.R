@@ -2,7 +2,7 @@
 # This file contains the definitions of methods
 # for operating on the XMLNode objects to make
 # the more user-friendly.  Specifically, these
-# methods are 
+# methods are
 #       print   displays the contents of a node and children
 #               as XML text rather than R/S list
 #
@@ -12,7 +12,7 @@
 #
 #       attrs   retrieves the attributes element of the XML node
 #
-#    [ and [[   access the children 
+#    [ and [[   access the children
 #                 (To get at the regular R/S fields in the object, use $
 #                    e.g.  node$name, node$attributes, node$value)
 
@@ -24,7 +24,7 @@ setS3Method =
 function(fun, class) {
   if(!useS4)
     return()
-  
+
   cat("setting method for", fun, class, "\n")
   setMethod(fun, class, get(paste(fun, class, sep = ".")), where = topenv(parent.frame()))
 }
@@ -41,7 +41,7 @@ function(classes)
    methods::setOldClass(classes)
 }
 
-# For R 2.7.2 and older.  In 2.8.0, extends() for setOldClass() works 
+# For R 2.7.2 and older.  In 2.8.0, extends() for setOldClass() works
 # better.
 
 oldClassTable =  list(
@@ -58,7 +58,7 @@ oldClassTable =  list(
   "XMLHashTree" = c("XMLAbstractDocument"),
   "XMLInternalDocument" = c("XMLAbstractDocument"),
   "HTMLInternalDocument" = c("XMLInternalDocument", "XMLAbstractDocument"),
-  "XMLTreeNode" = c("RXMLAbstractNode")    
+  "XMLTreeNode" = c("RXMLAbstractNode")
 )
 
 
@@ -66,7 +66,7 @@ oldClassTable =  list(
 oldClass =
 function(class)
 {
-  if(version$major == "2" && as.integer(version$minor) >= 8) 
+  if(version$major == "2" && as.integer(version$minor) >= 8)
      return(unique(c(class, extends(class))))
 
    c(class, oldClassTable[[ class ]])
@@ -156,10 +156,13 @@ setAs("XMLDocument", "XMLInternalDocument",
        })
 
 
+###################
+
+
 ############
 
 #setMethod("[[", c("XMLInternalElementNode", "numeric") ,
-"[[.XMLInternalElementNode" = 
+"[[.XMLInternalElementNode" =
 function(x, i, j, ..., exact = NA, namespaces = xmlNamespaceDefinitions(x, simplify = TRUE), addFinalizer = NA)
 {
    if(is(i, "numeric"))
@@ -175,10 +178,10 @@ function(x, addNames = TRUE, ...)
  UseMethod("xmlChildren")
 }
 
-setGeneric("xmlParent", 
+setGeneric("xmlParent",
             function(x, ...)
                 standardGeneric("xmlParent"))
- 
+
 
 
 
@@ -189,7 +192,7 @@ xmlChildren.XMLNode <-
 #
 function(x, addNames = TRUE, ...)
 {
-  structure(x$children, class = "XMLNodeList")
+  structure(if(length(x$children)) x$children else list(), class = "XMLNodeList")
 }
 
 
@@ -208,8 +211,8 @@ function(node, full = FALSE)
   ns  = unclass(node)$namespace
   if(!full || is.null(ns) || ns == "")
     return(node$name)
-  
-  # 
+
+  #
   if(!is.character(ns)) {
     tmp = ns$id
   } else if(inherits(ns, "XMLNamespace"))
@@ -244,8 +247,8 @@ function(node, full = FALSE)
   ns  = unclass(node)$namespace
   if(!full || is.null(ns) || ns == "")
     return(node$name)
-  
-  # 
+
+  #
   if(!is.character(ns)) {
     tmp = ns$id
   } else if(inherits(ns, "XMLNamespace"))
@@ -295,12 +298,12 @@ function(x, ..., all = FALSE)
  if(all) # "all" %in% names(list(...)) && list(...)[["all"]] == TRUE)
    structure(obj[ names(obj) %in% list(...)[[1]] ], class = "XMLNodeList")
  else
-   structure(obj[...], class = "XMLNodeList") # NextMethod("[") 
+   structure(obj[...], class = "XMLNodeList") # NextMethod("[")
 }
 
 
 "[[.XMLDocumentContent" <-
-function(x, ...) 
+function(x, ...)
 {
   x$children[[...]]
 }
@@ -367,7 +370,7 @@ xmlSize.XMLNode <-
 #
 function(obj)
 {
-  length(obj$children) 
+  length(obj$children)
 }
 
 
@@ -376,7 +379,7 @@ function(x, ..., indent = "", tagSeparator = "\n")
 {
   if(is.logical(indent) && !indent)
     indent <- ""
-  
+
   cat(indent, "<!--", xmlValue(x), "-->", tagSeparator, sep="")
 }
 
@@ -390,7 +393,7 @@ function(x, ..., indent = "", tagSeparator = "\n")
     txt = xmlValue(x)
   else
     txt = insertEntities( xmlValue(x) )
-  
+
   cat(indent, txt, tagSeparator, sep="")
 }
 
@@ -424,28 +427,28 @@ print.XMLNode <-
 #
 # displays a node and attributes (and its children)
 # in its XML format.
-# 
+#
 function(x, ..., indent = "", tagSeparator = "\n")
 {
  if(length(xmlAttrs(x))) {
    tmp <- paste(names(xmlAttrs(x)),paste("\"", insertEntities(xmlAttrs(x)), "\"", sep=""), sep="=", collapse=" ")
- } else 
+ } else
    tmp <- ""
 
  if(length(x$namespaceDefinitions) > 0) {
     k = as(x$namespaceDefinitions, "character")
     ns = paste("xmlns", ifelse(nchar(names(k)), ":", ""), names(k), "=", ddQuote(k), sep = "", collapse = " ")
-#   ns <- paste(sapply(x$namespaceDefinitions, 
+#   ns <- paste(sapply(x$namespaceDefinitions,
 #                       function(x) {
 #                            paste("xmlns", if(nchar(x$id) > 0) ":" else "", x$id, "=", "\"", x$uri, "\"", sep="")
 #                       }), collapse=" ")
 
- } else 
+ } else
    ns <- ""
 
 
    # Add one space to the indentation level for the children.
-   # This will accumulate across successive levels of recursion. 
+   # This will accumulate across successive levels of recursion.
   subIndent <- paste(indent, " ", sep="")
   if(is.logical(indent) && !indent) {
     indent <- ""
@@ -455,13 +458,13 @@ function(x, ..., indent = "", tagSeparator = "\n")
 
     if (length(xmlChildren(x)) == 0) {
       ## Empty Node - so difference is <nodename />
-      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
-          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, "/>", tagSeparator, 
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "",
+          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, "/>", tagSeparator,
           sep = ""), sep = "")
     } else if (length(xmlChildren(x))==1 &&
                inherits(xmlChildren(x)[[1]],"XMLTextNode")) {
       ## Sole child is text node, print without extra white space.
-      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "",
           " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">",
           sep = ""), sep = "")
       kid = xmlChildren(x)[[1]]
@@ -469,17 +472,17 @@ function(x, ..., indent = "", tagSeparator = "\n")
         txt = xmlValue(kid)
       else
         txt = insertEntities( xmlValue(kid) )
-      
+
       cat(txt,sep="")
-      cat(paste("</", xmlName(x, TRUE), ">", tagSeparator, 
+      cat(paste("</", xmlName(x, TRUE), ">", tagSeparator,
           sep = ""), sep = "")
     } else {
-      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "", 
-          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">", tagSeparator, 
+      cat(indent, paste("<", xmlName(x, TRUE), ifelse(tmp != "",
+          " ", ""), tmp, ifelse(ns != "", " ", ""), ns, ">", tagSeparator,
           sep = ""), sep = "")
       for (i in xmlChildren(x))
         print(i, indent = subIndent, tagSeparator = tagSeparator)
-      cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator, 
+      cat(indent, paste("</", xmlName(x, TRUE), ">", tagSeparator,
           sep = ""), sep = "")
     }
 }
@@ -489,7 +492,7 @@ function(x, ..., indent="", tagSeparator = "\n")
 {
   if(is.logical(indent) && !indent)
     indent <- ""
-  
+
   cat(indent, x$value)
 }
 
@@ -500,7 +503,7 @@ function(x, ..., indent="", tagSeparator = "\n")
 {
   if(is.logical(indent) && !indent)
     indent <- ""
-  
+
  cat(indent, "<![CDATA[", tagSeparator, sep = "")
    # Want new lines in value to be replaced by paste("\n", indent, sep="")
  cat(indent, x$value, sep = "")
@@ -513,7 +516,7 @@ function(x, ..., indent="", tagSeparator = "\n")
 {
   if(is.logical(indent) && !indent)
     indent <- ""
-  
+
  cat(indent, paste("<?", x$name," ", x$value, "?>", tagSeparator, sep=""), sep = "")
 }
 
@@ -527,16 +530,16 @@ function(el, name, recursive = FALSE)
 {
     kids = xmlChildren(el)
     idx  =  (names(kids) == name)
-    els  = kids[idx]    
+    els  = kids[idx]
 #    idx <-  (names(el$children) == name)
 #    els = el$children[idx]
 
     if(!recursive  || xmlSize(el) == 0)
       return(els)
-    
+
     subs = xmlApply(el, xmlElementsByTagName, name, TRUE)
     subs = unlist(subs, recursive = FALSE)
-    
+
     append(els, subs[!sapply(subs, is.null)])
   }
 
@@ -551,19 +554,19 @@ function(doc, ns = xmlNamespaceDefinitions(doc, simplify = simplify), simplify =
      ns[i]
   else
      character()
-  
+
 #  val = unlist(sapply(ns, function(x) if(x$id == "") x$uri))
 #  if(length(val))
 #     val[1]
-#  else   
+#  else
 #     character()
-}  
+}
 
 matchNamespaces =
   # d = xmlTreeParse("data/namespaces.xml", useInternal = TRUE)
   #   "omg"
   #   c("ns", "omegahat", "r")
-  #   c("ns", omegahat = "http://www.omegahat.net", "r")  
+  #   c("ns", omegahat = "http://www.omegahat.net", "r")
   #   c("ns" = "http://www.omegahat.net", "omg" = "http://www.omegahat.net/XML", "r")
   #
   #  Error because z and rs are not defined in the document.
@@ -606,7 +609,7 @@ function(doc, namespaces,
 
    # which need to be fixed up.
   i = (names(namespaces) == "")
-  
+
   if(any(i)) {
 
      # from parameters now: nsDefs = xmlNamespaceDefinitions(xmlRoot(doc), recursive = TRUE)
@@ -622,7 +625,7 @@ function(doc, namespaces,
       warning(e)
       i[1] = FALSE
     }
-    
+
     if(sum(i) > 0) {
            # So there is at least one namespace without a name.
 
@@ -639,12 +642,12 @@ function(doc, namespaces,
            stop("cannot find defined namespace(s) with prefix(es) ", paste(namespaces[i][is.na(idx)], collapse = ", "))
         names(namespaces)[i] = namespaces[i]
         namespaces[i] = sapply(nsDefs[idx], function(x) x$uri)
-      
+
       #  warning("namespaces without a name/prefix are not handled as you might expect in XPath. Use a prefix")
     } else if(length(defaultNs) == 0)
         stop("There is no default namespace on the target XML document")
   }
-  
+
   if(!is.character(namespaces) || ( length(namespaces) > 1 && length(names(namespaces)) == 0))
      stop("Namespaces must be a named character vector")
 
@@ -652,7 +655,7 @@ function(doc, namespaces,
      warning("namespaces without a name/prefix are not handled as you might expect in XPath. Use a prefix")
 
   namespaces
-}  
+}
 
 
 
@@ -672,33 +675,43 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
                          addFinalizer = addFinalizer)
 
     # Taken from sapply
-    if (simplify && length(answer) && length(common.len <- unique(unlist(lapply(answer, 
+    if (simplify && length(answer) && length(common.len <- unique(unlist(lapply(answer,
         length)))) == 1) {
-        if (common.len == 1) 
+        if (common.len == 1)
             unlist(answer, recursive = FALSE)
-        else if (common.len > 1) 
-            array(unlist(answer, recursive = FALSE), dim = c(common.len, 
-                length(answer)), dimnames = if (!(is.null(n1 <- names(answer[[1]])) & 
-                is.null(n2 <- names(answer)))) 
+        else if (common.len > 1)
+            array(unlist(answer, recursive = FALSE), dim = c(common.len,
+                length(answer)), dimnames = if (!(is.null(n1 <- names(answer[[1]])) &
+                is.null(n2 <- names(answer))))
                 list(n1, n2))
         else answer
     }
-    else answer  
+    else answer
 }
 
 xpathApply =
   #
-  # the caller can give the same prefixes of the namespaces defined in 
+  # the caller can give the same prefixes of the namespaces defined in
   # the target document as simple names.
   #
   #   xpathApply(d, "/o:a//c:c", fun = NULL, namespaces = c("o", "c"))
   #
   #
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, addFinalizer = NA)
+          resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list())
 {
   UseMethod("xpathApply")
-}  
+}
+
+
+xpathApply.XMLNode =
+function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
+          resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list())
+{
+   stop("xpathApply/xpathSApply/getNodeSet require an XML/HTML internal document or node. Use xmlParse() or htmlParse()")
+}
+
+
 
 toXMLNode =
   #
@@ -712,14 +725,14 @@ function(x, ...)
 
 xpathApply.XMLNode =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE)
+          resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list(), .node = NULL, noMatchOkay = FALSE)
 {
   idoc = xmlParse(saveXML(doc), asText = TRUE)
   ans = xpathApply(idoc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces,
-                        .node = .node, noMatchOkay = noMatchOkay)
+                        .node = .node, noMatchOkay = noMatchOkay, xpathFuns = xpathFuns)
 
   # Now convert the results
-  if(length(ans)) 
+  if(length(ans))
      ans = lapply(ans, toXMLNode)
 
   ans
@@ -728,7 +741,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
 
 xpathApply.XMLInternalDocument =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, addFinalizer = NA, .node = NULL, noMatchOkay = FALSE, 
+          resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list(), .node = NULL, noMatchOkay = FALSE,
            sessionEncoding = CE_NATIVE, noResultOk = FALSE) # native
 {
   path = paste(path, collapse = " | ")
@@ -736,16 +749,16 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
   if(is(namespaces, "list") && all(sapply(namespaces, is, "XMLNamespaceDefinition"))) {
      namespaces = structure(sapply(namespaces, `[[`, "uri"), names = names(namespaces))
   }
-    
+
   if(resolveNamespaces && !inherits( namespaces, "XMLNamespaceDefinitions"))
     namespaces = matchNamespaces(doc, namespaces)
-  
+
   if(!is.null(fun) && !is.call(fun))
     fun = match.fun(fun)
 
   # create an expression of the form fun(x, ...) and the C code will insert x for each node.
   args = list(...)
-  if(length(args))  
+  if(length(args))
     fun = as.call(c(fun, append(1, args)))
 
 
@@ -755,7 +768,14 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
              else
                 getEncodingREnum(sessionEncoding)
 
-  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, encoding, addFinalizer, PACKAGE = "XML")
+  anonFuns = NULL
+  if(is.character(xpathFuns))
+      xpathFuns = as.list(xpathFuns)
+  else
+      anonFuns = xpathFuns[ vapply(xpathFuns, is.function, FALSE) ]
+
+
+  ans = .Call("RS_XML_xpathEval", doc, .node, as.character(path), namespaces, fun, encoding, addFinalizer, xpathFuns, anonFuns, PACKAGE = "XML")
 
   if(!noMatchOkay && length(ans) == 0 && length(getDefaultNamespace(xmlRoot(doc))) > 0) {
     tmp = strsplit(path, "/")[[1]]
@@ -773,10 +793,10 @@ function(node, addFinalizer = TRUE)
 {
   if(!is(node, "XMLInternalElementNode"))
     stop("xmlDoc must be passed an internal XML node")
-  
+
   doc = .Call("RS_XML_createDocFromNode", node, PACKAGE = "XML")
   addDocFinalizer(doc, addFinalizer)
-  
+
   doc
 }
 
@@ -790,7 +810,7 @@ xpathApply.XMLInternalNode =
   #
   #  There are several situations here.
   #  We/libxml2 needs a document to search.
-  #  We have a node. If we use its document, all is fine, but the 
+  #  We have a node. If we use its document, all is fine, but the
   #  search will be over the entire document.  We may get nodes from other sub-trees
   #  that do not pertain to our starting point (doc).
   #  Alternatively, we can create a new doc with this node as the top-level node
@@ -810,7 +830,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
     # This is a wholesale copy.
   addDocAttribute = TRUE
   doc = xmlDoc(doc, TRUE)
-  
+
      #
      # If the doc is already there, can't we just use that without copying it? Yes.
      # XXX maybe not. Looks like libxml2 starts at the top of the doc again.
@@ -822,7 +842,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
      # Then need to add it to the results.
 if(FALSE) {
   tmp = as(doc, "XMLInternalDocument")
-  addDocAttribute = is.null(tmp)    
+  addDocAttribute = is.null(tmp)
   if(is.null(tmp)) {
      if(!is.null(attr(doc, "document")))
        doc = attr(doc, "document")
@@ -836,7 +856,7 @@ if(FALSE) {
 
   if(addDocAttribute && length(ans))
     ans = lapply(ans, function(x) { attr(x, "document") = doc; x})
-  
+
   ans
 }
 } # end if if(FALSE)
@@ -847,16 +867,16 @@ getRootNode =
 function(node)
 {
   p = node
-  while(!is.null(xmlParent(p))) 
+  while(!is.null(xmlParent(p)))
     p = xmlParent(p)
 
   p
 }
 
 xpathApply.XMLInternalNode =
-xpathSubNodeApply =  
+xpathSubNodeApply =
   #
-  # This allows us to use XPath to search within a sub-tree of the document, i.e. 
+  # This allows us to use XPath to search within a sub-tree of the document, i.e.
   # from a particular node.
   # This is slightly tricky because the libxml2 routines require a document to search.
   # We could copy the nodes to a new document, e.g.
@@ -877,18 +897,18 @@ xpathSubNodeApply =
   #   a) put the node back where it came from and b) free the document.
   #  So there is no memory leak.
   #
-  #  The other thing we must do is to find the 
+  #  The other thing we must do is to find the
   #
-  # 
+  #
   # This version avoids doing any copying of nodes when there is a document already
   # associated with the nodes.
   #
 function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-           resolveNamespaces = TRUE, addFinalizer = NA)
+           resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list())
 {
   path = paste(path, collapse = " | ")
-  
+
   node = doc
 
   addDocAttribute = FALSE
@@ -904,13 +924,13 @@ function(doc, path, fun = NULL, ...,
       else if(!is.null(info$parent))
         addChildren(info$parent, node)
       else if(!is.null(tmp))
-        addChildren(tmp, node)        
+        addChildren(tmp, node)
     }
   info = list(parent = xmlParent(node),
               left = getSibling(node, after = FALSE),
-              right = getSibling(node, after = TRUE))     
-  
- 
+              right = getSibling(node, after = TRUE))
+
+
        # The approaches here are to create a new empty document and then set the node
        # to be its root. We don't set the document for each of the sub-nodes but just this
        # top-level node. Then we arrange that when we end this function, we discard the
@@ -924,7 +944,7 @@ function(doc, path, fun = NULL, ...,
        #     If it is not, put to the right.
        # Need to make certain the resulting nodes have the original document
        # Use xmlSetTreeDoc rather than node->doc = node as this is recursive.
-       # And so this is now all done in the on.exit() via the call to RS_XML_setDocEl()  
+       # And so this is now all done in the on.exit() via the call to RS_XML_setDocEl()
 #    doc = newXMLDoc(node = node, addFinalizer = getNativeSymbolInfo("R_xmlFreeDocLeaveChildren")$address)
 
     doc = newXMLDoc(addFinalizer = FALSE)
@@ -936,19 +956,19 @@ function(doc, path, fun = NULL, ...,
                                         # Need to create a new document with the current node as the root.
                                         # When we are finished, we have to ensure that we put the node back into the original document
                                         # We can use the same mechanism as when we have to create the document from scratch.
-               .Call("RS_XML_setDocEl", node, tmp, PACKAGE = "XML") 
+               .Call("RS_XML_setDocEl", node, tmp, PACKAGE = "XML")
               }
               putBack(node, info)
             })
 
     docName(doc) = paste("created for xpathApply for", path, "in node", xmlName(node))
-   
 
-  ans = xpathApply(doc, path, NULL, namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer)
+
+  ans = xpathApply(doc, path, NULL, namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer, xpathFuns = xpathFuns)
 
   if(length(ans) == 0)
     return(ans)
-  
+
     # now check if the result was actually a descendant of our top-level node for this
     # query. It is possible that it arose from a different sub-tree.
 
@@ -963,7 +983,7 @@ function(doc, path, fun = NULL, ...,
 #       # Need to remove the links  from these nodes to the parent.
 #    lapply(ans, function(x) .Call("RS_XML_unsetDoc", x, unlink = FALSE, TRUE))
 
-  
+
   if(!is.null(fun))
      lapply(ans, fun, ...)
   else
@@ -976,32 +996,32 @@ if(TRUE)
 xpathApply.XMLInternalNode =
 function(doc, path, fun = NULL, ...,
           namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-           resolveNamespaces = TRUE, addFinalizer = NA)
+           resolveNamespaces = TRUE, addFinalizer = NA, xpathFuns = list())
 {
   ndoc = as(doc, "XMLInternalDocument")
   if(is.null(ndoc))
-    xpathSubNodeApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer)
+    xpathSubNodeApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, addFinalizer = addFinalizer, xpathFuns = xpathFuns)
   else
     xpathApply.XMLInternalDocument(ndoc, path, fun, ...,
                                  namespaces = namespaces, resolveNamespaces = resolveNamespaces,
-                                 .node = doc, addFinalizer = addFinalizer)
+                                 .node = doc, addFinalizer = addFinalizer, xpathFuns = xpathFuns)
 }
 
 
 xpathApply.XMLDocument =
-#xpathApply.XMLNode =  
+#xpathApply.XMLNode =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
-          resolveNamespaces = TRUE, .node = NULL, addFinalizer = NA)
+          resolveNamespaces = TRUE, .node = NULL, addFinalizer = NA, xpathFuns = list())
 {
   txt = saveXML(doc)
   doc = xmlParse(txt, asText = TRUE)
   ans = xpathApply(doc, path, fun, ..., namespaces = namespaces, resolveNamespaces = resolveNamespaces, .node = .node,
-                     addFinalizer = addFinalizer)
+                     addFinalizer = addFinalizer, xpathFuns = xpathFuns)
 
-  if(length(ans)) 
+  if(length(ans))
      ans = lapply(ans, toXMLNode)
 
-  ans  
+  ans
  # stop("XPath expressions cannot be applied to R-level nodes. Use xmlParse() to process the document and then use xpathApply()")
 }
 
@@ -1033,8 +1053,8 @@ function(x, fun = NULL, ..., addFinalizer = NA, count = -1L)
 
     if(count > 0 && length(ans) == count)
       break
-    
-    tmp = xmlParent(tmp, addFinalizer = addFinalizer)    
+
+    tmp = xmlParent(tmp, addFinalizer = addFinalizer)
   }
   ans
-}  
+}

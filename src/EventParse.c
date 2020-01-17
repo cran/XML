@@ -89,7 +89,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
                  USER_OBJECT_ trim, USER_OBJECT_ useExpat, USER_OBJECT_ stateObject,
                   USER_OBJECT_ replaceEntities, USER_OBJECT_ validate, USER_OBJECT_ saxVersion,
 	      USER_OBJECT_ branches, USER_OBJECT_ useDotNames, USER_OBJECT_ errorFun,
-              USER_OBJECT_ manageMemory)
+              USER_OBJECT_ manageMemory, USER_OBJECT_ r_encoding)
 {
 #ifdef LIBEXPAT
   FILE *file = NULL;
@@ -168,7 +168,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
    xmlSubstituteEntitiesDefault(LOGICAL_DATA(replaceEntities)[0]);   
 #endif
 
-  status = RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0]);
+  status = RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0], r_encoding);
 
 /* How about using R_alloc() here so that it is freed, i.e. for the fileName and the parserData itself. */
   ans = parserData->stateObject ? parserData->stateObject : handlers;
@@ -178,9 +178,9 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
   if(parserData->stateObject && parserData->stateObject != NULL_USER_OBJECT)
      R_ReleaseObject(parserData->stateObject);
 
-  if(status != 0) {
-    RSXML_structuredStop(errorFun, NULL);
-  }
+  if(status != 0) 
+     RSXML_structuredStop(errorFun, NULL);
+
 
   /* free(parserData); Now using R_alloc */
 
@@ -358,7 +358,7 @@ fixedTrim(char *str,  int len, int *start, int *end)
     return(str);
 
    /* Jump to the end */
-  tmp = str + len - 2;
+  tmp = str + len - 2;  // DTL has 1
   while(tmp >= str && isspace(*tmp)) {
       tmp--;
       (*end)--;
@@ -429,7 +429,7 @@ RS_XML(textHandler)(void *userData,  const XML_Char *s, int len)
  
   if(parserData->trim) {
     tmpString = trim(tmpString);
-    len = strlen(tmpString);
+    len = (int) strlen(tmpString);
   }
 
   if(len > 0 || parserData->ignoreBlankLines == 0 ) {

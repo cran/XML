@@ -5,6 +5,10 @@
 # by doubling the space. This makes things a lot faster
 # for large trees.
 
+utils::globalVariables(c('e', 'idx', 'nodeNames', 'nodeSet', 'parentCount'))
+## nothing here is exported.
+
+if(FALSE){
 xmlFlatListTree =
 function(nodes = list(),
          parents = character(), children = list(),
@@ -14,20 +18,20 @@ function(nodes = list(),
     # To make things reasonably fast, we store the nodes in a pre-allocated list
 
   env = structure(env, class = c("XMLFlatListTree", "XMLFlatTree"))
-  
+
   assign("nodeSet", vector("list", n), env)
   assign("idx", 1, env)
   assign("parentCount", 0, env)
 
-  assign("nodeNames", character(n), env)  
+  assign("nodeNames", character(n), env)
   assign("parents", character(n), env)
 
 
-  #XXX Deal with this if parents is specified.  
-  
+  #XXX Deal with this if parents is specified.
+
   # Assign the parents and children values and fill in any orphans, etc.
   # after calling addNode for the different nodes.
-  
+
   if(!exists(".nodes", env))
     env$.nodes <- env #?
 
@@ -36,24 +40,24 @@ function(nodes = list(),
     # identifier.
   f = function(suggestion = "") {
      if(suggestion == "" || suggestion %in% nodeNames)
-        as.character(idx + 1)  
+        as.character(idx + 1)
      else
         suggestion
   }
   environment(f) = env
-  
+
   assign( ".nodeIdGenerator", f, env)
 
-  
-  g = addParentNode  
+
+  g = addParentNode
   environment(g) = env
   assign(".addParentNode", g, env)
 
-  
+
   assign(".this", env, env)
   assign("n", n, env)
 
-  
+
   addNode = function(node, parentId) {
     node = asXMLTreeNode(node, .this)
     id = node$id
@@ -61,24 +65,24 @@ function(nodes = list(),
        # Put it in the nodeSet by position.
     nodeSet[[ idx ]] <<- node
     nodeNames[idx] <<- id
-    
+
     idx <<- idx + 1
 
     if(inherits(parentId, "XMLTreeNode"))
       parentId = parentId$id
-    
+
     if(length(parentId)) {
       parentCount <<- parentCount + 1
       .parents[ parentCount ] <<- parentId
       names(.parents)[parentCount] <<- id
 
       .children [[ parentId ]] <<- c(.children[[ parentId ]], id )
-    }    
+    }
     if(idx == n) {
       n <<- 2*n
       length(nodeSet) <<- n
     }
-      
+
     return(node)
   }
   environment(addNode)  = env
@@ -114,7 +118,7 @@ function(nodes = list(),
    function() {
       idx <- idx - 1
       length(nodeSet) <- idx
-      length(nodeNames) <- idx 
+      length(nodeNames) <- idx
       names(nodeSet) <- nodeNames
       .nodes <<- nodeSet
       idx
@@ -132,7 +136,7 @@ function(x, skip = TRUE, ...)
 {
   #XXX
    stop("not implemented")
-}  
+}
 
 
 
@@ -171,7 +175,7 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
 {
   # Assign the parents and children values and fill in any orphans, etc.
   # after calling addNode for the different nodes.
-  
+
   if(!exists(".nodes", env))
     env$.nodes <- env
 
@@ -185,10 +189,10 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
         suggestion
   }
   environment(f) = env
-  
+
   assign( ".nodeIdGenerator", f, env)
 
-  g = addParentNode  
+  g = addParentNode
   environment(g) = env
   assign(".addParentNode", g, env)
 
@@ -197,7 +201,7 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
   addNode = function(node, parentId) {
     node = asXMLTreeNode(node, .this)
     id = node$id
-    
+
     if(length(parentId)) {
       .parents[ id ] <<- parentId
       .children [[ parentId ]] <<- c(.children[[ parentId ]], id )
@@ -208,7 +212,7 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
   }
   environment(addNode)  = env
   env$.addNode <- addNode
-  
+
   ids = names(nodes)
   nodes = lapply(seq(along = nodes),
                   function(i) {
@@ -229,10 +233,10 @@ function(nodes = list(), parents = character(), children = list(), env = new.env
 
   env$.parents = parents
   env$.children = children
-  
+
   structure(env, class = c("XMLSimpleFlatTree", "XMLFlatTree"))
 }
-
+}
 
 
 

@@ -28,7 +28,7 @@ function(x, skip = TRUE, ...)
      if(any(which)) {
        which <- (1:length(x$children))[which]
        a <- x$children[[which[1]]]
-     } 
+     }
   }
 
  a
@@ -53,10 +53,10 @@ function(X, FUN, ...)
   UseMethod("xmlSApply")
 }
 
-xmlApply.XMLNode <- 
-function(X, FUN, ...) { 
-  lapply(xmlChildren(X), FUN, ...) 
-} 
+xmlApply.XMLNode <-
+function(X, FUN, ...) {
+  lapply(xmlChildren(X), FUN, ...)
+}
 
 
 xmlApply.XMLDocument <-
@@ -72,10 +72,10 @@ function(X, FUN, ...)
 }
 
 
-xmlSApply.XMLNode <- 
-function(X, FUN, ...) { 
-  sapply(xmlChildren(X), FUN, ...) 
-} 
+xmlSApply.XMLNode <-
+function(X, FUN, ...) {
+  sapply(xmlChildren(X), FUN, ...)
+}
 
 xmlApply.XMLDocumentContent <-
 function(X, FUN, ...)
@@ -90,7 +90,7 @@ function(X, FUN, ...)
 }
 
 
-xmlValue <- 
+xmlValue <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
  UseMethod("xmlValue")
@@ -101,7 +101,7 @@ if(useS4)
         standardGeneric("xmlValue"))
 
 
-xmlValue.XMLNode <- 
+xmlValue.XMLNode <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
  if(recursive && xmlSize(x) > 0) {
@@ -115,7 +115,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
     if(any(i))
       return(paste(unlist(lapply(xmlChildren(x)[i], xmlValue, ignoreComments, trim = trim)), collapse = ""))
  }
- 
+
  # if(xmlSize(x) == 1) # && (inherits(x[[1]], "XMLTextNode"))
  #    return(xmlValue(x[[1]], ignoreComments))
 
@@ -127,7 +127,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
 
 setS3Method("xmlValue", "XMLNode")
 
-xmlValue.XMLTextNode <- 
+xmlValue.XMLTextNode <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
   if(!is.null(x$value))
@@ -152,7 +152,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
 
 setS3Method("xmlValue", "XMLCommentNode")
 
-xmlValue.XMLCDataNode <- 
+xmlValue.XMLCDataNode <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
   if(trim) trim(x$value) else x$value
@@ -160,13 +160,25 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
 
 setS3Method("xmlValue", "XMLCDataNode")
 
-xmlValue.XMLProcessingInstruction <- 
+xmlValue.XMLProcessingInstruction <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
   if(trim) trim(x$value) else x$value
 }
 
 setS3Method("xmlValue", "XMLProcessingInstruction")
+
+
+xmlValue.list = xmlValue.XMLNodeSet =
+function (x, ignoreComments = FALSE, recursive = TRUE, encoding = if(length(x)) getEncoding(x[[1]]) else "",
+    trim = FALSE)
+{
+  sapply(x, xmlValue, recursive = recursive, encoding = encoding, trim = trim)
+}
+
+setS3Method("xmlValue", "XMLNodeSet")
+
+
 
 "xmlValue.NULL" =
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
@@ -197,12 +209,12 @@ xmlNamespaceDefinitions.XMLInternalDocument =
 function(x, addNames = TRUE, recursive = FALSE, simplify = FALSE, ...)
 {
   r = xmlRoot(x, addFinalizer = FALSE)
-  while(!is.null(r) && !inherits(r, "XMLInternalElementNode")) 
+  while(!is.null(r) && !inherits(r, "XMLInternalElementNode"))
      r = getSibling(r, addFinalizer = FALSE)
 
   if(is.null(r))
     return(if(simplify) character() else NULL)
-  
+
   xmlNamespaceDefinitions(r, addNames, recursive, simplify)
 }
 
@@ -227,7 +239,7 @@ xmlNamespaceDefinitions.XMLNode =
     if(simplify) {
       if(length(ans) == 0)
         return(character())
-      
+
       ans = structure(sapply(ans, function(x) x$uri),
                       class = c("SimplifiedXMLNamespaceDefinitions", "XMLNamespaceDefinitions"))
     } else if(!is.null(ans))
@@ -260,14 +272,14 @@ function(node, ...)
 
 tmp =
 function(node, ...)
-{  
+{
    ans = xmlNamespaceDefinitions(node)
    merge = function(to, what) {
       i = !(names(what) %in% names(to))
       if(any(i))
-        ans[names(what)[i]] <<- what[i] 
+        ans[names(what)[i]] <<- what[i]
    }
-     
+
    tmp = xmlParent(node, manageMemory = FALSE)
    while(!is.null(tmp)) {
       merge(ans, xmlNamespaceDefinitions(tmp))
@@ -300,9 +312,9 @@ function(ns)
                stop("different URIs for the same name space prefix ", names(els)[1])
              TRUE
            })
-  
+
   ns[!dups]
-}  
+}
 
 xmlNamespace <-
 function(x)
@@ -318,7 +330,7 @@ function(x)
 }
 
 #setMethod("xmlNamespace", "character",
-xmlNamespace.character = 
+xmlNamespace.character =
 function(x) {
     a = strsplit(x, ":")[[1]]
     if(length(a) == 1)
@@ -343,11 +355,11 @@ function(tag, def, node)
 
   defs = xmlNamespaceDefinitions(node)
 
-  if( defs[[ ns[1] ]]$uri != def[ ns[1] ]) 
+  if( defs[[ ns[1] ]]$uri != def[ ns[1] ])
       stop("name space prefix ", ns, " does not match ", def[ ns[1] ], " but ", defs[[ ns[1] ]] $uri)
 
   TRUE
-}  
+}
 
 
 xmlGetAttr <-
@@ -356,7 +368,7 @@ function(node, name, default = NULL, converter = NULL, namespaceDefinition = cha
           addNamespace = length(grep(":", name)) > 0)
 {
   a <- xmlAttrs(node, addNamespace)
-  if(is.null(a) || is.na(match(name, names(a)))) 
+  if(is.null(a) || is.na(match(name, names(a))))
     return(default)
 
   if(length(namespaceDefinition))
@@ -366,7 +378,7 @@ function(node, name, default = NULL, converter = NULL, namespaceDefinition = cha
     converter(a[[name]])
   else
     a[[name]]
-}  
+}
 
 
 getXInclude =
@@ -381,19 +393,19 @@ function(node, parse = FALSE, sourceDoc = NULL)
      # and see what the difference is. Not guaranteed
      # to work since people may have already altered
      # the source document.
-    
+
     if(!is.na(href)) {
        fileName = paste(dirname(docName(sourceDoc)), href, sep = .Platform$file.sep)
        doc = xmlParse(fileName)
     } else
       doc = sourceDoc
-    
+
     if(!is.na(xpointer)) {
 
     }
-  } else 
+  } else
     c(href = href, xpointer = xpointer)
-}  
+}
 
 getInclude =
   #
@@ -403,7 +415,7 @@ function(doc, parse = FALSE)
 {
   xpathApply(doc, "//xi:include", getXIncludeInfo, parse, docName(doc), doc,
                  namespaces = c(xi="http://www.w3.org/2001/XInclude"))
-}  
+}
 
 getXIncludeInfo =
 function(node, parse = FALSE, baseURL = character(), doc = NULL)

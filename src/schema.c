@@ -204,7 +204,7 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
     xmlSchemaValidCtxtPtr ctxt;
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(r_doc);
     xmlSchemaPtr schema = (xmlSchemaPtr) R_ExternalPtrAddr(r_schema);
-    int nprot = 0;
+//    int nprot = 0;
 //    ctxt = (xmlSchemaValidCtxtPtr) R_ExternalPtrAddr(r_ctxt);
 
     int status;

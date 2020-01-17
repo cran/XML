@@ -25,15 +25,15 @@ if(FALSE) {
   o = readHTMLTable(tbls[[1]], skip.rows = c(1, Inf), header = FALSE, colClasses = c("character", replicate(5, toNumber)), elFun = textOnly)
 
 
-  o = readHTMLTable("http://elections.nytimes.com/2008/results/states/president/california.html")  
+  o = readHTMLTable("http://elections.nytimes.com/2008/results/states/president/california.html")
 
-  x = readHTMLTable("http://www.usatoday.com/news/politicselections/vote2004/CA.htm", as.data.frame = FALSE)  
+  x = readHTMLTable("http://www.usatoday.com/news/politicselections/vote2004/CA.htm", as.data.frame = FALSE)
 }
 
 setGeneric("readHTMLTable",
           function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-                     as.data.frame = TRUE, which = integer(), ...)           
+                     as.data.frame = TRUE, which = integer(), ...)
              standardGeneric("readHTMLTable"))
 
 setMethod("readHTMLTable", "character",
@@ -49,7 +49,7 @@ setMethod("readHTMLTable", "character",
 setMethod("readHTMLTable", "HTMLInternalDocument",
           function(doc, header = NA,
                     colClasses = NULL, skip.rows = integer(), trim = TRUE, elFun = xmlValue,
-                     as.data.frame = TRUE, which = integer(), ...)           
+                     as.data.frame = TRUE, which = integer(), ...)
 {
      #  tbls = getNodeSet(doc, "//table[not(./tbody)]|//table/tbody")
    tbls = getNodeSet(doc, "//table")  # XXX probably want something related to nested tables
@@ -129,7 +129,7 @@ function(doc, header = NA ,
   headerFromTable = FALSE
   dropFirstRow = FALSE
 
-  
+
      # check if we have a header
   if(length(header) == 1 && is.na(header))                                     # this node was doc
       header = (xmlName(doc) %in% c("table", "tbody") &&
@@ -156,7 +156,7 @@ function(doc, header = NA ,
      #     readHTMLTable("http://www.google.com/finance?q=NASDAQ:MSFT&fstype=ii", header = TRUE, which = 1)
   tbody = getNodeSet(node, "./tbody")
   if(length(tbody))
-     node = tbody[[1]]  
+     node = tbody[[1]]
 
   if(is(header, "XMLInternalElementNode"))   {
       # get the last tr in the thead
@@ -173,7 +173,7 @@ function(doc, header = NA ,
      if(xmlName(node) == "table" && "tbody" %in% names(node))
         node = node[["tbody"]]
    }
-  
+
      # Process each row, by getting the content of each "cell" (th/td)
   rows = getNodeSet(node, ".//tr")
   if(dropFirstRow)
@@ -189,19 +189,19 @@ function(doc, header = NA ,
 
 #  spans = getNodeSet(node, ".//td[@rowspan] | .//th[@rowspan]")
 
-  
+
   if(length(skip.rows)) {
     infs = (skip.rows == Inf)
     if(any(infs))
           # want Inf - 2, Inf - 1, Inf,  to indicate drop last 3, but that won't work
           # take sequence of Inf to identify Inf - 2, Inf - 1, Inf
-       skip.rows[skip.rows == Inf] = length(els)  - seq(0, length = sum(infs))  
+       skip.rows[skip.rows == Inf] = length(els)  - seq(0, length = sum(infs))
     els = els[ - skip.rows ]
   }
 
   if(length(els) == 0)
     return(NULL)
-  
+
    numEls = sapply(els, length)
                                                            # els[[1]] should be a scalar
    if(is.logical(header) && !is.na(header) && header && any(nchar(els[[1]]) < 999)) {
@@ -224,22 +224,22 @@ function(doc, header = NA ,
    if(length(colClasses)) {
 
       colClasses = rep(colClasses, length = length(ans))
-     
-      n = sapply(colClasses, is.null)
+
+      n = sapply(colClasses, function(x) is.null(x) || x == "NULL")
       if(any(n)) {
          ans = ans[ ! n ]
          colClasses = colClasses[ ! n ]
       }
 
       ans = lapply(seq(along = ans) ,
-                      function(i) 
+                      function(i)
                          if(is.function(colClasses[[i]]))
                             colClasses[[i]](ans[[i]])
                          else if(colClasses[[i]] == "factor")
                              factor(ans[[i]])
                          else if(colClasses[[i]] == "ordered")
-                             ordered(ans[[i]])        
-                         else 
+                             ordered(ans[[i]])
+                         else
                             as(ans[[i]], colClasses[[i]])
                    )
 
@@ -252,7 +252,7 @@ function(doc, header = NA ,
      else if(nrow(ans) > 0)
        names(ans) = paste("V", seq(along = ans), sep = "")
    }
-    
+
   ans
 })
 

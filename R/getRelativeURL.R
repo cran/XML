@@ -1,6 +1,6 @@
 getRelativeURL =
   #
-  #  takes the name of a file/URL and a baseURL and 
+  #  takes the name of a file/URL and a baseURL and
   # figures out the URL for the new file given by u.
   # This handles the case where the file/URL is relative to the
   # the baseURL or if it is a fully qualified file or URL.
@@ -27,11 +27,11 @@ getRelativeURL =
   #    getRelativeURL("../foo", "http://www.omegahat.net/a/b.html")
   # should be http://www.omegahat.net/foo
   # or at least http://www.omegahat.net/a/../foo
-function(u, baseURL, sep = "/", addBase = TRUE, simplify = TRUE)  
+function(u, baseURL, sep = "/", addBase = TRUE, simplify = TRUE, escapeQuery = FALSE)
 {
    if(length(u) > 1)
      return(sapply(u, getRelativeURL, baseURL, sep))
-   
+
    pu = parseURI(u)
    #XXX Need to strip the path in baseURL if pu$path starts with /
    if(pu$scheme == "" && addBase) {
@@ -42,12 +42,18 @@ function(u, baseURL, sep = "/", addBase = TRUE, simplify = TRUE)
         return(as(b, "character"))
       }
 
-      b$path = sprintf("%s%s%s", dirname(b$path), sep, u)
+
+      endsWithSlash = grepl("/$", b$path)
+
+      if(endsWithSlash && grepl("^\\./", u))
+          u = substring(u, 3)
+
+      b$path = sprintf("%s%s%s", if(endsWithSlash) b$path else dirname(b$path), if(endsWithSlash) "" else sep, u)
         # handle .. in the path and try to collapse these.
       if(simplify && grepl("..", b$path, fixed = TRUE))
         b$path = simplifyPath(b$path)
 
-      return(as(b, "character"))         
+      return(as(b, "character"))
 #      b = as(b, "character")
 #      sprintf("%s%s%s", b, "" else sep, u)
    } else

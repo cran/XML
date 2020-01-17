@@ -6,11 +6,11 @@ function(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
 
 BOMRegExp = "(\\xEF\\xBB\\xBF|\\xFE\\xFF|\\xFF\\xFE)"
 
-xmlTreeParse <- 
+xmlTreeParse <-
    #
    # XML parser that reads the entire `document' tree into memory
-   # and then converts it to an R/S object. 
-   # Uses the libxml from Daniel Veillard at W3.org. 
+   # and then converts it to an R/S object.
+   # Uses the libxml from Daniel Veillard at W3.org.
    #
    # asText  treat the value of file as XML text, not the name of a file containing
    #       the XML text, and parse that.
@@ -21,23 +21,25 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
            isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
            useInternalNodes = FALSE, isSchema = FALSE,
            fullNamespaceInfo = FALSE, encoding = character(),
-           useDotNames = length(grep("^\\.", names(handlers))) > 0, 
+           useDotNames = length(grep("^\\.", names(handlers))) > 0,
            xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(), isHTML = FALSE, options = integer(),
            parentFirst = FALSE)
 {
   isMissingAsText = missing(asText)
-  
+
   if(length(file) > 1) {
     file = paste(file, collapse = "\n")
-    if(!missing(asText) && !asText) 
+    if(!missing(asText) && !asText)
       stop(structure(list(message = "multiple URLs passed to xmlTreeParse. If this is the content of the file, specify asText = TRUE"),
                      class = c("MultipleURLError", "XMLParserError", "simpleError", "error", "condition")))
     asText = TRUE
   }
-  
-  if(missing(isURL) && !asText) 
+
+  if(missing(isURL) && !asText)
     isURL <- length(grep("^(http|ftp|file)://", file, useBytes = TRUE, perl = TRUE))
 
+  if(file == "" || length(file) == 0)
+    stop("empty or no content specified")
 
   if(isHTML) {
     validate = FALSE
@@ -51,12 +53,12 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
   if(missing(fullNamespaceInfo) && inherits(handlers, "RequiresNamespaceInfo"))
     fullNamespaceInfo = TRUE
-  
+
 
   oldValidate = xmlValidity()
   xmlValidity(validate)
   on.exit(xmlValidity(oldValidate))
-  
+
     # check whether we are treating the file name as
     # a) the XML text itself, or b) as a URL.
     # Otherwise, check if the file exists and report an error.
@@ -80,12 +82,12 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
      # Look for a < in the string.
   if(asText && length(grep(sprintf("^%s?\\s*<", BOMRegExp), file, perl = TRUE, useBytes = TRUE)) == 0) {  # !isXMLString(file) ?
     if(!isHTML || (isMissingAsText && !inherits(file, "AsIs"))) {
-      e = simpleError(paste("XML content does not seem to be XML:", sQuote(file)))
+      e = simpleError(paste("XML content does not seem to be XML:", if(file.exists(file)) file else sQuote(substring(file, 100))))
       class(e) = c("XMLInputError", class(e))
       (if(isHTML) warning else stop)(e)
     }
   }
-  
+
 
  if(!is.logical(xinclude)) {
    # if(is(xinclude, "numeric"))
@@ -107,8 +109,8 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
 
   if(length(options))
      options = sum(options)  #XXX coerce to parser options
-  
- ans <- .Call("RS_XML_ParseTree", as.character(file), handlers, 
+
+ ans <- .Call("RS_XML_ParseTree", as.character(file), handlers,
               as.logical(ignoreBlanks), as.logical(replaceEntities),
               as.logical(asText), as.logical(trim), as.logical(validate), as.logical(getDTD),
               as.logical(isURL), as.logical(addAttributeNamespaces),
@@ -128,7 +130,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
   else if(!getDTD && !isSchema) {
        #??? is this a good idea.
      class(ans) =  oldClass("XMLDocumentContent")
-  } 
+  }
 
   ans
 }
@@ -216,7 +218,7 @@ function(node, flags = 0L)
 
 {
   .Call("RS_XML_xmlXIncludeProcessFlags", node, as.integer(flags), PACKAGE = "XML")
-}  
+}
 
 processXInclude.XMLInternalElementNode =
 function(node, flags = 0L)
@@ -225,7 +227,7 @@ function(node, flags = 0L)
 #    stop("can only process XInclude on include nodes")
 
   .Call("RS_XML_xmlXIncludeProcessTreeFlags", node, as.integer(flags), PACKAGE = "XML")
-} 
+}
 
 
 

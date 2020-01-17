@@ -51,14 +51,13 @@ SchemaRefFields = c("name", "targetNamespace", "version", "id",
                    )
 
 setMethod("$", "xmlSchemaRef",
-           function(x, name) {
-
-            idx = pmatch(name, SchemaRefFields)
-            if(is.na(idx))
-              stop("No field ", name, " in ", paste(SchemaRefFields, collapse = ", "))
-
-            .Call(paste("R_libxmlTypeTable", SchemaRefFields[idx], sep = "_"),  x, PACKAGE = "XML")
-           })
+          function(x, name) {
+    idx = pmatch(name, SchemaRefFields)
+    if(is.na(idx))
+        stop("No field ", name, " in ", paste(SchemaRefFields, collapse = ", "))
+    sym <- paste("R_libxmlTypeTable", SchemaRefFields[idx], sep = "_")
+    .Call(sym,  x, PACKAGE = "XML")
+})
 
 setMethod("names", "xmlSchemaRef", function(x) SchemaRefFields)
 
@@ -83,7 +82,7 @@ setClass("SchemaNotationTable", contains = "libxmlTypeTable")
 setClass("xmlSchemaNotationRef", contains = "ExternalReference")
 
 schemaValidationErrorHandler =
-function()  
+function()
 {
   errors = character()
   warnings = character()
@@ -91,7 +90,7 @@ function()
      if(inherits(msg, "XMLSchemaWarning"))
        warnings <<- c(warnings, msg)
      else
-       errors <<- c(errors, msg)       
+       errors <<- c(errors, msg)
   }
   structure(list(handler = h, results = function() list(errors = errors, warnings = warnings)), class = "XMLSchemaValidateHandler")
 }
@@ -108,7 +107,7 @@ function(schema, doc, errorHandler = xmlErrorFun(), options = 0L)
 
   .oldErrorHandler = setXMLErrorHandler(if(is.list(errorHandler)) errorHandler[[1]] else errorHandler)
   on.exit(.Call("RS_XML_setStructuredErrorHandler", .oldErrorHandler, PACKAGE = "XML"), add = TRUE)
-  
+
   status = .Call("RS_XML_xmlSchemaValidateDoc", schema@ref, doc, as.integer(options), NULL, PACKAGE = "XML") # errorHandler)
 
   if(inherits(errorHandler, "XMLStructuredErrorCumulator"))

@@ -1,8 +1,0 @@
-fl = system.file("exampleData", "mtcars.xml", package="XML")
-xml <- xmlTreeParse(fl, useInternal=TRUE)
-
-node = xpathApply(xml, "/*/*")[[1]]
-x = xpathApply(node, "/*/*")[[1]]
-
-
-sapply(xpathApply(node, "//*[@id]"), xmlName)

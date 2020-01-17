@@ -1,5 +1,4 @@
-\name{xmlFlatListTree}
-\alias{xmlFlatListTree}
+\name{xmlHashTree}
 \alias{xmlHashTree}
 \title{Constructors for trees stored as flat list of nodes with
     information about parents and children.}
@@ -25,10 +24,7 @@
 \usage{
 xmlHashTree(nodes = list(), parents = character(), children = list(), 
              env = new.env(TRUE, parent = emptyenv()))
-xmlFlatListTree(nodes = list(), parents = character(), children = list(),
-                env = new.env(), n = 200)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{nodes}{ a collection of existing nodes that are to be added to
     the tree. These are used to initialize the tree. If this is
@@ -41,17 +37,9 @@ xmlFlatListTree(nodes = list(), parents = character(), children = list(),
     modify parts of the tree without having to reassign the top-level
     object.    Unlike most R data types, environments are mutable.
    }
-  \item{n}{for \code{xmlFlatListTree}, this is used as the default size
-    to allocate for the list containing the nodes}
 }
 
 \value{
-  An object of class XMLFlatTree which is specialized
-  to \code{XMLFlatListTree} by the \code{xmlFlatListTree}
-  function and \code{XMLHashTree} by the \code{xmlHashTree} function.
-  Both objects are simply the environment which contains information
-  about the tree elements and functions to access this information.
-
   An \code{xmlHashTree} object has an accessor method via
   \code{$} for accessing individual  nodes within the tree.
   One can use the node name/identifier in an expression such as

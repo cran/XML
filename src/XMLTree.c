@@ -87,7 +87,7 @@ R_newXMLTextNode(USER_OBJECT_ value, USER_OBJECT_ sdoc, SEXP manageMemory)
 
     txt = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(value, 0)));
     if(doc)
-	node = xmlNewDocTextLen(doc, txt, strlen(XMLCHAR_TO_CHAR(txt)));
+	node = xmlNewDocTextLen(doc, txt, (int)strlen(XMLCHAR_TO_CHAR(txt)));
     else
 	node = xmlNewText(txt);
 	
@@ -106,7 +106,7 @@ R_newXMLCDataNode(USER_OBJECT_ sdoc, USER_OBJECT_ value, USER_OBJECT_ manageMemo
 
   tmp = CHAR_DEREF(STRING_ELT(value,0));
 
-  node = xmlNewCDataBlock(doc, CHAR_TO_XMLCHAR(tmp), strlen(tmp));
+  node = xmlNewCDataBlock(doc, CHAR_TO_XMLCHAR(tmp), (int)strlen(tmp));
 
   return(R_createXMLNodeRef(node, manageMemory));
 }
@@ -1096,7 +1096,7 @@ R_createXMLNodeRef(xmlNodePtr node, USER_OBJECT_ finalize)
   addFinalizer = R_XML_getManageMemory(finalize, node->doc, node);
 
 /*  !IS_NOT_OUR_NODE_TO_TOUCH(node) */
-  if(addFinalizer && ((node->_private && ((int*)node->_private)[1] == R_MEMORY_MANAGER_MARKER)
+  if(addFinalizer && ((node->_private && ((int*)node->_private)[1] == (int) R_MEMORY_MANAGER_MARKER)
 		      || !node->doc || (!(IS_NOT_OUR_DOC_TO_TOUCH(node->doc))))) {
       if(node->_private == NULL) {
         node->_private = calloc(2, sizeof(int));
@@ -1206,7 +1206,9 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	    xmlSetDocCompressMode(doc, INTEGER_DATA(compression)[0]);
 	}
 	if(encoding && encoding[0])
-	    xmlSaveFileEnc(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc, encoding);
+// xmlSaveFileEnc doesn't indent. So use xmlSaveFormatFileEnc(). Issue identified by Earl Brown.
+//	    xmlSaveFileEnc(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc, encoding);
+	    xmlSaveFormatFileEnc(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc, encoding, LOGICAL_DATA(sindent)[0]);
 #if 0
 	else
 	    xmlSaveFile(CHAR_DEREF(STRING_ELT(sfileName, 0)),  doc);
@@ -1214,6 +1216,10 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	else {
 	  FILE *f;
 	  f = fopen(CHAR_DEREF(STRING_ELT(sfileName, 0)), "w");
+	  if(!f) {
+	      PROBLEM "cannot create file %s. Check the directory exists and permissions are appropriate", CHAR_DEREF(STRING_ELT(sfileName, 0))
+		  ERROR;
+          }
 	  xmlDocFormatDump(f, doc, 1);
 	  fclose(f);
 	}
@@ -1804,4 +1810,34 @@ R_childStringValues(SEXP r_node, SEXP r_len, SEXP r_asVector, SEXP r_encoding, S
 
     UNPROTECT(nprotect);
     return(ans);
+}
+
+
+
+USER_OBJECT_
+R_replaceNodeWithChildren(USER_OBJECT_ r_node)
+{
+    xmlNodePtr node = (xmlNodePtr) R_ExternalPtrAddr(r_node);    
+
+    xmlNodePtr nxt = node->next;
+
+    if(node->prev) {
+	node->prev->next = node->children;
+	node->children->prev = node->prev;
+    } else if(node->parent)
+	node->parent->children = node->children;
+    
+    if(node->children) {
+	xmlNodePtr cur = node->children;
+	while(cur->next) {
+	    cur->parent = node->parent;
+	    cur = cur->next;
+	}
+
+	cur->next = nxt;
+	if(nxt)
+	    nxt->prev = cur;
+    }
+
+    return(NULL_USER_OBJECT);
 }

@@ -43,7 +43,8 @@ xmlXIncludes(filename, recursive = TRUE,
     \code{gsub}.
     The function is called with a vector of file names. The regular
     expressions are used in a call to \code{gsub}.}
-  \item{ignoreTextParse}{undocuemnted.}
+  \item{ignoreTextParse}{if \code{TRUE}, ignore the XIncluded files that
+  are identified as text and not XML with \code{parse="text"}.}
 }
 \value{
  If \code{recursive} is \code{FALSE}, a character vector giving the
