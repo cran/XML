@@ -57,7 +57,7 @@
   which attempts to simplify the result if it can be converted
   to a vector or matrix rather than left as a list.
   In this way, it has the same relationship to  \code{xpathApply}
-  as \code{\link[base]{sapply}} has to  \code{\link[base]{lapply}}.
+  as \code{\link{sapply}} has to  \code{\link{lapply}}.
 
   \code{matchNamespaces} is a separate function that is used to
   facilitate
@@ -157,8 +157,8 @@ matchNamespaces(doc, namespaces,
  \item{simplify}{a logical value indicating whether the function
    should attempt to perform the simplification of the result
    into a vector rather  than leaving it as a list.
-   This is the same as \code{\link[base]{sapply}} does
-   in comparison to \code{\link[base]{lapply}}.
+   This is the same as \code{\link{sapply}} does
+   in comparison to \code{\link{lapply}}.
  }
 %XXX
 \item{sessionEncoding}{experimental functionality and parameter related
@@ -173,7 +173,7 @@ matchNamespaces(doc, namespaces,
     A character string identifies the name of the XPath function and the
     R function of the same name (and located on the R search path).
     A C routine to implement an XPath function is specified via a call
-    to \code{\link[base]{getNativeSymbolInfo}} and passing just the
+    to \code{\link{getNativeSymbolInfo}} and passing just the
     address field.  This is provided in the \code{list()} with a name which is
     used as the name of the XPath function.
   }

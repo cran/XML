@@ -51,11 +51,11 @@ Duncan Temple Lang
   \code{\link{getXIncludes}}
 }
 \examples{\donttest{ # site is flaky
-  getHTMLLinks("http://www.omegahat.net")
+  try(getHTMLLinks("http://www.omegahat.net"))
 
-  getHTMLLinks("http://www.omegahat.net/RSXML")
+  try(getHTMLLinks("http://www.omegahat.net/RSXML"))
 
-  unique(getHTMLExternalFiles("http://www.omegahat.net"))
+  try(unique(getHTMLExternalFiles("http://www.omegahat.net")))
 }}
 \keyword{IO}
 \keyword{programming}

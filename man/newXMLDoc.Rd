@@ -90,7 +90,7 @@ newXMLDTDNode(nodeName, externalID = character(),
   external pointer object.
   This can also be the name of a C routine or a reference
   to a C routine retrieved using
-  \code{\link[base]{getNativeSymbolInfo}}. }
+  \code{\link{getNativeSymbolInfo}}. }
  \item{name}{the tag/element name for the XML node and
    the for a Processing Instruction (PI) node, this is the "target",
    e.g. the identifier for the system for whose attention this PI node is intended.}

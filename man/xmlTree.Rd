@@ -159,6 +159,7 @@ cat(saveXML(d))
 # Dealing with DTDs and system and public identifiers for DTDs.
 # Just doctype
 za = xmlTree("people", dtd = "people")
+### www.omegahat.net is flaky
 # no public element
 zb = xmlTree("people",
              dtd = c("people", "", "http://www.omegahat.net/XML/types.dtd"))
@@ -166,8 +167,5 @@ zb = xmlTree("people",
 zc = xmlTree("people",
              dtd = c("people", "//a//b//c//d",
                      "http://www.omegahat.net/XML/types.dtd"))
-
-
-
 }
 \keyword{IO}

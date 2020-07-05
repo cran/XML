@@ -17,8 +17,8 @@
   The deserialize function converts such objects back to their
   original form.
 
-  These functions are used in calls to \code{\link[base]{saveRDS}}
-  and \code{\link[base]{readRDS}} via the
+  These functions are used in calls to \code{\link{saveRDS}}
+  and \code{\link{readRDS}} via the
   \code{refhook} argument.
 \code{
 saveRDS(obj, filename, refhook = xmlSerializeHook)
@@ -50,7 +50,7 @@ Duncan Temple Lang
 }
 
 \seealso{
-\code{\link[base]{saveRDS}}  and \code{\link[base]{readRDS}}
+\code{\link{saveRDS}}  and \code{\link{readRDS}}
 }
 \examples{
 z = newXMLNode("foo")
