@@ -298,8 +298,9 @@ void RS_XML(endElement)(void *userData, const char *name)
 
   fun = findEndElementFun(name, rinfo);
   if(fun)  {
-      USER_OBJECT_ val = RS_XML(invokeFunction)(fun, opArgs, rinfo->stateObject, rinfo->ctx);
+      USER_OBJECT_ val = PROTECT(RS_XML(invokeFunction)(fun, opArgs, rinfo->stateObject, rinfo->ctx));
       updateState(val, rinfo);
+      UNPROTECT(1);
   }
   else
      RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "endElement"), NULL, ((RS_XMLParserData*) userData), opArgs);
@@ -510,8 +511,9 @@ RS_XML(callUserFunction)(const char *opName, const char *preferredName, RS_XMLPa
    return(NULL_USER_OBJECT);
   }
 
-  val = RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject, parserData->ctx);
+  val = PROTECT(RS_XML(invokeFunction)(fun, opArgs, parserData->stateObject, parserData->ctx));
   updateState(val, parserData);
+  UNPROTECT(1);
   return(val); 
 }
 

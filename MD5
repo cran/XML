@@ -1,5 +1,5 @@
 7d963ca5b9a1b7cb1d7416d050fb3255 *ChangeLog
-0ffa6f6e0ed1a8cc86a72bc9dc9ad1c0 *DESCRIPTION
+271adee5dc1ae2a61d249034b910e6db *DESCRIPTION
 75ba638bc1410426a9b221d2078675d2 *LICENSE
 ebcf996872ad4bb2a7e0c0cbcc3e42de *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -367,13 +367,13 @@ ee3b71a6c94f5688b9563ddaa3cfd11c *man/xmlTreeParse.Rd
 8e63213e0feed979bc71b1124833a0a3 *man/xmlValue.Rd
 ab0d1756d7572c1b40f5980bffc4fcbc *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
-89730d5017527c72bc0b07167566af94 *src/EventParse.c
+1b85c072397a0a194623f667849bf328 *src/EventParse.c
 a855ea27bb2ad2247b4bec96992d9730 *src/EventParse.h
 9faae64cf580ca671c10472749066776 *src/ExpatParse.c
 21327b0c7a0406a35e0aa87168d02fd9 *src/ExpatParse.h
 a80157991fc463bcc9b25a0302dbffd3 *src/HTMLParse.c
 f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
-71c00bad0068967ed4d3d9154b504d5f *src/Makevars.win
+217afdc4385bc2657eb8ee19978d00e5 *src/Makevars.win
 251c144c12ee1e31a84ff7ab6ada7687 *src/NodeGC.c
 bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
 956d2b8925bf7a209732e71104657f58 *src/RSCommon.h
@@ -384,7 +384,7 @@ f063232669548479d2365405b6d09b30 *src/RUtils.c
 03074fb2977f7e985ce25c447336e302 *src/Rcatalog.c
 5c81ec96878e63cabe3455a1f6f35dbd *src/Utils.c
 6a29995de60cffb12e6a2f102c7fd17a *src/Utils.h
-2140db7f699891744c5ebc995fe0033c *src/XMLEventParse.c
+4b4b865988d483d74276a626efa00a07 *src/XMLEventParse.c
 3e7acc33bf84545bfe136389b78248e7 *src/XMLHashTree.c
 0d466efbdcd512d2e6a9913485f0c3eb *src/XMLTree.c
 06dff24eae84b53211ddb5d1ad52dfcb *src/fixNS.c

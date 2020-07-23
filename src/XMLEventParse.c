@@ -588,8 +588,9 @@ RS_XML(xmlSAX2EndElementNs)(void * ctx,
 
   fun = findEndElementFun((const char *)localname, rinfo);
   if(fun)  {
-      USER_OBJECT_ val = RS_XML(invokeFunction)(fun, args, rinfo->stateObject, rinfo->ctx);
+      USER_OBJECT_ val = PROTECT(RS_XML(invokeFunction)(fun, args, rinfo->stateObject, rinfo->ctx));
       updateState(val, rinfo);
+      UNPROTECT(1);
   } else
       RS_XML(callUserFunction)(HANDLER_FUN_NAME(ctx, "endElement"), NULL, (RS_XMLParserData *)ctx, args);
 
