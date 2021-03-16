@@ -1,5 +1,5 @@
 7d963ca5b9a1b7cb1d7416d050fb3255 *ChangeLog
-271adee5dc1ae2a61d249034b910e6db *DESCRIPTION
+9d79d8dfbcfefb88effaafad2f987bf2 *DESCRIPTION
 75ba638bc1410426a9b221d2078675d2 *LICENSE
 ebcf996872ad4bb2a7e0c0cbcc3e42de *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -373,6 +373,7 @@ a855ea27bb2ad2247b4bec96992d9730 *src/EventParse.h
 21327b0c7a0406a35e0aa87168d02fd9 *src/ExpatParse.h
 a80157991fc463bcc9b25a0302dbffd3 *src/HTMLParse.c
 f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
+25e8b4be2f14b1b437eaa4411a30605a *src/Makevars.ucrt
 217afdc4385bc2657eb8ee19978d00e5 *src/Makevars.win
 251c144c12ee1e31a84ff7ab6ada7687 *src/NodeGC.c
 bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
