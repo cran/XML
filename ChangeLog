@@ -9,12 +9,12 @@ Version 3.99-0
 Version 3.98-2
 
   *      xmlSave() of a document to a file with encoding now honors indenting.
-         Uses xmlSaveFormatFileEnc(). Issue identified by Earl Brown.
+	 Uses xmlSaveFormatFileEnc(). Issue identified by Earl Brown.
 
 Version 3.98-1
 
   *      xmlToS4() handles attributes with namespace prefixes and children
-         with the same node name.
+	 with the same node name.
 
   *      Compilation error with clang. Simple declaration of a routine.
 
@@ -33,17 +33,17 @@ Version 3.98-0
 Version 3.97-0
 
   *      Fix for xmlValue(node) = text.  Identified by Lawrence Edwards.
-         Uses xmlNodeSetContent() now and leaves freeing the original content to that routine.
+	 Uses xmlNodeSetContent() now and leaves freeing the original content to that routine.
 
   *      Updates for xmlSource()
 
 Version 3.96-1
- 
+
   *     readHTMLTable() ignores headers that are over 999 characters.
 
-  *     Fix a problem in readHTMLTable() with some table headers not having 
-        the correct number of elements to match the columns.
-  
+  *     Fix a problem in readHTMLTable() with some table headers not having
+	the correct number of elements to match the columns.
+
 Version 3.96-0
 
   *     Introduced readHTMLList(), getHTMLLinks(), getHTMLExternalFiles(), getXIncludes().

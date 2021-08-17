@@ -162,8 +162,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     name = CHARACTER_DATA(fileName)[0];
 #endif
     if(!isURLDoc && (name == NULL || stat(name, &tmp_stat) < 0)) {
-      PROBLEM "Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0))
-      ERROR;
+	Rf_error("Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0)) );
     }
   } else {
     name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
@@ -226,8 +225,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
       } else
         return(stop("XMLParseError", "error in creating parser for %s", name));
 
-      PROBLEM "error in creating parser for %s", name
-      ERROR;
+      Rf_error("error in creating parser for %s", name);
   }
 
   if(TYPEOF(xinclude) == LGLSXP && LOGICAL_DATA(xinclude)[0]) {
@@ -246,8 +244,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
    	      free((char *) name);
 
 
-	  PROBLEM "XML document is invalid"
-          ERROR;
+	  Rf_error("XML document is invalid");
       }
   }
 
@@ -516,8 +513,7 @@ RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node, USER_OBJECT_ recur
   xmlNodePtr node;
 
   if(TYPEOF(r_node) != EXTPTRSXP) {
-       PROBLEM "R_internalNodeNamespaceDefinitions expects InternalXMLNode objects"
-       ERROR;
+      Rf_error("R_internalNodeNamespaceDefinitions expects InternalXMLNode objects");
     }
 
   node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
@@ -1055,11 +1051,9 @@ notifyError(const char *msg, va_list ap, Rboolean isError)
 {
 #if 0
     if(isError) {
-	 PROBLEM "error in validating XML document"
-	 ERROR;
+	Rf_error("error in validating XML document");
     } else {
-	 PROBLEM "warning when validating XML document"
-	 ERROR;
+	Rf_error("warning when validating XML document");
     }
 
 #else
@@ -1070,11 +1064,6 @@ notifyError(const char *msg, va_list ap, Rboolean isError)
     vsnprintf(buf, BUFSIZE, msg, ap);
 
     Rf_warning(buf);
-#if 0
-    PROBLEM buf
-        WARN;
-#endif
-
 #endif
 }
 
@@ -1251,8 +1240,7 @@ R_getNodeChildByIndex(USER_OBJECT_ snode, USER_OBJECT_ r_index, USER_OBJECT_ man
     
     num = INTEGER(r_index)[0] - 1;
     if(num < 0) {
-	PROBLEM "cannot index an internal node with a negative number %d", num
-	    ERROR;
+	Rf_error("cannot index an internal node with a negative number %d", num);
     }
 	
 
@@ -1300,8 +1288,7 @@ RS_XML_setDocumentName(USER_OBJECT_ sdoc, USER_OBJECT_ sname)
     xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
 
     if(!doc) {
-	PROBLEM "NULL pointer supplied for internal document"
-	    WARN;
+	Rf_warning("NULL pointer supplied for internal document");
 	return(R_NilValue);
     }
 
@@ -1323,8 +1310,7 @@ RS_XML_getDocumentName(USER_OBJECT_ sdoc)
     USER_OBJECT_ ans;
     const xmlChar *encoding;
     if(!doc) {
-	PROBLEM "NULL pointer supplied for internal document"
-	    WARN;
+	Rf_warning("NULL pointer supplied for internal document");
 	return(R_NilValue);
     }
     encoding = doc->encoding;
@@ -1372,8 +1358,7 @@ RS_XML_xmlXIncludeProcessTreeFlags(USER_OBJECT_ r_node, USER_OBJECT_ r_flags)
     if(n == 0)
 	return(R_NilValue);
     else if(n == -1) {
-	PROBLEM "failed in XInclude"
-        ERROR;
+	Rf_error("failed in XInclude");
     }
 
 #if 0

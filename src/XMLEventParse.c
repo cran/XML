@@ -83,8 +83,7 @@ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_d
       len = (int)(ptr[4] - ptr[3] + 1);
       tmp = malloc(sizeof(char) * len);
       if(!tmp) {
-         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
-	 ERROR;
+	  Rf_error("Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2));
       }
       memcpy(tmp, ptr[3], ptr[4] - ptr[3]);
       tmp[len-1] = '\0'; /*XXX*/
@@ -198,8 +197,7 @@ RS_XML_readConnectionInput(void *context, char *buffer, int len)
       if(n != 0) { /* Just add a new line and do it again. */
 
          if(n > left) {
-            PROBLEM "string read from XML connection too long for buffer: truncating %s to %d characters", str, left
-     	    WARN;
+	     Rf_warning("string read from XML connection too long for buffer: truncating %s to %d characters", str, left);
          }
          strncpy(buffer, str, left);
          left -= n;
@@ -255,8 +253,7 @@ RS_XML_xmlCreateConnectionParserCtxt(USER_OBJECT_ con)
 
       xmlParserInputPtr input = xmlNewIOInputStream(ctx, buf, XML_CHAR_ENCODING_NONE);
       if(!input) {
-	  PROBLEM "can't create new IOInputStream"
-	      ERROR;
+	  Rf_error("can't create new IOInputStream");
       }
       inputPush(ctx, input);
 #endif
@@ -290,8 +287,7 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
 
 
   if(ctx == NULL) {
-    PROBLEM "Can't parse %s", fileName
-    ERROR;
+      Rf_error("Can't parse %s", fileName);
   }
 
 
@@ -351,8 +347,7 @@ getPropertyValue(const xmlChar **ptr)
   len = (int)(ptr[4] - ptr[3] + 1);
       tmp = malloc(sizeof(char) * len);
       if(!tmp) {
-         PROBLEM "Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2)
-	 ERROR;
+	  Rf_error("Cannot allocate space for attribute of length %d", (int) (ptr[4] - ptr[3] + 2));
       }
       memcpy(tmp, ptr[3], ptr[4] - ptr[3]);
       tmp[len-1] = '\0'; /*XXX*/
@@ -845,9 +840,8 @@ RS_XML(fatalErrorHandler)(void *ctx, const char *format, ...)
   va_end(args);
 
 
-  PROBLEM "Fatal error in the XML event driven parser for %s: %s",
-	  ((RS_XMLParserData*) ctx)->fileName, msg
-  ERROR;
+  Rf_error("Fatal error in the XML event driven parser for %s: %s",
+	   ((RS_XMLParserData*) ctx)->fileName, msg);
 
 }
 
@@ -863,9 +857,8 @@ RS_XML(errorHandler)(void *ctx, const char *format, ...)
 
   va_end(args);
 
-  PROBLEM "Error in the XML event driven parser for %s: %s",
-    ((RS_XMLParserData*) ctx)->fileName, msg
-  ERROR;
+  Rf_error("Error in the XML event driven parser for %s: %s",
+	   ((RS_XMLParserData*) ctx)->fileName, msg);
 
 }
 
@@ -873,13 +866,11 @@ void
 RS_XML(structuredErrorHandler)(void *ctx, xmlErrorPtr err)
 {
    if(err->level == XML_ERR_FATAL) {
-      PROBLEM "Error in the XML event driven parser (line = %d, column = %d): %s",
-         err->line, err->int2 , err->message
-      ERROR;
+      Rf_error("Error in the XML event driven parser (line = %d, column = %d): %s",
+	       err->line, err->int2 , err->message);
    } else {
-      PROBLEM "Error in the XML event driven parser (line = %d, column = %d): %s",
-         err->line, err->int2 , err->message
-      WARN;
+      Rf_warning("Error in the XML event driven parser (line = %d, column = %d): %s",
+		 err->line, err->int2 , err->message);
    }
 }
 
@@ -887,9 +878,8 @@ void
 RS_XML(warningHandler)(void *ctx, const char *msg, ...)
 {
 
- PROBLEM "XML event driven parser warning from %s.",
-   ((RS_XMLParserData*) ctx)->fileName
- WARN;
+ Rf_warning("XML event driven parser warning from %s.",
+	    ((RS_XMLParserData*) ctx)->fileName);
 
 }
 
@@ -901,14 +891,12 @@ RS_XML_xmlStopParser(SEXP r_context)
     xmlParserCtxtPtr context;
 
     if(TYPEOF(r_context) != EXTPTRSXP || R_ExternalPtrTag(r_context) != Rf_install(XML_PARSER_CONTEXT_TYPE_NAME)) {
-	PROBLEM "xmlStopParser requires an " XML_PARSER_CONTEXT_TYPE_NAME " object"
-	    ERROR;
+	Rf_error("xmlStopParser requires an " XML_PARSER_CONTEXT_TYPE_NAME " object");
     }
     context = (xmlParserCtxtPtr) R_ExternalPtrAddr(r_context);
 
     if(!context) {
-	PROBLEM "NULL value passed to RS_XML_xmlStopParser. Is it a value from a previous session?"
-	    ERROR;
+	Rf_error("NULL value passed to RS_XML_xmlStopParser. Is it a value from a previous session?");
     }
     
     xmlStopParser(context);

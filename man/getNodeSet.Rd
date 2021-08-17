@@ -213,9 +213,9 @@ So we would use
 }
 
 \references{\url{http://xmlsoft.org}, 
-  \url{http://www.w3.org/xml}
-  \url{http://www.w3.org/TR/xpath}
-  \url{http://www.omegahat.net/RSXML}
+  \url{http://www.w3.org/XML/}
+  \url{https://www.w3.org/TR/xpath/}
+  \url{http://www.omegahat.net/RSXML/}
 }
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 

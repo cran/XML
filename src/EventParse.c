@@ -117,8 +117,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
 #endif
     file = fopen(name,"r");
     if(file == NULL) {
-      PROBLEM "Can't find file %s", name
-      ERROR;
+	Rf_error("Can't find file %s", name);
     }
 
   } else

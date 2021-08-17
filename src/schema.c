@@ -13,14 +13,12 @@ name(SEXP obj) \
 { \
    SEXP ref = GET_SLOT(obj, Rf_install("ref")); \
    if(TYPEOF(ref) != EXTPTRSXP) { \
-      PROBLEM "Expected external pointer object" \
-      ERROR; \
+       Rf_error("Expected external pointer object");	\
    } \
 \
    if(R_ExternalPtrTag(ref) != Rf_install(#type)) { \
-      PROBLEM "Expected external pointer to have internal tag %s, got %s",  \
-               #type, PRINTNAME(ref) \
-      ERROR; \
+      Rf_error("Expected external pointer to have internal tag %s, got %s",  \
+               #type, PRINTNAME(ref)); \
    } \
 \
    return((type) R_ExternalPtrAddr(ref)); \
@@ -39,20 +37,17 @@ R_getExternalRef(SEXP obj, const char *className)
    void *ans;
 
    if(TYPEOF(ref) != EXTPTRSXP) { 
-      PROBLEM "Expected external pointer object" 
-      ERROR; 
+       Rf_error("Expected external pointer object"); 
    } 
 
    if(className && R_ExternalPtrTag(ref) != Rf_install(className)) { 
-      PROBLEM "Expected external pointer to have internal tag %s, got %s",  
-  	     className, CHAR(PRINTNAME(R_ExternalPtrTag(ref)))
-      ERROR; 
+      Rf_error("Expected external pointer to have internal tag %s, got %s",  
+	       className, CHAR(PRINTNAME(R_ExternalPtrTag(ref))) ); 
    } 
 
    ans = R_ExternalPtrAddr(ref);
    if(!ans) {
-       PROBLEM "Got NULL value in reference for %s", className
-       ERROR;
+       Rf_error("Got NULL value in reference for %s", className);
    }
 
    return(ans); 

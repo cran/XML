@@ -107,8 +107,7 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
      if(LOGICAL_DATA(isURL)[0] == 0) {
 	 struct stat tmp_stat;
 	 if(extId == NULL || stat(extId, &tmp_stat) < 0) {
-             PROBLEM "Can't find file %s", extId
-	     ERROR;
+             Rf_error("Can't find file %s", extId);
 	 }
      }
 
@@ -116,8 +115,7 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
  }
 
  if(ctxt == NULL) {
-    PROBLEM "error creating XML parser for `%s'", extId
-    ERROR;
+     Rf_error("error creating XML parser for `%s'", extId);
  }
 
   ctxt->validate = 1;
@@ -160,8 +158,7 @@ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId,
       } else
         return(stop("DTDParseError", "error parsing %s", dtdName));
 
-   PROBLEM "error in DTD %s", extId
-   ERROR;
+      Rf_error("error in DTD %s", extId);
   }
 
   if(localAsText) {

@@ -248,8 +248,7 @@ R_replaceDummyNS(USER_OBJECT_ s_node, USER_OBJECT_ newNS, USER_OBJECT_ prefix)
 {
     xmlNodePtr node;
     if(TYPEOF(s_node) != EXTPTRSXP) {
-	PROBLEM "non external pointer passed to R_replaceDummyNS"
-	    ERROR;
+	Rf_error("non external pointer passed to R_replaceDummyNS");
     }
 	
     node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
@@ -417,14 +416,12 @@ R_removeInternalNode(SEXP r_node, SEXP r_free)
     for(i = 0; i < n; i++) {
 	SEXP el = VECTOR_ELT(r_node, i);
 	if(TYPEOF(el) != EXTPTRSXP) {
-	    PROBLEM "removeInternalNode needs ans external pointer object"
-	    ERROR;
+	    Rf_error("removeInternalNode needs ans external pointer object");
 	}
 
 	node = (xmlNodePtr) R_ExternalPtrAddr(el);
 	if(!node) {
-	    PROBLEM "removeInternalNode ignoring a NULL external pointer object"
-		WARN;	
+	    Rf_warning("removeInternalNode ignoring a NULL external pointer object");	
 	}
 	xmlUnlinkNode(node);
     
@@ -484,8 +481,7 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
     xmlNodePtr n, p, /*check,*/ tmp = NULL;
     
     if(TYPEOF(parent) != EXTPTRSXP) {
-       PROBLEM "R_insertXMLNode expects XMLInternalNode objects for the parent node"
-       ERROR;
+	Rf_error("R_insertXMLNode expects XMLInternalNode objects for the parent node");
     }
 
     if(IS_LIST(node))  {
@@ -508,16 +504,14 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
     }
 
     if(TYPEOF(node) != EXTPTRSXP) {
-       PROBLEM "R_insertXMLNode expects XMLInternalNode objects"
-       ERROR;
+	Rf_error("R_insertXMLNode expects XMLInternalNode objects");
     }
 
     p = (xmlNodePtr) R_ExternalPtrAddr(parent);
     n = (xmlNodePtr) R_ExternalPtrAddr(node);
 
     if(!p || !n) {
-	PROBLEM "either the parent or child node is NULL"
-        ERROR;
+	Rf_error("either the parent or child node is NULL");
     }
 
 #if 0
@@ -575,9 +569,8 @@ R_insertXMLNode(USER_OBJECT_ node, USER_OBJECT_ parent, USER_OBJECT_ at, USER_OB
 	break;
     default:
        {
-	   PROBLEM "ignoring request to add child (types parent: %d, child %d)",
-               p->type, n->type
-	    WARN
+	   Rf_warning("ignoring request to add child (types parent: %d, child %d)",
+		      p->type, n->type);
        }
 	break;
     }
@@ -605,21 +598,18 @@ RS_XML_xmlAddSiblingAt(USER_OBJECT_ r_to, USER_OBJECT_ r_node, USER_OBJECT_ r_af
     xmlNodePtr (*f)(xmlNodePtr, xmlNodePtr);
 
     if(TYPEOF(r_to) != EXTPTRSXP) {
-       PROBLEM "RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the parent node"
-       ERROR;
+	Rf_error("RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the parent node");
     }
 
     if(TYPEOF(r_node) != EXTPTRSXP) {
-       PROBLEM "RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the node to add"
-       ERROR;
+	Rf_error("RS_XML_xmlAddSiblingAt expects XMLInternalNode objects for the node to add");
     }
 
     p = (xmlNodePtr) R_ExternalPtrAddr(r_to);
     n = (xmlNodePtr) R_ExternalPtrAddr(r_node);
 
     if(!p || !n) {
-	PROBLEM "either the parent or child node is NULL"
-        ERROR;
+	Rf_error("either the parent or child node is NULL");
     }
 	
     f = LOGICAL(r_after)[0] ?  xmlAddNextSibling : xmlAddPrevSibling ;
@@ -640,15 +630,13 @@ RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new, USER_OBJECT_ manag
     xmlNodePtr Old, New, ans;
 
     if(TYPEOF(r_old) != EXTPTRSXP && TYPEOF(r_new) != EXTPTRSXP) {
-       PROBLEM "R_replaceXMLNode expects XMLInternalNode objects"
-       ERROR;
+	Rf_error("R_replaceXMLNode expects XMLInternalNode objects");
     }
     Old = (xmlNodePtr) R_ExternalPtrAddr(r_old);
     New = (xmlNodePtr) R_ExternalPtrAddr(r_new);
 
     if(!Old) {
-	PROBLEM "NULL value for XML node to replace"
-	    ERROR;
+	Rf_error("NULL value for XML node to replace");
     }
 
     ans = xmlReplaceNode(Old, New);
@@ -670,8 +658,7 @@ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeN
 	node = (xmlNodePtr) R_ExternalPtrAddr(s_node);
     
 	if(!node) {
-	    PROBLEM "Empty XMLInternalNode"
-		ERROR;
+	    Rf_error("Empty XMLInternalNode");
 	}
     }
     
@@ -682,8 +669,7 @@ RS_XML_removeChildren(USER_OBJECT_ s_node, USER_OBJECT_ kids, USER_OBJECT_ freeN
 	if(!tmp)
 	    continue;
 	if(node && tmp->parent != node) {
-	    PROBLEM "trying to remove a child node from a different parent node"
-   	     ERROR;
+	    Rf_error("trying to remove a child node from a different parent node");
 	}
 
 	xmlUnlinkNode(tmp);
@@ -706,8 +692,7 @@ R_xmlRootNode(USER_OBJECT_ sdoc, USER_OBJECT_ skipDtd, USER_OBJECT_ manageMemory
       node = doc->children;
   
   if(!node) {
-      PROBLEM "empty XML document"
-	  WARN;
+      Rf_warning("empty XML document");
       return(NULL_USER_OBJECT);
   }
 
@@ -857,13 +842,11 @@ USER_OBJECT_
 RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ manageMemory)
 {
     if(TYPEOF(obj) != EXTPTRSXP) {
-	PROBLEM  "clone can only be applied to an internal, C-level libxml2 object"
-        ERROR;
+	Rf_error( "clone can only be applied to an internal, C-level libxml2 object");
     }
 
     if(!R_ExternalPtrAddr(obj)) {
-	PROBLEM  "NULL value passed to clone, possibly from a previous session"
-        ERROR;
+	Rf_error( "NULL value passed to clone, possibly from a previous session");
     }
 
     if(R_isInstanceOf(obj, "XMLInternalElementNode")) {
@@ -877,8 +860,7 @@ RS_XML_clone(USER_OBJECT_ obj, USER_OBJECT_ recursive, USER_OBJECT_ manageMemory
 	return(R_createXMLDocRef(xmlCopyDoc(doc, INTEGER(recursive)[0]))); // , manageMemory));
     }
     
-    PROBLEM "clone doesn't (yet) understand this internal data type"
-    ERROR;
+    Rf_error("clone doesn't (yet) understand this internal data type");
 
     return(NULL_USER_OBJECT); /* never reached */
 }
@@ -921,8 +903,7 @@ USER_OBJECT_
 R_removeXMLNsRef(xmlNsPtr ns)
 {
 /*XXX    xmlNsPtr p = (xmlNsPtr) R_ExternalPtrAddr(); */
-    PROBLEM "C routine R_removeXMLNsRef() not implemented yet" 
-    ERROR;
+    Rf_error("C routine R_removeXMLNsRef() not implemented yet");
     return(R_NilValue);
 }
 
@@ -946,8 +927,7 @@ R_convertXMLNsRef(SEXP r_ns)
   xmlNsPtr ns;
 
   if(TYPEOF(r_ns) != EXTPTRSXP) {
-      PROBLEM "wrong type for namespace reference"
-	  ERROR;
+      Rf_error("wrong type for namespace reference");
   }
 
   ns = (xmlNsPtr) R_ExternalPtrAddr(r_ns);
@@ -1166,8 +1146,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     const char *encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
     
     if(TYPEOF(sdoc) != EXTPTRSXP) {
-       PROBLEM "document passed to R_saveXMLDOM is not an external pointer"
-	   ERROR;
+	Rf_error("document passed to R_saveXMLDOM is not an external pointer");
     }
 
     doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
@@ -1217,8 +1196,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	  FILE *f;
 	  f = fopen(CHAR_DEREF(STRING_ELT(sfileName, 0)), "w");
 	  if(!f) {
-	      PROBLEM "cannot create file %s. Check the directory exists and permissions are appropriate", CHAR_DEREF(STRING_ELT(sfileName, 0))
-		  ERROR;
+	      Rf_error("cannot create file %s. Check the directory exists and permissions are appropriate", CHAR_DEREF(STRING_ELT(sfileName, 0)) );
           }
 	  xmlDocFormatDump(f, doc, 1);
 	  fclose(f);
@@ -1256,8 +1234,7 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 	    xmlFree(mem);
 	} else { 
                /*XXX get the error message from libxml2 */
-	    PROBLEM "failed to write XML document contents"
-		ERROR;
+	    Rf_error("failed to write XML document contents");
 	}
         UNPROTECT(1);
 
@@ -1476,8 +1453,7 @@ R_setXMLInternalTextNode_noenc(SEXP node)
 {
      xmlNodePtr n = (xmlNodePtr) R_ExternalPtrAddr(node);
      if(!n) {
-	 PROBLEM "null value passed for XMLInternalTextNode"
-	     ERROR;
+	 Rf_error("null value passed for XMLInternalTextNode");
      }
      n->name = (const xmlChar *) (&xmlStringTextNoenc);
      return(ScalarLogical(TRUE));
@@ -1494,8 +1470,7 @@ R_setXMLInternalTextNode_value(SEXP node, SEXP value)
    // DECL_ENCODING_FROM_NODE(n)
 
    if(n->type != XML_TEXT_NODE) {
-       PROBLEM  "Can only set value on an text node"
-	   ERROR;
+       Rf_error( "Can only set value on an text node");
    }
 
    str = CHAR(STRING_ELT(value, 0));
@@ -1521,8 +1496,7 @@ R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
    DECL_ENCODING_FROM_NODE(n)
 
    if(!n) {
-      PROBLEM  "null value for xml node reference"
-      ERROR;
+       Rf_error( "null value for xml node reference");
    }
 
    tmp  = xmlNodeGetContent(n);
@@ -1599,8 +1573,7 @@ RS_XML_isDescendantOf(USER_OBJECT_ r_node, USER_OBJECT_ r_top, USER_OBJECT_ stri
     top = (xmlNodePtr) R_ExternalPtrAddr(r_top);    
 
     if(!node || !top) {
-	PROBLEM  "null value passed to RS_XML_isDescendantOf"
-	    ERROR;
+	Rf_error( "null value passed to RS_XML_isDescendantOf");
     }
 
 /*XXX */

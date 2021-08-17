@@ -136,8 +136,7 @@ void xmlParserError(void *ctx, const char *msg, ...)
     /* Write in the actual message. */
   vsprintf(tmp, msg, args);
   va_end(args);
-  PROBLEM "XML Parsing Error: %s", buf
-  WARN;
+  Rf_warning("XML Parsing Error: %s", buf);
 #endif
 }
 
@@ -268,15 +267,13 @@ R_makeRefObject(void *ref, const char *className)
    SEXP klass, obj, sref;
 
    if(!ref) {
-      PROBLEM "NULL value for external reference"
-      WARN;
-      return(R_NilValue);
+       Rf_warning("NULL value for external reference");
+       return(R_NilValue);
    }
 
    PROTECT(klass = MAKE_CLASS((char *) className)); /* XXX define MAKE_CLASS with const */
    if(klass == R_NilValue) { /* Is this the right test? */
-      PROBLEM "Cannot find class %s for external reference", className
-      ERROR;
+       Rf_error("Cannot find class %s for external reference", className);
    }
    PROTECT(obj = NEW_OBJECT(klass));
    PROTECT(sref = R_MakeExternalPtr(ref, Rf_install(className), R_NilValue));
@@ -299,8 +296,7 @@ R_parseURI(SEXP r_uri)
   int i= 0;
   uri = xmlParseURI( CHAR( STRING_ELT( r_uri, 0 )));
   if(!uri) {
-     PROBLEM "cannot parse URI %s", CHAR( STRING_ELT( r_uri, 0) )
-     ERROR;
+      Rf_error("cannot parse URI %s", CHAR( STRING_ELT( r_uri, 0) ) );
   }
 
   PROTECT(ans = NEW_LIST(8));

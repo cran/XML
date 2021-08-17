@@ -102,8 +102,7 @@ convertXPathObjectToR(xmlXPathObjectPtr obj, SEXP fun, int encoding, SEXP manage
     case XPATH_RANGE:
     case XPATH_LOCATIONSET:
     case XPATH_USERS:
-	PROBLEM "currently unsupported xmlXPathObject type %d in convertXPathObjectToR. Please send mail to maintainer.", obj->type
-        WARN
+	Rf_warning("currently unsupported xmlXPathObject type %d in convertXPathObjectToR. Please send mail to maintainer.", obj->type);
     default:
 	ans = R_NilValue;
   }
@@ -124,8 +123,7 @@ R_namespaceArray(SEXP namespaces, xmlXPathContextPtr ctxt)
  els = xmlMallocAtomic(sizeof(xmlNsPtr) * n); 
  
  if(!els) {
-   PROBLEM  "Failed to allocated space for namespaces"
-   ERROR;
+     Rf_error( "Failed to allocate space for namespaces");
  }
 
  for(i = 0; i < n; i++) {
@@ -194,8 +192,7 @@ SEXP
 R_XMLInternalDocument_free(SEXP sdoc)
 {
   if(TYPEOF(sdoc) != EXTPTRSXP || R_ExternalPtrTag(sdoc) != Rf_install("XMLInternalDocument")) {
-     PROBLEM "R_free must be given an internal XML document object, 'XMLInternalDocument'"
-     ERROR;
+      Rf_error("R_free must be given an internal XML document object, 'XMLInternalDocument'");
   }
 
   R_xmlFreeDoc(sdoc);
@@ -218,8 +215,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, S
  xmlDocPtr doc;
 
  if(TYPEOF(sdoc) != EXTPTRSXP || R_ExternalPtrTag(sdoc) != Rf_install("XMLInternalDocument")) {
-   PROBLEM "xpathEval must be given an internal XML document object, 'XMLInternalDocument'"
-   ERROR;
+     Rf_error("xpathEval must be given an internal XML document object, 'XMLInternalDocument'");
  }
 
  doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
@@ -255,8 +251,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, S
 	 if(TYPEOF(el) == EXTPTRSXP) {
 	     routine = R_ExternalPtrAddr(el);
 	     if(!id) {
-		 PROBLEM "no name for XPath function routine"
-		     ERROR;
+		 Rf_error("no name for XPath function routine");
 	     }
 	 } else if(TYPEOF(el) == CLOSXP) {
 	     routine = R_genericAnonXPathFun;
@@ -280,8 +275,7 @@ RS_XML_xpathEval(SEXP sdoc, SEXP r_node, SEXP path, SEXP namespaces, SEXP fun, S
  R_AnonXPathFuns = NULL;
 
  if(!result) {
-   PROBLEM  "error evaluating xpath expression %s", CHAR_DEREF(STRING_ELT(path, 0))
-   ERROR;
+     Rf_error( "error evaluating xpath expression %s", CHAR_DEREF(STRING_ELT(path, 0)));
  }
 
  return(ans);
@@ -343,8 +337,7 @@ RS_XML_killNodesFreeDoc(SEXP sdoc)
 {
    xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(sdoc);
    if(!doc) {
-       PROBLEM "null xmlDocPtr passed as externalptr to RS_XML_killNodesFreeDoc"
-	   WARN;
+       Rf_warning("null xmlDocPtr passed as externalptr to RS_XML_killNodesFreeDoc");
        return(ScalarLogical(FALSE));
    }
    doc->children = NULL;
@@ -364,8 +357,7 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
  xmlDocPtr doc;
 
  if(TYPEOF(s_node) != EXTPTRSXP || R_ExternalPtrTag(s_node) != Rf_install("XMLInternalNode")) {
-   PROBLEM "xpathEval must be given an internal XML document object, 'XMLInternalNode'"
-   ERROR;
+     Rf_error("xpathEval must be given an internal XML document object, 'XMLInternalNode'");
  }
 
  ctxt = xmlXPathNewContext(doc);
@@ -385,8 +377,7 @@ RS_XML_xpathNodeEval(SEXP s_node, SEXP path, SEXP namespaces, SEXP fun)
  xmlXPathFreeContext(ctxt);
 
  if(!result) {
-   PROBLEM  "error evaluating xpath expression %s", CHAR_DEREF(STRING_ELT(path, 0))
-   ERROR;
+     Rf_error( "error evaluating xpath expression %s", CHAR_DEREF(STRING_ELT(path, 0)));
  }
 
  return(ans);
@@ -652,8 +643,7 @@ convertXPathVal(xmlXPathObjectPtr xval)
       }
 	break;
     default:
-	PROBLEM "converting an XPath type %d to R not supported now", xval->type
-	    WARN;
+	Rf_warning("converting an XPath type %d to R not supported now", xval->type);
     }
     return(ans);
 }
@@ -675,8 +665,7 @@ R_pushResult(xmlXPathParserContextPtr ctxt, SEXP ans)
 	xmlXPathReturnString(ctxt, xmlStrdup((const xmlChar *)CHAR(STRING_ELT(ans, 0))));
 	break;
     default:
-	PROBLEM "R type not supported as result of XPath function"
-	    ERROR;
+	Rf_error("R type not supported as result of XPath function");
     }
 }
 

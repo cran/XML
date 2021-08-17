@@ -84,7 +84,7 @@ The following are specific to \code{xmlOutputDOM}:
    to the currently active/open node from the root node.}
 }
 \references{\url{http://www.omegahat.net/RSXML},
-\url{http://www.w3.org/xml}}
+\url{http://www.w3.org/XML/}}
 \author{Duncan Temple Lang}
 
 \seealso{

@@ -42,8 +42,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     name = CHARACTER_DATA(fileName)[0];
 #endif
     if(!isURLDoc && (name == NULL || stat(name, &tmp_stat) < 0)) {
-      PROBLEM "Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0))
-      ERROR;
+	Rf_error("Can't find file %s", CHAR_DEREF(STRING_ELT(fileName, 0)) );
     }
   } else {
      name = strdup(CHAR_DEREF(STRING_ELT(fileName, 0)));
@@ -69,8 +68,7 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   if(doc == NULL) {
     if(freeName && name)
         free((char *) name);
-    PROBLEM "error in creating parser for %s", name
-    ERROR;
+    Rf_error("error in creating parser for %s", name);
   }
 
   PROTECT(rdoc = RS_XML(convertXMLDoc)(name, doc, converterFunctions, &parserSettings));

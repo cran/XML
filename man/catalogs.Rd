@@ -55,7 +55,7 @@
    \url{http://xmlsoft.org/catalog.html}
    and \url{http://www.sagehill.net/docbookxsl/Catalogs.html}
    among many resources and the specification for the catalog format at
-    \url{http://www.oasis-open.org/committees/entity/spec-2001-08-06.html}.
+    \url{https://www.oasis-open.org/committees/entity/spec-2001-08-06.html}.
    }
 
 \usage{
