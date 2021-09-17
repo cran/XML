@@ -1,5 +1,5 @@
 0c8607c1408272f87cb4412d0a75829c *ChangeLog
-d8ee1e8a50364c03cb063f60bb36a0e5 *DESCRIPTION
+0fae3f570dc131b0f5373acaa975a8d5 *DESCRIPTION
 75ba638bc1410426a9b221d2078675d2 *LICENSE
 ebcf996872ad4bb2a7e0c0cbcc3e42de *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -66,8 +66,8 @@ c1909bbb22618650552d7c9cca20d119 *R/xmlTreeParse.R
 4ac67423f4eb47a3b0d2817f8e9d082a *R/zzz.R
 081453acd1b3e6642a8ba518d2d14251 *README
 b0777f8f8a90181ea55c9efd274ba7d3 *cleanup
-fffeaf575f3ad7c7d8d122c3c4c062d6 *configure
-fa0f117bbc0c8f21152373d4b638e83d *configure.ac
+fb248a085dbe1cc71c22ef263485d56b *configure
+d32e082bc9f133816d2388ff5352cfd9 *configure.ac
 d59bee01710e95ca311dfc7dc95e27e0 *configure.win
 0b3b8ce6fd20c02d923efa867f9932c9 *inst/COPYRIGHTS
 ff54e5b8500551dcb3239e7054a77001 *inst/FAQ.html
@@ -316,7 +316,7 @@ ccf6362ee95dda2969aa6b0000567b8c *man/libxmlVersion.Rd
 176d202aa4ba2469ef9bb1c826e2e7c4 *man/print.Rd
 d36e4628f65dff3c8d5fe347b126676d *man/processXInclude.Rd
 e99ccdfa2e19019869106513d076b79b *man/readHTMLList.Rd
-1a28e659d861a5b131bdabe70e612cd6 *man/readHTMLTable.Rd
+b6004a95125c1959f98f3df397d9fe65 *man/readHTMLTable.Rd
 8f81d16226120619817fa1a172679a08 *man/readKeyValueDB.Rd
 8d15b91eaa346f72664bbb62ab5455fc *man/readSolrDoc.Rd
 72281e5a24125d35b55afc9f70555a4a *man/removeXMLNamespaces.Rd

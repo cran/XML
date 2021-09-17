@@ -1,5 +1,5 @@
 Package: XML
-Version: 3.99-0.7
+Version: 3.99-0.8
 Authors@R: c(person("CRAN Team", role = c('ctb', 'cre'),
                     email = "CRAN@r-project.org",
                     comment = "de facto maintainer since 2013"),
@@ -32,10 +32,10 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R
 NeedsCompilation: yes
-Packaged: 2021-08-17 11:54:45 UTC; ripley
+Packaged: 2021-09-16 09:18:06 UTC; ripley
 Author: CRAN Team [ctb, cre] (de facto maintainer since 2013),
   Duncan Temple Lang [aut] (<https://orcid.org/0000-0003-0159-1546>),
   Tomas Kalibera [ctb]
 Maintainer: CRAN Team <CRAN@r-project.org>
 Repository: CRAN
-Date/Publication: 2021-08-17 19:22:29 UTC
+Date/Publication: 2021-09-17 06:19:17 UTC
