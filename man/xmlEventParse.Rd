@@ -325,7 +325,7 @@ If this is True, each callback function  should support
 \details{
  This is now implemented using the libxml parser.
  Originally, this was implemented via the Expat XML parser by
- Jim Clark (\url{http://www.jclark.com}).
+ Jim Clark (\url{http://www.jclark.com/}).
 }
 \value{
   The return value is the `handlers'
@@ -334,7 +334,7 @@ the callback functions have manipulated variables
 local to it and that the caller knows how to extract this.
 }
 
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml}}
+\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{Duncan Temple Lang}
 \note{
  The libxml parser can read URLs via http or ftp.

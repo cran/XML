@@ -26,7 +26,7 @@
 \usage{
 xmlToDataFrame(doc, colClasses = NULL, homogeneous = NA,
                collectNames = TRUE, nodes = list(),
-               stringsAsFactors = default.stringsAsFactors())
+               stringsAsFactors = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

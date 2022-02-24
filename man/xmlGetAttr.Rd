@@ -57,7 +57,7 @@ xmlGetAttr(node, name, default = NULL, converter = NULL,
   the return value is  a string which is the value of the attribute.
   Otherwise, the value of \code{default} is returned.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
+\references{\url{http://www.w3.org/XML//}, \url{http://www.jclark.com/xml/},
 \url{http://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

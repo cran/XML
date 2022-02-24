@@ -42,7 +42,7 @@ was activatd for that feature, or \code{NA} if that feature is not
 part of the particular version of libcurl.
 }
 
-\references{\url{http://www.w3.org/XML}, \url{http://www.xmlsoft.org},
+\references{\url{http://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
 \url{http://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

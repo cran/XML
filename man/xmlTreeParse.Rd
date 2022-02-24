@@ -391,7 +391,7 @@ contents.
   
  } }
 
- \references{\url{http://xmlsoft.org}, \url{http://www.w3.org/XML/}}
+ \references{\url{http://xmlsoft.org}, \url{http://www.w3.org/XML//}}
 
  \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>} 
 

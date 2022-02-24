@@ -18,7 +18,7 @@ append.xmlNode(to, ...)
 \value{
  The original \code{to} node containing its new children nodes.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
+\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{http://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

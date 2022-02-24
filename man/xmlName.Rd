@@ -28,7 +28,7 @@ xmlName(node, full = FALSE)
  A character vector of length 1
  which is the \code{node$name} entry.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
+\references{\url{http://www.w3.org/XML//}, \url{http://www.jclark.com/xml/},
 \url{http://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

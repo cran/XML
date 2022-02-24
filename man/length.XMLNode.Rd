@@ -18,7 +18,7 @@ It is provided as a convenient form of calling the
  An integer giving the number of sub-nodes
  of this node.
 }
-\references{\url{http://www.w3.org/XML}, \url{http://www.jclark.com/xml},
+\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{http://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 
