@@ -1,5 +1,5 @@
 0c8607c1408272f87cb4412d0a75829c *ChangeLog
-35e3012138eee2fae4b2ee87d80f1869 *DESCRIPTION
+bd043851acb4de0c4f07a3e9f6d6f800 *DESCRIPTION
 75ba638bc1410426a9b221d2078675d2 *LICENSE
 ebcf996872ad4bb2a7e0c0cbcc3e42de *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -32,7 +32,7 @@ c1001a4a49a44e593ae73d9dd2da4873 *R/htmlLinks.R
 57957d2e3fe9252d2df2d88a70b9f1dc *R/namespaces.R
 608a1b5940175cf71f79b656ed988d9a *R/nodeAccessors.R
 0a08d749c99681148ef8c635de0cd6cd *R/parseDTD.R
-ef3669c755c641d7d951e1e4f0913fd0 *R/parser.R
+719bbd175850d2c345fe7245c45c7605 *R/parser.R
 1da99c4595f2cad8d7c92c3916973750 *R/readHTMLTable.R
 ed3eddf359449369643ee34b7953fb4a *R/reflection.R
 9dc1ee46d1277d6edfb4e846c89663c0 *R/saveXML.R
@@ -298,7 +298,7 @@ d3e3902ea4fe25d3857aa794dec075b0 *man/findXInclude.Rd
 3d95b1004bd3e03b0d136bf4b3be8eae *man/getChildrenStrings.Rd
 9443e267094cee408efe309f7223ab91 *man/getEncoding.Rd
 613afd8990c818c884f181ffe69d34f3 *man/getHTMLLinks.Rd
-f59f6290846bb3c59920def0f2e46cfd *man/getLineNumber.Rd
+ab922d47da651c3656c4f9fc64d3c333 *man/getLineNumber.Rd
 7141be92166bb259210073b470e0ff27 *man/getNodeSet.Rd
 694c74919056235f36ea2122371b6d72 *man/getRelativeURL.Rd
 c063b2ac3fec2b4e41f2b17d1a8518a7 *man/getXIncludes.Rd
@@ -336,7 +336,7 @@ d82937bbdc89754413dd1bacd993f337 *man/xmlChildren.Rd
 117d7cbdd806523b9af112f3e5403b71 *man/xmlContainsEntity.Rd
 d472a327e57e023b9a417b623aeeb0df *man/xmlDOMApply.Rd
 368fa01a925a08db5b309623c46b99ed *man/xmlElementSummary.Rd
-97bf52a8240ce3838ba645d341965462 *man/xmlElementsByTagName.Rd
+6a52f50f906aecc2b3f463295dc814fe *man/xmlElementsByTagName.Rd
 615fa88da4403d8b300521558258d09b *man/xmlEventHandler.Rd
 66316f590af07e431cca873d5bbde391 *man/xmlEventParse.Rd
 a08ad438d5387952933f8bf777140e1c *man/xmlGetAttr.Rd
@@ -363,7 +363,7 @@ b1e31fe1039894e3d13d5c3959bddb54 *man/xmlRoot.Rd
 29646a080808de5840f7bcb8994400c9 *man/xmlToList.Rd
 15fdef72e6e90aeacf92e9afd126b3b3 *man/xmlToS4.Rd
 043bcac7d47c3174c6fc0bf6631c7852 *man/xmlTree.Rd
-fbb7fadd3283be7081739dd708dd3d64 *man/xmlTreeParse.Rd
+34090671ab3ee23995f6bd2edcfb0558 *man/xmlTreeParse.Rd
 1861c838e232793806e9203278768992 *man/xmlValue.Rd
 bde6753d3103e984833a49e173dd1a9f *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h

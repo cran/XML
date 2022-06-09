@@ -85,7 +85,7 @@ xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator(
 
 \arguments{
  \item{file}{ The name of the file containing the XML contents.
-This can contain \~ which is expanded to the user's
+This can contain ~ which is expanded to the user's
 home directory.
 It can also be a URL. See \code{isURL}.
 Additionally, the file can be compressed (gzip)
@@ -93,7 +93,7 @@ and is read directly without the user having
 to de-compress (gunzip) it.}
  \item{ignoreBlanks}{ logical value indicating whether
 text elements made up entirely of white space should be included
-in the resulting `tree'. }
+in the resulting \sQuote{tree}. }
  \item{handlers}{Optional collection of functions
   used to map the different XML nodes to R
   objects. Typically, this is a named list of functions,
@@ -118,7 +118,7 @@ in the resulting `tree'. }
     with full reference information.
     }
   \item{asText}{logical value indicating that the first argument,
-    `file', 
+    \code{file}, 
      should be treated as the XML text to parse, not the name of 
      a file. This allows the contents of documents to be retrieved 
      from different sources (e.g. HTTP servers, XML-RPC, etc.) and still
@@ -376,17 +376,17 @@ contents.
 
  If internal nodes are used and the internal tree returned directly,
  all the nodes are returned as-is and no attempt to 
-  trim white space, remove ``empty'' nodes (i.e. containing only white
+  trim white space, remove \dQuote{empty} nodes (i.e. containing only white
  space), etc. is done. This is potentially quite expensive and so is
  not done generally, but should  be done during the processing
  of the nodes.  When using XPath queries, such nodes are easily
  identified and/or ignored and so do not cause any difficulties.
  They do become an issue when dealing with a node's chidren
  directly and so one can use simple filtering techniques such as
- \code{ xmlChildren(node)[ ! xmlSApply(node, inherits,  "XMLInternalTextNode")]}
+ \code{ xmlChildren(node)[!xmlSApply(node, inherits,  "XMLInternalTextNode")]}
  and even check the \code{\link{xmlValue}} to determine if it contains only
  white space.
- \code{ xmlChildren(node)[ ! xmlSApply(node, function(x) inherit(x,
+ \code{ xmlChildren(node)[!xmlSApply(node, function(x) inherit(x,
               "XMLInternalTextNode")] && trim(xmlValue(x)) == "")}
   
  } }
@@ -458,7 +458,7 @@ m <- xmlTreeParse(fileName,
   # from the startElement handler.
   #
   # We cumulate the names of variables in a character
-  # vector named `vars'.
+  # vector named 'vars'.
   # We define this within a closure and define the 
   # variable function within that closure so that it
   # will be invoked when the parser encounters a <variable>

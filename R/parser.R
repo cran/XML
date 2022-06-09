@@ -3,11 +3,11 @@
 #setClass("XMLParserOption", "EnumValue")
 
 parserOptions =
-  structure(c(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 
+  structure(c(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048,
 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576
-), .Names = c("RECOVER", "NOENT", "DTDLOAD", "DTDATTR", "DTDVALID", 
-"NOERROR", "NOWARNING", "PEDANTIC", "NOBLANKS", "SAX1", "XINCLUDE", 
-"NONET", "NODICT", "NSCLEAN", "NOCDATA", "NOXINCNODE", "COMPACT", 
+), .Names = c("RECOVER", "NOENT", "DTDLOAD", "DTDATTR", "DTDVALID",
+"NOERROR", "NOWARNING", "PEDANTIC", "NOBLANKS", "SAX1", "XINCLUDE",
+"NONET", "NODICT", "NSCLEAN", "NOCDATA", "NOXINCNODE", "COMPACT",
 "OLD10", "NOBASEFIX", "HUGE", "OLDSAX"))
 
 RECOVER = 2^0
@@ -32,6 +32,8 @@ NOBASEFIX = 2^18
 HUGE = 2^19
 OLDSAX = 2^20
 
+## This can (and does) send illegal file names to file.exists(), which
+## has been protected against that but should really be caught here.
 xmlParseDoc =
 function(file, options = 1L, encoding = character(), asText = !file.exists(file),
           baseURL = file)
