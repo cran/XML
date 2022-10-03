@@ -507,7 +507,7 @@ m <- xmlTreeParse(fileName,
 \dontrun{
  # Parse an XML document directly from a URL.
  # Requires Internet access.
- xmlTreeParse("http://www.omegahat.net/Scripts/Data/mtcars.xml", asText=TRUE)
+ xmlTreeParse("https://www.omegahat.net/Scripts/Data/mtcars.xml", asText=TRUE)
 }
 
   counter = function() {

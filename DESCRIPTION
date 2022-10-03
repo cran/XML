@@ -1,5 +1,5 @@
 Package: XML
-Version: 3.99-0.10
+Version: 3.99-0.11
 Authors@R: c(person("CRAN Team", role = c('ctb', 'cre'),
                     email = "CRAN@r-project.org",
                     comment = "de facto maintainer since 2013"),
@@ -15,7 +15,7 @@ Description: Many approaches for both reading and
         creating XML (and HTML) documents (including DTDs), both local
         and accessible via HTTP or FTP.  Also offers access to an
         'XPath' "interpreter".
-URL: http://www.omegahat.net/RSXML/
+URL: https://www.omegahat.net/RSXML/
 License: BSD_3_clause + file LICENSE
 Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         applyDOM.R assignChild.R catalog.R createNode.R dynSupports.R
@@ -32,10 +32,10 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R
 NeedsCompilation: yes
-Packaged: 2022-06-09 10:06:34 UTC; ligges
+Packaged: 2022-10-02 20:51:30 UTC; ripley
 Author: CRAN Team [ctb, cre] (de facto maintainer since 2013),
   Duncan Temple Lang [aut] (<https://orcid.org/0000-0003-0159-1546>),
   Tomas Kalibera [ctb]
 Maintainer: CRAN Team <CRAN@r-project.org>
 Repository: CRAN
-Date/Publication: 2022-06-09 22:40:12 UTC
+Date/Publication: 2022-10-03 08:46:01 UTC

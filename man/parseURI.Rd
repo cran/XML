@@ -39,7 +39,7 @@ parseURI(uri)
  \code{\link{getRelativeURL}}
 }
 \examples{\dontrun{ ## site is flaky
-  parseURI("http://www.omegahat.net:8080/RCurl/index.html")
+  parseURI("https://www.omegahat.net:8080/RCurl/index.html")
   parseURI("ftp://duncan@www.omegahat.net:8080/RCurl/index.html")
 
   parseURI("ftp://duncan@www.omegahat.net:8080/RCurl/index.html#my_anchor")

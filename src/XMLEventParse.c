@@ -412,7 +412,7 @@ fprintf(stderr, "Freeing XML node from a branch\n");
 int numDocsCreated = 0;
 
 void
-R_reportDocGC()
+R_reportDocGC(void)
 {
     REprintf("<r:docReport createdInBranch='%d' createdByXMLPackage='%d' freed='%d'/>\n", numDocsCreated, R_numXMLDocs, R_numXMLDocsFreed);
 }

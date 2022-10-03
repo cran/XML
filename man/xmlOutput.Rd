@@ -39,7 +39,7 @@ This provides a convenient way to specify the default name space that appers in 
   For \code{xmlOuputDOM}, this is a named character vector with each
   element giving the name space identifier and the
   corresponding URI, \\
-  e.g \code{c(shelp = "http://www.omegahat.net/XML/SHelp")}
+  e.g \code{c(shelp = "https://www.omegahat.net/XML/SHelp")}
 }
  \item{header}{if non-NULL, this is immediately written to the output stream allowing
   one to control the initial section of the XML document.}
@@ -83,7 +83,7 @@ The following are specific to \code{xmlOutputDOM}:
   \item{current}{obtain the path or collection of indices to 
    to the currently active/open node from the root node.}
 }
-\references{\url{http://www.omegahat.net/RSXML/},
+\references{\url{https://www.omegahat.net/RSXML/},
 \url{http://www.w3.org/XML//}}
 \author{Duncan Temple Lang}
 
@@ -111,12 +111,12 @@ con$closeTag() # address
 
 con$addTag("section", close = FALSE)
  con$addNode(xmlTextNode("This is some text "))
- con$addTag("a","and a link", attrs=c(href="http://www.omegahat.net"))
+ con$addTag("a","and a link", attrs=c(href="https://www.omegahat.net"))
  con$addNode(xmlTextNode("and some follow up text"))
 
  con$addTag("subsection", close = FALSE)
    con$addNode(xmlTextNode("some addtional text "))
-   con$addTag("a", attrs=c(href="http://www.omegahat.net"), close=FALSE)
+   con$addTag("a", attrs=c(href="https://www.omegahat.net"), close=FALSE)
      con$addNode(xmlTextNode("the content of the link"))
    con$closeTag() # a
  con$closeTag() # "subsection"

@@ -160,7 +160,7 @@ libxml2 \url{http://www.xmlsoft.org}
 
 b = newXMLNode("bob",
               namespace = c(r = "http://www.r-project.org",
-                            omg = "http://www.omegahat.net"))
+                            omg = "https://www.omegahat.net"))
 
 cat(saveXML(b), "\n")
 
@@ -227,7 +227,7 @@ z = xmlNode("arg", attrs = c(default="TRUE"),
 o = addChildren(z,
                 "some text",
                 xmlNode("a", "a link",
-                         attrs = c(href = "http://www.omegahat.net/RSXML")))
+                         attrs = c(href = "https://www.omegahat.net/RSXML")))
 o
 
 

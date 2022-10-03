@@ -45,7 +45,7 @@ Duncan Temple Lang
 \code{\link{readHTMLTable}}
 }
 \examples{\donttest{
-  try(readHTMLList("http://www.omegahat.net"))
+  try(readHTMLList("https://www.omegahat.net"))
 }}
 \keyword{IO}
 \keyword{programming}

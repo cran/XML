@@ -57,7 +57,7 @@ xmlElementsByTagName(el, name, recursive = FALSE)
  A list containing those child nodes of \code{el} whose
  tag name matches that specified by the user.
 }
-\references{\url{http://www.w3.org/XML/}, \url{http://www.omegahat.net/RSXML/},
+\references{\url{http://www.w3.org/XML/}, \url{https://www.omegahat.net/RSXML/},
 }
 \author{Duncan Temple Lang}
 \seealso{
@@ -67,7 +67,7 @@ xmlElementsByTagName(el, name, recursive = FALSE)
 
 \examples{
 \dontrun{
- doc <- xmlTreeParse("http://www.omegahat.net/Scripts/Data/mtcars.xml")
+ doc <- xmlTreeParse("https://www.omegahat.net/Scripts/Data/mtcars.xml")
  xmlElementsByTagName(doc$children[[1]], "variable")
 }
 

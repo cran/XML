@@ -36,7 +36,7 @@ getXMLErrors(filename, parse = xmlParse, ...)
   getXMLErrors(system.file("html", "getXMLErrors.html", package = "XML"))
 
 \dontrun{
-  getXMLErrors("http://www.omegahat.net/index.html")
+  getXMLErrors("https://www.omegahat.net/index.html")
 }
 
 }

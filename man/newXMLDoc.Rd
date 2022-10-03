@@ -83,7 +83,7 @@ newXMLDTDNode(nodeName, externalID = character(),
   with each element specifying a name space identifier and the
   corresponding URI for that namespace
   that are to be declared and used in the XML document, \\
-  e.g. \code{c(shelp = "http://www.omegahat.net/XML/SHelp")}}
+  e.g. \code{c(shelp = "https://www.omegahat.net/XML/SHelp")}}
  \item{addFinalizer}{a logical value indicating whether the
   default finalizer routine should be registered to
   free the internal xmlDoc when R no longer has a reference to this
@@ -227,11 +227,11 @@ and \code{XMLInternalNode}, respectively
 }
 
 \references{\url{http://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
-\url{http://www.omegahat.net}}
+\url{https://www.omegahat.net}}
 \author{ Duncan Temple Lang }
 
 \note{These functions are used to build up an internal XML tree.
-This can be used in the Sxslt package (\url{http://www.omegahat.net/Sxslt/})
+This can be used in the Sxslt package (\url{https://www.omegahat.net/Sxslt/})
 when creating content in R that is to be dynamically inserted into an XML
 document.}
 
@@ -297,12 +297,12 @@ d$closeNode()
 # Just doctype
 z = xmlTree("people", dtd = "people")
 # no public element
-z = xmlTree("people", dtd = c("people", "", "http://www.omegahat.net/XML/types.dtd"))
+z = xmlTree("people", dtd = c("people", "", "https://www.omegahat.net/XML/types.dtd"))
 # public and system
-z = xmlTree("people", dtd = c("people", "//a//b//c//d", "http://www.omegahat.net/XML/types.dtd"))
+z = xmlTree("people", dtd = c("people", "//a//b//c//d", "https://www.omegahat.net/XML/types.dtd"))
 
 # Using a DTD node directly.
-dtd = newXMLDTDNode(c("people", "", "http://www.omegahat.net/XML/types.dtd"))
+dtd = newXMLDTDNode(c("people", "", "https://www.omegahat.net/XML/types.dtd"))
 z = xmlTree("people", dtd = dtd)
 
 
@@ -318,7 +318,7 @@ z$closeNode()
 z = xmlTree()
 z$addNode("r:data",
          namespace = c(r = "http://www.r-project.org",
-                       omg = "http://www.omegahat.net"),
+                       omg = "https://www.omegahat.net"),
          close = FALSE)
 x = rnorm(3)
 z$addNode("r:numeric", attrs = c("omg:length" = length(x)))

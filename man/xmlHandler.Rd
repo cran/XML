@@ -26,7 +26,7 @@ xmlHandler()
 
 \examples{
 \dontrun{
-xmlURL <- "http://www.omegahat.net/Scripts/Data/mtcars.xml"
+xmlURL <- "https://www.omegahat.net/Scripts/Data/mtcars.xml"
 xmlText <- paste(scan(xmlURL, what="", sep="\n"),"\n",collapse="\n")
 }
 

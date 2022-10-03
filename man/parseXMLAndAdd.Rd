@@ -83,13 +83,13 @@ Duncan Temple Lang
 
   o = c("<x>dog</x>", "<omg:x>cat</omg:x>")
   node = parseXMLAndAdd(o, nsDefs  = c("http://cran.r-project.org",
-                                       omg = "http://www.omegahat.net"))
+                                       omg = "https://www.omegahat.net"))
   xmlNamespace(node[[1]])
   xmlNamespace(node[[2]])
 
   tt = newXMLNode("myTop")
   node = parseXMLAndAdd(o, tt, nsDefs  = c("http://cran.r-project.org",
-                                           omg = "http://www.omegahat.net"))
+                                           omg = "https://www.omegahat.net"))
   tt
 }
 

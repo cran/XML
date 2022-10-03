@@ -41,7 +41,7 @@ on \code{xmlChildren(x)}.
 \references{
   \url{http://www.w3.org/XML//},
   \url{http://www.jclark.com/xml/},
-  \url{http://www.omegahat.net}
+  \url{https://www.omegahat.net}
 }
 
 \author{Duncan Temple Lang}
