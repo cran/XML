@@ -146,17 +146,19 @@ void xmlParserError(void *ctx, const char *msg, ...)
  
 */
 void
-RSXML_setErrorHandlers()
+RSXML_setErrorHandlers(void)
 {
+    // Next 2 are deprecated in 2.10.x and will be made private
+#if LIBXML_VERSION < 21000
    xmlDefaultSAXHandlerInit();
    htmlDefaultSAXHandlerInit();
-#if 0
-   docbDefaultSAXHandlerInit();
-#endif
 
    xmlDefaultSAXHandler.error = S_xmlParserError;
    htmlDefaultSAXHandler.error = S_xmlParserError;
+#endif
+
 #if 0
+   docbDefaultSAXHandlerInit();
    docbDefaultSAXHandler.error = S_xmlParserError;
 #endif
 }

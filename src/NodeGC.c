@@ -421,7 +421,7 @@ R_clearNodeMemoryManagement(SEXP r_node)
 
 
 SEXP
-R_xmlRefCountEnabled()
+R_xmlRefCountEnabled(void)
 {
   int ans =
 #ifdef XML_REF_COUNT_NODES

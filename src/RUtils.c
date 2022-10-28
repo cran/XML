@@ -286,7 +286,7 @@ R_isInstanceOf(USER_OBJECT_ obj, const char *klass)
 
 
 SEXP
-RS_XML_getStructuredErrorHandler()
+RS_XML_getStructuredErrorHandler(void)
 {
     SEXP ans;
     PROTECT(ans = NEW_LIST(2));

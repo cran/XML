@@ -55,7 +55,7 @@ RS_XML(getDefaultValiditySetting)(USER_OBJECT_ val)
 {
 #ifdef HAVE_VALIDITY
 
- extern int xmlDoValidityCheckingDefaultValue;
+// extern int xmlDoValidityCheckingDefaultValue;
  USER_OBJECT_ ans;
  ans = NEW_INTEGER(1);
  INTEGER_DATA(ans)[0] = xmlDoValidityCheckingDefaultValue;
@@ -1023,7 +1023,7 @@ RS_XML(notifyNamespaceDefinition)(USER_OBJECT_ arg, R_XMLSettings *parserSetting
 #endif
 
 USER_OBJECT_
-RS_XML(libxmlVersion)()
+RS_XML(libxmlVersion)(void)
 {
  USER_OBJECT_ ans;
  unsigned int val;
