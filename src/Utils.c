@@ -106,7 +106,7 @@ RS_XML(treeApply)(USER_OBJECT_ rtree, USER_OBJECT_ function, USER_OBJECT_ args)
 
 #include <stdarg.h>
 
-void localXmlParserPrintFileInfo(xmlParserInputPtr input, char *buf);
+void localXmlParserPrintFileInfo(xmlParserInputPtr input, char *buf, int nbuf);
 
 
 #ifndef USE_LINKED_ERROR_HANDLER
@@ -128,7 +128,7 @@ void xmlParserError(void *ctx, const char *msg, ...)
   memset(buf , '\0', sizeof(buf)/sizeof(buf[0]));
 
     /* Insert the file and line number. */
-  localXmlParserPrintFileInfo(ctxt->input, buf);
+  localXmlParserPrintFileInfo(ctxt->input, buf, 3000);
     /* Move to the end of the buffer's contents. */
   tmp = buf + strlen(buf);
 
@@ -169,13 +169,13 @@ RSXML_setErrorHandlers(void)
     Write the file name and the current line number into the specified 
     string.
  */
-void localXmlParserPrintFileInfo(xmlParserInputPtr input, char *buf) {
+void localXmlParserPrintFileInfo(xmlParserInputPtr input, char *buf, int nbuf) {
     if (input != NULL) {
 	if (input->filename)
-	    sprintf(buf, "%s:%d: ", input->filename,
+	    snprintf(buf, nbuf, "%s:%d: ", input->filename,
 		    input->line);
 	else
-	    sprintf(buf, "Entity: line %d: ", input->line);
+	    snprintf(buf, nbuf, "Entity: line %d: ", input->line);
     }
 }
 

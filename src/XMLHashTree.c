@@ -63,7 +63,7 @@ static const char * const nodeElementNames[] =  {
    uniqueness.  Ignore the next definition in the comment!
 #define SET_NODE_NAME(x, id) sprintf(x, "%d", id)
 */
-#define SET_NODE_NAME(x, id, node) sprintf(x, "%p", (void *)node)
+#define SET_NODE_NAME(x, id, node) snprintf(x, 20, "%p", (void *)node)
 
 
 SEXP

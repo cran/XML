@@ -1447,7 +1447,7 @@ RS_XML(AttributeList)(xmlNodePtr node, R_XMLSettings *parserSettings)
          if(atts->name) {
            if(addNSPrefix && atts->ns && atts->ns->prefix) {
              char buf[400];
-             sprintf(buf, "%s:%s", atts->ns->prefix, atts->name);
+             snprintf(buf, 400, "%s:%s", atts->ns->prefix, atts->name);
              SET_STRING_ELT(ans_names, i, ENC_COPY_TO_USER_STRING(buf));
 	   } else
              SET_STRING_ELT(ans_names, i, ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(atts->name)));
