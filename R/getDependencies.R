@@ -1,15 +1,15 @@
 getXIncludes =
 function(filename, recursive = TRUE, skip = character(),
          omitPattern = "\\.(js|html?|txt|R|c)$",
-          namespace = c(xi = "http://www.w3.org/2003/XInclude"),
+          namespace = c(xi = "https://www.w3.org/2003/XInclude"),
           duplicated = TRUE)
 {
    doc = xmlParse(filename, xinclude = FALSE)
 
    if(missing(namespace)) {
      ns = xmlNamespaceDefinitions(doc, simplify = TRUE)
-     if("http://www.w3.org/2001/XInclude" %in% ns)
-       namespace = c(xi = "http://www.w3.org/2001/XInclude")
+     if("https://www.w3.org/2001/XInclude" %in% ns)
+       namespace = c(xi = "https://www.w3.org/2001/XInclude")
    }
 
    nodes = getNodeSet(doc, "//xi:include", namespaces = namespace)

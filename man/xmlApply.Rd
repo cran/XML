@@ -39,7 +39,7 @@ on \code{xmlChildren(x)}.
 }
 
 \references{
-  \url{http://www.w3.org/XML//},
+  \url{https://www.w3.org/XML//},
   \url{http://www.jclark.com/xml/},
   \url{https://www.omegahat.net}
 }

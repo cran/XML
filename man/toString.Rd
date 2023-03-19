@@ -24,7 +24,7 @@
   string corresponding to the XML node's contents.
 }
 
-\references{\url{http://www.w3.org/XML//}, \url{http://www.jclark.com/xml/}}
+\references{\url{https://www.w3.org/XML//}, \url{http://www.jclark.com/xml/}}
 \author{Duncan Temple Lang}
 \note{ This requires the Expat XML parser to be installed. }
 

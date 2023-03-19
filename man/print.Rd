@@ -57,7 +57,7 @@ that they would appear in an XML document.
 \value{
  Currently, \code{NULL}.
 }
-\references{\url{http://www.w3.org}, \url{https://www.omegahat.net/RSXML/}}
+\references{\url{https://www.w3.org}, \url{https://www.omegahat.net/RSXML/}}
 \author{Duncan Temple Lang}
 
 \seealso{

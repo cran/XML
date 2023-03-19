@@ -21,7 +21,7 @@ or XMLDocument.}
  an integer which is the \code{\link{length}}
  of the value from \code{\link{xmlChildren}}.
 }
-\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{https://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

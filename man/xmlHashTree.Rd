@@ -73,7 +73,7 @@ xmlHashTree(nodes = list(), parents = character(), children = list(),
   navigate up the tree from a node via its parent.  Certain tasks are
   more complex as the hierarchy is not implicit within a node.
 }
-\references{\url{http://www.w3.org/XML/}}
+\references{\url{https://www.w3.org/XML/}}
 \author{ Duncan Temple Lang }
 
 \seealso{

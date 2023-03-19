@@ -215,7 +215,7 @@ This is ignored when parsing an HTML document.
   This is the preferred way to write new code.
 }
 \item{xinclude}{a logical value indicating whether
-  to process nodes of the form \code{<xi:include xmlns:xi="http://www.w3.org/2001/XInclude">}
+  to process nodes of the form \code{<xi:include xmlns:xi="https://www.w3.org/2001/XInclude">}
   to insert content from other parts of (potentially different)
   documents. \code{TRUE} means resolve the external references;
   \code{FALSE} means leave the node as is.
@@ -391,7 +391,7 @@ contents.
   
  } }
 
- \references{\url{http://xmlsoft.org}, \url{http://www.w3.org/XML//}}
+ \references{\url{http://xmlsoft.org}, \url{https://www.w3.org/XML//}}
 
  \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>} 
 

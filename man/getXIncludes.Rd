@@ -12,11 +12,11 @@
 \usage{
 getXIncludes(filename, recursive = TRUE, skip = character(),
              omitPattern = "\\\\.(js|html?|txt|R|c)$",
-             namespace = c(xi = "http://www.w3.org/2003/XInclude"),
+             namespace = c(xi = "https://www.w3.org/2003/XInclude"),
             duplicated = TRUE)
 xmlXIncludes(filename, recursive = TRUE,
          omitPattern = "\\\\.(js|html?|txt|R|c)$",
-         namespace = c(xi = "http://www.w3.org/2003/XInclude"),
+         namespace = c(xi = "https://www.w3.org/2003/XInclude"),
          addNames = TRUE,
          clean = NULL, ignoreTextParse = FALSE)
 }

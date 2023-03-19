@@ -5,7 +5,7 @@ xmlXIncludes =
   #
 function(filename, recursive = TRUE,
          omitPattern = "\\.(js|html?|txt|R|c)$",
-         namespace = c(xi = "http://www.w3.org/2003/XInclude"),
+         namespace = c(xi = "https://www.w3.org/2003/XInclude"),
          addNames = TRUE,
          clean = NULL, ignoreTextParse = FALSE)
 {
@@ -13,8 +13,8 @@ function(filename, recursive = TRUE,
 #if(filename == "./XPath/xpathApplyFunctionTable.xml") browser()
    if(missing(namespace)) {
      ns = xmlNamespaceDefinitions(doc, simplify = TRUE)
-     if("http://www.w3.org/2001/XInclude" %in% ns)
-       namespace = c(xi = "http://www.w3.org/2001/XInclude")
+     if("https://www.w3.org/2001/XInclude" %in% ns)
+       namespace = c(xi = "https://www.w3.org/2001/XInclude")
    }
 
    nodes = getNodeSet(doc, "//xi:include[not(ancestor::ignore)]", namespaces = namespace)
@@ -32,10 +32,10 @@ function(filename, recursive = TRUE,
      files = files[!nonRecursive]
      nonRecursive = rep(FALSE, length(files))
    }
-   
+
    files = doClean(files, clean)
-   
-   if(length(omitPattern)) 
+
+   if(length(omitPattern))
       nonRecursive = grepl(omitPattern, unlist(files)) | nonRecursive
 
    if(recursive) {

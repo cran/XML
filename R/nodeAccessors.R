@@ -226,8 +226,8 @@ xmlNamespaceDefinitions.XMLNode =
                    #      warning("recursive facility not yet implemented.")
       f = function(node) {
             if(!inherits(node, "XMLNode") || xmlName(node) == "")
-              return(FALSE)
-            ans <<- append(ans, unclass(node)$namespaceDefinitions)
+                return(FALSE)
+            ans <<- append.xmlNode(ans, unclass(node)$namespaceDefinitions)
             xmlApply(node, f)
           }
       xmlApply(x, f)

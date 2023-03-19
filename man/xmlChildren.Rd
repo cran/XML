@@ -38,7 +38,7 @@ xmlChildren(x, addNames= TRUE, ...)
  A list whose elements are sub-nodes of the user-specified
 XMLNode. These are also of class XMLNode.
 }
-\references{\url{http://www.w3.org/XML/}}
+\references{\url{https://www.w3.org/XML/}}
 \author{Duncan Temple Lang}
 
 \seealso{

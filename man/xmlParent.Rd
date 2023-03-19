@@ -69,7 +69,7 @@ xmlAncestors(x, fun = NULL, ..., addFinalizer = NA, count = -1L)
   each node. Again, the order is top down.
 }
 
-\references{\url{http://www.w3.org/XML/}}
+\references{\url{https://www.w3.org/XML/}}
 \author{ Duncan Temple Lang }
 
 \seealso{

@@ -72,7 +72,7 @@ objects.
 }
 }
 }
-\references{ \url{http://www.w3.org} }
+\references{ \url{https://www.w3.org} }
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 \note{Needs libxml (currently version 1.8.7)}
 

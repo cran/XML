@@ -226,7 +226,7 @@ These are of class \code{XMLInternalDocument}
 and \code{XMLInternalNode}, respectively
 }
 
-\references{\url{http://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
 \url{https://www.omegahat.net}}
 \author{ Duncan Temple Lang }
 

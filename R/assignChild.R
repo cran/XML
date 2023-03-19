@@ -23,15 +23,14 @@ function(x, i, value)
                  xmlName(value)
                else
                  sapply(value, xmlName)
-  }  
+  }
  x
 }
 
-append <-
 append.xmlNode <-
 function(to, ...)
 {
- UseMethod("append")
+ UseMethod("append.xmlNode")
 }
 
 append.XMLNode <-
@@ -40,11 +39,11 @@ function(to, ...)
  args <- list(...)
  if(!inherits(args[[1]], "XMLNode") && is.list(args[[1]]))
    args <- args[[1]]
-    
+
  idx <- seq(length(to$children) + 1, length=length(args))
 
  args = addNames(args)
- 
+
  if(is.null(to$children))
    to$children <- args
  else  {
@@ -55,10 +54,10 @@ function(to, ...)
  to
 }
 
-append.default <-
+append.xmlNode.default <-
 function(to, ...)
     base::append(to, ...)
-    
+
 if(FALSE) {
 xmlAddChild <-
 function(node, child) {

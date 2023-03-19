@@ -540,7 +540,7 @@ function(el, name, recursive = FALSE)
     subs = xmlApply(el, xmlElementsByTagName, name, TRUE)
     subs = unlist(subs, recursive = FALSE)
 
-    append(els, subs[!sapply(subs, is.null)])
+    append.xmlNode(els, subs[!sapply(subs, is.null)])
   }
 
 

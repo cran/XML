@@ -15,10 +15,17 @@ append.xmlNode(to, ...)
    If this is a \code{list} of \code{XMLNode} objects (e.g. create by a call to 
    \code{\link{lapply}}), then that list is used.}
 }
+\details{
+  \code{append.xmlNode} is a generic function with method \code{append.XMLNode}
+  for class \code{"XMLNode"} and default method \code{base::append}.
+
+  This seems historical and users may as well use \code{append.XMLNode}
+  directly.
+}
 \value{
  The original \code{to} node containing its new children nodes.
 }
-\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{https://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

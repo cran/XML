@@ -213,7 +213,7 @@ So we would use
 }
 
 \references{\url{http://xmlsoft.org}, 
-  \url{http://www.w3.org/XML//}
+  \url{https://www.w3.org/XML//}
   \url{https://www.w3.org/TR/xpath/}
   \url{https://www.omegahat.net/RSXML/}
 }

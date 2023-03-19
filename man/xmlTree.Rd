@@ -79,7 +79,7 @@ contents of the tree.}
 }
 
 
-\references{\url{http://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
 \url{https://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

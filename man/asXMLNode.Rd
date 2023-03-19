@@ -25,7 +25,7 @@ asXMLNode(x)
 \value{
  An object of class XMLNode.
 }
-\references{\url{http://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{https://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 
