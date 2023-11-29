@@ -1063,7 +1063,7 @@ notifyError(const char *msg, va_list ap, Rboolean isError)
     memset(buf, '\0', BUFSIZE);
     vsnprintf(buf, BUFSIZE, msg, ap);
 
-    Rf_warning(buf);
+    Rf_warning("%s", buf);
 #endif
 }
 

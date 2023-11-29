@@ -1,5 +1,5 @@
 0c8607c1408272f87cb4412d0a75829c *ChangeLog
-66a1da8be4678956fd03595bf5597c3a *DESCRIPTION
+336e4222e8a9dff8c60d104586a2c34d *DESCRIPTION
 82de24270a90587d5492f8d12e85abcd *LICENSE
 38d88c89e954d242754f758e149248e4 *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -310,7 +310,7 @@ cfa4e11592ed00f9cb8247d0e59d3f95 *man/isXMLString.Rd
 bcc6efd399abe7a78f398f445f8410d8 *man/names.XMLNode.Rd
 49856050e87fc54c666cf9fcfc328dc7 *man/newXMLDoc.Rd
 43e3c93ff036a105e40dd1bf228d7236 *man/newXMLNamespace.Rd
-9572618185b9d0cdda5a8d9e723e4e8b *man/parseDTD.Rd
+3e0d0d90ec56e3fbbbfbf12f58469aac *man/parseDTD.Rd
 02c7cd373c3ea7d6c476df65b87980e4 *man/parseURI.Rd
 1c85a344a9e4bfd39cb3df303a2e20cf *man/parseXMLAndAdd.Rd
 4a577e2869ec67fd1fdd1d81d017511a *man/print.Rd
@@ -363,9 +363,9 @@ ffa5a30b01090b1d05a5a19c9a3bea68 *man/xmlSubset.Rd
 29646a080808de5840f7bcb8994400c9 *man/xmlToList.Rd
 15fdef72e6e90aeacf92e9afd126b3b3 *man/xmlToS4.Rd
 3d7f4bf5224bfd4eeb21632a4469e711 *man/xmlTree.Rd
-ecb352977dc8c5d32d5cef42d496ed31 *man/xmlTreeParse.Rd
+55020834b11452c69fcf47c46c5eecff *man/xmlTreeParse.Rd
 00f96e20f0a390f00ceefeb78f26e6e6 *man/xmlValue.Rd
-7d82b7aa3a3e5f5629d24c53a05bebd4 *src/DocParse.c
+cb322b8d72d6b6ce8e4da637dd50c53f *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 b5cb0dd5f43481ce20675e7501996484 *src/EventParse.c
 a855ea27bb2ad2247b4bec96992d9730 *src/EventParse.h

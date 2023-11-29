@@ -336,7 +336,7 @@ contents.
  A list of the XML nodes at the top of the document.
  Each of these is of class \code{XMLNode}.
  These are made up of 4 fields.
-  \itemize{
+  \describe{
    \item{\code{name}}{The name of the element.}
    \item{\code{attributes}}{For regular elements, a named list
      of XML attributes converted from the 
