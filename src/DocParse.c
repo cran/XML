@@ -46,7 +46,13 @@ static USER_OBJECT_ makeSchemaReference(xmlSchemaPtr ref);
 USER_OBJECT_
 RS_XML(libxmlVersionRuntime)(void)
 {
-    return(mkString(*__xmlParserVersion()));
+    return(mkString(
+#if LIBXML_VERSION < 21200
+		*__xmlParserVersion()
+#else
+		xmlParserVersion
+#endif
+	));
 }
 
 

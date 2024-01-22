@@ -12,6 +12,12 @@
 #include <libxml/parserInternals.h>
 #endif
 
+#ifdef _WIN32
+/* on Unix, there is a configure check */
+# if LIBXML_VERSION < 20627 || LIBXML_VERSION > 21100
+#  define NO_CHECKED_ENTITY_FIELD 
+# endif
+#endif
 
 static USER_OBJECT_ createSAX2AttributesList(const xmlChar **attributes, int nb_attributes, int nb_defaulted, const xmlChar *encoding);
 
@@ -47,9 +53,11 @@ int RS_XML(isStandAloneHandler)(void *ctx);
 void RS_XML(warningHandler)(void *ctx, const char *msg, ...);
 void RS_XML(errorHandler)(void *ctx, const char *format, ...); 
 void RS_XML(fatalErrorHandler)(void *ctx, const char *msg, ...);
+#if LIBXML_VERSION < 21200
 void RS_XML(structuredErrorHandler)(void *ctx, xmlErrorPtr err);
-
-
+#else
+void RS_XML(structuredErrorHandler)(void *ctx, const struct _xmlError *err);
+#endif
 
 
 static void RS_XML(initXMLParserHandler)(xmlSAXHandlerPtr xmlParserHandler, int saxVersion);
@@ -862,8 +870,13 @@ RS_XML(errorHandler)(void *ctx, const char *format, ...)
 
 }
 
+// was  RS_XML(structuredErrorHandler)(void *ctx, const xmlError err)
 void 
+#if LIBXML_VERSION < 21200
 RS_XML(structuredErrorHandler)(void *ctx, xmlErrorPtr err)
+#else
+RS_XML(structuredErrorHandler)(void *ctx, const struct _xmlError *err)
+#endif
 {
    if(err->level == XML_ERR_FATAL) {
       Rf_error("Error in the XML event driven parser (line = %d, column = %d): %s",

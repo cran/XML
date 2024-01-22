@@ -1,6 +1,85 @@
+============ entries from CRAN ============
+
+Version 3.99-0.16.1
+
+	Changes for libxml2 >= 2.11.0, in src/DocParse.c and src/XMLEventParse.c
+
+Version 3.99-0.16
+
+	Avoid prntf-like warnings
+	Rd markup
+
+Version 3.99-0.15
+
+	Complete stub in LICENSE file.
+
+Version 3.99-0.14
+	remove unexported generic append()
+	update URLs
+
+Version 3.99-0.13
+
+	use snprintf instead of sprintf
+
+Version 3.99-0.12
+
+	version for libxml2 2.10.x
+	update URLs
+	tweaks for -Wstrict-prototypes
+
+Version 3.99-0.11
+
+	workaround for a LaTeX message that causes R CMD check to
+	  interpret it as an error
+	reduce LaTeX warnings
+
+Version 3.99-0.10
+
+	Rd markup
+
+Version 3.99-0.9
+
+	replace default.stringsAsFactors() by FALSE
+
+Version 3.99-0.8
+
+	run autoupdate
+
+Version 3.99-0.7
+
+	use Rf_{error,warning} rather than S legacy macros
+
+Version 3.99-0.6
+
+	Add src/Makevars.ucrt
+
+Version 3.99-0.5
+
+	Update src/Makevars.win
+	Add missing PROTECT() wrappers.
+
+Version 3.99-0.4
+
+	replace --slave by --no-echo
+
+Version: 3.99-0.3
+
+	follow DTL with BSD_3_clause
+	tweak for Windows
+
+version 3.99-0.2 (2020-01-18)
+
+	CRAN (not DTL) as maintainer.
+
+version 3.99-0.1
+
+	First 3.99 version in R svn, bug fixes.
+
+============ entries from DTL ============
+
 Version 3.99-0
 
-  *      We can specify R functions and C routines for use as XPath
+ *      We can specify R functions and C routines for use as XPath
 	 functions in calls to getNodeSet() and xpathApply().
 
  *      Implementations of XPath 2.0 functions matches(), lower-case(),

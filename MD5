@@ -1,5 +1,5 @@
-0c8607c1408272f87cb4412d0a75829c *ChangeLog
-336e4222e8a9dff8c60d104586a2c34d *DESCRIPTION
+2609442c34b48d582f2edb4ea0a94c76 *ChangeLog
+77038cb3160e37d66a4a9834b3310a89 *DESCRIPTION
 82de24270a90587d5492f8d12e85abcd *LICENSE
 38d88c89e954d242754f758e149248e4 *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -365,7 +365,7 @@ ffa5a30b01090b1d05a5a19c9a3bea68 *man/xmlSubset.Rd
 3d7f4bf5224bfd4eeb21632a4469e711 *man/xmlTree.Rd
 55020834b11452c69fcf47c46c5eecff *man/xmlTreeParse.Rd
 00f96e20f0a390f00ceefeb78f26e6e6 *man/xmlValue.Rd
-cb322b8d72d6b6ce8e4da637dd50c53f *src/DocParse.c
+70da44b0aa162474cb86decbc2fdb14f *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 b5cb0dd5f43481ce20675e7501996484 *src/EventParse.c
 a855ea27bb2ad2247b4bec96992d9730 *src/EventParse.h
@@ -385,7 +385,7 @@ c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
 816c0e976c2a0a3a0cfb1ff9cff4ac43 *src/Rcatalog.c
 dfb2d8cdac46685f4b989e0678dc4747 *src/Utils.c
 addb035c852a81af74f1af3a759d6e11 *src/Utils.h
-2d7df9eeb788e494c6ee95ef8b7b78d1 *src/XMLEventParse.c
+ec5c630530c87bc4a54e37f47a6d1336 *src/XMLEventParse.c
 06d148d209a76bd776779709f29f2193 *src/XMLHashTree.c
 090b188864dd9de35dcd189419b0092a *src/XMLTree.c
 06dff24eae84b53211ddb5d1ad52dfcb *src/fixNS.c
