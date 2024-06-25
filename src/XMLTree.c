@@ -347,7 +347,9 @@ RS_XML_removeNodeAttributes(USER_OBJECT_ s_node, USER_OBJECT_ attrs, USER_OBJECT
 	    xmlNsPtr ns = NULL;
 	    xmlChar *id;
 	    id = CHAR_TO_XMLCHAR(CHAR_DEREF(STRING_ELT(attr_names, i)));
-	    ns = (xmlNsPtr) R_ExternalPtrAddr(VECTOR_ELT(attrs, i));
+	    SEXP ai = VECTOR_ELT(attrs, i);
+	    if(TYPEOF(ai) == EXTPTRSXP)
+		ns = (xmlNsPtr) R_ExternalPtrAddr(ai);
 	    if(id[0])
 		INTEGER(ans)[i] = xmlUnsetNsProp(node, ns, id);
 	} else

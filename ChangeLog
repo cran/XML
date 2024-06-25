@@ -1,5 +1,8 @@
 ============ entries from CRAN ============
 
+Version 3.99-0.17
+	Changes for safe use of R_ExternalPtrAddr() in src/XMLTree.c.
+
 Version 3.99-0.16.1
 
 	Changes for libxml2 >= 2.11.0, in src/DocParse.c and src/XMLEventParse.c
