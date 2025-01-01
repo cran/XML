@@ -19,7 +19,7 @@ of each of the sub-nodes of a given
 tag names of the sub-nodes of the given
 \code{XMLNode} argument.
 }
-\references{\url{https://www.w3.org/XML//}, \url{http://www.jclark.com/xml/},
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
 \url{https://www.omegahat.net}  }
 \author{ Duncan Temple Lang }
 

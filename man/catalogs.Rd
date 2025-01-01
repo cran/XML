@@ -53,8 +53,8 @@
   
    More information can be found at
    \url{http://xmlsoft.org/catalog.html}
-   and \url{http://www.sagehill.net/docbookxsl/Catalogs.html}
-   among many resources and the specification for the catalog format at
+%%   and \url{http://www.sagehill.net/docbookxsl/Catalogs.html} among
+    many resources and the specification for the catalog format at
     \url{https://www.oasis-open.org/committees/entity/spec-2001-08-06.html}.
    }
 

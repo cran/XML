@@ -85,30 +85,6 @@ AC_PROG_CPP
 
 dnl ======================================================
 
-dnl Check whether we are compiling this for use with SPlus
-dnl and if so, figure out which version.
-if test -n "${USE_SPLUS}" ; then
-  # Allows the user to say --with-splus=/usr/local/bin/Splus5
-  # This could be fooled, but unlikely unless the user does something
-  # "clever"
- if test -x ${with_splus} ; then
-   SPLUS=${with_splus}
- else
-   SPLUS=Splus
- fi
-
-   # Get the major version of the Splus being run.
-   dnl Shouldn't this be perl -epn
- SPLUS_VERSION=`echo 'cat(version$major,"\n",sep="")' | ${SPLUS} | perl -e 'while(<STDIN>){ $x = $_;} printf $x;'`
-  
-   # If this is version 3, we are in trouble.
- if test ${SPLUS_VERSION} -lt 5 ; then
-    echo "This package does not work with SPlus 3, but only SPlus 5 and 6" 
-    exit 1
- fi
-fi  # end of USE_SPLUS.
-
-
 
 AC_ARG_WITH(xmlsec, [  --with-xmlsec           add support (experimental) for XML security with xmlsec. Specify no, xmlsec1 or xmlsec1-openssl],
   [ if test "${withval}" = no; then
@@ -244,7 +220,7 @@ dnl extended regular expression usage with this version of sed.
            exit 1
          fi
 
-         if test "$MINOR" -eq 6 -a "$PATCH" -lt 3 ; then
+         if test "$MINOR" -eq 6 && test "$PATCH" -lt 3 ; then
             echo ""
             echo "**** There are problems compiling this package with libxml2-2.6.1 or libmxml2-2.6.2.  ****"
             echo "**** You will probably encounter compilation errors, so we are terminating the build.  ****"
@@ -572,36 +548,8 @@ else
 fi
 
 
-
-if test -z "${USE_SPLUS}" ; then
-
   LANGUAGE_DEFS="-DUSE_R=1 -D_R_=1 ${LANGUAGE_DEFS}"
 dnl   PKG_SYS_FILE='system.file("scripts", name, pkg="RSPerl")'
-
-else 
-
-  dnl Test to see if the patch has been made to renamin the attribute()
-  dnl routine in libxml
-
- if test ${SUPPORTS_LIBXML}="TRUE" ; then
-
-   AC_CHECK_LIB(xml, attribute, NEED_LIBXML_PATCH=1)
-   if test -n "${NEED_LIBXML_PATCH}" ; then
-    echo "The XML package will not work with S-Plus and the current libxml"
-    echo "because of a conflict from both having a routine named attribute()"
-    echo "We suggest that you modify the SAX.c file in the libxml and re-install."
-    echo "See PATCH.attribute in this package's distribution."
-    exit 1
-   fi
-
- fi # ? SUPPORTS_LIBXML = "TRUE"
-
- LANGUAGE_DEFS="-D_S_=1 -DUSE_S=1 -D_S4_=1 -D_SPLUS${SPLUS_VERSION}_ -DNO_SPLUS_THREAD_DEF=1 ${LANGUAGE_DEFS}"
- INSTALL_DIR=`pwd`
- PKG_SYS_FILE="paste(\"${INSTALL_DIR}/inst/scripts/\", name,sep=\"\")"
-
-fi   dnl end of if S-Plus.
-
 
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include "parser.h"
@@ -771,11 +719,6 @@ AC_SUBST(LD_PATH)
 
 AC_SUBST(EXPORT_MEMORY_MANAGEMENT)
 
-if test -n "${USE_SPLUS}" ; then
-  AC_SUBST(SPLUS)
-  SPLUS_MAKEFILE=GNUmakefile.Splus
-fi
-
 
 echo ""
 echo "****************************************"
@@ -813,23 +756,8 @@ fi
  dnl We had NAMESPACE here when were conditionally exporting the functions to 
  dnl remove finalizers on a node or document.  Need to add NAMESPACE.in in 
  dnl Install/GNUmakefile.admin
-AC_CONFIG_FILES([src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh ${SPLUS_MAKEFILE}])
+AC_CONFIG_FILES([src/Makevars R/supports.R inst/scripts/RSXML.csh inst/scripts/RSXML.bsh])
 AC_OUTPUT
 chmod +x cleanup
-
-
- dnl Set things up for an S-Plus chapter.
-if test -n "${USE_SPLUS}" ; then
- mv GNUmakefile.Splus GNUmakefile
-
- echo "Creating S-Plus chapter"
- cd src 
- C_SRC_FILES="DocParse.c RSDTD.c Utils.c"
- ${SPLUS} CHAPTER ${C_SRC_FILES}
- echo "include Makevars" >> makefile
- echo 'CFLAGS:= $(PKG_CPPFLAGS) $(CFLAGS)' >> makefile
- echo 'LOCAL_LIBS=$(PKG_LIBS) ' >> makefile
- cd ..
-fi
 
 

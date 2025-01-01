@@ -44,7 +44,7 @@ catalogResolve(id, type = "uri", asIs = FALSE, debug = FALSE)
 }
 \references{
   \url{http://www.xmlsoft.org}
-  \url{http://www.sagehill.net/docbookxsl/Catalogs.html} provides a short, succinct tutorial on catalogs. 
+%%  \url{http://www.sagehill.net/docbookxsl/Catalogs.html} provides a short, succinct tutorial on catalogs. 
 }
 \author{Duncan Temple Lang}
 
