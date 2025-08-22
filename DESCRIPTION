@@ -1,12 +1,13 @@
 Package: XML
-Version: 3.99-0.18
+Version: 3.99-0.19
 Authors@R: c(person("CRAN Team", role = c('ctb', 'cre'),
                     email = "CRAN@r-project.org",
                     comment = "de facto maintainer since 2013"),
              person("Duncan", "Temple Lang", role = c("aut"),
                     email = "duncan@r-project.org",
                     comment = c(ORCID = "0000-0003-0159-1546")),
-	    person("Tomas", "Kalibera", role = "ctb"))
+	     person("Tomas", "Kalibera", role = "ctb"),
+	     person("Ivan", "Krylov", role = "ctb"))
 Title: Tools for Parsing and Generating XML Within R and S-Plus
 Depends: R (>= 4.0.0), methods, utils
 Suggests: bitops, RCurl
@@ -32,10 +33,12 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R
 NeedsCompilation: yes
-Packaged: 2025-01-01 22:13:11 UTC; ripley
+Packaged: 2025-08-22 06:00:32 UTC; hornik
 Author: CRAN Team [ctb, cre] (de facto maintainer since 2013),
-  Duncan Temple Lang [aut] (<https://orcid.org/0000-0003-0159-1546>),
-  Tomas Kalibera [ctb]
+  Duncan Temple Lang [aut] (ORCID:
+    <https://orcid.org/0000-0003-0159-1546>),
+  Tomas Kalibera [ctb],
+  Ivan Krylov [ctb]
 Maintainer: CRAN Team <CRAN@r-project.org>
 Repository: CRAN
-Date/Publication: 2025-01-01 22:15:47 UTC
+Date/Publication: 2025-08-22 08:38:51 UTC

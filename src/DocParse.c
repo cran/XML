@@ -241,7 +241,10 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
   if(!useHTML && LOGICAL_DATA(validate)[0]) {
-      xmlValidCtxt ctxt;
+      xmlValidCtxt ctxt = {
+          .error = RS_XML(ValidationError),
+          .warning = RS_XML(ValidationWarning),
+      };
       ctxt.error = RS_XML(ValidationError);
       ctxt.warning = RS_XML(ValidationWarning);
 
