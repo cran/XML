@@ -519,3 +519,10 @@ export(replaceNodeWithChildren)
 
 S3method(toString, XMLNode)
 
+S3method(addNode, XMLFlatListTree)
+S3method(removeNodes, default)
+S3method(replaceNodes, list)
+S3method(xmlRoot, XMLFlatTree)
+S3method(xmlRoot, XMLInternalElement)
+S3method(xmlValue, XMLCommentNode)
+S3method(xpathApply, XMLDocument)

@@ -282,7 +282,11 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
       break;
 
     case RS_XML_FILENAME:
+#if LIBXML_VERSION < 21400
       ctx = xmlCreateFileParserCtxt(fileName);
+#else
+      ctx = xmlCreateURLParserCtxt(fileName, XML_PARSE_UNZIP);
+#endif
       break;
 
     case RS_XML_CONNECTION:
@@ -912,7 +916,14 @@ RS_XML_xmlStopParser(SEXP r_context)
 	Rf_error("NULL value passed to RS_XML_xmlStopParser. Is it a value from a previous session?");
     }
     
+#if LIBXML_VERSION >= 21500
+    /* Previously stopping preserved the wellFormed value */
+    int wellFormed = context->wellFormed;
+#endif
     xmlStopParser(context);
+#if LIBXML_VERSION >= 21500
+    context->wellFormed = wellFormed ;
+#endif
     return(ScalarLogical(1));
 }
 

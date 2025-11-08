@@ -32,7 +32,7 @@ RS_XML(invokeFunction)(USER_OBJECT_ fun, USER_OBJECT_ opArgs, USER_OBJECT_ data,
   USER_OBJECT_ ans;
   int addContext = 0;
 
-  if(context && TYPEOF(fun) == CLOSXP && OBJECT(fun) && R_isInstanceOf(fun, XML_PARSE_CONTEXT_FUNCTION))
+  if(context && TYPEOF(fun) == CLOSXP && isObject(fun) && R_isInstanceOf(fun, XML_PARSE_CONTEXT_FUNCTION))
       addContext = 1;
 
   n = Rf_length(opArgs) + addContext + 1;

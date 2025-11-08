@@ -44,7 +44,7 @@ function(node, kids = character())
 
 
 addNode.XMLFlatListTree =
-function(node, parent)
+function(node, parent, to, ...)
 {
   e = parent$env
   if(!("id" %in% names(unclass(node))))

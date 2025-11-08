@@ -1,7 +1,7 @@
-8958716eed084a63b884781a004391aa *ChangeLog
-83e94ca42e4429a0cbf6d74102a87387 *DESCRIPTION
+2035b9170aad3bfe44c9cb4df39dd960 *ChangeLog
+f7464dbe05c0ccc8e72811e04b2d62f4 *DESCRIPTION
 82de24270a90587d5492f8d12e85abcd *LICENSE
-38d88c89e954d242754f758e149248e4 *NAMESPACE
+e2176ef6169828607809ea5855b78192 *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
 05aace6af9a5a1b841570d5af955146f *R/DTD.R
 ff35133bf0deee2608952a104a91a913 *R/DTDClasses.R
@@ -45,7 +45,7 @@ ec6b4d13943f86381db6aa1583465fdb *R/summary.R
 fead2c9d63dc1a7acf3244431d84e1e0 *R/tangle.R
 033f27eaa77cba260e69fabe55c0c2e6 *R/tangle1.R
 9bc0920c6ab4c3011613d6e6a4d8030a *R/toString.R
-3c83404c574ba491c4a8238cba41defc *R/tree.R
+a844d3215f6935ae7a6772302085d2a5 *R/tree.R
 09e4d0bea29cff3b118f144b6d394c4a *R/version.R
 4f4954b191d7593ac720220b9ec0117d *R/xincludes.R
 05cf14141f68e19441882cf078c8fecb *R/xmlErrorEnums.R
@@ -365,7 +365,7 @@ ffa5a30b01090b1d05a5a19c9a3bea68 *man/xmlSubset.Rd
 3d7f4bf5224bfd4eeb21632a4469e711 *man/xmlTree.Rd
 ad90e3c2b5f0d2ba1584d5c1c04362e7 *man/xmlTreeParse.Rd
 00f96e20f0a390f00ceefeb78f26e6e6 *man/xmlValue.Rd
-14bb5379395193888377c774c0b096a4 *src/DocParse.c
+bcdb5e11d7e55ebabbef53cd7b5b03e5 *src/DocParse.c
 5244014df10ef5a255f890ff7df5424f *src/DocParse.h
 b5cb0dd5f43481ce20675e7501996484 *src/EventParse.c
 a855ea27bb2ad2247b4bec96992d9730 *src/EventParse.h
@@ -381,11 +381,11 @@ bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
 171c784de7fd4530c552c88ca8d39695 *src/RSDTD.c
 d51866b3b7de881b366d5f57819156f6 *src/RSDTD.h
 c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
-9b5b0ab44c9f48f388cad45e79510132 *src/RUtils.c
+39faa4f13314c6319d63c7491546d7ec *src/RUtils.c
 816c0e976c2a0a3a0cfb1ff9cff4ac43 *src/Rcatalog.c
 dfb2d8cdac46685f4b989e0678dc4747 *src/Utils.c
 addb035c852a81af74f1af3a759d6e11 *src/Utils.h
-ec5c630530c87bc4a54e37f47a6d1336 *src/XMLEventParse.c
+990a9c8d120db82a5b8a2ef7d561baf9 *src/XMLEventParse.c
 06d148d209a76bd776779709f29f2193 *src/XMLHashTree.c
 dfd8201878dd162bb317d550592acf06 *src/XMLTree.c
 06dff24eae84b53211ddb5d1ad52dfcb *src/fixNS.c

@@ -1,5 +1,9 @@
 ============ entries from CRAN ============
 
+Version 3.99-0.20
+	libxl2 2.15 compatibility fixes by Ivan Krylov.
+        Minor updates to make checks happy.
+
 Version 3.99-0.18
 	configure.ac: change bashism, remove S-Plus sections.
 	man/*.Rd: cleanup some URLs

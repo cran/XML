@@ -211,6 +211,9 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
          doc->name = (char *) xmlStrdup(CHAR_TO_XMLCHAR("<buffer>"));
 
   } else {
+#if LIBXML_VERSION >= 21400
+      parserOptions |= XML_PARSE_UNZIP;
+#endif
       doc = useHTML ? htmlParseFile(XMLCHAR_TO_CHAR(name), encoding) : 
 	              xmlReadFile(name, encoding, parserOptions) /* xmlParseFile(name) */ ;
   }
