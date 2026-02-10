@@ -5,6 +5,10 @@
   Examines the definition of the DTD element definition identified
 by \code{element} to see if it supports an attribute named
 \code{name}.
+
+ Since \code{\link{parseDTD}} no longer works, this function isn't
+ expected to work either and will be removed in a future version of
+ \CRANpkg{XML}.
 }
 \usage{
 dtdIsAttribute(name, element, dtd)

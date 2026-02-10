@@ -906,10 +906,12 @@ function(oldNode, newNode, ...)
   UseMethod("replaceNodes")
 }
 
+if (FALSE) {
 replaceNodes.list =
 function(oldNode, newNode, addFinalizer = NA, ...)
 {
  mapply(replaceNodes, oldNode, newNode, MoreArgs = list(addFinalizer = addFinalizer, ...))
+}
 }
 
 replaceNodes.XMLInternalNode =

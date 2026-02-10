@@ -408,7 +408,6 @@ if(libxmlVersion()$major >= 2) {
  startElement = function(x, ...) cat(x, "\n")
 
  xmlEventParse(ff <- file(f), handlers = list(startElement = startElement))
- close(ff)
 
  # Parse with a function providing the input as needed.
  xmlConnection = 
@@ -456,7 +455,6 @@ if(libxmlVersion()$major >= 2) {
   # Parse from a connection. Each time the parser needs more input, it
   # calls readLines(<con>, 1)
  xmlEventParse(ff <-file(f),  handlers = list(startElement = startElement))
- close(ff)
 
   # using SAX 2
  h = list(startElement = function(name, attrs, namespace, allNamespaces){ 

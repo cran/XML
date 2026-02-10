@@ -256,7 +256,7 @@ function(x, skip = TRUE, ...)
 
 
  #??? This was XMLInternalElement and not ...Node
-xmlRoot.XMLInternalElement = xmlRoot.XMLInternalNode =
+xmlRoot.XMLInternalNode =
 function(x, skip = TRUE, ...)
 {
   doc = as(x, "XMLInternalDocument")
@@ -265,6 +265,7 @@ function(x, skip = TRUE, ...)
   else
     xmlRoot(doc, skip = skip)
 }
+if (FALSE) xmlRoot.XMLInternalElement = xmlRoot.XMLInternalNode
 
 
      # Get the name of the file/URI for the document.

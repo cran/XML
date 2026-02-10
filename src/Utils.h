@@ -52,8 +52,6 @@ USER_OBJECT_ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converter
 				   USER_OBJECT_ skipBlankLines, USER_OBJECT_ replaceEntities,
 				   USER_OBJECT_ asText, USER_OBJECT_ trim, USER_OBJECT_ isURL);
 
-USER_OBJECT_ RS_XML(getDTD)(USER_OBJECT_ dtdFileName, USER_OBJECT_ externalId, 
-			    USER_OBJECT_ asText, USER_OBJECT_ isURL, USER_OBJECT_ errorFun);
 USER_OBJECT_ RS_XML(libxmlVersion)(void);
 
 
@@ -106,7 +104,7 @@ USER_OBJECT_ R_xmlCatalogResolve(SEXP r_id, SEXP type, USER_OBJECT_ debug);
 USER_OBJECT_ RS_XML_setDoc(USER_OBJECT_ snode, USER_OBJECT_ sdoc);
 USER_OBJECT_ RS_XML_unsetDoc(USER_OBJECT_ snode, USER_OBJECT_ unlink, USER_OBJECT_ r_parent, USER_OBJECT_ recursive);
 
-		 USER_OBJECT_ RS_XML_printXMLNode(USER_OBJECT_ node, USER_OBJECT_ level, USER_OBJECT_ format, USER_OBJECT_ indent, USER_OBJECT_ r_encoding, USER_OBJECT_ r_encoding_int);
+USER_OBJECT_ RS_XML_printXMLNode(USER_OBJECT_ node, USER_OBJECT_ level, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ r_encoding_int);
 
 USER_OBJECT_ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_encoding, USER_OBJECT_ indent, USER_OBJECT_ outFile);
 
@@ -122,8 +120,6 @@ USER_OBJECT_ RS_XML_xmlNodeChildrenReferences(USER_OBJECT_ snode, USER_OBJECT_ r
 
 
 USER_OBJECT_ RS_XML(internalNodeNamespaceDefinitions)(USER_OBJECT_ r_node, USER_OBJECT_ recursive);
-
-USER_OBJECT_ RS_XML(getDefaultValiditySetting)(USER_OBJECT_ val);
 
 SEXP RS_XML_freeDoc(SEXP ref);
 SEXP RS_XML_setRootNode(USER_OBJECT_ r_doc, USER_OBJECT_ r_node);
@@ -172,7 +168,6 @@ USER_OBJECT_ RS_XML_removeNodeAttributes(USER_OBJECT_ s_node, USER_OBJECT_ attrs
 USER_OBJECT_ RS_XML_getNsList(USER_OBJECT_ s_node, USER_OBJECT_ asRef);
 
 USER_OBJECT_ RS_XML_setNodeName(USER_OBJECT_ s_node, USER_OBJECT_ s_name);
-USER_OBJECT_ R_xmlNsAsCharacter(USER_OBJECT_ s_ns);
 
 
 USER_OBJECT_ R_createXMLNsRef(xmlNsPtr ns);

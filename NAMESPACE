@@ -103,6 +103,7 @@ S3method(removeNodes, "list")
 S3method(removeNodes, "XMLNodeSet")
 S3method(removeNodes, "XMLNodeList")
 S3method(removeNodes, "XMLInternalNode")
+S3method(removeNodes, "default")
 
 exportMethods("addAttributes", "removeAttributes")
 
@@ -362,9 +363,6 @@ export(xmlSourceSection)
 exportMethods("xmlSourceSection")
 
 
-# Not yet exported....
-#xmlValidity
-
 if(TRUE) {
 exportClasses("ExternalReference", "xmlSchemaRef", "libxmlTypeTable")
 exportClasses("SchemaElementTable", "xmlSchemaElementRef",
@@ -518,11 +516,3 @@ export(xmlCleanNamespaces)
 export(replaceNodeWithChildren)
 
 S3method(toString, XMLNode)
-
-S3method(addNode, XMLFlatListTree)
-S3method(removeNodes, default)
-S3method(replaceNodes, list)
-S3method(xmlRoot, XMLFlatTree)
-S3method(xmlRoot, XMLInternalElement)
-S3method(xmlValue, XMLCommentNode)
-S3method(xpathApply, XMLDocument)

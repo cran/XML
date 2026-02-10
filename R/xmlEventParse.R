@@ -56,12 +56,7 @@ function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = 
   checkHandlerNames(handlers, "SAX")
 
   if(validate)
-    warning("Currently, libxml2 does support validation using SAX/event-driven parsing. It requires a DOM.")
-  else {
-      oldValidate = xmlValidity()
-      xmlValidity(validate)
-      on.exit(xmlValidity(oldValidate))
-  }
+    warning("Currently, XML does not support validation using SAX/event-driven parsing. It requires a DOM.")
 
   if(!any(saxVersion == c(1, 2))) {
      stop("saxVersion must be 1 or 2")
@@ -72,7 +67,7 @@ function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = 
     con = file
     if(!isOpen(file)) {
       open(file, "r")
-      on.exit(close(con))
+      on.exit(close(con), add = TRUE)
     }
 
     leftOver = ""
@@ -101,7 +96,7 @@ function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = 
   } else if(is.function(file)) {
       # call with -1 to allow us to close the connection
       # if necessary.
-    on.exit(file(-1))
+    on.exit(file(-1), add = TRUE)
   } else {
    if(!asText && missing(isURL)) {
         # check if this is a URL or regular file.
@@ -120,8 +115,11 @@ function(file, handlers = xmlEventHandler(), ignoreBlanks = FALSE, addContext = 
  if(length(branches) > 0 && (length(names(branches)) == 0 || any(names(branches) == "")))
     stop("All branch elements must have a name!")
 
-  old = setEntitySubstitution(replaceEntities)
-  on.exit(setEntitySubstitution(old))
+  # NOTE: since 2007 (XML_1.7-1), there used to be an on.exit() right
+  # here that overwrote all previous on.exit()s, including the one that
+  # closed the connection if `file` was a previously unopened
+  # connection. If a bug is 17 years old, will fixing it break
+  # everything?
 
   if(!is.function(error))
     stop("error must be a function")

@@ -55,9 +55,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
     fullNamespaceInfo = TRUE
 
 
-  oldValidate = xmlValidity()
-  xmlValidity(validate)
-  on.exit(xmlValidity(oldValidate))
+  if (validate) options <- union(options, DTDVALID)
 
     # check whether we are treating the file name as
     # a) the XML text itself, or b) as a URL.
@@ -76,8 +74,7 @@ function(file, ignoreBlanks = TRUE, handlers = NULL,
  if(asText && length(file) > 1)
    file = paste(file, collapse = "\n")
 
- old = setEntitySubstitution(replaceEntities)
- on.exit(setEntitySubstitution(old), add = TRUE)
+ if (replaceEntities) options <- union(options, NOENT)
 
      # Look for a < in the string.
   if(asText && length(grep(sprintf("^%s?\\s*<", BOMRegExp), file, perl = TRUE, useBytes = TRUE)) == 0) {  # !isXMLString(file) ?
@@ -193,13 +190,6 @@ setMethod("getEncoding", "XMLInternalDOM",
                getEncoding(obj)
             })
 }
-
-xmlValidity =
-function(val = integer(0))
-{
-  .Call("RS_XML_getDefaultValiditySetting", as.integer(val), PACKAGE = "XML")
-}
-
 
 
 

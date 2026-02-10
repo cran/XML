@@ -50,12 +50,6 @@ RS_XML(HtmlParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
   }
 
 
-#if 0
-    /* If one wants entities expanded directly and to appear as text.  */
-  if(LOGICAL_DATA(replaceEntities)[0])
-    xmlSubstituteEntitiesDefault(1);   
-#endif
-
   if(asTextBuffer) {
    doc = htmlParseDoc(CHAR_TO_XMLCHAR(name), NULL);
    if(doc != NULL) {
@@ -109,13 +103,7 @@ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_enco
     xmlOutputBufferPtr buf;
     xmlBufferPtr xbuf;
 
-    int oldIndent;
-
-    oldIndent = xmlIndentTreeOutput;
-
     node = (xmlDocPtr) R_ExternalPtrAddr(r_node);
-
-    xmlIndentTreeOutput =  LOGICAL(indent)[0];
 
 #if ADD_XML_OUTPUT_BUFFER_CODE
     if(Rf_length(outFile)) {
@@ -138,9 +126,8 @@ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_enco
 
     htmlDocContentDumpFormatOutput(buf, node, encoding, INTEGER(format)[0]);
     xmlOutputBufferFlush(buf);
-    xmlIndentTreeOutput = oldIndent;
 
-    if(xbuf->use > 0) {
+    if(xmlBufferLength(xbuf) > 0) {
         /*XXX this const char * in CHARSXP means we have to make multiple copies. */
 #if 0
 	char *rbuf = R_alloc(sizeof(char) * (xbuf->use + 1));
@@ -149,7 +136,7 @@ RS_XML_dumpHTMLDoc(USER_OBJECT_ r_node, USER_OBJECT_ format, USER_OBJECT_ r_enco
 #endif
 	// ans = ScalarString(mkChar(xbuf->content));
 	DECL_ENCODING_FROM_DOC(node)
-	ans = ScalarString(ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(xbuf->content)));
+	ans = ScalarString(ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(xmlBufferContent(xbuf))));
     } else
       ans = NEW_CHARACTER(1);
 

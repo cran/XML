@@ -301,7 +301,16 @@ RS_XML(libXMLEventParse)(const char *fileName, RS_XMLParserData *parserData, RS_
   if(ctx == NULL) {
       Rf_error("Can't parse %s", fileName);
   }
-
+#if LIBXML_VERSION < 21400
+  ctx->replaceEntities = !!parserData->replaceEntities;
+#else
+  int options = xmlCtxtGetOptions(ctx);
+  xmlCtxtSetOptions(ctx,
+    parserData->replaceEntities ?
+      (options |  XML_PARSE_NOENT) :
+      (options & ~XML_PARSE_NOENT)
+  );
+#endif
 
   xmlParserHandler = (xmlSAXHandlerPtr) S_alloc(sizeof(xmlSAXHandler), 1);
   /* Make certain this is initialized so that we don't have any references  to unwanted routines!  */

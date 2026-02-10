@@ -13,6 +13,10 @@ definition of the \code{element} element in the specified DTD.  This
 is a generic function that dispatches on the element type, so that
 different version take effect for \code{XMLSequenceContent},
 \code{XMLOrContent}, \code{XMLElementContent}.
+
+ Since \code{\link{parseDTD}} no longer works, this function isn't
+ expected to work either and will be removed in a future version of
+ \CRANpkg{XML}.
 }
 \usage{
 dtdElementValidEntry(element, name, pos=NULL)
@@ -53,6 +57,5 @@ can appear in an \code{element} tag or not.
  dtdFile <- system.file("exampleData", "foo.dtd",package="XML")
  dtd <- parseDTD(dtdFile) 
  
-  dtdElementValidEntry(dtdElement("variables",dtd), "variable")
 }
 \keyword{file}

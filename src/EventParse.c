@@ -139,6 +139,7 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
   parserData->callByTagName    = LOGICAL_DATA(useTagName)[0]; 
   parserData->addContextInfo   = LOGICAL_DATA(addContext)[0]; 
   parserData->trim             = LOGICAL_DATA(trim)[0]; 
+  parserData->replaceEntities  = LOGICAL_DATA(replaceEntities)[0]; 
   parserData->ignoreBlankLines = LOGICAL_DATA(ignoreBlanks)[0]; 
   parserData->stateObject = (stateObject == NULL_USER_OBJECT ? NULL : stateObject);
   parserData->useDotNames = LOGICAL_DATA(useDotNames)[0];
@@ -162,10 +163,6 @@ RS_XML(Parse)(USER_OBJECT_ fileName, USER_OBJECT_ handlers, USER_OBJECT_ endElem
   } else 
 #endif /* ifdef LIBEXPAT */
 
-#if 0
-    /* If one wants entities expanded directly and to appear as text.  */
-   xmlSubstituteEntitiesDefault(LOGICAL_DATA(replaceEntities)[0]);   
-#endif
 
   status = RS_XML(libXMLEventParse)(input, parserData, asTextBuffer, INTEGER_DATA(saxVersion)[0], r_encoding);
 

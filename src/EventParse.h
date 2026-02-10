@@ -74,6 +74,10 @@ typedef struct {
    */
   int trim;
 
+  /*
+     Flag indicating whether entities sould be expanded while parsing.
+  */
+  int replaceEntities;
 
    /* S object used in event parsing to share state across calls. */
   USER_OBJECT_ stateObject;

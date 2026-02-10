@@ -9,6 +9,10 @@ individual elements of these two lists, using the name
  of the element or entity.
  The DTD is provided to determine where to look for the
  entry.
+
+ Since \code{\link{parseDTD}} no longer works, these functions aren't
+ expected to work either and will be removed in a future version of
+ \CRANpkg{XML}.
 } 
 \usage{
 dtdElement(name,dtd)
@@ -57,7 +61,6 @@ indexing this \code{elements} list.
  
    # Get the definition of the `entry1' element
  tmp <- dtdElement("variable", foo.dtd)
- xmlAttrs(tmp)
 
  tmp <- dtdElement("entry1", foo.dtd)
 

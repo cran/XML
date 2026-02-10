@@ -15,7 +15,7 @@ function(doc, file = NULL, compression = 0, indent = TRUE, prefix = '<?xml versi
   if(is.na(encoding) || length(encoding) == 0 || encoding == "")
     encoding = character()
 
-  ans = .Call("RS_XML_printXMLNode", doc, as.integer(0), as.integer(indent), as.logical(indent),
+  ans = .Call("RS_XML_printXMLNode", doc, as.integer(0), as.integer(indent),
                 as.character(encoding), getEncodingREnum(as.character(encoding)), PACKAGE = "XML")
 
   if(length(file)) {
@@ -149,7 +149,7 @@ setMethod("saveXML", "XMLInternalDOM", saveXML.XMLInternalDOM)
 setMethod("saveXML", "XMLOutputStream", saveXML.XMLOutputStream)
 setMethod("saveXML", "XMLNode", saveXML.sink)
 setOldClass("XMLFlatTree")
-setOldClass(c("XMLFlatListTree", "XMLFlatTree"))
+#setOldClass(c("XMLFlatListTree", "XMLFlatTree"))
 setMethod("saveXML", "XMLFlatTree", saveXML.sink)
 
 

@@ -138,7 +138,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
 
 setS3Method("xmlValue", "XMLTextNode")
 
-xmlValue.XMLComment <-  xmlValue.XMLCommentNode <-
+xmlValue.XMLComment <-
 function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x), trim = FALSE)
 {
  if(ignoreComments)
@@ -149,6 +149,7 @@ function(x, ignoreComments = FALSE, recursive = TRUE, encoding = getEncoding(x),
   else
      character(0)
 }
+if (FALSE) xmlValue.XMLCommentNode <- xmlValue.XMLComment
 
 setS3Method("xmlValue", "XMLCommentNode")
 

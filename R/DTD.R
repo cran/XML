@@ -1,6 +1,7 @@
 dtdIsAttribute <-
 function(name, element, dtd)
 {
+  .Deprecated(msg = "'dtdIsAttribute' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  if(!inherits(element,"XMLElementDef")) {
    element <- dtdElement(as.character(element), dtd)
  }
@@ -25,6 +26,7 @@ dtdValidElement <-
 
 function(name, within, dtd, pos=NULL)
 {
+  .Deprecated(msg = "'dtdValidElement' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
 
  el <- dtdElement(within, dtd)
  if(is.null(el))
@@ -36,6 +38,7 @@ function(name, within, dtd, pos=NULL)
 dtdElementValidEntry <-
 function(element, name, pos=NULL)
 {
+ .Deprecated(msg = "'dtdElementValidEntry' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  UseMethod("dtdElementValidEntry", element) # , name, pos)
 }
 
@@ -101,6 +104,7 @@ xmlContainsEntity <-
 #
 function(name, dtd)
 {
+ .Deprecated(msg = "'xmlContainsEntity' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  return(!is.na(match(name,dtd$entities)))
 }
 
@@ -111,6 +115,7 @@ xmlContainsElement <-
 #
 function(name, dtd)
 {
+ .Deprecated(msg = "'xmlContainsElement' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  return(!is.na(match(name,dtd$element)))
 }
 
@@ -122,6 +127,7 @@ dtdEntity <-
 #
 function(name, dtd)
 {
+ .Deprecated(msg = "'dtdEntity' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  dtd$entities[[name]]
 }
 
@@ -131,5 +137,6 @@ dtdElement <-
 # Uses the `dtd$elements' list.
 function(name, dtd)
 {
+ .Deprecated(msg = "'dtdElement' is deprecated and will be removed soon. Please contact maintainer('XML') if you would like it to keep working.", package = 'XML')
  dtd$elements[[name]]
 }

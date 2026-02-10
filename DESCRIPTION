@@ -1,13 +1,14 @@
 Package: XML
-Version: 3.99-0.20
-Authors@R: c(person("CRAN Team", role = c('ctb', 'cre'),
+Version: 3.99-0.22
+Authors@R: c(person("CRAN Team", role = "ctb",
                     email = "CRAN@r-project.org",
-                    comment = "de facto maintainer since 2013"),
-             person("Duncan", "Temple Lang", role = c("aut"),
+                    comment = "de facto maintainer in 2013-2026"),
+             person("Duncan", "Temple Lang", role = "aut",
                     email = "duncan@r-project.org",
                     comment = c(ORCID = "0000-0003-0159-1546")),
-	     person("Tomas", "Kalibera", role = "ctb"),
-	     person("Ivan", "Krylov", role = "ctb"))
+             person("Tomas", "Kalibera", role = "ctb"),
+             person("Ivan", "Krylov", email = "ikrylov@disroot.org",
+                    role = "cre"))
 Title: Tools for Parsing and Generating XML Within R and S-Plus
 Depends: R (>= 4.0.0), methods, utils
 Suggests: bitops, RCurl
@@ -16,7 +17,7 @@ Description: Many approaches for both reading and
         creating XML (and HTML) documents (including DTDs), both local
         and accessible via HTTP or FTP.  Also offers access to an
         'XPath' "interpreter".
-URL: https://www.omegahat.net/RSXML/
+BugReports: https://codeberg.org/aitap/XML/issues
 License: BSD_3_clause + file LICENSE
 Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         applyDOM.R assignChild.R catalog.R createNode.R dynSupports.R
@@ -33,12 +34,12 @@ Collate: AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R
 NeedsCompilation: yes
-Packaged: 2025-11-07 19:59:15 UTC; ligges
-Author: CRAN Team [ctb, cre] (de facto maintainer since 2013),
+Packaged: 2026-02-10 10:57:23 UTC; ivan
+Author: CRAN Team [ctb] (de facto maintainer in 2013-2026),
   Duncan Temple Lang [aut] (ORCID:
     <https://orcid.org/0000-0003-0159-1546>),
   Tomas Kalibera [ctb],
-  Ivan Krylov [ctb]
-Maintainer: CRAN Team <CRAN@r-project.org>
+  Ivan Krylov [cre]
+Maintainer: Ivan Krylov <ikrylov@disroot.org>
 Repository: CRAN
-Date/Publication: 2025-11-08 13:50:02 UTC
+Date/Publication: 2026-02-10 12:40:02 UTC

@@ -17,13 +17,12 @@
 #include <sys/stat.h>
 #include <unistd.h>  
 
-#include "RSDTD.h"
-
 #include <stdarg.h>
 
 
 #include <libxml/xmlschemas.h>
 #include <libxml/xinclude.h>
+#include <libxml/HTMLparser.h>
 
 
 
@@ -55,27 +54,6 @@ RS_XML(libxmlVersionRuntime)(void)
 	));
 }
 
-
-USER_OBJECT_
-RS_XML(getDefaultValiditySetting)(USER_OBJECT_ val)
-{
-#ifdef HAVE_VALIDITY
-
-// extern int xmlDoValidityCheckingDefaultValue;
- USER_OBJECT_ ans;
- ans = NEW_INTEGER(1);
- INTEGER_DATA(ans)[0] = xmlDoValidityCheckingDefaultValue;
-
-  if(GET_LENGTH(val))
-     xmlDoValidityCheckingDefaultValue = INTEGER_DATA(val)[0];
-  return(ans);
-
-#else
-
-  return(NEW_INTEGER(0));
-
-#endif
-}
 
 #include <libxml/parser.h>
 void
@@ -175,11 +153,6 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     freeName = 1;
   }
 
-#if 0 /* Done in R now.*/
-    /* If one wants entities expanded directly and to appear as text.  */
-  if(LOGICAL_DATA(replaceEntities)[0]) 
-      xmlSubstituteEntitiesDefault(1);   
-#endif
 
 
   if(LOGICAL_DATA(isSchema)[0]) {
@@ -248,8 +221,6 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
           .error = RS_XML(ValidationError),
           .warning = RS_XML(ValidationWarning),
       };
-      ctxt.error = RS_XML(ValidationError);
-      ctxt.warning = RS_XML(ValidationWarning);
 
       if(!xmlValidateDocument(&ctxt, doc)) {
 	  if(freeName && name)
@@ -291,7 +262,7 @@ RS_XML(ParseTree)(USER_OBJECT_ fileName, USER_OBJECT_ converterFunctions,
     const char *names[] = {"doc", "dtd"};
       PROTECT(ans = NEW_LIST(2));
         SET_VECTOR_ELT(ans, 0, rdoc);
-        SET_VECTOR_ELT(ans, 1, tmp = RS_XML(ConstructDTDList)(doc, 1, NULL));
+        SET_VECTOR_ELT(ans, 1, tmp = allocVector(VECSXP, 0));
 
         PROTECT(klass = NEW_CHARACTER(1));
         SET_STRING_ELT( klass, 0, mkChar("DTDList"));

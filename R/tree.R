@@ -42,7 +42,8 @@ function(node, kids = character())
   id
 }  
 
-
+# this apparent method seems completely unused
+if (FALSE) {
 addNode.XMLFlatListTree =
 function(node, parent, to, ...)
 {
@@ -67,6 +68,7 @@ function(node, parent, to, ...)
   
   node
 }  
+}
 
 
 
@@ -81,13 +83,14 @@ function(x, name) {
   get(".nodes", envir = x)[[name]]
 }
 
+if (FALSE) {
 xmlRoot.XMLFlatTree =
 function(x, skip = TRUE, ...)
 {
    p = get(".parents", x)
 #XXX   
 }  
-
+}
 
 
 xmlChildren.XMLTreeNode =

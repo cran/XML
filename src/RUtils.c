@@ -134,17 +134,6 @@ R_InternalRecursiveApply(USER_OBJECT_ top, USER_OBJECT_ func, USER_OBJECT_ klass
   return(tmp);
 }
 
-USER_OBJECT_
-RS_XML_SubstituteEntitiesDefault(USER_OBJECT_ replaceEntities)
-{
-    int value;
-    USER_OBJECT_ ans;
-    value = xmlSubstituteEntitiesDefault(LOGICAL_DATA(replaceEntities)[0]);   
-    ans = NEW_LOGICAL(1);
-    LOGICAL_DATA(ans)[0] = value;
-    return(ans);
-}
-
 #include <R_ext/Rdynload.h>
 
 /* Simple macro for expanding ENTRY(x, n) to {"<x>", (DL_FUNC) &<x>, <n>} */
@@ -156,10 +145,8 @@ static R_CallMethodDef callMethods[] = {
 #ifdef UNUSED_DOT_CALLS
 	ENTRY(RS_XML_HtmlParseTree, 7),
         ENTRY(RS_XML_setDoc, 2),
-        ENTRY(R_xmlNsAsCharacter, 1),
 	ENTRY(R_addXMLNodeFinalizer, 1),
 #endif
-	ENTRY(RS_XML_getDTD, 5),
 	ENTRY(RS_XML_libxmlVersion, 0),
 	ENTRY(RS_XML_Parse, 18),
 	ENTRY(RS_XML_ParseTree, 21),
@@ -178,7 +165,7 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(R_xmlCatalogResolve, 3),
 	ENTRY(RS_XML_xmlNodeNumChildren, 1),
         ENTRY(RS_XML_unsetDoc, 4),
-        ENTRY(RS_XML_printXMLNode, 6),
+        ENTRY(RS_XML_printXMLNode, 5),
         ENTRY(RS_XML_dumpHTMLDoc, 5),
         ENTRY(RS_XML_removeChildren, 3),
         ENTRY(RS_XML_clone, 3),
@@ -186,7 +173,6 @@ static R_CallMethodDef callMethods[] = {
         ENTRY(RS_XML_removeNodeAttributes, 3),
         ENTRY(RS_XML_getNsList, 2),
         ENTRY(RS_XML_setNodeName, 2),
-        ENTRY(RS_XML_SubstituteEntitiesDefault, 1),
         ENTRY(RS_XML_getNextSibling, 3),
         ENTRY(R_getXMLNodeDocument, 1),
         ENTRY(RS_XML_createDocFromNode, 1),
@@ -241,7 +227,6 @@ static R_CallMethodDef callMethods[] = {
 	ENTRY(R_matchNodesInList, 3),
 	ENTRY(RS_XML_copyNodesToDoc, 3),
 	ENTRY(RS_XML_getDocumentName, 1),
-	ENTRY(RS_XML_getDefaultValiditySetting, 1),
 	ENTRY(RS_XML_xmlXIncludeProcessFlags, 2),
 	ENTRY(RS_XML_xmlXIncludeProcessTreeFlags, 2),
 	ENTRY(R_convertXMLNsRef, 1),

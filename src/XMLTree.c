@@ -1144,7 +1144,6 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
     USER_OBJECT_ ans = NULL_USER_OBJECT;
     xmlDtdPtr dtd = NULL;
 
-    int oldIndent = xmlIndentTreeOutput;
     const char *encoding = CHAR_DEREF(STRING_ELT(r_encoding, 0));
     
     if(TYPEOF(sdoc) != EXTPTRSXP) {
@@ -1155,8 +1154,6 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
 
     if(doc == NULL)
 	return(NEW_CHARACTER(0));
-
-    xmlIndentTreeOutput = LOGICAL_DATA(sindent)[0];
 
     if(GET_LENGTH(prefix) == 3) {
 	dtd = xmlNewDtd(doc, ValOrNULL(CHAR_DEREF(STRING_ELT(prefix, 0))), 
@@ -1243,7 +1240,6 @@ R_saveXMLDOM(USER_OBJECT_ sdoc, USER_OBJECT_ sfileName, USER_OBJECT_ compression
        return(ans);
     }
 
-    xmlIndentTreeOutput = oldIndent;
     return(ans);
 }
 
@@ -1408,7 +1404,7 @@ Test:
 */
 USER_OBJECT_
 RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format, 
-		    USER_OBJECT_ indent, USER_OBJECT_ r_encoding, USER_OBJECT_ r_encoding_int)
+		    USER_OBJECT_ r_encoding, USER_OBJECT_ r_encoding_int)
 {
     USER_OBJECT_ ans;
     xmlNodePtr node;
@@ -1418,11 +1414,7 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 
     int oldIndent;
 
-    oldIndent = xmlIndentTreeOutput;
-
     node = (xmlNodePtr) R_ExternalPtrAddr(r_node);
-
-    xmlIndentTreeOutput =  LOGICAL(indent)[0];
 
     xbuf = xmlBufferCreate();
    
@@ -1434,14 +1426,13 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
 
     xmlNodeDumpOutput(buf,  node->doc, node, INTEGER(level)[0], INTEGER(format)[0], encoding);
     xmlOutputBufferFlush(buf);
-    xmlIndentTreeOutput = oldIndent;
 
-    if(xbuf->use > 0) {
+    if(xmlBufferLength(xbuf) > 0) {
         /*XXX this const char * in CHARSXP means we have to make multiple copies. */
      if(INTEGER(r_encoding_int)[0] == CE_NATIVE)
-        ans = ScalarString(CreateCharSexpWithEncoding((const xmlChar *)encoding, (const xmlChar *)xbuf->content));
+        ans = ScalarString(CreateCharSexpWithEncoding((const xmlChar *)encoding, (const xmlChar *)xmlBufferContent(xbuf)));
      else
-        ans = ScalarString(mkCharCE((const char *)xbuf->content, INTEGER(r_encoding_int)[0]));
+        ans = ScalarString(mkCharCE((const char *)xmlBufferContent(xbuf), INTEGER(r_encoding_int)[0]));
     } else
       ans = NEW_CHARACTER(1);
 
@@ -1526,33 +1517,6 @@ R_xmlNodeValue(SEXP node, SEXP raw, SEXP r_encoding)
        ans = NEW_CHARACTER(0);
 
    return(ans);
-}
-
-USER_OBJECT_
-R_xmlNsAsCharacter(USER_OBJECT_ s_ns)
-{
-  xmlNsPtr ns = NULL;
-  USER_OBJECT_ ans, names;
-  const xmlChar *encoding = NULL;
-  ns = (xmlNsPtr) R_ExternalPtrAddr(s_ns);  
-#ifdef LIBXML_NAMESPACE_HAS_CONTEXT
-  encoding = ns->context ? ns->context->encoding : NULL;
-#endif
-
-  PROTECT(ans = NEW_CHARACTER(2));
-  PROTECT(names = NEW_CHARACTER(2));
-
-  SET_STRING_ELT(names, 0, mkChar("prefix"));
-  SET_STRING_ELT(names, 1, mkChar("href"));
-
-  if(ns->prefix)
-      SET_STRING_ELT(ans, 0, ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->prefix)));
-  if(ns->href)
-      SET_STRING_ELT(ans, 1, ENC_COPY_TO_USER_STRING(XMLCHAR_TO_CHAR(ns->href)));
-
-  SET_NAMES(ans, names);
-  UNPROTECT(2);
-  return(ans);
 }
 
 USER_OBJECT_

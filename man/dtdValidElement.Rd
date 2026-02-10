@@ -6,6 +6,10 @@
 to use as a direct sub-element of the \code{within} tag
 according to the definition of the \code{within}
 element in the specified DTD.
+
+ Since \code{\link{parseDTD}} no longer works, this function isn't
+ expected to work either and will be removed in a future version of
+ \CRANpkg{XML}.
 }
 \usage{
 dtdValidElement(name, within, dtd, pos=NULL)
@@ -48,12 +52,5 @@ FALSE indicates that it cannot.
 \examples{
  dtdFile <- system.file("exampleData", "foo.dtd", package="XML")
  foo.dtd <- parseDTD(dtdFile)
-
-  # The following are true.
- dtdValidElement("variable","variables", dtd = foo.dtd)
- dtdValidElement("record","dataset", dtd = foo.dtd)
-
-  # This is false.
- dtdValidElement("variable","dataset", dtd = foo.dtd)
 }
 \keyword{file}

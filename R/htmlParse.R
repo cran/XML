@@ -65,8 +65,7 @@ if(TRUE)
  if(!asText && !isURL)
    file = path.expand(file)
 
- old = setEntitySubstitution(replaceEntities)
- on.exit(setEntitySubstitution(old))
+ if (replaceEntities) options <- union(options, NOENT)
 
  if(!is.logical(xinclude)) {
    if(inherits(xinclude, "numeric"))

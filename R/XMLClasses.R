@@ -1008,6 +1008,7 @@ function(doc, path, fun = NULL, ...,
 }
 
 
+if (FALSE) {
 xpathApply.XMLDocument =
 #xpathApply.XMLNode =
 function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, simplify = TRUE),
@@ -1024,7 +1025,7 @@ function(doc, path, fun = NULL, ... , namespaces = xmlNamespaceDefinitions(doc, 
   ans
  # stop("XPath expressions cannot be applied to R-level nodes. Use xmlParse() to process the document and then use xpathApply()")
 }
-
+}
 
 # d = xmlTreeParse("data/book.xml", useInternal = TRUE)
 # ch = getNodeSet(d, "//chapter")
