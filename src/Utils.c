@@ -398,7 +398,7 @@ stop(const char *className, const char *msg, ...)
     PROTECT(e = allocVector(LANGSXP, 2));
     PROTECT(ns_name = mkString("XML"));
     PROTECT(ns_env = R_FindNamespace(ns_name));
-    SETCAR(e, findVarInFrame(ns_env, Rf_install("xmlStop")));
+    SETCAR(e, Rf_eval(Rf_install("xmlStop"), ns_env));
     SETCAR(CDR(e), error);
     Rf_eval(e, R_GlobalEnv);
     UNPROTECT(4);

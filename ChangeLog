@@ -1,5 +1,9 @@
 ============ entries from Ivan Krylov ============
 
+Version 3.99-0.23
+	Fixed issues detected by 'rchk'
+	Replaced the use of non-API 'Rf_findVarInFrame' with 'eval'
+
 Version 3.99-0.22
 	Disabled DTD introspection API
 

@@ -564,7 +564,8 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
   UNPROTECT(2);
 
 
-  ans = RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs);
+  // rchk: assume that isBranchFunction() allocates
+  ans = PROTECT(RS_XML(callUserFunction)(HANDLER_FUN_NAME(rinfo, "startElement"), XMLCHAR_TO_CHAR(localname), rinfo, opArgs));
 
   /* If the handler function returned us a SAXBranchFunction function, then we need to build the node's sub-tree and 
      then invoke the function with that node as the main argument. (It may also get the context/parser.) */
@@ -575,7 +576,7 @@ RS_XML(xmlSAX2StartElementNs)(void * userData,
       R_processBranch(rinfo, -1, localname, prefix, URI, nb_namespaces, namespaces, nb_attributes, nb_defaulted, attributes, FALSE);
   }
 
-  UNPROTECT(1);
+  UNPROTECT(2);
 }
 
 

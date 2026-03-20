@@ -33,7 +33,7 @@ R_GET_EXTERNAL_REF(xmlSchemaElementPtr, R_libxmlSchemaElementGetRef)
 void *
 R_getExternalRef(SEXP obj, const char *className) 
 {
-   SEXP ref = GET_SLOT(obj, Rf_install("ref")); 
+   SEXP ref = PROTECT(GET_SLOT(obj, Rf_install("ref"))); 
    void *ans;
 
    if(TYPEOF(ref) != EXTPTRSXP) { 
@@ -50,6 +50,7 @@ R_getExternalRef(SEXP obj, const char *className)
        Rf_error("Got NULL value in reference for %s", className);
    }
 
+   UNPROTECT(1);
    return(ans); 
 } 
 
@@ -210,9 +211,10 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
 	xmlSchemaSetValidOptions(ctxt, INTEGER(r_options)[0]);
 
     numErrHandlers = Rf_length(r_errorHandlers);
+    int nprot = 0;
     if(numErrHandlers > 0) {
 	R_SchemaValidCallback cbinfo;
-	PROTECT(cbinfo.fun = allocVector(LANGSXP, 2));
+	PROTECT(cbinfo.fun = allocVector(LANGSXP, 2)); ++nprot;
 	SETCAR(cbinfo.fun, VECTOR_ELT(r_errorHandlers, 0));
 	xmlSchemaSetValidErrors(ctxt, (xmlSchemaValidityErrorFunc) R_schemaValidityErrorFunc, 
                                       (xmlSchemaValidityWarningFunc) R_schemaValidityWarningFunc, &cbinfo);
@@ -220,7 +222,7 @@ RS_XML_xmlSchemaValidateDoc(SEXP r_schema, SEXP r_doc, SEXP r_options, SEXP r_er
 
     status = xmlSchemaValidateDoc(ctxt, doc);
     xmlSchemaFreeValidCtxt(ctxt); /* R_alloc this if possible. */
-    if(numErrHandlers > 0) UNPROTECT(1);
+    UNPROTECT(nprot);
 
     return(ScalarInteger(status));
 }
