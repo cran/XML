@@ -42,8 +42,7 @@ was activatd for that feature, or \code{NA} if that feature is not
 part of the particular version of libcurl.
 }
 
-\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org}}
 \author{ Duncan Temple Lang }
 
 %\seealso{}

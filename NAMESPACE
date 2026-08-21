@@ -11,11 +11,6 @@ export(
  Doctype,
  asXMLNode,
  comment.SAX,
- dtdElement,
- dtdElementValidEntry,
- dtdEntity,
- dtdIsAttribute,
- dtdValidElement,
  endElement.SAX,
  entityDeclaration.SAX,
  genericSAXHandlers,
@@ -34,7 +29,6 @@ export(
  newXMLCommentNode,
  newXMLCDataNode,
  newXMLDTDNode,
- parseDTD,
  processingInstruction.SAX,
  saveXML,
  startElement.SAX,
@@ -49,8 +43,6 @@ export(
  xmlCDataNode,
  xmlChildren,
  xmlCommentNode,
- xmlContainsElement,
- xmlContainsEntity,
  xmlDOMApply,
  xmlElementsByTagName,
  xmlEventHandler,
@@ -328,12 +320,6 @@ exportMethods(saveXML)
 # S3method(saveXML, XMLNode)
 # S3method(saveXML, XMLFlatTree)
 
-S3method(dtdElementValidEntry, XMLElementDef)
-S3method(dtdElementValidEntry, XMLOrContent)
-S3method(dtdElementValidEntry, XMLElementContent)
-S3method(dtdElementValidEntry, character)
-S3method(dtdElementValidEntry, XMLSequenceContent)
-
 export(docName)
 if(FALSE) {
 S3method(docName, XMLDocument)
@@ -516,3 +502,15 @@ export(xmlCleanNamespaces)
 export(replaceNodeWithChildren)
 
 S3method(toString, XMLNode)
+
+# defunct
+export(
+ dtdElement,
+ dtdElementValidEntry,
+ dtdEntity,
+ dtdIsAttribute,
+ dtdValidElement,
+ parseDTD,
+ xmlContainsElement,
+ xmlContainsEntity
+)

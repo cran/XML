@@ -83,8 +83,7 @@ The following are specific to \code{xmlOutputDOM}:
   \item{current}{obtain the path or collection of indices to 
    to the currently active/open node from the root node.}
 }
-\references{\url{https://www.omegahat.net/RSXML/},
-\url{https://www.w3.org/XML/}}
+\references{\url{https://www.w3.org/XML/}}
 \author{Duncan Temple Lang}
 
 \seealso{

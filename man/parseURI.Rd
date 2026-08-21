@@ -24,7 +24,7 @@ parseURI(uri)
   A list with 8 elements
   \item{scheme}{the name of the protocol being used, http, ftp as a string.}
   \item{authority}{a string represeting a rarely used aspect of URIs}
-  \item{server}{a string identifying the host, e.g. www.omegahat.net}
+  \item{server}{a string identifying the host, e.g. r-project.org}
   \item{user}{a string giving the name of the user, e.g. in FTP
   "ftp://duncan@www.omegahat.net", this would yield "duncan"}
   \item{path}{a string identifying the path of the target file}

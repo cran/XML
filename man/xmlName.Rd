@@ -16,20 +16,21 @@ and the value can have an XML name space prefix, e.g.
 }
 \usage{
 xmlName(node, full = FALSE)
+xmlName(x) <- value
 }
 \arguments{
-  \item{node}{The XMLNode object whose tag name is being requested.}
+  \item{node, x}{The XMLNode object whose tag name is being requested.}
   \item{full}{a logical value indicating whether to prepend the
     namespace prefix, if there is one, or return just the
     name of the XML element/node. \code{TRUE} means prepend the prefix.}
+  \item{value}{New tag name for \code{x}.}
 }
 
 \value{
  A character vector of length 1
  which is the \code{node$name} entry.
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 
 

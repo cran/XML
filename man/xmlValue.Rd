@@ -44,8 +44,7 @@ xmlValue(x, ignoreComments = FALSE, recursive = TRUE,
  \code{value} slot of the \code{XMLNode} object.
  This is typically a string.
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 
 \seealso{

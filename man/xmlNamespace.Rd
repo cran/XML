@@ -41,8 +41,7 @@ namespace.}
 \item{uri}{the URI or location that defines this namespace.}
 \item{local}{? (can't remember off-hand).}
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 
 \seealso{

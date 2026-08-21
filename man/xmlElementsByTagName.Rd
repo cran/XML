@@ -57,8 +57,7 @@ xmlElementsByTagName(el, name, recursive = FALSE)
  A list containing those child nodes of \code{el} whose
  tag name matches that specified by the user.
 }
-\references{\url{https://www.w3.org/XML/}, \url{https://www.omegahat.net/RSXML/},
-}
+\references{\url{https://www.w3.org/XML/}}
 \author{Duncan Temple Lang}
 \seealso{
 \code{\link{xmlChildren}}

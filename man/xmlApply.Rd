@@ -40,8 +40,7 @@ on \code{xmlChildren(x)}.
 
 \references{
   \url{https://www.w3.org/XML/},
-  \url{http://www.jclark.com/xml/},
-  \url{https://www.omegahat.net}
+  \url{http://www.jclark.com/xml/}
 }
 
 \author{Duncan Temple Lang}

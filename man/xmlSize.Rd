@@ -12,6 +12,7 @@ It applies to an object of class XMLNode or XMLDocument.
 }
 \usage{
 xmlSize(obj)
+\method{xmlSize}{default}(obj)
 }
 \arguments{
   \item{obj}{ An an object of class XMLNode
@@ -21,8 +22,7 @@ or XMLDocument.}
  an integer which is the \code{\link{length}}
  of the value from \code{\link{xmlChildren}}.
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 
 \seealso{

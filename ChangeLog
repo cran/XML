@@ -1,5 +1,10 @@
 ============ entries from Ivan Krylov ============
 
+Version 3.99-0.24
+	Fixed obsolete attribute names in structure() calls
+	Removed links that started failing URL checks
+	The DTD introspection interface is now defunct
+
 Version 3.99-0.23
 	Fixed issues detected by 'rchk'
 	Replaced the use of non-API 'Rf_findVarInFrame' with 'eval'

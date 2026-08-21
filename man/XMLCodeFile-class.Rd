@@ -24,6 +24,16 @@
  while an \code{XMLCodeFile} object re-reads the file each time and so reflects
  any "asynchronous" changes.
 }
+\usage{
+ xmlCodeFile(f, parse = FALSE)
+}
+\arguments{
+  \item{f}{Path to the XML file.}
+  \item{parse}{
+    Whether to construct an \code{XMLCodeDoc} object containing the contents of
+    \code{f} instead of an \code{XMLCodeFile} containing its name.
+  }
+}
 \section{Objects from the Class}{
   One can create these objects using coercion methods, e.g
  \code{as("file/name", "XMLCodeFile")}

@@ -50,7 +50,7 @@ Duncan Temple Lang
 \seealso{
   \code{\link{getXIncludes}}
 }
-\examples{\donttest{ # site is flaky
+\examples{\dontrun{ # domain lost
   try(getHTMLLinks("https://www.omegahat.net"))
 
   try(getHTMLLinks("https://www.omegahat.net/RSXML"))

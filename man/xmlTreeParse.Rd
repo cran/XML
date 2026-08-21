@@ -81,6 +81,15 @@ htmlParse(file, ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE,
                 options = integer(), parentFirst = FALSE) 
 
 xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
+
+xmlParse(file, ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE,
+         asText = FALSE, trim = TRUE, validate = FALSE, getDTD = TRUE,
+         isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
+         useInternalNodes = TRUE, isSchema = FALSE, fullNamespaceInfo = FALSE,
+         encoding = character(),
+         useDotNames = length(grep("^\\\\.",  names(handlers))) > 0,
+         xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
+         isHTML = FALSE, options = integer(), parentFirst = FALSE)
 }
 
 \arguments{

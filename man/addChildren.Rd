@@ -39,13 +39,13 @@ addAttributes(node, ..., .attrs = NULL,
                 append = TRUE)
 removeAttributes(node, ..., .attrs = NULL, .namespace = FALSE,
                   .all = (length(list(...)) + length(.attrs)) == 0)
-%xmlParent(node) = value
+xmlParent(x, \dots) <- value
 }
 \arguments{
-  \item{node}{the XML node whose state is to be modified,
+  \item{node, value}{the XML node whose state is to be modified,
       i.e. to which the child nodes are to be added or whose attribute list
       is to be changed.}
-    \item{\dots}{This is for use in interactive settings when specifying a collection of
+    \item{\dots, x}{This is for use in interactive settings when specifying a collection of
       values individuall. In programming contexts when one obtains the
       collection as a vector or list from another call, use the
       \code{kids} or \code{.attrs} parameter.

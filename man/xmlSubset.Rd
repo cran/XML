@@ -42,7 +42,7 @@ generic \code{link{[}} and \code{link{[[}} operators}
 children of the XML node given by \code{obj}
 and identified by \dots.
 }
-\references{\url{https://www.w3.org/XML/}, \url{https://www.omegahat.net/RSXML/}}
+\references{\url{https://www.w3.org/XML/}}
 \author{Duncan Temple Lang}
 
 

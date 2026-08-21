@@ -25,8 +25,7 @@ append.xmlNode(to, ...)
 \value{
  The original \code{to} node containing its new children nodes.
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 
 

@@ -226,12 +226,11 @@ These are of class \code{XMLInternalDocument}
 and \code{XMLInternalNode}, respectively
 }
 
-\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
-\url{https://www.omegahat.net}}
+\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org}}
 \author{ Duncan Temple Lang }
 
 \note{These functions are used to build up an internal XML tree.
-This can be used in the Sxslt package (\url{https://www.omegahat.net/Sxslt/})
+This can be used in the Sxslt package
 when creating content in R that is to be dynamically inserted into an XML
 document.}
 

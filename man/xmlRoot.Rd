@@ -35,8 +35,7 @@ xmlRoot(x, skip = TRUE, ...)
 \value{
  An object of class \code{XMLNode}.
 }
-\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.jclark.com/xml/}}
 \author{ Duncan Temple Lang }
 \note{One cannot obtain the parent or top-level node
   of an XMLNode object in S. This is different from 

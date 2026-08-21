@@ -10,7 +10,7 @@ but that uses the internal structures of
 libxml.
 This can be used to create a DOM that can be 
 constructed in R and exported to another system
-such as XSLT (\url{https://www.omegahat.net/Sxslt/})
+such as XSLT.
 }
 \usage{
 xmlTree(tag, attrs = NULL, dtd=NULL, namespaces=list(),
@@ -79,8 +79,7 @@ contents of the tree.}
 }
 
 
-\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org},
-\url{https://www.omegahat.net}  }
+\references{\url{https://www.w3.org/XML/}, \url{http://www.xmlsoft.org}}
 \author{ Duncan Temple Lang }
 
 \note{This is an early version of this function and I need to iron out some

@@ -13,7 +13,6 @@ via the assignment operator, such as
 }
 \usage{
 \method{[}{XMLNode}(x, i) <- value
-\method{[}{XMLNode}(x, i) <-  value
 \method{[[}{XMLNode}(x, i) <- value
 }
 \arguments{
@@ -28,7 +27,7 @@ via the assignment operator, such as
  The XML node \code{x} containing the new or modified
 nodes.
 }
-\references{\url{https://www.w3.org}, \url{https://www.omegahat.net/RSXML/}}
+\references{\url{https://www.w3.org}}
 \author{Duncan Templle Lang}
 
 

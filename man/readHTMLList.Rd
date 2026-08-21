@@ -44,7 +44,7 @@ Duncan Temple Lang
 \seealso{
 \code{\link{readHTMLTable}}
 }
-\examples{\donttest{
+\examples{\dontrun{
   try(readHTMLList("https://www.omegahat.net"))
 }}
 \keyword{IO}

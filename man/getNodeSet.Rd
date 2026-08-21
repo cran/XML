@@ -213,9 +213,8 @@ So we would use
 }
 
 \references{\url{http://xmlsoft.org}, 
-  \url{https://www.w3.org/XML/}
+  \url{https://www.w3.org/XML/},
   \url{https://www.w3.org/TR/xpath/}
-  \url{https://www.omegahat.net/RSXML/}
 }
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
