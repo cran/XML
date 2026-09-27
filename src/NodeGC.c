@@ -307,6 +307,9 @@ internal_decrementNodeRefCount(xmlNodePtr node)
 	if(node->doc && !IS_NOT_OUR_DOC_TO_TOUCH(node->doc)) {
 	    val = (int *) node->doc->_private;
 	    if(val) (*val)--;
+#ifdef R_XML_DEBUG
+	    REprintf(" parent doc %p count now %d\n", node->doc, val ? *val : -1);
+#endif
 	    if(!val || *val == 0) {
 		/* Consolidate with R_xmlFreeDoc */
 #ifdef R_XML_DEBUG

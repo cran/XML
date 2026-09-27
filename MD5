@@ -1,5 +1,5 @@
-1c76ff8e29043b3af9fc6605448b74f7 *ChangeLog
-ed32c8ae83207a9e029664d2acf71783 *DESCRIPTION
+976575eb2f1f78b9e7e6424a0af79ab0 *ChangeLog
+d349fb2703b4cd4db9630e2c70310aed *DESCRIPTION
 c5de6254757fe4c650a72a9c5e796cb6 *LICENSE
 d229c7bee3d32b320433f95fab757df2 *NAMESPACE
 b29605c39dd87687b2928668b9b52c6d *R/AAA.R
@@ -370,7 +370,7 @@ ba74a8dd3f8aa88750de6caf5820c052 *src/HTMLParse.c
 f8e657440de4c71940b40c6952e9d9d3 *src/Makevars.in
 467719c974b932b2ac77b0ef23288343 *src/Makevars.ucrt
 217afdc4385bc2657eb8ee19978d00e5 *src/Makevars.win
-4df946341180f6e453b0a9f7e6e19ba5 *src/NodeGC.c
+28d260f5fe480e51b75b4d7b48836b24 *src/NodeGC.c
 bba8153b861732e55247d7caf8d44817 *src/NodeGC.h
 956d2b8925bf7a209732e71104657f58 *src/RSCommon.h
 c8ef975634bb5874143107dfe9e1546a *src/RS_XML.h
@@ -380,11 +380,12 @@ f611828e0fc544216a07495e65660a1c *src/RUtils.c
 adf73ff885009e09e6764a59ea34700f *src/Utils.h
 13037818121d986c1469cb62163a3d37 *src/XMLEventParse.c
 06d148d209a76bd776779709f29f2193 *src/XMLHashTree.c
-1c0bf039437c884f64f130087946be22 *src/XMLTree.c
+b05d8907b017191a3dbf0db952c13ec3 *src/XMLTree.c
 06dff24eae84b53211ddb5d1ad52dfcb *src/fixNS.c
 34157f4ab7a2c930e4d3ea68d14e2a7f *src/libxmlFeatures.c
 16b328920f90981a1abae42e70f44ef2 *src/schema.c
 f9f4a35d94a429e6924e0d3260ba34bb *src/xmlsecurity.c
 5ff6882475929a186aadd9b71947eca1 *src/xpath.c
+b68bf66e8922870db38dfa6b9da4710f *tests/bugs.R
 d57cba02759463551e2a35af6d44a756 *tests/reg-tests.R
 7df2e149e2477d6b0afd53a980e4c28b *tests/reg-tests.Rout.save

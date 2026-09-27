@@ -1,5 +1,5 @@
 Package: XML
-Version: 3.99-0.24
+Version: 3.99-0.25
 Authors@R: c(person("CRAN Team", role = "ctb",
                     email = "CRAN@r-project.org",
                     comment = "de facto maintainer in 2013-2026"),
@@ -34,7 +34,7 @@ Collate: AAA.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R
         htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R
         simplifyPath.R defunct.R
 NeedsCompilation: yes
-Packaged: 2026-08-21 14:45:01 UTC; aitap
+Packaged: 2026-09-27 13:36:27 UTC; aitap
 Author: CRAN Team [ctb] (de facto maintainer in 2013-2026),
   Duncan Temple Lang [aut] (ORCID:
     <https://orcid.org/0000-0003-0159-1546>),
@@ -42,4 +42,4 @@ Author: CRAN Team [ctb] (de facto maintainer in 2013-2026),
   Ivan Krylov [cre]
 Maintainer: Ivan Krylov <ikrylov@disroot.org>
 Repository: CRAN
-Date/Publication: 2026-08-21 22:00:58 UTC
+Date/Publication: 2026-09-27 23:40:02 UTC

@@ -641,7 +641,51 @@ RS_XML_replaceXMLNode(USER_OBJECT_ r_old, USER_OBJECT_ r_new, USER_OBJECT_ manag
 	Rf_error("NULL value for XML node to replace");
     }
 
+    xmlDocPtr prevNewDoc = New->doc;
     ans = xmlReplaceNode(Old, New);
+    // Old retains its ->doc (but not the place in the tree), and New is
+    // now connected to the same ->doc as well. If New is actively
+    // reference-counted, reference counts on both its current document
+    // and its previous document need to be adjusted.
+    if (!IS_NOT_OUR_NODE_TO_TOUCH(New) && New->doc != prevNewDoc) {
+	incrementDocRef(New->doc);
+	if (New->type == XML_ELEMENT_NODE) {
+#ifdef R_XML_DEBUG
+	    REprintf("xmlReconciliateNs(New->doc(%p), New(%p))\n", New->doc, New);
+#endif
+	    if (xmlReconciliateNs(New->doc, New) != 0)
+		Rf_error("Failed to xmlReconciliateNs() after replacing node");
+	}
+	if (prevNewDoc && !IS_NOT_OUR_DOC_TO_TOUCH(prevNewDoc)
+#if LIBXML_VERSION < 21000
+	    // Until v2.10.0, xmlReplaceNode -> xmlSetTreeDoc did not fix up the
+	    // dictionary, retaining references to the old document's interned
+	    // strings in the new document. Decrement the reference count and
+	    // free if either libxml2 is sufficiently new, or the document
+	    // doesn't have a dictionary.
+	    && !prevNewDoc->dict
+#endif
+	) {
+	    int *refcnt = prevNewDoc->_private;
+	    --*refcnt;
+	    if (!*refcnt) {
+		free(refcnt);
+		prevNewDoc->_private = NULL;
+		xmlFreeDoc(prevNewDoc);
+		prevNewDoc = NULL;
+		R_numXMLDocsFreed++;
+	    }
+	}
+#ifdef R_XML_DEBUG
+	REprintf(
+	   "after ReplaceNode(old=%p[ref=%d], new=%p[ref=%d]): prev{new->doc}(%p)->ref=%d, new->doc(%p)->ref=%d\n",
+	    Old, Old->_private ? *(int*)Old->_private : -1,
+	    New, New->_private ? *(int*)New->_private : -1,
+	    prevNewDoc, (prevNewDoc && prevNewDoc->_private) ? *(int*)prevNewDoc->_private : -1,
+	    New->doc, (New->doc && New->doc->_private) ? *(int*)New->doc->_private : -1
+	);
+#endif
+    }
     return(R_createXMLNodeRef(ans, manageMemory));  
 }
 
@@ -1437,6 +1481,7 @@ RS_XML_printXMLNode(USER_OBJECT_ r_node, USER_OBJECT_ level, USER_OBJECT_ format
       ans = NEW_CHARACTER(1);
 
     xmlOutputBufferClose(buf);
+    xmlBufferFree(xbuf);
 
     return(ans);
 }
